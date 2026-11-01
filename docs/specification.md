@@ -137,14 +137,18 @@ the editor has no layouts of its own ([decision 21](#decisions)).
 ### R-GEN-011
 
 **Available libraries first.** The editor uses existing open-source
-libraries wherever one fits, and respects their licenses: only licenses that
-allow the use in an MIT package (MIT, ISC, BSD, Apache-2.0), and their
-notices go with every bundle ([decision 15](#decisions)). Own code stays for
-what no library does. The libraries:
+libraries wherever one fits, and respects their licenses
+([decision 15](#decisions)). The license of each library is decided one by
+one, and the license of the editor itself, MIT today, can change when a
+library needs it ([decision 23](#decisions)). The file
+`licenses.json` lists each package of the bundle with the license that was
+decided for it; CI fails for a package or a license that the file does not
+list. The notices go with every bundle. Own code stays for what no library
+does. The libraries:
 
 | Library | License | Use |
 | --- | --- | --- |
-| Tiptap 3 (`@tiptap/core`, `@tiptap/pm`, `@tiptap/starter-kit`, `@tiptap/extension-table`, `@tiptap/extension-list`) | MIT | The editor on ProseMirror, its extensions, and the extension API for the plugins |
+| Tiptap 3 (`@tiptap/core`, `@tiptap/pm`, `@tiptap/starter-kit` and the `@tiptap/extension-*` packages of the nodes and marks) | MIT | The editor on ProseMirror, its extensions, and the extension API for the plugins |
 | ProseMirror (through `@tiptap/pm`) | MIT | The engine ([R-GEN-009](#r-gen-009)) |
 | markdown-it, `markdown-it-footnote`, `markdown-it-task-lists` | MIT, MIT, ISC | Parsing the Markdown text, as Notes and Paper do |
 | `prosemirror-markdown` | MIT | The bridge from the tokens of markdown-it to the document, and the Markdown of a changed block |
@@ -300,6 +304,9 @@ has a schema of the front matter of its documents
     render and view the Markdown with its layout ([R-GEN-010](#r-gen-010)).
 22. **The format bar on selected text:** the buttons of the format bar of
     the Claude document editor ([R-GEN-003](#r-gen-003)).
+23. **Licenses per library:** the license of each library is decided one
+    by one; the license of the editor can change when a library needs it
+    ([R-GEN-011](#r-gen-011)).
 
 ## Open questions
 
