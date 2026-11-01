@@ -61,6 +61,11 @@ editor of Claude Desktop and of Claude on the web
   rows and columns, sets the width of a column, deletes the table, sorts a
   column, aligns a column, colors cells, switches the header row and inserts
   items;
+- a format bar over selected text with the buttons comment, reaction, text
+  style, bold, italic, underline, strikethrough, code, color, list and link;
+  a button whose function comes from an extension, such as the comment of
+  Notes, shows only when that extension is active
+  ([decision 22](#decisions));
 - these functions come from the code of this repository; no code and no
   design file of the Claude interface is copied.
 
@@ -293,6 +298,8 @@ has a schema of the front matter of its documents
     the rendered text ([R-GEN-013](#r-gen-013)).
 21. **The layout comes from Paper:** Markdown Paper brings the function to
     render and view the Markdown with its layout ([R-GEN-010](#r-gen-010)).
+22. **The format bar on selected text:** the buttons of the format bar of
+    the Claude document editor ([R-GEN-003](#r-gen-003)).
 
 ## Open questions
 
@@ -314,6 +321,8 @@ has a schema of the front matter of its documents
     or for each user), and whether the AI writes it without asking.
 11. Whether the mode to learn Markdown shows all marks or only the marks at
     the cursor, and whether the user can edit the marks.
+12. How the file writes underlined and colored text, which Markdown does not
+    have.
 
 ---
 
