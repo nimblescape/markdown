@@ -13,6 +13,8 @@ specification: what the libraries must, should and may do, each requirement
 with an ID, the open questions and the plan of the steps. A requirement is
 the clean summary of a decision, without the texts of the discussion. A
 change of a feature updates its requirement in the same pull request.
+[docs/evaluation.md](docs/evaluation.md) specifies the evaluation plugin of
+the history in the same form.
 
 ## Files
 

@@ -46,15 +46,13 @@ Code.
 | Editor | A part that shows the text in a form that the user changes |
 | Renderer | A part that turns the text into content without edit functions |
 | Layout | A part that puts rendered content into a layout: styles, templates, pages, PDF |
-| History | A part that records every action on a text, saves it, replays it and evaluates it |
+| History | A part that records every action on a text, saves it and replays it |
 | Backend | A plugin of the history that stores the steps of a history and reads them back |
 | Platform adapter | The code that connects the libraries to one platform, for example VS Code |
 | Plugin | An object that adds functions to one part |
 | Format extension | The plugins of one file format for all parts, for example Markdown Notes |
 | Step | One recorded action of the history |
 | Origin | Who made a change: the user, the AI, or another program |
-| Intellectual origin | Work that creates content of its own: ideas, claims and their phrasing, structure, design, new code |
-| Mechanics | Work that applies given rules or finds given things: formatting, search, literature research |
 
 ## 3. Architecture
 
@@ -64,8 +62,46 @@ Code.
 | Editor | Shows the text in a form that the user edits, and turns each edit into a change of the text. |
 | Renderer | Turns the text into content without edit functions: HTML, with a view for each kind of token. |
 | Layout | Puts the content of the renderer into a layout: styles, title page and templates, numbers, generated lists, pages, PDF. |
-| History | Records every action with its origin, saves it through a pluggable backend, replays it, back and forward, and evaluates it. |
+| History | Records every action with its origin, saves it through a pluggable backend, and replays it, back and forward. Its plugins evaluate it. |
 | Platform | Connects the libraries to one platform, and decides how each function is shown and used there. |
+
+Every edit, in any editor and by the AI, becomes a change of the text in the
+source, which sends it to the renderer and to the history. In VS Code,
+Markdown Notes and Markdown Paper build on the history extension
+([R-VSC-004](#r-vsc-004)), which records every change in the workspace.
+
+```mermaid
+flowchart TB
+  subgraph vscode["VS Code"]
+    notes["Markdown Notes<br/>notes, threads, AI chats"]
+    paper["Markdown Paper<br/>layouts, citations, PDF"]
+    historyExtension["History extension<br/>records every change in the workspace,<br/>the base of all editing in VS Code"]
+    notes -- builds on --> historyExtension
+    paper -- builds on --> historyExtension
+  end
+  web["Web page<br/>editor, views in a page"]
+  cli["Command line<br/>mp build: PDF, no view"]
+  subgraph libraries["Libraries: the same on every platform; each part takes plugins"]
+    source["Source<br/>the text: the only truth"]
+    editor["Editor<br/>rendered Markdown, text, code, form"]
+    renderer["Renderer<br/>markdown-it, a view per token"]
+    layout["Layout<br/>styles, pages, numbers, lists, PDF"]
+    history["History<br/>every action, replay, pluggable backends"]
+    plugins["Plugins of Notes and Paper<br/>in every part: format, views, commands, schema"]
+    evaluation["Evaluation plugin<br/>classes, views, feedback, API"]
+    editor <-->|edits and changes| source
+    source -- every change --> renderer
+    source -- every change --> history
+    renderer --> layout
+    plugins -. plug in .-> editor
+    plugins -. plug in .-> renderer
+    plugins -. plug in .-> layout
+    evaluation -- reads --> history
+  end
+  vscode -- adapter --> libraries
+  web -- adapter --> libraries
+  cli -- adapter --> libraries
+```
 
 ### R-GEN-015
 
@@ -100,9 +136,10 @@ renderer and the layout run without the editor.
 (source), `@nimblescape/editor` (the editor API and the rendered Markdown
 editor), `@nimblescape/render` (renderer), `@nimblescape/layout` (layout,
 pages, PDF), `@nimblescape/history` (history), and one package for each
-platform, `@nimblescape/vscode` and `@nimblescape/web`. Until the API
-between the parts reaches version 1, they live in one repository as npm
-workspaces.
+platform, `@nimblescape/vscode` and `@nimblescape/web`; the evaluation
+plugin is `@nimblescape/evaluation`
+([R-EVAL-017](evaluation.md#r-eval-017)). Until the API between the parts
+reaches version 1, they live in one repository as npm workspaces.
 
 ## 4. Source
 
@@ -414,6 +451,8 @@ source. The history must stay after the file is closed.
 - a question to the AI: the prompt, the selection and the context that the
   AI got, the provider and the model;
 - an answer of the AI: its text and the changes that it proposes;
+- a change of the workspace: a file created, deleted or renamed, a setting,
+  or a command in the terminal;
 - the decision of the user on a proposed change: accepted or rejected.
 
 Each step must record its time, its author and its origin: user, AI or other
@@ -457,9 +496,9 @@ again. "Run again" sends a recorded question to the AI as a new question.
 
 **The prompt protocol of Paper.** Markdown Paper uses the history for the
 prompt protocol of a paper; `mp build` may add the history, or a list of the
-questions to the AI, with the cognitive evaluation
-([R-HIST-007](#r-hist-007) to [R-HIST-009](#r-hist-009)), as an appendix of
-the PDF.
+questions to the AI, with the evaluation and the declaration of the use of
+AI of the evaluation plugin ([R-EVAL-009](evaluation.md#r-eval-009)), as an
+appendix of the PDF.
 
 ### R-HIST-006
 
@@ -472,48 +511,21 @@ as a branch.
 
 ### R-HIST-007
 
-**Cognitive evaluation.** The history must give a cognitive evaluation of
-the protocol: each step that creates or changes content is classified as
-intellectual origin or as mechanics, by the work that it does.
-
-- *Intellectual origin:* work that creates content of its own, for example
-  an idea, a claim and the phrasing of specific claims, the structure of an
-  argument, a design, or new code such as a new function that implements the
-  quick sort algorithm.
-- *Mechanics:* work that applies given rules or finds given things, without
-  content of its own, for example the reference list rewritten in APA 7,
-  code formatted, a paper found that supports a given statement, or a
-  literature research about "Industrialisierung von Dienstleistungen".
-
-A question to the AI is classified by the work that it asks for; its answer
-and the changes that the user accepts carry this class with the origin AI.
-Each classification must record its reason, so that a reader can check it.
+**Plugins of the history.** Plugins of the history read the steps through
+the API of the history and may add data of their own to a step, for example
+a class and its reason. The evaluation plugin is such a plugin: it
+classifies each step as intellectual origin or as mechanics, shows the
+result in views, and gives feedback on work and learning, also for student
+assignments and for source code. Its specification is
+[docs/evaluation.md](evaluation.md).
 
 ### R-HIST-008
 
-**Class and origin.** The evaluation must combine the class with the origin
-([R-HIST-001](#r-hist-001)): for the user and for the AI, it shows the steps
-and the share of the text of each class, for the whole document and for
-each section. A view mode must mark the text by its origin and its class.
-
-### R-HIST-009
-
-**The classifier.** The classifier is a plugin of the history and may use an
-AI through the provider API ([R-AI-002](#r-ai-002)). *(proposal)* Its rules
-are a file with a description and examples of each class: the library
-brings default rules with the examples of [R-HIST-007](#r-hist-007), and a
-layout of Paper may bring the rules of its institution, for example the
-rules of PHT for the use of AI. The classifier classifies each step when the
-history records it. A step that holds both classes is split into its parts.
-The user may correct a classification with a reason; the correction is a
-step of its own, and the protocol shows the classification and the
-correction. The rules code each step with three codes: the cognitive
-process (the revised taxonomy of Bloom, Krathwohl 2002), the stage of the
-work (the types of automation of Parasuraman, Sheridan and Wickens 2000)
-and, for an edit, the type of revision (a surface or a meaning change, after
-Faigley and Witte 1981); the two classes come from these codes. People
-check the classifier on a sample with Krippendorff's alpha, with 0.800 as
-the goal.
+**A history without the editor.** The history must have an API that reads
+the steps of a history, with their texts, changes, times and origins, on
+every platform, and the file form of a history must be readable without the
+editor, so that a plugin can evaluate a history on its own, for example the
+history that a student submits with an assignment.
 
 ## 9. Plugins and format extensions
 
@@ -668,9 +680,24 @@ network address of its own. It may require a newer VS Code version than
 
 #### R-VSC-004
 
-**The history in every text editor.** A VS Code extension of the history
-records the actions in every text editor of VS Code through the stable API,
-and shows the history for any file.
+**The history extension.** The history extension of VS Code is the base of
+all editing in VS Code: Markdown Notes and Markdown Paper build on it, as an
+extension dependency, and record their actions through it. It must record
+every change in the workspace through the stable API of VS Code, not only
+the edits of a file: the edits and selections in every text editor and
+notebook; files that are created, deleted or renamed, also by Git or by
+programs outside VS Code; the settings; and the commands in the terminal,
+where the shell integration of VS Code reports them. It shows the history
+for any file and for the whole workspace.
+
+An AI tool that reports its actions through hooks, for example Claude Code
+or the agent of GitHub Copilot, gives its prompts, answers and edits with
+the origin AI and the name of the tool. A change whose source VS Code does
+not report, for example an accepted inline completion of Copilot or a change
+by Git, gets the origin "other program", and the user may mark it as an
+edit of the AI. *(proposal)* The history marks a change of unknown source as
+"probably AI" when its form shows it, for example several lines inserted at
+once at the cursor, and the user confirms it.
 
 ### 11.3 Web
 
@@ -796,14 +823,8 @@ use:
 17. Licenses: `markdown-it-task-lists` (ISC), `entities` (BSD-2-Clause, used
     by markdown-it) and `argparse` (Python-2.0, only in the command line
     program of markdown-it, in no bundle).
-18. Cognitive evaluation: only the two classes, with a step that holds both
-    split into its parts ([R-HIST-009](#r-hist-009), proposal), or a third
-    class "mixed" or a scale? Does the classifier run when a step is
-    recorded (proposal) or only when the protocol is evaluated? Default
-    rules in the library (proposal) or always the rules of the institution
-    in the layout? May the user correct a classification (proposal: yes, as
-    a step of its own)? Is the coding scheme of three codes the right basis
-    of the rules ([R-HIST-009](#r-hist-009), proposal)?
+18. Evaluation plugin: its open questions are in
+    [docs/evaluation.md](evaluation.md#9-open-questions).
 
 ## Plan
 
@@ -822,8 +843,9 @@ use:
 | 11 | The release workflow of the npm packages, the same as for the other nimblescape npm packages | [R-GEN-007](#r-gen-007) | planned |
 
 The parts of [section 3](#3-architecture) that the plan does not name yet,
-the source, the renderer, the layout and the history with its backends, get
-their steps when the open questions 1 to 4 and 16 have answers.
+the source, the renderer, the layout, the history with its backends and its
+VS Code extension, and the evaluation plugin, get their steps when the open
+questions 1 to 4, 16 and 18 have answers.
 
 ---
 
