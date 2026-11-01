@@ -18,7 +18,7 @@ decided yet: no requirement depends on them.
 
 | Step | Content | Requirements | State |
 | --- | --- | --- | --- |
-| 1 | Setup of the repository: the npm package, an example page for the web, CI and release workflows without a publish, license notices | [R-GEN-007](#r-gen-007) | planned |
+| 1 | Setup of the repository: the npm package, an example page for the web, CI with a check of the licenses | [R-GEN-007](#r-gen-007), [R-GEN-011](#r-gen-011) | planned |
 | 2 | The core on ProseMirror: Markdown into the document of the editor and back, with tests of the round trip | [R-GEN-006](#r-gen-006), [R-GEN-009](#r-gen-009) | planned |
 | 3 | Rendered editing of CommonMark and GFM: toolbar, format bar, insert menu, slash menu, block handles, find and replace, read-only mode | [R-GEN-003](#r-gen-003), [R-GEN-008](#r-gen-008) | planned |
 | 4 | Tables: handles, markers for new rows and columns, the table menu | [R-GEN-003](#r-gen-003) | planned |
@@ -27,6 +27,8 @@ decided yet: no requirement depends on them.
 | 7 | The plugin API, version 1 | [R-GEN-005](#r-gen-005) | planned |
 | 8 | The plugin of nimblescape Markdown Notes, in its repository; the editor in the Notes side view | [R-GEN-002](#r-gen-002), [R-GEN-004](#r-gen-004), [R-GEN-005](#r-gen-005) | planned |
 | 9 | The plugin of nimblescape Markdown Paper, in its repository; the schema of each layout | [R-GEN-005](#r-gen-005), [R-FM-004](#r-fm-004) | planned |
+| 10 | The AI chat with the provider API and the Claude provider | [R-AI-001](#r-ai-001), [R-AI-002](#r-ai-002) | planned |
+| 11 | The release workflow of the npm package, the same as for the other nimblescape npm packages | [R-GEN-007](#r-gen-007) | planned |
 
 ## General
 
@@ -125,6 +127,35 @@ view without edit functions is the editor in its read-only mode
 from the same rendering code and the same views of the plugins
 ([decision 14](#decisions)).
 
+### R-GEN-011
+
+**Available libraries first.** The editor uses existing open-source
+libraries wherever one fits, and respects their licenses: only licenses that
+allow the use in an MIT package (MIT, ISC, BSD, Apache-2.0), and their
+notices go with every bundle ([decision 15](#decisions)). Own code stays for
+what no library does. The libraries:
+
+| Library | License | Use |
+| --- | --- | --- |
+| Tiptap 3 (`@tiptap/core`, `@tiptap/pm`, `@tiptap/starter-kit`, `@tiptap/extension-table`, `@tiptap/extension-list`) | MIT | The editor on ProseMirror, its extensions, and the extension API for the plugins |
+| ProseMirror (through `@tiptap/pm`) | MIT | The engine ([R-GEN-009](#r-gen-009)) |
+| markdown-it, `markdown-it-footnote`, `markdown-it-task-lists` | MIT, MIT, ISC | Parsing the Markdown text, as Notes and Paper do |
+| `prosemirror-markdown` | MIT | The bridge from the tokens of markdown-it to the document, and the Markdown of a changed block |
+| `string-width` | MIT | The width of the cells of a table |
+
+## AI chat
+
+### R-AI-001
+
+**AI chat in the editor.** The editor has an AI chat that works as Claude
+Code does: it knows the document and the selection, and it proposes changes
+that the user accepts or rejects ([decision 16](#decisions)).
+
+### R-AI-002
+
+**Pluggable AI.** A general provider API makes any AI pluggable. The first
+and for now only provider is the Claude API ([decision 16](#decisions)).
+
 ## Theme
 
 ### R-THEME-001
@@ -208,6 +239,10 @@ has a schema of the front matter of its documents
 14. **One rendering:** the renderer is the editor without its edit
     functions; view, pages and PDF share one rendering
     ([R-GEN-010](#r-gen-010)).
+15. **Available libraries first:** existing open-source libraries wherever
+    one fits, with respect for their licenses ([R-GEN-011](#r-gen-011)).
+16. **AI chat:** an AI chat as in Claude Code, with a provider API; Claude
+    first ([R-AI-001](#r-ai-001), [R-AI-002](#r-ai-002)).
 
 ## Open questions
 
@@ -224,6 +259,7 @@ has a schema of the front matter of its documents
 6. The fonts of the text in VS Code.
 7. The name of the npm package and the contribution point of the plugins.
 8. How the pages of a paper switch with the editing view.
+9. Where the AI chat shows, and how it shows the changes that it proposes.
 
 ---
 
