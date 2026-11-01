@@ -27,7 +27,7 @@ decided yet: no requirement depends on them.
 | 7 | The plugin API, version 1, with both levels of extensions | [R-GEN-005](#r-gen-005), [R-GEN-012](#r-gen-012) | planned |
 | 8 | The plugin of nimblescape Markdown Notes, in its repository; the editor in the Notes side view | [R-GEN-002](#r-gen-002), [R-GEN-004](#r-gen-004), [R-GEN-005](#r-gen-005) | planned |
 | 9 | The plugin of nimblescape Markdown Paper, in its repository; the schema of each layout | [R-GEN-005](#r-gen-005), [R-FM-004](#r-fm-004) | planned |
-| 10 | The provider API, the Claude provider and the proposed changes in the editor; in Notes, the AI chat as notes and the memory | [R-AI-001](#r-ai-001) to [R-AI-003](#r-ai-003) | planned |
+| 10 | The provider API, the Claude provider and the proposed changes in the editor; in Notes, the AI chat as notes and the memory; in Paper, the prompt protocol | [R-AI-001](#r-ai-001) to [R-AI-004](#r-ai-004) | planned |
 | 11 | The release workflow of the npm package, the same as for the other nimblescape npm packages | [R-GEN-007](#r-gen-007) | planned |
 
 ## General
@@ -208,6 +208,17 @@ example the memory ([R-AI-003](#r-ai-003)).
 **Memory.** The AI uses a memory, so that a decision in a chat has the
 context of the other decisions and chats ([decision 17](#decisions)).
 
+### R-AI-004
+
+**Prompt protocol.** nimblescape Markdown Paper records every prompt and
+its result, as a log of transactions in their order. The user can replay
+the log and go back in time through it, as with Time Machine, and see the
+document as it was at each prompt ([decision 25](#decisions)). The editor
+gives the general parts: an event for each prompt and its result through
+the provider API ([R-AI-002](#r-ai-002)), an event for each proposed change
+that the user accepts or rejects, and the read-only mode to show an earlier
+state of the document ([R-GEN-008](#r-gen-008)).
+
 ## Theme
 
 ### R-THEME-001
@@ -316,6 +327,9 @@ has a schema of the front matter of its documents
     ([R-GEN-004](#r-gen-004)).
 24. **Which files open in the editor:** a setting chooses which Markdown
     files open in the editor in VS Code ([R-GEN-004](#r-gen-004)).
+25. **Prompt protocol:** Markdown Paper records every prompt and its result
+    as a log of transactions that the user can replay and go back in time
+    through, as with Time Machine ([R-AI-004](#r-ai-004)).
 
 ## Open questions
 
@@ -340,6 +354,9 @@ has a schema of the front matter of its documents
     the cursor, and whether the user can edit the marks.
 12. How the file writes underlined and colored text, which Markdown does not
     have.
+13. Where and in which format Paper stores the prompt protocol, whether a
+    replay sends the prompts to the AI again or shows the recorded results,
+    and whether the edits of the user between two prompts are in the log.
 
 ---
 
