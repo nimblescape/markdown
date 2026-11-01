@@ -27,7 +27,7 @@ decided yet: no requirement depends on them.
 | 7 | The plugin API, version 1, with both levels of extensions; the icons of threads beside the text | [R-GEN-005](#r-gen-005), [R-GEN-012](#r-gen-012), [R-GEN-014](#r-gen-014) | planned |
 | 8 | The plugin of nimblescape Markdown Notes, in its repository; the editor in the Notes side view | [R-GEN-002](#r-gen-002), [R-GEN-004](#r-gen-004), [R-GEN-005](#r-gen-005) | planned |
 | 9 | The plugin of nimblescape Markdown Paper, in its repository; the schema of each layout | [R-GEN-005](#r-gen-005), [R-FM-004](#r-fm-004) | planned |
-| 10 | The provider API, the Claude provider and the proposed changes in the editor; in Notes, the AI chat as notes and the memory; in Paper, the prompt protocol | [R-AI-001](#r-ai-001) to [R-AI-004](#r-ai-004) | planned |
+| 10 | The provider API, the Claude provider and the proposed changes in the editor; in Notes, the AI chat as notes and the memory; the events for the action history, whose library is built in its own repository | [R-AI-001](#r-ai-001) to [R-AI-004](#r-ai-004) | planned |
 | 11 | The release workflow of the npm package, the same as for the other nimblescape npm packages | [R-GEN-007](#r-gen-007) | planned |
 
 ## General
@@ -222,20 +222,23 @@ context of the other decisions and chats ([decision 17](#decisions)).
 
 ### R-AI-004
 
-**Prompt protocol.** nimblescape Markdown Paper records every action of the
-work on a paper, in its order, as a saved undo and redo history: the edits
-of the user, the text that the user selects, each question to the AI with
-its selection, the answer of the AI, and each proposed change that the user
-accepts or rejects. Each step records whether it came from the user or from
-the AI, so that the history tells the edits of the author and the edits of
-the AI apart. The history stays after the file is closed; the user scrolls
-through it, back and forward, as with Time Machine, and sees at each step
-the document as it was and the action of that step, and can replay the
-steps ([decision 25](#decisions)). The editor gives the general parts: an
-event for each edit, selection, prompt and result, through the provider API
-([R-AI-002](#r-ai-002)) for the AI, an event for each proposed change that
-the user accepts or rejects, a way to set the text and the selection to a
-given state as one change that can be undone, and marks that show the
+**Action history.** A library of its own, apart from this editor, records
+every action on a text document, in its order, as a saved undo and redo
+history: the edits of the user, the text that the user selects, each
+question to the AI with its selection, the answer of the AI, and each
+proposed change that the user accepts or rejects. It works for every text
+document, for example a Markdown file or source code of any language. Each
+step records whether it came from the user or from the AI, so that the
+history tells the edits of the author and the edits of the AI apart. The
+history stays after the file is closed; the user scrolls through it, back
+and forward, as with Time Machine, and sees at each step the document as
+it was and the action of that step, and can replay the steps. Markdown
+Paper uses it for the prompt protocol of a paper
+([decision 25](#decisions)). This editor gives the history library the
+events of each edit, selection, prompt and result, through the provider
+API ([R-AI-002](#r-ai-002)) for the AI, the events of the proposed changes
+that the user accepts or rejects, a way to set the text and the selection
+to a given state as one change that can be undone, and marks that show the
 changes of a step and their origin.
 
 ## Theme
@@ -346,11 +349,13 @@ has a schema of the front matter of its documents
     ([R-GEN-004](#r-gen-004)).
 24. **Which files open in the editor:** a setting chooses which Markdown
     files open in the editor in VS Code ([R-GEN-004](#r-gen-004)).
-25. **Prompt protocol:** Markdown Paper records every action on a paper
-    (edits, selections, questions to the AI and its answers) as a saved
-    undo and redo history that the user scrolls through and replays, as
-    with Time Machine; the history tells the edits of the user and the
-    edits of the AI apart ([R-AI-004](#r-ai-004)).
+25. **Action history:** a library of its own records every action on a
+    text document (edits, selections, questions to the AI and its answers)
+    as a saved undo and redo history that the user scrolls through and
+    replays, as with Time Machine; it tells the edits of the user and the
+    edits of the AI apart, and works for every text document, also source
+    code. Markdown Paper uses it for the prompt protocol
+    ([R-AI-004](#r-ai-004)).
 26. **Threads beside the text:** the editor can show icons beside the text
     that open the threads of notes and AI chats; the integrating code
     decides whether it uses them or a view of its own, for example the side
@@ -379,10 +384,10 @@ has a schema of the front matter of its documents
     the cursor, and whether the user can edit the marks.
 12. How the file writes underlined and colored text, which Markdown does not
     have.
-13. Where and in which format Paper stores the prompt protocol, what happens
-    to the later steps when the user goes back and changes the text, and
-    whether a replay sends the prompts to the AI again or shows the recorded
-    results.
+13. The repository and the name of the library of the action history,
+    where it stores the history, what happens to the later steps when the
+    user goes back and changes the text, and whether a replay sends the
+    prompts to the AI again or shows the recorded results.
 
 ---
 
