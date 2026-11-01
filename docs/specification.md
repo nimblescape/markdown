@@ -514,10 +514,10 @@ as a branch.
 **Plugins of the history.** Plugins of the history read the steps through
 the API of the history and may add data of their own to a step, for example
 a class and its reason. The evaluation plugin is such a plugin: it
-classifies each step as intellectual origin or as mechanics, shows the
-result in views, and gives feedback on work and learning, also for student
-assignments and for source code. Its specification is
-[docs/evaluation.md](evaluation.md).
+classifies each step as original work or as routine work, gives each part of
+a step a role (direct, produce or judge), shows the result in views, and
+gives feedback on work and learning, also for student assignments and for
+source code. Its specification is [docs/evaluation.md](evaluation.md).
 
 ### R-HIST-008
 

@@ -9,12 +9,13 @@ Licensed under the MIT License. See LICENSE in the repository root for details.
 This specification defines the evaluation plugin of nimblescape Markdown.
 The plugin evaluates the history of a text document
 ([specification](specification.md#8-history), section 8): it classifies each
-step as intellectual origin or as mechanics, shows the result in views, and
-gives feedback on work and learning. It is normative in the same way as the
-[specification](specification.md): "must" marks a requirement, "should" a
-recommendation, and "may" an option; a requirement marked *(proposal)* is
-not decided yet, and [section 9](#9-open-questions) lists these open
-questions. Each requirement has an ID as its heading.
+step as original work or as routine work, gives each part of a step a role,
+shows the result in views, and gives feedback on work and learning. It is
+normative in the same way as the [specification](specification.md): "must"
+marks a requirement, "should" a recommendation, and "may" an option; a
+requirement marked *(proposal)* is not decided yet, and
+[section 9](#9-open-questions) lists these open questions. Each requirement
+has an ID as its heading.
 
 ## 1. Scope
 
@@ -37,10 +38,11 @@ in VS Code, on a web page, on the command line and on a server.
 | Term | Meaning |
 | --- | --- |
 | Episode | A question to the AI, its answer, the decision of the user, and the edits that follow on the same text; or a group of edits without the AI, by the undo groups of the editor |
-| Intellectual origin | Work that creates content of its own: ideas, claims and their phrasing, structure, design, new code |
-| Mechanics | Work that applies given rules or finds given things: formatting, search, literature research |
+| Original work | Work that creates content that did not exist in this form: ideas, claims and their phrasing, structure, design, new code |
+| Routine work | Work that applies a given rule or finds a given thing: formatting, search, literature research |
+| Role | What a party does in a part of an episode: direct, produce or judge ([R-EVAL-018](#r-eval-018)) |
+| Intellectual work | Original work and the roles direct and judge: the thinking that the evaluation counts for a party |
 | Code | A value of a coding scheme that the classifier gives an episode, with its reason |
-| Role | What a party does in a part of an episode: direct, produce or judge ([R-EVAL-018](#r-eval-018), proposal) |
 | Indicator | A number of the evaluation that describes the process of work and learning |
 | Assignment | A document or a set of source files with its history, which a student submits |
 
@@ -49,22 +51,27 @@ in VS Code, on a web page, on the command line and on a server.
 ### R-EVAL-002
 
 **Two classes.** The plugin must classify each episode that creates or
-changes content as intellectual origin or as mechanics, by the work that it
+changes content as original work or as routine work, by the work that it
 does:
 
-- *Intellectual origin:* work that creates content of its own, for example
-  an idea, a claim and the phrasing of specific claims, the structure of an
-  argument, a design, or new code such as a new function that implements the
-  quick sort algorithm, or the design of a module.
-- *Mechanics:* work that applies given rules or finds given things, without
-  content of its own, for example the reference list rewritten in APA 7,
-  code formatted, a rename by a refactoring tool, a paper found that
+- *Original work:* work that creates content that did not exist in this
+  form, for example an idea, a claim and the phrasing of specific claims,
+  the structure of an argument, a design, or new code such as a new
+  function that implements the quick sort algorithm, or the design of a
+  module.
+- *Routine work:* work that applies a given rule or finds a given thing,
+  without content of its own, for example the reference list rewritten in
+  APA 7, code formatted, a rename by a refactoring tool, a paper found that
   supports a given statement, or a literature research about
   "Industrialisierung von Dienstleistungen".
 
-A question to the AI is classified by the work that it asks for; its answer
-and the changes that the user accepts carry this class with the origin AI.
-Each classification must record its reason, so that a reader can check it.
+The term follows the routine tasks of labor economics: tasks that follow
+explicit rules, so that a program can do them (Autor et al., 2003). A
+question to the AI is the role direct of the user
+([R-EVAL-018](#r-eval-018)); the answer and the changes that the user
+accepts are the role produce of the AI, with the class of the work that the
+question asks for. Each classification must record its reason, so that a
+reader can check it.
 
 ### R-EVAL-003
 
@@ -81,8 +88,8 @@ codes, and the two classes come from these codes:
   the syntax tree, or a refactoring by a tool that keeps the behavior, is a
   surface change; a change of the behavior is a meaning change.
 
-Intellectual origin is create, evaluate, or an analysis with a conclusion of
-its own; decision selection; a meaning change. Mechanics is remember,
+Original work is create, evaluate, or an analysis with a conclusion of its
+own; decision selection; a meaning change. Routine work is remember,
 understand, or apply a given rule; information acquisition; an
 implementation by a given rule; a surface change. New code counts as
 create, also when it implements a known algorithm such as quick sort
@@ -118,8 +125,8 @@ plugin shows the alpha of the rules in use.
 
 ### R-EVAL-018
 
-*(proposal)* **Roles.** The classifier gives each part of an episode a role,
-with the party that did it, the user or the AI:
+**Roles.** The classifier must give each part of an episode a role, with
+the party that did it, the user or the AI:
 
 - *direct:* set the goal, the limits and the method of a task, for example
   a question to the AI with its conditions, or the choice of an algorithm
@@ -131,11 +138,11 @@ with the party that did it, the user or the AI:
   AI.
 
 The two classes of [R-EVAL-002](#r-eval-002) apply to the role produce.
-Direct and judge are intellectual work of the party that did them, and the
-evaluation shows them apart from the intellectual origin of the content:
-who created the content, who directed it and who checked it. With AI,
-checking information, integrating answers and steering the task become a
-large part of the critical thinking of a person (Lee et al., 2025). An
+Direct and judge are intellectual work of the party that did them, as
+original work is, and the evaluation must show the three apart: who created
+the content, who directed it and who checked it. With AI, checking
+information, integrating answers and steering the task become a large part
+of the critical thinking of a person (Lee et al., 2025). *(proposal)* An
 accept counts as judge only when the history shows a check, for example a
 test run, an edit of the answer or a question about it; an accept without
 a check is recorded as such.
@@ -150,25 +157,24 @@ and for the AI, it gives the episodes, the time and the share of the final
 text of each class, for the whole document or set of files, and for each
 section or file. Changes with the origin "other program" or "probably AI"
 ([R-VSC-004](specification.md#r-vsc-004)) count apart until the user marks
-them. *(proposal)* With the roles ([R-EVAL-018](#r-eval-018)), it also
-gives the episodes that each party directed and judged.
+them. With the roles ([R-EVAL-018](#r-eval-018)), it also gives the
+episodes that each party directed and judged.
 
 ### R-EVAL-008
 
 **Origin of the final text.** Each character of the final text belongs to
-the episode that wrote it. A later meaning change by the other party moves
-the intellectual origin of that text to that party; a surface change does
-not.
+the episode that wrote it. A later meaning change by the other party makes
+that text original work of that party; a surface change does not.
 
 ### R-EVAL-009
 
 **Declaration.** The plugin must write a declaration of the use of AI from
-the evaluation: the intellectual episodes of the AI, the mechanics that the
-AI did, and the roles in the terms of CRediT (Brand et al., 2015) and GAIDeT
-(Suchikova et al., 2025). Paper adds the declaration and the views to the
-appendix of the PDF ([R-HIST-005](specification.md#r-hist-005)).
-*(proposal)* With the roles ([R-EVAL-018](#r-eval-018)), the declaration
-also states which work of the AI the user directed and checked.
+the evaluation: the original work of the AI, the routine work that the AI
+did, and the roles in the terms of CRediT (Brand et al., 2015) and GAIDeT
+(Suchikova et al., 2025). With the roles ([R-EVAL-018](#r-eval-018)), the
+declaration also states which work of the AI the user directed and checked.
+Paper adds the declaration and the views to the appendix of the PDF
+([R-HIST-005](specification.md#r-hist-005)).
 
 ## 5. Views
 
@@ -179,9 +185,9 @@ also states which work of the AI the user directed and checked.
 | View | What it shows |
 | --- | --- |
 | Timeline | Each episode on a time axis: the class as color, the origin as form, the cognitive process as height |
-| Shares over time | For each session or week, the shares of intellectual origin and mechanics of the user and of the AI |
+| Shares over time | For each session or week, the shares of original work, routine work, directing and judging of the user and of the AI |
 | Map | Each section of a document, or each file of a set of source files, with its shares of class and origin |
-| Effort | Time and episodes for each class and origin, and the time of mechanics that the AI took over |
+| Effort | Time and episodes for each class, role and origin, and the time of routine work that the AI took over |
 | Goals | The goals of the author, of the teacher or of the rules, beside the current shares |
 
 A click on a mark opens its episode in the history
@@ -209,11 +215,11 @@ and of the learning efficiency:
 
 | Indicator | Meaning |
 | --- | --- |
-| The share of own intellectual origin, and its trend | Learning effect: the author does more of the intellectual work over time |
+| The share of own intellectual work, and its trend | Learning effect: the author does more of the intellectual work over time |
 | The cognitive processes of the own episodes, and their trend | Learning effect: the author moves from remember and apply to analyze, evaluate and create |
 | The share of AI answers that the author rejects or changes in their meaning | Critical evaluation of the output of the AI |
 | *(proposal)* The share of AI answers that the author accepts without a check ([R-EVAL-018](#r-eval-018)) | Reliance on the AI without critical evaluation |
-| The share of the time on intellectual work, and the time of mechanics that the AI took over | Learning efficiency: time free for intellectual work |
+| The share of the time on intellectual work, and the time of routine work that the AI took over | Learning efficiency: time free for intellectual work |
 
 ### R-EVAL-013
 
@@ -272,10 +278,10 @@ own.
 
 ## 9. Open questions
 
-1. Classes and roles: the two classes with the roles direct, produce and
-   judge ([R-EVAL-018](#r-eval-018), proposal), a third class "judgment"
-   without roles, or only the two classes, with an episode that holds both
-   split into its parts ([R-EVAL-004](#r-eval-004))?
+1. Checks: does an accept count as judge only when the history shows a
+   check ([R-EVAL-018](#r-eval-018), proposal), and which signs count as a
+   check: a test run, an edit of the answer, a question about it, or the
+   time to read it?
 2. Codes: is the scheme of three codes the right basis of the rules
    ([R-EVAL-003](#r-eval-003), proposal)? Which further code fits source
    code, for example the type of a change (a feature, a fix, a refactoring,
@@ -299,6 +305,10 @@ own.
 
 ## Sources
 
+- Autor, D. H., Levy, F., & Murnane, R. J. (2003). The skill content of
+  recent technological change: An empirical exploration. *The Quarterly
+  Journal of Economics, 118*(4), 1279–1333.
+  <https://doi.org/10.1162/003355303322552801>
 - Brand, A., Allen, L., Altman, M., Hlava, M., & Scott, J. (2015). Beyond
   authorship: Attribution, contribution, collaboration, and credit. *Learned
   Publishing, 28*(2), 151–155. <https://doi.org/10.1087/20150211>
