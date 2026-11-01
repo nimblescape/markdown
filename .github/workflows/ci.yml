@@ -6,7 +6,7 @@
 # pull request, on the pinned Node.js release (.node-version). The job
 # installs the locked development tools without install scripts, checks the
 # types, the code style and the licenses of the libraries (licenses.json,
-# decision 23), runs the unit tests, builds the package and the example page,
+# decision 22), runs the unit tests, builds the package and the example page,
 # and packs the npm package @nimblescape/markdown with npm pack. The package
 # stays a workflow artifact for inspection. This workflow publishes nothing:
 # nothing is published before the release (CONTRIBUTING.md, "Release").

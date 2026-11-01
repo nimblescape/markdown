@@ -65,7 +65,7 @@ editor of Claude Desktop and of Claude on the web
   style, bold, italic, underline, strikethrough, code, color, list and link;
   a button whose function comes from an extension, such as the comment of
   Notes, shows only when that extension is active
-  ([decision 22](#decisions));
+  ([decision 21](#decisions));
 - these functions come from the code of this repository; no code and no
   design file of the Claude interface is copied.
 
@@ -74,7 +74,12 @@ editor of Claude Desktop and of Claude on the web
 **The extensions decide where they use it.** Notes and Paper decide where
 they use the editor. Notes uses it for each answer of a note in its side
 view "Notes", and the editor is made to edit a whole file in the main
-editor area too ([decision 4](#decisions), [decision 11](#decisions)).
+editor area too ([decision 4](#decisions), [decision 11](#decisions)). In
+VS Code, a setting of the extension chooses which Markdown files open in the
+editor ([decision 24](#decisions)). The editor and its adapter for the
+webviews of VS Code can require a newer VS Code version than the extensions
+require today, when that makes the editor simpler
+([decision 23](#decisions)).
 
 ### R-GEN-005
 
@@ -113,16 +118,16 @@ plugin knows, so that a file stays intact.
 
 **Read-only mode.** A button switches the editor between editing and
 reading. The code that integrates the library decides whether the button
-shows and in which mode the editor starts, so that an extension can make
-the editor a viewer only, also through a setting of its user
-([decision 10](#decisions)).
+is available at all and in which mode the editor starts, so that an
+extension can make the editor a viewer only, also through a setting of its
+user ([decision 10](#decisions)).
 
 ### R-GEN-009
 
 **The engine.** The editor is built on ProseMirror. The engine meets each
 requirement through its normal API, without workarounds; a requirement that
 ProseMirror cannot meet in this way leads to a new engine of its own
-([decision 13](#decisions)).
+([decision 12](#decisions)).
 
 ### R-GEN-010
 
@@ -130,17 +135,17 @@ ProseMirror cannot meet in this way leads to a new engine of its own
 view without edit functions is the editor in its read-only mode
 ([R-GEN-008](#r-gen-008)). The view, the pages of a paper and the PDF come
 from the same rendering code and the same views of the plugins
-([decision 14](#decisions)). The view of the Markdown with its layout, with
+([decision 13](#decisions)). The view of the Markdown with its layout, with
 pages, comes from nimblescape Markdown Paper, as an extension of the editor;
-the editor has no layouts of its own ([decision 21](#decisions)).
+the editor has no layouts of its own ([decision 20](#decisions)).
 
 ### R-GEN-011
 
 **Available libraries first.** The editor uses existing open-source
 libraries wherever one fits, and respects their licenses
-([decision 15](#decisions)). The license of each library is decided one by
+([decision 14](#decisions)). The license of each library is decided one by
 one, and the license of the editor itself, MIT today, can change when a
-library needs it ([decision 23](#decisions)). The file
+library needs it ([decision 22](#decisions)). The file
 `licenses.json` lists each package of the bundle with the license that was
 decided for it; CI fails for a package or a license that the file does not
 list. The notices go with every bundle. Own code stays for what no library
@@ -157,7 +162,7 @@ does. The libraries:
 ### R-GEN-012
 
 **Extensions that render, or render and edit.** An extension adds a
-function at one of two levels ([decision 19](#decisions)):
+function at one of two levels ([decision 18](#decisions)):
 
 - *Render:* it adds syntax with the function `extendMarkdownIt(md)`, as an
   extension of the Markdown preview of VS Code does, and a view for each new
@@ -177,7 +182,7 @@ VS Code and in the editor without a change.
 **A mode to learn Markdown.** When the user switches this mode on, the
 editor shows the Markdown marks under the rendered text, as other editors do,
 for example `**` around bold text and `#` before a heading
-([decision 20](#decisions)).
+([decision 19](#decisions)).
 
 ## AI chat
 
@@ -185,23 +190,23 @@ for example `**` around bold text and `#` before a heading
 
 **AI chats are notes.** An AI chat works as Claude Code does: it knows the
 document and the selection, and it proposes changes that the user accepts or
-rejects ([decision 16](#decisions)). The chat is a thread of a note of
+rejects ([decision 15](#decisions)). The chat is a thread of a note of
 nimblescape Markdown Notes: the AI answers in the thread as one more author.
 Notes integrates the chat; the editor gives the general parts: the provider
 API ([R-AI-002](#r-ai-002)) and the proposed changes in the text
-([decision 17](#decisions)).
+([decision 16](#decisions)).
 
 ### R-AI-002
 
 **Pluggable AI.** A general provider API makes any AI pluggable. The first
-and for now only provider is the Claude API ([decision 16](#decisions)). The
+and for now only provider is the Claude API ([decision 15](#decisions)). The
 integrating code gives the AI its tools through the provider API, for
 example the memory ([R-AI-003](#r-ai-003)).
 
 ### R-AI-003
 
 **Memory.** The AI uses a memory, so that a decision in a chat has the
-context of the other decisions and chats ([decision 18](#decisions)).
+context of the other decisions and chats ([decision 17](#decisions)).
 
 ## Theme
 
@@ -223,7 +228,7 @@ creates the editor chooses its colors ([decision 5](#decisions)).
 of a file as a form, not as YAML text. The form is a general function of the
 editor, for every Markdown file; Notes and Paper add only their own parts
 ([decision 7](#decisions), [decision 9](#decisions)). The form edits every
-front matter format: YAML, TOML and JSON ([decision 12](#decisions)).
+front matter format: YAML, TOML and JSON.
 
 ### R-FM-002
 
@@ -256,17 +261,17 @@ has a schema of the front matter of its documents
 3. **One view:** the editor replaces the clean editing view and the visual
    editor of Markdown Notes and the Markdown preview
    ([R-GEN-002](#r-gen-002)).
-4. **Main view and side view:** the editor serves the main editor area and
-   the side view of the notes; since decision 11, Notes and Paper decide
-   where they use it ([R-GEN-004](#r-gen-004)).
+4. **Main view and side view:** Notes and Paper decide where they use the
+   editor; Notes uses it in its side view, and the editor can also edit a
+   whole file in the main editor area ([R-GEN-004](#r-gen-004)).
 5. **Theme:** the colors of the VS Code theme in VS Code; themable on the
    web ([R-THEME-001](#r-theme-001), [R-THEME-002](#r-theme-002)).
 6. **File formats:** Notes and Paper extend the file format with their
    parts, and the editor gives them the API for it
    ([R-GEN-006](#r-gen-006)).
-7. **Front matter:** a structured editor with a read-only mode (values
-   only, driven by a schema) and an edit mode (structured values can be
-   added); since decision 12 for every front matter format
+7. **Front matter:** a structured editor for every front matter format
+   (YAML, TOML and JSON), with a read-only mode (values only, driven by a
+   schema) and an edit mode (structured values can be added)
    ([R-FM-001](#r-fm-001) to [R-FM-003](#r-fm-003)).
 8. **JSON schemas:** the schema of a front matter is JSON; each layout gets
    one ([R-FM-004](#r-fm-004)).
@@ -274,44 +279,49 @@ has a schema of the front matter of its documents
    their functions through a clean API; the front matter is a general
    function of the editor ([R-GEN-005](#r-gen-005), [R-FM-001](#r-fm-001)).
 10. **Read-only mode:** a button switches to read-only; the integrating code
-    can make the editor a viewer only ([R-GEN-008](#r-gen-008)).
+    decides whether the button is available at all and can make the editor
+    a viewer only ([R-GEN-008](#r-gen-008)).
 11. **A general library:** the editor is a general Markdown library, not a
     VS Code extension of its own; Notes and Paper decide where they use it
     ([R-GEN-001](#r-gen-001), [R-GEN-004](#r-gen-004)).
-12. **Every front matter format:** YAML, TOML and JSON
-    ([R-FM-001](#r-fm-001)).
-13. **The engine:** the engine that suits the editor best, which meets each
+12. **The engine:** the engine that suits the editor best, which meets each
     requirement through its normal API without workarounds, else a new
     engine; ProseMirror ([R-GEN-009](#r-gen-009)).
-14. **One rendering:** the renderer is the editor without its edit
+13. **One rendering:** the renderer is the editor without its edit
     functions; view, pages and PDF share one rendering
     ([R-GEN-010](#r-gen-010)).
-15. **Available libraries first:** existing open-source libraries wherever
+14. **Available libraries first:** existing open-source libraries wherever
     one fits, with respect for their licenses ([R-GEN-011](#r-gen-011)).
-16. **AI chat:** an AI chat as in Claude Code, with a provider API; Claude
+15. **AI chat:** an AI chat as in Claude Code, with a provider API; Claude
     first ([R-AI-001](#r-ai-001), [R-AI-002](#r-ai-002)).
-17. **AI chats are notes:** an AI chat is a thread of a note of Markdown
+16. **AI chats are notes:** an AI chat is a thread of a note of Markdown
     Notes; Notes integrates the chat ([R-AI-001](#r-ai-001)).
-18. **Memory of the AI:** the AI uses a memory, so that a decision in a chat
+17. **Memory of the AI:** the AI uses a memory, so that a decision in a chat
     has the context of the other decisions and chats
     ([R-AI-003](#r-ai-003)).
-19. **Two levels of extensions:** extensions that render, or render and
+18. **Two levels of extensions:** extensions that render, or render and
     edit; the Markdown API of VS Code is the reference
     ([R-GEN-012](#r-gen-012)).
-20. **A mode to learn Markdown:** the editor shows the Markdown marks under
+19. **A mode to learn Markdown:** the editor shows the Markdown marks under
     the rendered text ([R-GEN-013](#r-gen-013)).
-21. **The layout comes from Paper:** Markdown Paper brings the function to
+20. **The layout comes from Paper:** Markdown Paper brings the function to
     render and view the Markdown with its layout ([R-GEN-010](#r-gen-010)).
-22. **The format bar on selected text:** the buttons of the format bar of
+21. **The format bar on selected text:** the buttons of the format bar of
     the Claude document editor ([R-GEN-003](#r-gen-003)).
-23. **Licenses per library:** the license of each library is decided one
+22. **Licenses per library:** the license of each library is decided one
     by one; the license of the editor can change when a library needs it
     ([R-GEN-011](#r-gen-011)).
+23. **VS Code version:** the editor can require a newer VS Code version
+    than the extensions require today, when that makes the editor simpler
+    ([R-GEN-004](#r-gen-004)).
+24. **Which files open in the editor:** a setting chooses which Markdown
+    files open in the editor in VS Code ([R-GEN-004](#r-gen-004)).
 
 ## Open questions
 
 1. Whether Notes also uses the editor for the main view of a file in VS
-   Code, and which Markdown files open in it by default.
+   Code, and which Markdown files open in it when the user did not change
+   the setting.
 2. How the editor keeps the text of a file that the user did not change.
 3. The split of functions between the editor, Notes and Paper: standard
    footnotes; captions, links to figures and tables, and listings; values of

@@ -2,7 +2,7 @@
 // © 2026 Hannes Stauss (scalarion@nimblescape.com)
 // Licensed under the MIT License. See LICENSE in the repository root for details.
 
-// The check of the licenses of the libraries (docs/specification.md, R-GEN-011, decision 23): the license of each
+// The check of the licenses of the libraries (docs/specification.md, R-GEN-011, decision 22): the license of each
 // library is decided one by one, and licenses.json lists each package that the editor depends on at run time with the
 // license that was decided for it. The check reads the packages from package-lock.json, without the development
 // tools, and fails for a package that licenses.json does not list or whose license is not the decided one. CI runs it

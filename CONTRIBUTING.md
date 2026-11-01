@@ -32,7 +32,7 @@ requirement in the same pull request.
 | `src/**/*.test.ts` | The unit tests, with vitest: the round trip of the Markdown (`src/markdown/codec.test.ts`) and the editor in a page of happy-dom (`src/editor.test.ts`). |
 | `test/corpus/` | The Markdown files of the tests of the round trip: GFM, the front matter in TOML and JSON, the format of Markdown Notes and the documents and layouts of Markdown Paper. [test/corpus/README.md](test/corpus/README.md) explains them. |
 | `demo/index.html`, `demo/main.ts` | The example page: the editor on the left and its Markdown text on the right. |
-| `licenses.json` | The license that was decided for each package that the editor needs at run time ([R-GEN-011](docs/specification.md#r-gen-011), [decision 23](docs/specification.md#decisions)). |
+| `licenses.json` | The license that was decided for each package that the editor needs at run time ([R-GEN-011](docs/specification.md#r-gen-011), [decision 22](docs/specification.md#decisions)). |
 | `scripts/check-licenses.mjs`, `scripts/check-licenses.test.mjs` | The check of `package-lock.json` against `licenses.json` and its test. |
 | `scripts/third-party-notices.mjs` | Writes the notices of the packages of a bundle from the installed packages, for the example page. |
 | `esbuild.mjs` | Builds `dist/index.js` and `dist/markdown.css`, and with `--demo` or `--serve` the example page in `demo/dist/`. |

@@ -5,7 +5,7 @@
 # Dependabot: weekly updates of the development tools, in one group, of the
 # libraries of the editor, and of the pinned actions of the workflows. A new
 # library or a new version can bring another license; the CI checks it against
-# licenses.json (decision 23).
+# licenses.json (decision 22).
 version: 2
 updates:
   - package-ecosystem: npm

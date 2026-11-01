@@ -4,9 +4,9 @@
 
 // The front matter at the start of a file (docs/specification.md, R-FM-001): YAML between two lines `---` (the last
 // one can also be `...`), TOML between two lines `+++`, or JSON as an object whose first line is `{` and whose last
-// line is `}` (decision 12).
+// line is `}` (decision 7).
 
-/** FrontMatterFormat is the syntax of a front matter (decision 12). */
+/** FrontMatterFormat is the syntax of a front matter (decision 7). */
 export type FrontMatterFormat = 'yaml' | 'toml' | 'json';
 
 /** FrontMatter is a front matter that starts a text. */
