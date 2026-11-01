@@ -27,7 +27,7 @@ decided yet: no requirement depends on them.
 | 7 | The plugin API, version 1 | [R-GEN-005](#r-gen-005) | planned |
 | 8 | The plugin of nimblescape Markdown Notes, in its repository; the editor in the Notes side view | [R-GEN-002](#r-gen-002), [R-GEN-004](#r-gen-004), [R-GEN-005](#r-gen-005) | planned |
 | 9 | The plugin of nimblescape Markdown Paper, in its repository; the schema of each layout | [R-GEN-005](#r-gen-005), [R-FM-004](#r-fm-004) | planned |
-| 10 | The AI chat with the provider API and the Claude provider | [R-AI-001](#r-ai-001), [R-AI-002](#r-ai-002) | planned |
+| 10 | The provider API, the Claude provider and the proposed changes in the editor; in Notes, the AI chat as notes and the memory | [R-AI-001](#r-ai-001) to [R-AI-003](#r-ai-003) | planned |
 | 11 | The release workflow of the npm package, the same as for the other nimblescape npm packages | [R-GEN-007](#r-gen-007) | planned |
 
 ## General
@@ -147,14 +147,25 @@ what no library does. The libraries:
 
 ### R-AI-001
 
-**AI chat in the editor.** The editor has an AI chat that works as Claude
-Code does: it knows the document and the selection, and it proposes changes
-that the user accepts or rejects ([decision 16](#decisions)).
+**AI chats are notes.** An AI chat works as Claude Code does: it knows the
+document and the selection, and it proposes changes that the user accepts or
+rejects ([decision 16](#decisions)). The chat is a thread of a note of
+nimblescape Markdown Notes: the AI answers in the thread as one more author.
+Notes integrates the chat; the editor gives the general parts: the provider
+API ([R-AI-002](#r-ai-002)) and the proposed changes in the text
+([decision 17](#decisions)).
 
 ### R-AI-002
 
 **Pluggable AI.** A general provider API makes any AI pluggable. The first
-and for now only provider is the Claude API ([decision 16](#decisions)).
+and for now only provider is the Claude API ([decision 16](#decisions)). The
+integrating code gives the AI its tools through the provider API, for
+example the memory ([R-AI-003](#r-ai-003)).
+
+### R-AI-003
+
+**Memory.** The AI uses a memory, so that a decision in a chat has the
+context of the other decisions and chats ([decision 18](#decisions)).
 
 ## Theme
 
@@ -243,6 +254,11 @@ has a schema of the front matter of its documents
     one fits, with respect for their licenses ([R-GEN-011](#r-gen-011)).
 16. **AI chat:** an AI chat as in Claude Code, with a provider API; Claude
     first ([R-AI-001](#r-ai-001), [R-AI-002](#r-ai-002)).
+17. **AI chats are notes:** an AI chat is a thread of a note of Markdown
+    Notes; Notes integrates the chat ([R-AI-001](#r-ai-001)).
+18. **Memory of the AI:** the AI uses a memory, so that a decision in a chat
+    has the context of the other decisions and chats
+    ([R-AI-003](#r-ai-003)).
 
 ## Open questions
 
@@ -259,7 +275,9 @@ has a schema of the front matter of its documents
 6. The fonts of the text in VS Code.
 7. The name of the npm package and the contribution point of the plugins.
 8. How the pages of a paper switch with the editing view.
-9. Where the AI chat shows, and how it shows the changes that it proposes.
+9. How the editor shows the changes that the AI proposes.
+10. Where the memory of the AI is stored (in the repository of the document,
+    or for each user), and whether the AI writes it without asking.
 
 ---
 
