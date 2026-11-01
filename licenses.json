@@ -1,0 +1,190 @@
+{
+  "about": "The license that was decided for each package that the editor needs at run time (docs/specification.md, R-GEN-011, decision 23). npm run licenses checks package-lock.json against this file.",
+  "packages": {
+    "@tiptap/core": {
+      "license": "MIT"
+    },
+    "@tiptap/extension-blockquote": {
+      "license": "MIT"
+    },
+    "@tiptap/extension-bold": {
+      "license": "MIT"
+    },
+    "@tiptap/extension-bullet-list": {
+      "license": "MIT"
+    },
+    "@tiptap/extension-code": {
+      "license": "MIT"
+    },
+    "@tiptap/extension-code-block": {
+      "license": "MIT"
+    },
+    "@tiptap/extension-document": {
+      "license": "MIT"
+    },
+    "@tiptap/extension-dropcursor": {
+      "license": "MIT"
+    },
+    "@tiptap/extension-gapcursor": {
+      "license": "MIT"
+    },
+    "@tiptap/extension-hard-break": {
+      "license": "MIT"
+    },
+    "@tiptap/extension-heading": {
+      "license": "MIT"
+    },
+    "@tiptap/extension-horizontal-rule": {
+      "license": "MIT"
+    },
+    "@tiptap/extension-image": {
+      "license": "MIT"
+    },
+    "@tiptap/extension-italic": {
+      "license": "MIT"
+    },
+    "@tiptap/extension-link": {
+      "license": "MIT"
+    },
+    "@tiptap/extension-list": {
+      "license": "MIT"
+    },
+    "@tiptap/extension-list-item": {
+      "license": "MIT"
+    },
+    "@tiptap/extension-list-keymap": {
+      "license": "MIT"
+    },
+    "@tiptap/extension-ordered-list": {
+      "license": "MIT"
+    },
+    "@tiptap/extension-paragraph": {
+      "license": "MIT"
+    },
+    "@tiptap/extension-strike": {
+      "license": "MIT"
+    },
+    "@tiptap/extension-table": {
+      "license": "MIT"
+    },
+    "@tiptap/extension-text": {
+      "license": "MIT"
+    },
+    "@tiptap/extension-underline": {
+      "license": "MIT"
+    },
+    "@tiptap/extensions": {
+      "license": "MIT"
+    },
+    "@tiptap/pm": {
+      "license": "MIT"
+    },
+    "@tiptap/starter-kit": {
+      "license": "MIT"
+    },
+    "@types/linkify-it": {
+      "license": "MIT"
+    },
+    "@types/markdown-it": {
+      "license": "MIT"
+    },
+    "@types/mdurl": {
+      "license": "MIT"
+    },
+    "ansi-regex": {
+      "license": "MIT"
+    },
+    "argparse": {
+      "license": "Python-2.0",
+      "note": "Only the command line program of markdown-it uses it; no bundle of the editor holds it."
+    },
+    "entities": {
+      "license": "BSD-2-Clause",
+      "note": "markdown-it decodes character references with it; the notices of a bundle hold its license."
+    },
+    "get-east-asian-width": {
+      "license": "MIT"
+    },
+    "linkify-it": {
+      "license": "MIT"
+    },
+    "linkifyjs": {
+      "license": "MIT"
+    },
+    "markdown-it": {
+      "license": "MIT"
+    },
+    "markdown-it-footnote": {
+      "license": "MIT"
+    },
+    "markdown-it-task-lists": {
+      "license": "ISC"
+    },
+    "mdurl": {
+      "license": "MIT"
+    },
+    "orderedmap": {
+      "license": "MIT"
+    },
+    "prosemirror-changeset": {
+      "license": "MIT"
+    },
+    "prosemirror-commands": {
+      "license": "MIT"
+    },
+    "prosemirror-dropcursor": {
+      "license": "MIT"
+    },
+    "prosemirror-gapcursor": {
+      "license": "MIT"
+    },
+    "prosemirror-history": {
+      "license": "MIT"
+    },
+    "prosemirror-inputrules": {
+      "license": "MIT"
+    },
+    "prosemirror-keymap": {
+      "license": "MIT"
+    },
+    "prosemirror-markdown": {
+      "license": "MIT"
+    },
+    "prosemirror-model": {
+      "license": "MIT"
+    },
+    "prosemirror-schema-list": {
+      "license": "MIT"
+    },
+    "prosemirror-state": {
+      "license": "MIT"
+    },
+    "prosemirror-tables": {
+      "license": "MIT"
+    },
+    "prosemirror-transform": {
+      "license": "MIT"
+    },
+    "prosemirror-view": {
+      "license": "MIT"
+    },
+    "punycode.js": {
+      "license": "MIT"
+    },
+    "rope-sequence": {
+      "license": "MIT"
+    },
+    "string-width": {
+      "license": "MIT"
+    },
+    "strip-ansi": {
+      "license": "MIT"
+    },
+    "uc.micro": {
+      "license": "MIT"
+    },
+    "w3c-keyname": {
+      "license": "MIT"
+    }
+  }
+}

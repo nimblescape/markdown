@@ -1,0 +1,86 @@
+{
+  "name": "@nimblescape/markdown",
+  "version": "0.1.0",
+  "description": "An editor of rendered Markdown for the web and for the webviews of VS Code, built on ProseMirror. It keeps every block of a file that the user does not change byte for byte, and other packages extend it with plugins.",
+  "license": "MIT",
+  "author": {
+    "name": "nimblescape e.U.",
+    "url": "https://nimblescape.com"
+  },
+  "homepage": "https://github.com/nimblescape/markdown#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nimblescape/markdown.git"
+  },
+  "bugs": {
+    "url": "https://github.com/nimblescape/markdown/issues"
+  },
+  "keywords": [
+    "markdown",
+    "editor",
+    "wysiwyg",
+    "prosemirror",
+    "vscode"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./markdown.css": "./dist/markdown.css"
+  },
+  "files": [
+    "dist/*.js",
+    "dist/*.d.ts",
+    "dist/**/*.d.ts",
+    "dist/markdown.css"
+  ],
+  "sideEffects": [
+    "*.css"
+  ],
+  "scripts": {
+    "build": "node esbuild.mjs --production && tsc -p tsconfig.build.json",
+    "demo": "node esbuild.mjs --serve",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "licenses": "node scripts/check-licenses.mjs"
+  },
+  "dependencies": {
+    "@tiptap/core": "^3.32.2",
+    "@tiptap/extension-bold": "^3.32.2",
+    "@tiptap/extension-code": "^3.32.2",
+    "@tiptap/extension-code-block": "^3.32.2",
+    "@tiptap/extension-horizontal-rule": "^3.32.2",
+    "@tiptap/extension-image": "^3.32.2",
+    "@tiptap/extension-italic": "^3.32.2",
+    "@tiptap/extension-link": "^3.32.2",
+    "@tiptap/extension-list": "^3.32.2",
+    "@tiptap/extension-strike": "^3.32.2",
+    "@tiptap/extension-table": "^3.32.2",
+    "@tiptap/pm": "^3.32.2",
+    "@tiptap/starter-kit": "^3.32.2",
+    "@types/markdown-it": "^14.2.0",
+    "markdown-it": "^14.3.3",
+    "markdown-it-footnote": "^4.0.0",
+    "markdown-it-task-lists": "^2.1.1",
+    "prosemirror-markdown": "^1.13.9",
+    "string-width": "^8.3.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^24.19.2",
+    "commonmark-spec": "^0.31.2",
+    "esbuild": "^0.28.2",
+    "eslint": "^10.14.0",
+    "globals": "^17.14.0",
+    "happy-dom": "^21.0.4",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.72.1",
+    "vitest": "^5.0.5"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

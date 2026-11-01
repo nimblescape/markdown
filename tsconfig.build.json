@@ -1,0 +1,18 @@
+// SPDX-License-Identifier: MIT
+// © 2026 Hannes Stauss (scalarion@nimblescape.com)
+// Licensed under the MIT License. See LICENSE in the repository root for details.
+
+// The declarations of the npm package in dist/; esbuild writes its JavaScript.
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "rootDir": "src",
+    "outDir": "dist",
+    "types": []
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["src/**/*.test.ts"]
+}

@@ -1,0 +1,34 @@
+# SPDX-License-Identifier: MIT
+# © 2026 Hannes Stauss (scalarion@nimblescape.com)
+# Licensed under the MIT License. See LICENSE in the repository root for details.
+
+# Dependabot: weekly updates of the development tools, in one group, of the
+# libraries of the editor, and of the pinned actions of the workflows. A new
+# library or a new version can bring another license; the CI checks it against
+# licenses.json (decision 23).
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      dev-dependencies:
+        dependency-type: development
+        patterns: ['*']
+      tiptap:
+        patterns: ['@tiptap/*']
+    ignore:
+      # @types/node stays at the major version of the Node.js of .node-version.
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
+      # markdown-it and its types stay at version 14, the version of the Markdown preview of VS Code, so that a
+      # markdown-it plugin works in both (R-GEN-012).
+      - dependency-name: 'markdown-it'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@types/markdown-it'
+        update-types: ['version-update:semver-major']
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

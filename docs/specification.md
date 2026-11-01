@@ -18,8 +18,8 @@ decided yet: no requirement depends on them.
 
 | Step | Content | Requirements | State |
 | --- | --- | --- | --- |
-| 1 | Setup of the repository: the npm package, an example page for the web, CI with a check of the licenses | [R-GEN-007](#r-gen-007), [R-GEN-011](#r-gen-011) | planned |
-| 2 | The core on ProseMirror: Markdown into the document of the editor and back, with tests of the round trip | [R-GEN-006](#r-gen-006), [R-GEN-009](#r-gen-009) | planned |
+| 1 | Setup of the repository: the npm package, an example page for the web, CI with a check of the licenses | [R-GEN-007](#r-gen-007), [R-GEN-011](#r-gen-011) | built |
+| 2 | The core on ProseMirror: Markdown into the document of the editor and back, with tests of the round trip | [R-GEN-006](#r-gen-006), [R-GEN-009](#r-gen-009) | built |
 | 3 | Rendered editing of CommonMark and GFM: toolbar, format bar, insert menu, slash menu, block handles, find and replace, read-only mode, the mode to learn Markdown | [R-GEN-003](#r-gen-003), [R-GEN-008](#r-gen-008), [R-GEN-013](#r-gen-013) | planned |
 | 4 | Tables: handles, markers for new rows and columns, the table menu | [R-GEN-003](#r-gen-003) | planned |
 | 5 | The editor of the front matter with both modes and the JSON schema | [R-FM-001](#r-fm-001) to [R-FM-004](#r-fm-004) | planned |

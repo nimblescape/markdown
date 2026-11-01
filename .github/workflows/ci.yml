@@ -1,0 +1,72 @@
+# SPDX-License-Identifier: MIT
+# © 2026 Hannes Stauss (scalarion@nimblescape.com)
+# Licensed under the MIT License. See LICENSE in the repository root for details.
+
+# Test the library and build its npm package for every push to main and every
+# pull request, on the pinned Node.js release (.node-version). The job
+# installs the locked development tools without install scripts, checks the
+# types, the code style and the licenses of the libraries (licenses.json,
+# decision 23), runs the unit tests, builds the package and the example page,
+# and packs the npm package @nimblescape/markdown with npm pack. The package
+# stays a workflow artifact for inspection. This workflow publishes nothing:
+# nothing is published before the release (CONTRIBUTING.md, "Release").
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  # Checkout needs repository reads; the checks get no write scope.
+  contents: read
+
+jobs:
+  test:
+    name: Test and package
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out the source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up the pinned Node release
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+
+      - name: Install the locked development tools without install scripts
+        run: npm ci --ignore-scripts
+
+      - name: Check the types
+        run: npm run typecheck
+
+      - name: Check the code style
+        run: npm run lint
+
+      - name: Check the licenses of the libraries
+        run: npm run licenses
+
+      - name: Run the unit tests
+        run: npm test
+
+      - name: Build the package
+        run: npm run build
+
+      # The example page bundles all libraries; its build checks that the package works in a page.
+      - name: Build the example page
+        run: node esbuild.mjs --demo
+
+      - name: Build the npm package
+        run: npm pack
+
+      - name: Keep the npm package
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: npm
+          path: '*.tgz'
+          if-no-files-found: error
