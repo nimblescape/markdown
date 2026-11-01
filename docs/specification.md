@@ -117,6 +117,14 @@ requirement through its normal API, without workarounds; a requirement that
 ProseMirror cannot meet in this way leads to a new engine of its own
 ([decision 13](#decisions)).
 
+### R-GEN-010
+
+**One rendering.** There is no renderer apart from the editor: a rendered
+view without edit functions is the editor in its read-only mode
+([R-GEN-008](#r-gen-008)). The view, the pages of a paper and the PDF come
+from the same rendering code and the same views of the plugins
+([decision 14](#decisions)).
+
 ## Theme
 
 ### R-THEME-001
@@ -197,6 +205,9 @@ has a schema of the front matter of its documents
 13. **The engine:** the engine that suits the editor best, which meets each
     requirement through its normal API without workarounds, else a new
     engine; ProseMirror ([R-GEN-009](#r-gen-009)).
+14. **One rendering:** the renderer is the editor without its edit
+    functions; view, pages and PDF share one rendering
+    ([R-GEN-010](#r-gen-010)).
 
 ## Open questions
 
@@ -212,7 +223,7 @@ has a schema of the front matter of its documents
    `layout.json`; the mode of the form for a file without a schema.
 6. The fonts of the text in VS Code.
 7. The name of the npm package and the contribution point of the plugins.
-8. The pages of a paper in the editor.
+8. How the pages of a paper switch with the editing view.
 
 ---
 
