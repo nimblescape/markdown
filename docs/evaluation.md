@@ -66,30 +66,6 @@ A question to the AI is classified by the work that it asks for; its answer
 and the changes that the user accepts carry this class with the origin AI.
 Each classification must record its reason, so that a reader can check it.
 
-### R-EVAL-018
-
-*(proposal)* **Roles.** The classifier gives each part of an episode a role,
-with the party that did it, the user or the AI:
-
-- *direct:* set the goal, the limits and the method of a task, for example
-  a question to the AI with its conditions, or the choice of an algorithm
-  for a problem;
-- *produce:* write the content, for example the text, the code or the list
-  of the papers found;
-- *judge:* check, select, correct, accept or reject content, for example
-  test the code of the AI, compare two answers, or correct a claim of the
-  AI.
-
-The two classes of [R-EVAL-002](#r-eval-002) apply to the role produce.
-Direct and judge are intellectual work of the party that did them, and the
-evaluation shows them apart from the intellectual origin of the content:
-who created the content, who directed it and who checked it. With AI,
-checking information, integrating answers and steering the task become a
-large part of the critical thinking of a person (Lee et al., 2025). An
-accept counts as judge only when the history shows a check, for example a
-test run, an edit of the answer or a question about it; an accept without
-a check is recorded as such.
-
 ### R-EVAL-003
 
 *(proposal)* **Three codes.** The classifier codes each episode with three
@@ -139,6 +115,30 @@ measures the agreement of the people and the classifier (Hayes &
 Krippendorff, 2007). The rules and their examples improve until alpha
 reaches 0.800, the usual limit for reliable data (Krippendorff, 2004). The
 plugin shows the alpha of the rules in use.
+
+### R-EVAL-018
+
+*(proposal)* **Roles.** The classifier gives each part of an episode a role,
+with the party that did it, the user or the AI:
+
+- *direct:* set the goal, the limits and the method of a task, for example
+  a question to the AI with its conditions, or the choice of an algorithm
+  for a problem;
+- *produce:* write the content, for example the text, the code or the list
+  of the papers found;
+- *judge:* check, select, correct, accept or reject content, for example
+  test the code of the AI, compare two answers, or correct a claim of the
+  AI.
+
+The two classes of [R-EVAL-002](#r-eval-002) apply to the role produce.
+Direct and judge are intellectual work of the party that did them, and the
+evaluation shows them apart from the intellectual origin of the content:
+who created the content, who directed it and who checked it. With AI,
+checking information, integrating answers and steering the task become a
+large part of the critical thinking of a person (Lee et al., 2025). An
+accept counts as judge only when the history shows a check, for example a
+test run, an edit of the answer or a question about it; an accept without
+a check is recorded as such.
 
 ## 4. Evaluation
 
