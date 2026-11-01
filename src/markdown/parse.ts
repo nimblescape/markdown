@@ -2,12 +2,12 @@
 // © 2026 Hannes Stauss (scalarion@nimblescape.com)
 // Licensed under the MIT License. See LICENSE in the repository root for details.
 
-// Markdown text into the document of the editor (docs/specification.md, R-GEN-006): markdown-it reads the text, and
+// Markdown text into the document of the editor (docs/specification.md, R-EDIT-004): markdown-it reads the text, and
 // the MarkdownParser of prosemirror-markdown builds the document from its tokens. Each top-level block of the document
 // remembers the lines of the file that it comes from, so that the serializer writes a block that the user did not
-// change byte for byte (open question 2 of the specification, recommendation A of the discussion document). Lines that
-// no block holds and that are not blank, such as the definitions of link references, become raw blocks, and the front
-// matter becomes a block of its own, so the blocks and the blank lines between them make up the whole text.
+// change byte for byte. Lines that no block holds and that are not blank, such as the definitions of link references,
+// become raw blocks, and the front matter becomes a block of its own (R-SRC-003), so the blocks and the blank lines
+// between them make up the whole text.
 
 import type { Node, Schema } from '@tiptap/pm/model';
 import type MarkdownIt from 'markdown-it';

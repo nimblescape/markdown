@@ -1,5 +1,5 @@
 {
-  "about": "The license that was decided for each package that the editor needs at run time (docs/specification.md, R-GEN-011, decision 22). npm run licenses checks package-lock.json against this file.",
+  "about": "The license that was decided for each package that the editor needs at run time (docs/specification.md, R-GEN-011). npm run licenses checks package-lock.json against this file.",
   "packages": {
     "@tiptap/core": {
       "license": "MIT"

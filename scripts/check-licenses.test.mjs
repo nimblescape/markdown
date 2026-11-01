@@ -2,7 +2,7 @@
 // © 2026 Hannes Stauss (scalarion@nimblescape.com)
 // Licensed under the MIT License. See LICENSE in the repository root for details.
 
-// The tests of the check of the licenses (docs/specification.md, R-GEN-011, decision 22).
+// The tests of the check of the licenses (docs/specification.md, R-GEN-011).
 
 import * as fs from 'node:fs';
 import { describe, expect, it } from 'vitest';

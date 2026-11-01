@@ -6,8 +6,8 @@ and edits the rendered text; the file stays plain Markdown. nimblescape
 Markdown Notes and nimblescape Markdown Paper extend the editor with their
 functions through a plugin API.
 
-[docs/specification.md](docs/specification.md) holds the requirements, the
-decisions, the open questions and the plan of the steps. The first steps
+[docs/specification.md](docs/specification.md) is the normative
+specification, with the open questions and the plan of the steps. The first steps
 are built: the npm package and the core, which reads Markdown into the
 document of the editor and writes it back. A block that the user does not
 change keeps its text byte for byte. The toolbars, the menus and the plugin

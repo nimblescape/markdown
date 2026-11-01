@@ -8,11 +8,11 @@ Licensed under the MIT License. See LICENSE in the repository root for details.
 
 This guide explains the files, the development, the tests and the use of the
 npm package `@nimblescape/markdown` before its release.
-[docs/specification.md](docs/specification.md) lists what the editor must
-do, each requirement with an ID, with the plan of the steps, the decisions
-and the open questions. A requirement is the clean summary of a decision,
-without the texts of the discussion. A change of a feature updates its
-requirement in the same pull request.
+[docs/specification.md](docs/specification.md) is the normative
+specification: what the libraries must, should and may do, each requirement
+with an ID, the open questions and the plan of the steps. A requirement is
+the clean summary of a decision, without the texts of the discussion. A
+change of a feature updates its requirement in the same pull request.
 
 ## Files
 
@@ -22,9 +22,9 @@ requirement in the same pull request.
 | `src/editor.ts` | `MarkdownEditor`: the editor on a DOM element, with its Markdown text in and out, the read-only mode ([R-GEN-008](docs/specification.md#r-gen-008)) and the event of a change. |
 | `src/extensions/core.ts` | The Tiptap extensions of the document: the nodes and marks of CommonMark and GFM, footnotes, the front matter and the raw nodes for HTML and for text that no block of Markdown holds. Attributes that record the form of the Markdown text, such as the bullet of a list, let a changed block keep its form. |
 | `src/markdown/markdownIt.ts` | The markdown-it of the editor: HTML, links in the text, footnotes and task lists, and the markdown-it plugins of the extensions ([R-GEN-012](docs/specification.md#r-gen-012)). |
-| `src/markdown/frontMatter.ts` | The front matter at the start of a file, in YAML, TOML or JSON ([R-FM-001](docs/specification.md#r-fm-001)). |
+| `src/markdown/frontMatter.ts` | The front matter at the start of a file, in YAML, TOML or JSON ([R-SRC-003](docs/specification.md#r-src-003)). |
 | `src/markdown/parse.ts` | The Markdown text into the document of the editor, by the tokens of markdown-it and `prosemirror-markdown`. It keeps the text of each top-level block and the blank lines between the blocks. |
-| `src/markdown/serialize.ts` | The document back into Markdown text ([R-GEN-006](docs/specification.md#r-gen-006)): each block that the user did not change keeps its text byte for byte; a changed block is written new, in the form of the formatter of nimblescape Markdown Notes. |
+| `src/markdown/serialize.ts` | The document back into Markdown text ([R-EDIT-004](docs/specification.md#r-edit-004), [R-EDIT-005](docs/specification.md#r-edit-005)): each block that the user did not change keeps its text byte for byte; a changed block is written new, in the form of the formatter of nimblescape Markdown Notes. |
 | `src/markdown/escape.ts` | The backslashes of a changed block: only before characters that would otherwise start Markdown syntax. |
 | `src/markdown/codec.ts` | `MarkdownCodec`: the parser and the serializer with one schema and one markdown-it, for the editor and for code without a page. |
 | `src/styles/markdown.css` | The styles of the editor, with the tokens `--nsmd-*` of the theme ([R-THEME-001](docs/specification.md#r-theme-001)). |
@@ -32,7 +32,7 @@ requirement in the same pull request.
 | `src/**/*.test.ts` | The unit tests, with vitest: the round trip of the Markdown (`src/markdown/codec.test.ts`) and the editor in a page of happy-dom (`src/editor.test.ts`). |
 | `test/corpus/` | The Markdown files of the tests of the round trip: GFM, the front matter in TOML and JSON, the format of Markdown Notes and the documents and layouts of Markdown Paper. [test/corpus/README.md](test/corpus/README.md) explains them. |
 | `demo/index.html`, `demo/main.ts` | The example page: the editor on the left and its Markdown text on the right. |
-| `licenses.json` | The license that was decided for each package that the editor needs at run time ([R-GEN-011](docs/specification.md#r-gen-011), [decision 22](docs/specification.md#decisions)). |
+| `licenses.json` | The license that was decided for each package that the editor needs at run time ([R-GEN-011](docs/specification.md#r-gen-011)). |
 | `scripts/check-licenses.mjs`, `scripts/check-licenses.test.mjs` | The check of `package-lock.json` against `licenses.json` and its test. |
 | `scripts/third-party-notices.mjs` | Writes the notices of the packages of a bundle from the installed packages, for the example page. |
 | `esbuild.mjs` | Builds `dist/index.js` and `dist/markdown.css`, and with `--demo` or `--serve` the example page in `demo/dist/`. |
@@ -64,10 +64,11 @@ Node.js release in `.node-version`.
 ## The round trip of the Markdown
 
 The editor changes only the text of the blocks that the user changes
-([R-GEN-006](docs/specification.md#r-gen-006)). The parser keeps the text of
+([R-EDIT-004](docs/specification.md#r-edit-004)). The parser keeps the text of
 each top-level block and the lines between the blocks; the serializer writes
 each block that is still the same node of the document with this text, and
-writes a changed block new. The tests check three things:
+writes a changed block new. The tests check three things
+([R-EDIT-006](docs/specification.md#r-edit-006)):
 
 - Every example of the CommonMark specification (package `commonmark-spec`,
   a development tool only) and every file of `test/corpus/` comes back byte

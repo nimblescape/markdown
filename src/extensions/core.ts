@@ -2,7 +2,7 @@
 // © 2026 Hannes Stauss (scalarion@nimblescape.com)
 // Licensed under the MIT License. See LICENSE in the repository root for details.
 
-// The Tiptap extensions of the document of the editor (docs/specification.md, R-GEN-006, R-GEN-011): the nodes and
+// The Tiptap extensions of the document of the editor (docs/specification.md, R-EDIT-003, R-GEN-011): the nodes and
 // marks of CommonMark and GFM from the extensions of Tiptap, footnotes, the front matter, and raw nodes for HTML and
 // for text that no block of Markdown holds. Attributes that only record the form of the Markdown text, such as the
 // character of a bullet, let the serializer write a changed block in the form that it had; the editor does not render
@@ -48,7 +48,7 @@ const rawView = (kind: string, text: string, inline = false): [string, Record<st
   text,
 ];
 
-/** FrontMatter is the front matter at the start of a file, with its fences (R-FM-001). */
+/** FrontMatter is the front matter at the start of a file, with its fences (R-SRC-003). */
 export const FrontMatter = Node.create({
   name: 'frontMatter',
   group: 'block',

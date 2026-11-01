@@ -2,7 +2,7 @@
 // © 2026 Hannes Stauss (scalarion@nimblescape.com)
 // Licensed under the MIT License. See LICENSE in the repository root for details.
 
-// The escaping of text in a changed block (docs/specification.md, R-GEN-006): a backslash goes only before the
+// The escaping of text in a changed block (docs/specification.md, R-EDIT-005): a backslash goes only before the
 // characters that would otherwise start Markdown syntax, so that the text of a block that the user changes stays as
 // readable as the text of the file. prosemirror-markdown escapes `[` and `]` everywhere, which breaks the GitHub alerts
 // `> [!NOTE]` of the templates of Paper, so the serializer uses this function.

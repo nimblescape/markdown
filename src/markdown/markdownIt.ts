@@ -2,7 +2,7 @@
 // © 2026 Hannes Stauss (scalarion@nimblescape.com)
 // Licensed under the MIT License. See LICENSE in the repository root for details.
 
-// The markdown-it of the editor (docs/specification.md, R-GEN-006, R-GEN-011): CommonMark with the parts of GFM
+// The markdown-it of the editor (docs/specification.md, R-EDIT-003, R-REN-001): CommonMark with the parts of GFM
 // (tables, strikethrough, links of bare addresses, task lists), raw HTML, and footnotes. The definitions of the
 // footnotes stay where the file has them, because the editor shows each block in its place: the core rule
 // `footnote_tail`, which moves them to the end for the HTML of a preview, is off. The inline footnotes `^[text]` of
