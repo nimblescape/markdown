@@ -79,24 +79,6 @@ documented plugin API. The plugin of each extension lives in the repository
 of that extension. The editor holds the general functions; a plugin adds
 only the functions of its extension ([decision 9](#decisions)).
 
-### R-GEN-012
-
-**Extensions that render, or render and edit.** An extension adds a
-function at one of two levels ([decision 19](#decisions)):
-
-- *Render:* it adds syntax with the function `extendMarkdownIt(md)`, as an
-  extension of the Markdown preview of VS Code does, and a view for each new
-  kind of token. The editor keeps the Markdown text of such a block
-  unchanged; the user changes it by editing its source.
-- *Render and edit:* it also adds nodes and marks of the document, how a
-  token becomes a node and how a changed node is written as Markdown,
-  commands, keys and menu items.
-
-The Markdown API of VS Code (`markdown.markdownItPlugins`,
-`markdown.previewStyles`, `markdown.previewScripts`) is the reference for
-the extension API, so that a markdown-it plugin works in the preview of
-VS Code and in the editor without a change.
-
 ### R-GEN-006
 
 **The file formats.** The editor knows Markdown. Notes and Paper extend the
@@ -160,6 +142,24 @@ what no library does. The libraries:
 | markdown-it, `markdown-it-footnote`, `markdown-it-task-lists` | MIT, MIT, ISC | Parsing the Markdown text, as Notes and Paper do |
 | `prosemirror-markdown` | MIT | The bridge from the tokens of markdown-it to the document, and the Markdown of a changed block |
 | `string-width` | MIT | The width of the cells of a table |
+
+### R-GEN-012
+
+**Extensions that render, or render and edit.** An extension adds a
+function at one of two levels ([decision 19](#decisions)):
+
+- *Render:* it adds syntax with the function `extendMarkdownIt(md)`, as an
+  extension of the Markdown preview of VS Code does, and a view for each new
+  kind of token. The editor keeps the Markdown text of such a block
+  unchanged; the user changes it by editing its source.
+- *Render and edit:* it also adds nodes and marks of the document, how a
+  token becomes a node and how a changed node is written as Markdown,
+  commands, keys and menu items.
+
+The Markdown API of VS Code (`markdown.markdownItPlugins`,
+`markdown.previewStyles`, `markdown.previewScripts`) is the reference for
+the extension API, so that a markdown-it plugin works in the preview of
+VS Code and in the editor without a change.
 
 ## AI chat
 
