@@ -1,6 +1,7 @@
 # nimblescape Markdown
 
-An editor of rendered Markdown for the web and for VS Code. The user reads
+An editor of rendered Markdown for the web and for VS Code, as a general
+library built on ProseMirror. The user reads
 and edits the rendered text; the file stays plain Markdown. nimblescape
 Markdown Notes and nimblescape Markdown Paper extend the editor with their
 functions through a plugin API.

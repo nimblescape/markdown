@@ -18,24 +18,27 @@ decided yet: no requirement depends on them.
 
 | Step | Content | Requirements | State |
 | --- | --- | --- | --- |
-| 1 | Setup of the repository: the VS Code extension, the npm package, an example page for the web, CI and release workflows without a publish, license notices | [R-GEN-007](#r-gen-007) | planned |
-| 2 | The core: Markdown into the document of the editor and back, with tests of the round trip | [R-GEN-006](#r-gen-006) | planned |
-| 3 | Rendered editing of CommonMark and GFM: toolbar, format bar, insert menu, slash menu, block handles, find and replace | [R-GEN-003](#r-gen-003) | planned |
+| 1 | Setup of the repository: the npm package, an example page for the web, CI and release workflows without a publish, license notices | [R-GEN-007](#r-gen-007) | planned |
+| 2 | The core on ProseMirror: Markdown into the document of the editor and back, with tests of the round trip | [R-GEN-006](#r-gen-006), [R-GEN-009](#r-gen-009) | planned |
+| 3 | Rendered editing of CommonMark and GFM: toolbar, format bar, insert menu, slash menu, block handles, find and replace, read-only mode | [R-GEN-003](#r-gen-003), [R-GEN-008](#r-gen-008) | planned |
 | 4 | Tables: handles, markers for new rows and columns, the table menu | [R-GEN-003](#r-gen-003) | planned |
 | 5 | The editor of the front matter with both modes and the JSON schema | [R-FM-001](#r-fm-001) to [R-FM-004](#r-fm-004) | planned |
-| 6 | VS Code: the editor of the main view, the theme of VS Code | [R-GEN-002](#r-gen-002), [R-GEN-004](#r-gen-004), [R-THEME-001](#r-theme-001) | planned |
+| 6 | The adapter for the webviews of VS Code and the theme of VS Code | [R-GEN-004](#r-gen-004), [R-THEME-001](#r-theme-001) | planned |
 | 7 | The plugin API, version 1 | [R-GEN-005](#r-gen-005) | planned |
-| 8 | The plugin of nimblescape Markdown Notes, in its repository; the Notes side view with the editor | [R-GEN-002](#r-gen-002), [R-GEN-004](#r-gen-004), [R-GEN-005](#r-gen-005) | planned |
+| 8 | The plugin of nimblescape Markdown Notes, in its repository; the editor in the Notes side view | [R-GEN-002](#r-gen-002), [R-GEN-004](#r-gen-004), [R-GEN-005](#r-gen-005) | planned |
 | 9 | The plugin of nimblescape Markdown Paper, in its repository; the schema of each layout | [R-GEN-005](#r-gen-005), [R-FM-004](#r-fm-004) | planned |
 
 ## General
 
 ### R-GEN-001
 
-**An editor of its own.** nimblescape Markdown is an independent editor of
-rendered Markdown. It runs on the web and in VS Code with the same code. It
-shows the text rendered, and the user edits the rendered text
-([decision 1](#decisions), [decision 9](#decisions)).
+**A general library.** nimblescape Markdown is an independent editor of
+rendered Markdown, delivered as a general library, the npm package
+`@nimblescape/markdown`. It runs on the web and in the webviews of VS Code
+with the same code; it is not a VS Code extension of its own. It shows the
+text rendered, and the user edits the rendered text
+([decision 1](#decisions), [decision 9](#decisions),
+[decision 11](#decisions)).
 
 ### R-GEN-002
 
@@ -61,9 +64,10 @@ editor of Claude Desktop and of Claude on the web
 
 ### R-GEN-004
 
-**Main view and side view.** The same editor edits a whole file in the main
-editor area and each answer of a note in the side view "Notes" of
-nimblescape Markdown Notes ([decision 4](#decisions)).
+**The extensions decide where they use it.** Notes and Paper decide where
+they use the editor. Notes uses it for each answer of a note in its side
+view "Notes", and the editor is made to edit a whole file in the main
+editor area too ([decision 4](#decisions), [decision 11](#decisions)).
 
 ### R-GEN-005
 
@@ -75,12 +79,14 @@ only the functions of its extension ([decision 9](#decisions)).
 
 ### R-GEN-006
 
-**The file formats.** With the plugins of Notes and Paper, the editor knows
-the format of the notes (the notes, the hidden form, the comment of the
-format, captions, listings, values of the front matter in the text) and the
-format of a paper (layouts, citations, the sources, special sections,
-generated lists) ([decision 6](#decisions)). It keeps every part of a file
-that it does not show, so that a file stays intact.
+**The file formats.** The editor knows Markdown. Notes and Paper extend the
+file format with the parts that they add, through the API of the editor
+for the parsing, the Markdown form and the view of each part: Notes with
+the notes, the hidden form, the comment of the format, captions, listings
+and values of the front matter in the text; Paper with layouts, citations,
+the sources, special sections and generated lists
+([decision 6](#decisions)). The editor keeps every part of a file that no
+plugin knows, so that a file stays intact.
 
 ### R-GEN-007
 
@@ -95,6 +101,21 @@ that it does not show, so that a file stays intact.
   fixed commit.
 - The npm package uses the same structure, build and release workflow as
   the npm packages of the other nimblescape extensions.
+
+### R-GEN-008
+
+**Read-only mode.** A button switches the editor between editing and
+reading. The code that integrates the library decides whether the button
+shows and in which mode the editor starts, so that an extension can make
+the editor a viewer only, also through a setting of its user
+([decision 10](#decisions)).
+
+### R-GEN-009
+
+**The engine.** The editor is built on ProseMirror. The engine meets each
+requirement through its normal API, without workarounds; a requirement that
+ProseMirror cannot meet in this way leads to a new engine of its own
+([decision 13](#decisions)).
 
 ## Theme
 
@@ -115,8 +136,8 @@ creates the editor chooses its colors ([decision 5](#decisions)).
 **Structured editor of the front matter.** The editor shows the front matter
 of a file as a form, not as YAML text. The form is a general function of the
 editor, for every Markdown file; Notes and Paper add only their own parts
-([decision 7](#decisions), [decision 9](#decisions)). The form edits a
-front matter in YAML only.
+([decision 7](#decisions), [decision 9](#decisions)). The form edits every
+front matter format: YAML, TOML and JSON ([decision 12](#decisions)).
 
 ### R-FM-002
 
@@ -149,26 +170,39 @@ has a schema of the front matter of its documents
 3. **One view:** the editor replaces the clean editing view and the visual
    editor of Markdown Notes and the Markdown preview
    ([R-GEN-002](#r-gen-002)).
-4. **Main view and side view:** the same editor in the main editor area and
-   in the side view of the notes ([R-GEN-004](#r-gen-004)).
+4. **Main view and side view:** the editor serves the main editor area and
+   the side view of the notes; since decision 11, Notes and Paper decide
+   where they use it ([R-GEN-004](#r-gen-004)).
 5. **Theme:** the colors of the VS Code theme in VS Code; themable on the
    web ([R-THEME-001](#r-theme-001), [R-THEME-002](#r-theme-002)).
-6. **File formats:** the editor knows the formats of Markdown Notes and of
-   Markdown Paper ([R-GEN-006](#r-gen-006)).
-7. **Front matter:** a structured editor, YAML only, with a read-only mode
-   (values only, driven by a schema) and an edit mode (structured values
-   can be added) ([R-FM-001](#r-fm-001) to [R-FM-003](#r-fm-003)).
+6. **File formats:** Notes and Paper extend the file format with their
+   parts, and the editor gives them the API for it
+   ([R-GEN-006](#r-gen-006)).
+7. **Front matter:** a structured editor with a read-only mode (values
+   only, driven by a schema) and an edit mode (structured values can be
+   added); since decision 12 for every front matter format
+   ([R-FM-001](#r-fm-001) to [R-FM-003](#r-fm-003)).
 8. **JSON schemas:** the schema of a front matter is JSON; each layout gets
    one ([R-FM-004](#r-fm-004)).
 9. **An editor with a clean API:** Notes and Paper extend the editor with
    their functions through a clean API; the front matter is a general
    function of the editor ([R-GEN-005](#r-gen-005), [R-FM-001](#r-fm-001)).
+10. **Read-only mode:** a button switches to read-only; the integrating code
+    can make the editor a viewer only ([R-GEN-008](#r-gen-008)).
+11. **A general library:** the editor is a general Markdown library, not a
+    VS Code extension of its own; Notes and Paper decide where they use it
+    ([R-GEN-001](#r-gen-001), [R-GEN-004](#r-gen-004)).
+12. **Every front matter format:** YAML, TOML and JSON
+    ([R-FM-001](#r-fm-001)).
+13. **The engine:** the engine that suits the editor best, which meets each
+    requirement through its normal API without workarounds, else a new
+    engine; ProseMirror ([R-GEN-009](#r-gen-009)).
 
 ## Open questions
 
-1. The engine of the editor, and how it keeps the text of a file that the
-   user did not change.
-2. Which Markdown files VS Code opens in the editor by default.
+1. Whether Notes also uses the editor for the main view of a file in VS
+   Code, and which Markdown files open in it by default.
+2. How the editor keeps the text of a file that the user did not change.
 3. The split of functions between the editor, Notes and Paper: standard
    footnotes; captions, links to figures and tables, and listings; values of
    the front matter in the text; the view "Front Matter" of Paper.
@@ -177,7 +211,7 @@ has a schema of the front matter of its documents
 5. The file of the schema of a layout and the field `fields` of
    `layout.json`; the mode of the form for a file without a schema.
 6. The fonts of the text in VS Code.
-7. The names of the extension, of the npm package and of its folder.
+7. The name of the npm package and the contribution point of the plugins.
 8. The pages of a paper in the editor.
 
 ---
