@@ -125,7 +125,9 @@ ProseMirror cannot meet in this way leads to a new engine of its own
 view without edit functions is the editor in its read-only mode
 ([R-GEN-008](#r-gen-008)). The view, the pages of a paper and the PDF come
 from the same rendering code and the same views of the plugins
-([decision 14](#decisions)).
+([decision 14](#decisions)). The view of the Markdown with its layout, with
+pages, comes from nimblescape Markdown Paper, as an extension of the editor;
+the editor has no layouts of its own ([decision 21](#decisions)).
 
 ### R-GEN-011
 
@@ -289,6 +291,8 @@ has a schema of the front matter of its documents
     ([R-GEN-012](#r-gen-012)).
 20. **A mode to learn Markdown:** the editor shows the Markdown marks under
     the rendered text ([R-GEN-013](#r-gen-013)).
+21. **The layout comes from Paper:** Markdown Paper brings the function to
+    render and view the Markdown with its layout ([R-GEN-010](#r-gen-010)).
 
 ## Open questions
 
@@ -304,7 +308,7 @@ has a schema of the front matter of its documents
    `layout.json`; the mode of the form for a file without a schema.
 6. The fonts of the text in VS Code.
 7. The name of the npm package and the contribution point of the plugins.
-8. How the pages of a paper switch with the editing view.
+8. How the pages of the layout view of Paper switch with the editing view.
 9. How the editor shows the changes that the AI proposes.
 10. Where the memory of the AI is stored (in the repository of the document,
     or for each user), and whether the AI writes it without asking.
