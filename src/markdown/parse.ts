@@ -2,7 +2,7 @@
 // © 2026 Hannes Stauss (scalarion@nimblescape.com)
 // Licensed under the MIT License. See LICENSE in the repository root for details.
 
-// Markdown text into the document of the editor (docs/specification.md, R-EDIT-004): markdown-it reads the text, and
+// Markdown text into the document of the editor (docs/editor.md, R-EDIT-004): markdown-it reads the text, and
 // the MarkdownParser of prosemirror-markdown builds the document from its tokens. Each top-level block of the document
 // remembers the lines of the file that it comes from, so that the serializer writes a block that the user did not
 // change byte for byte. Lines that no block holds and that are not blank, such as the definitions of link references,

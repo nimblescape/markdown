@@ -2,11 +2,11 @@
 // © 2026 Hannes Stauss (scalarion@nimblescape.com)
 // Licensed under the MIT License. See LICENSE in the repository root for details.
 
-// The Tiptap extensions of the document of the editor (docs/specification.md, R-EDIT-003, R-GEN-011): the nodes and
-// marks of CommonMark and GFM from the extensions of Tiptap, footnotes, the front matter, and raw nodes for HTML and
-// for text that no block of Markdown holds. Attributes that only record the form of the Markdown text, such as the
-// character of a bullet, let the serializer write a changed block in the form that it had; the editor does not render
-// them.
+// The Tiptap extensions of the document of the editor (docs/editor.md, R-EDIT-003; docs/specification.md, R-GEN-011):
+// the nodes and marks of CommonMark and GFM from the extensions of Tiptap, footnotes, the front matter, and raw nodes
+// for HTML and for text that no block of Markdown holds. Attributes that only record the form of the Markdown text,
+// such as the character of a bullet, let the serializer write a changed block in the form that it had; the editor does
+// not render them.
 
 import { type AnyExtension, Node, mergeAttributes } from '@tiptap/core';
 import Bold from '@tiptap/extension-bold';

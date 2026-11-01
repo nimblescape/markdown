@@ -1,7 +1,7 @@
 {
   "name": "@nimblescape/markdown",
   "version": "0.1.0",
-  "description": "An editor of rendered Markdown for the web and for the webviews of VS Code, built on ProseMirror. It keeps every block of a file that the user does not change byte for byte, and other packages extend it with plugins.",
+  "description": "General libraries for text documents, Markdown first, for the web and for VS Code. Today the package holds an editor of rendered Markdown, built on ProseMirror, which keeps every block of a file that the user does not change byte for byte; other packages extend it with plugins.",
   "license": "MIT",
   "author": {
     "name": "nimblescape e.U.",

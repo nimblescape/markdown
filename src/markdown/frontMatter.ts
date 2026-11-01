@@ -2,7 +2,7 @@
 // © 2026 Hannes Stauss (scalarion@nimblescape.com)
 // Licensed under the MIT License. See LICENSE in the repository root for details.
 
-// The front matter at the start of a file (docs/specification.md, R-SRC-003): YAML between two lines `---` (the last
+// The front matter at the start of a file (docs/source.md, R-SRC-003): YAML between two lines `---` (the last
 // one can also be `...`), TOML between two lines `+++`, or JSON as an object whose first line is `{` and whose last
 // line is `}`.
 

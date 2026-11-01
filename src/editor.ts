@@ -2,10 +2,10 @@
 // © 2026 Hannes Stauss (scalarion@nimblescape.com)
 // Licensed under the MIT License. See LICENSE in the repository root for details.
 
-// The editor of rendered Markdown (docs/specification.md, R-GEN-001, R-GEN-008): a Tiptap editor with the extensions
-// of the document, which reads and writes Markdown text with the codec of the editor. The text that the editor writes
-// keeps each block that the user did not change as the file has it (R-EDIT-004). In read-only mode, the same editor is
-// the view of the text.
+// The editor of rendered Markdown (docs/specification.md, R-GEN-001; docs/editor.md, R-GEN-008): a Tiptap editor with
+// the extensions of the document, which reads and writes Markdown text with the codec of the editor. The text that the
+// editor writes keeps each block that the user did not change as the file has it (R-EDIT-004). In read-only mode, the
+// same editor is the view of the text.
 
 import { type AnyExtension, Editor } from '@tiptap/core';
 import { EditorState } from '@tiptap/pm/state';

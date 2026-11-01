@@ -6,16 +6,15 @@ Licensed under the MIT License. See LICENSE in the repository root for details.
 
 # Specification of the evaluation plugin
 
-This specification defines the evaluation plugin of nimblescape Markdown.
-The plugin evaluates the history of a text document
-([specification](specification.md#8-history), section 8): it classifies each
-step as original work or as routine work, gives each part of a step a role,
-shows the result in views, and gives feedback on work and learning. It is
-normative in the same way as the [specification](specification.md): "must"
-marks a requirement, "should" a recommendation, and "may" an option; a
-requirement marked *(proposal)* is not decided yet, and
-[section 9](#9-open-questions) lists these open questions. Each requirement
-has an ID as its heading.
+This document defines the evaluation plugin of nimblescape Markdown.
+The plugin evaluates the history of a text document ([history](history.md)):
+it classifies each step as original work or as routine work, gives each part
+of a step a role, shows the result in views, and gives feedback on work and
+learning. It is normative in the same way as the
+[specification](specification.md): "must" marks a requirement, "should" a
+recommendation, and "may" an option; a requirement marked *(proposal)* is
+not decided yet, and [section 9](#9-open-questions) lists these open
+questions. Each requirement has an ID as its heading.
 
 ## 1. Scope
 
@@ -24,13 +23,13 @@ has an ID as its heading.
 **An evaluation of a history.** The evaluation plugin evaluates the history
 of any text document: a Markdown document, a paper of Markdown Paper, or
 source code of any language, which the history records in every text editor
-of VS Code ([R-VSC-004](specification.md#r-vsc-004)). It serves two uses:
+of VS Code ([R-VSC-004](history.md#r-vsc-004)). It serves two uses:
 the author gets feedback on their own work and learning, and a teacher
 evaluates student assignments, written texts as well as programming
 assignments, with their histories. The plugin reads a history only through
 the API and the file form of the history
-([R-HIST-007](specification.md#r-hist-007),
-[R-HIST-008](specification.md#r-hist-008)), so it runs without the editor:
+([R-HIST-007](history.md#r-hist-007),
+[R-HIST-008](history.md#r-hist-008)), so it runs without the editor:
 in VS Code, on a web page, on the command line and on a server.
 
 ### R-EVAL-019
@@ -115,7 +114,7 @@ create, also when it implements a known algorithm such as quick sort
 ### R-EVAL-004
 
 **The classifier.** The classifier is pluggable and may use an AI through
-the provider API of the libraries ([R-AI-002](specification.md#r-ai-002)).
+the provider API of the libraries ([R-AI-002](ai.md#r-ai-002)).
 Large language models can code text with an accuracy and an agreement above
 those of crowd workers (Gilardi et al., 2023), but the result depends on the
 task, so the classifier must pass the check of [R-EVAL-006](#r-eval-006).
@@ -182,11 +181,11 @@ Buçinca et al., 2021).
 ### R-EVAL-007
 
 **Class and origin.** The evaluation must combine the class with the origin
-of each episode ([R-HIST-001](specification.md#r-hist-001)): for the user
+of each episode ([R-HIST-001](history.md#r-hist-001)): for the user
 and for the AI, it gives the episodes, the time and the share of the final
 text of each class, for the whole document or set of files, and for each
 section or file. Changes with the origin "other program" or "probably AI"
-([R-VSC-004](specification.md#r-vsc-004)) count apart until the user marks
+([R-VSC-004](history.md#r-vsc-004)) count apart until the user marks
 them. With the roles ([R-EVAL-018](#r-eval-018)), it also gives the episodes
 that each party directed and judged. This shows which cognitive work the
 author moved to the AI, in the sense of cognitive offloading: an action that
@@ -210,7 +209,7 @@ The declaration comes from the history and not from memory, because people
 who write with AI declare themselves as authors even when they do not feel
 ownership of the text of the AI (Draxler et al., 2024). Paper adds the
 declaration and the views to the appendix of the PDF
-([R-HIST-005](specification.md#r-hist-005)).
+([R-HIST-005](history.md#r-hist-005)).
 
 ## 5. Views
 
@@ -230,8 +229,8 @@ The timeline follows the visualizations of the writing process in keystroke
 logging (Leijten & Van Waes, 2013), and the views as a whole follow the
 dashboards of learning analytics (Verbert et al., 2013). A click on a mark
 opens its episode in the history
-([R-HIST-003](specification.md#r-hist-003)). The colors come from the theme
-([R-THEME-001](specification.md#r-theme-001)), and every view also tells the
+([R-HIST-003](history.md#r-hist-003)). The colors come from the theme
+([R-THEME-001](platforms.md#r-theme-001)), and every view also tells the
 classes and the origins apart without color: about 8% of men of European
 origin have a red-green color deficiency (Birch, 2012).
 

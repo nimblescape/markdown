@@ -2,7 +2,7 @@
 // © 2026 Hannes Stauss (scalarion@nimblescape.com)
 // Licensed under the MIT License. See LICENSE in the repository root for details.
 
-// The Markdown of the editor in both directions (docs/specification.md, R-EDIT-004, R-EDIT-005): the reader and the
+// The Markdown of the editor in both directions (docs/editor.md, R-EDIT-004, R-EDIT-005): the reader and the
 // writer for one schema and one markdown-it, with the parts that the extensions of the editor add (R-GEN-012).
 
 import { getSchema, type AnyExtension } from '@tiptap/core';

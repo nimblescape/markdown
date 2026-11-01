@@ -2,9 +2,9 @@
 // © 2026 Hannes Stauss (scalarion@nimblescape.com)
 // Licensed under the MIT License. See LICENSE in the repository root for details.
 
-// The tests of the round trip of the Markdown of the editor (docs/specification.md, R-EDIT-004 to R-EDIT-006): every example of the
-// CommonMark specification and every file of test/corpus comes back byte for byte when nothing changed; written new,
-// each shows the same HTML in markdown-it; a change of one block changes only the text of that block.
+// The tests of the round trip of the Markdown of the editor (docs/editor.md, R-EDIT-004 to R-EDIT-006): every example
+// of the CommonMark specification and every file of test/corpus comes back byte for byte when nothing changed; written
+// new, each shows the same HTML in markdown-it; a change of one block changes only the text of that block.
 
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';

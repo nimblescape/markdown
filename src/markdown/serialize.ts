@@ -2,7 +2,7 @@
 // © 2026 Hannes Stauss (scalarion@nimblescape.com)
 // Licensed under the MIT License. See LICENSE in the repository root for details.
 
-// The document of the editor back into Markdown text (docs/specification.md, R-EDIT-004, R-EDIT-005): a top-level block
+// The document of the editor back into Markdown text (docs/editor.md, R-EDIT-004, R-EDIT-005): a top-level block
 // that the user did not change is the same node as after parsing, and the serializer writes its text from the file byte for
 // byte, with the blank lines between such blocks. The MarkdownSerializer of prosemirror-markdown writes a changed or
 // new block in the form of the formatter of nimblescape Markdown Notes: each paragraph on one line, a table with

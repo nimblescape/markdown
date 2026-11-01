@@ -1,15 +1,19 @@
 # nimblescape Markdown
 
-An editor of rendered Markdown for the web and for VS Code, as a general
-library built on ProseMirror. The user reads
-and edits the rendered text; the file stays plain Markdown. nimblescape
-Markdown Notes and nimblescape Markdown Paper extend the editor with their
-functions through a plugin API.
+General libraries for text documents, Markdown first, for VS Code and the
+web: the source of a file with its changes, editors (first an editor of
+rendered Markdown, built on ProseMirror), a renderer, layouts with pages and
+PDF, and a history that records every action, with plugins that evaluate
+it. The file stays plain text. nimblescape Markdown Notes and nimblescape
+Markdown Paper extend the libraries with their functions through a plugin
+API.
 
 [docs/specification.md](docs/specification.md) is the normative
-specification, with the open questions and the plan of the steps. The first steps
-are built: the npm package and the core, which reads Markdown into the
-document of the editor and writes it back. A block that the user does not
+specification: the scope, the architecture, the open questions and the plan
+of the steps, with one document for each part, for example
+[docs/editor.md](docs/editor.md) and [docs/history.md](docs/history.md).
+The first steps are built: the npm package and the core, which reads
+Markdown into the document of the editor and writes it back. A block that the user does not
 change keeps its text byte for byte. The toolbars, the menus and the plugin
 API come in the next steps.
 
