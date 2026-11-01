@@ -46,13 +46,15 @@ Code.
 | Editor | A part that shows the text in a form that the user changes |
 | Renderer | A part that turns the text into content without edit functions |
 | Layout | A part that puts rendered content into a layout: styles, templates, pages, PDF |
-| History | A part that records every action on a text, saves it and replays it |
+| History | A part that records every action on a text, saves it, replays it and evaluates it |
 | Backend | A plugin of the history that stores the steps of a history and reads them back |
 | Platform adapter | The code that connects the libraries to one platform, for example VS Code |
 | Plugin | An object that adds functions to one part |
 | Format extension | The plugins of one file format for all parts, for example Markdown Notes |
 | Step | One recorded action of the history |
 | Origin | Who made a change: the user, the AI, or another program |
+| Intellectual origin | Work that creates content of its own: ideas, claims and their phrasing, structure, design, new code |
+| Mechanics | Work that applies given rules or finds given things: formatting, search, literature research |
 
 ## 3. Architecture
 
@@ -62,7 +64,7 @@ Code.
 | Editor | Shows the text in a form that the user edits, and turns each edit into a change of the text. |
 | Renderer | Turns the text into content without edit functions: HTML, with a view for each kind of token. |
 | Layout | Puts the content of the renderer into a layout: styles, title page and templates, numbers, generated lists, pages, PDF. |
-| History | Records every action with its origin, saves it through a pluggable backend, and replays it, back and forward. |
+| History | Records every action with its origin, saves it through a pluggable backend, replays it, back and forward, and evaluates it. |
 | Platform | Connects the libraries to one platform, and decides how each function is shown and used there. |
 
 ### R-GEN-015
@@ -455,7 +457,9 @@ again. "Run again" sends a recorded question to the AI as a new question.
 
 **The prompt protocol of Paper.** Markdown Paper uses the history for the
 prompt protocol of a paper; `mp build` may add the history, or a list of the
-questions to the AI, as an appendix of the PDF.
+questions to the AI, with the cognitive evaluation
+([R-HIST-007](#r-hist-007) to [R-HIST-009](#r-hist-009)), as an appendix of
+the PDF.
 
 ### R-HIST-006
 
@@ -465,6 +469,45 @@ document, with one step per line and the change of each edit as a text
 patch. A second backend keeps the history in the local store of the
 platform. When the user goes back and then acts again, the later steps stay
 as a branch.
+
+### R-HIST-007
+
+**Cognitive evaluation.** The history must give a cognitive evaluation of
+the protocol: each step that creates or changes content is classified as
+intellectual origin or as mechanics, by the work that it does.
+
+- *Intellectual origin:* work that creates content of its own, for example
+  an idea, a claim and the phrasing of specific claims, the structure of an
+  argument, a design, or new code such as a new function that implements the
+  quick sort algorithm.
+- *Mechanics:* work that applies given rules or finds given things, without
+  content of its own, for example the reference list rewritten in APA 7,
+  code formatted, a paper found that supports a given statement, or a
+  literature research about "Industrialisierung von Dienstleistungen".
+
+A question to the AI is classified by the work that it asks for; its answer
+and the changes that the user accepts carry this class with the origin AI.
+Each classification must record its reason, so that a reader can check it.
+
+### R-HIST-008
+
+**Class and origin.** The evaluation must combine the class with the origin
+([R-HIST-001](#r-hist-001)): for the user and for the AI, it shows the steps
+and the share of the text of each class, for the whole document and for
+each section. A view mode must mark the text by its origin and its class.
+
+### R-HIST-009
+
+**The classifier.** The classifier is a plugin of the history and may use an
+AI through the provider API ([R-AI-002](#r-ai-002)). *(proposal)* Its rules
+are a file with a description and examples of each class: the library
+brings default rules with the examples of [R-HIST-007](#r-hist-007), and a
+layout of Paper may bring the rules of its institution, for example the
+rules of PHT for the use of AI. The classifier classifies each step when the
+history records it. A step that holds both classes is split into its parts.
+The user may correct a classification with a reason; the correction is a
+step of its own, and the protocol shows the classification and the
+correction.
 
 ## 9. Plugins and format extensions
 
@@ -747,6 +790,13 @@ use:
 17. Licenses: `markdown-it-task-lists` (ISC), `entities` (BSD-2-Clause, used
     by markdown-it) and `argparse` (Python-2.0, only in the command line
     program of markdown-it, in no bundle).
+18. Cognitive evaluation: only the two classes, with a step that holds both
+    split into its parts ([R-HIST-009](#r-hist-009), proposal), or a third
+    class "mixed" or a scale? Does the classifier run when a step is
+    recorded (proposal) or only when the protocol is evaluated? Default
+    rules in the library (proposal) or always the rules of the institution
+    in the layout? May the user correct a classification (proposal: yes, as
+    a step of its own)?
 
 ## Plan
 
