@@ -24,7 +24,7 @@ decided yet: no requirement depends on them.
 | 4 | Tables: handles, markers for new rows and columns, the table menu | [R-GEN-003](#r-gen-003) | planned |
 | 5 | The editor of the front matter with both modes and the JSON schema | [R-FM-001](#r-fm-001) to [R-FM-004](#r-fm-004) | planned |
 | 6 | The adapter for the webviews of VS Code and the theme of VS Code | [R-GEN-004](#r-gen-004), [R-THEME-001](#r-theme-001) | planned |
-| 7 | The plugin API, version 1 | [R-GEN-005](#r-gen-005) | planned |
+| 7 | The plugin API, version 1, with both levels of extensions | [R-GEN-005](#r-gen-005), [R-GEN-012](#r-gen-012) | planned |
 | 8 | The plugin of nimblescape Markdown Notes, in its repository; the editor in the Notes side view | [R-GEN-002](#r-gen-002), [R-GEN-004](#r-gen-004), [R-GEN-005](#r-gen-005) | planned |
 | 9 | The plugin of nimblescape Markdown Paper, in its repository; the schema of each layout | [R-GEN-005](#r-gen-005), [R-FM-004](#r-fm-004) | planned |
 | 10 | The provider API, the Claude provider and the proposed changes in the editor; in Notes, the AI chat as notes and the memory | [R-AI-001](#r-ai-001) to [R-AI-003](#r-ai-003) | planned |
@@ -78,6 +78,24 @@ nimblescape Markdown Paper extend the editor with their functions through a
 documented plugin API. The plugin of each extension lives in the repository
 of that extension. The editor holds the general functions; a plugin adds
 only the functions of its extension ([decision 9](#decisions)).
+
+### R-GEN-012
+
+**Extensions that render, or render and edit.** An extension adds a
+function at one of two levels ([decision 19](#decisions)):
+
+- *Render:* it adds syntax with the function `extendMarkdownIt(md)`, as an
+  extension of the Markdown preview of VS Code does, and a view for each new
+  kind of token. The editor keeps the Markdown text of such a block
+  unchanged; the user changes it by editing its source.
+- *Render and edit:* it also adds nodes and marks of the document, how a
+  token becomes a node and how a changed node is written as Markdown,
+  commands, keys and menu items.
+
+The Markdown API of VS Code (`markdown.markdownItPlugins`,
+`markdown.previewStyles`, `markdown.previewScripts`) is the reference for
+the extension API, so that a markdown-it plugin works in the preview of
+VS Code and in the editor without a change.
 
 ### R-GEN-006
 
@@ -259,6 +277,9 @@ has a schema of the front matter of its documents
 18. **Memory of the AI:** the AI uses a memory, so that a decision in a chat
     has the context of the other decisions and chats
     ([R-AI-003](#r-ai-003)).
+19. **Two levels of extensions:** extensions that render, or render and
+    edit; the Markdown API of VS Code is the reference
+    ([R-GEN-012](#r-gen-012)).
 
 ## Open questions
 
