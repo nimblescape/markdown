@@ -517,7 +517,9 @@ a class and its reason. The evaluation plugin is such a plugin: it
 classifies each step as original work or as routine work, gives each part of
 a step a role (direct, produce or judge), shows the result in views, and
 gives feedback on work and learning, also for student assignments and for
-source code. Its specification is [docs/evaluation.md](evaluation.md).
+source code. Its methods rest on published scientific work
+([R-EVAL-019](evaluation.md#r-eval-019)). Its specification is
+[docs/evaluation.md](evaluation.md).
 
 ### R-HIST-008
 
