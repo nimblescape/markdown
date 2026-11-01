@@ -196,6 +196,19 @@ icons beside the text show them ([decision 26](#decisions)). The icons are
 code of this repository, as the other functions of
 [R-GEN-003](#r-gen-003).
 
+### R-GEN-015
+
+**Six pluggable parts.** The architecture has six parts, and each part
+takes plugins ([decision 27](#decisions)):
+
+- the *source*: the text of a file, the only truth;
+- *editors* of that text;
+- *renderers* of that text;
+- the *layout* of the output of a renderer;
+- the *history*: a recorder of every action with replay
+  ([R-AI-004](#r-ai-004));
+- the *platforms*, for example VS Code and the web.
+
 ## AI chat
 
 ### R-AI-001
@@ -360,6 +373,10 @@ has a schema of the front matter of its documents
     that open the threads of notes and AI chats; the integrating code
     decides whether it uses them or a view of its own, for example the side
     view of Notes in VS Code ([R-GEN-014](#r-gen-014)).
+27. **Architecture:** six parts, each pluggable: the source file as text,
+    editors of that text, renderers of that text, the layout, a recorder
+    of the history with replay, and the platforms such as VS Code and the
+    web ([R-GEN-015](#r-gen-015)).
 
 ## Open questions
 
@@ -388,6 +405,10 @@ has a schema of the front matter of its documents
     where it stores the history, what happens to the later steps when the
     user goes back and changes the text, and whether a replay sends the
     prompts to the AI again or shows the recorded results.
+14. How the six parts of the architecture split into packages and
+    repositories, whether the editor is built on the renderer (a change of
+    decision 13), and whether the layout code of Markdown Paper moves into
+    the layout part.
 
 ---
 
