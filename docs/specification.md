@@ -507,7 +507,13 @@ rules of PHT for the use of AI. The classifier classifies each step when the
 history records it. A step that holds both classes is split into its parts.
 The user may correct a classification with a reason; the correction is a
 step of its own, and the protocol shows the classification and the
-correction.
+correction. The rules code each step with three codes: the cognitive
+process (the revised taxonomy of Bloom, Krathwohl 2002), the stage of the
+work (the types of automation of Parasuraman, Sheridan and Wickens 2000)
+and, for an edit, the type of revision (a surface or a meaning change, after
+Faigley and Witte 1981); the two classes come from these codes. People
+check the classifier on a sample with Krippendorff's alpha, with 0.800 as
+the goal.
 
 ## 9. Plugins and format extensions
 
@@ -796,7 +802,8 @@ use:
     recorded (proposal) or only when the protocol is evaluated? Default
     rules in the library (proposal) or always the rules of the institution
     in the layout? May the user correct a classification (proposal: yes, as
-    a step of its own)?
+    a step of its own)? Is the coding scheme of three codes the right basis
+    of the rules ([R-HIST-009](#r-hist-009), proposal)?
 
 ## Plan
 
