@@ -209,6 +209,14 @@ takes plugins ([decision 27](#decisions)):
   ([R-AI-004](#r-ai-004));
 - the *platforms*, for example VS Code and the web.
 
+The functions are in the libraries of these parts, the same on every
+platform. How a function is shown and used, its view and its interaction,
+depends on the platform: the adapter of each platform is thin and only
+connects the libraries to the views, commands, settings and storage of its
+platform. For example, the threads of notes show in the side view of Notes
+in VS Code and in icons beside the text on a web page
+([R-GEN-014](#r-gen-014)).
+
 ## AI chat
 
 ### R-AI-001
@@ -376,7 +384,9 @@ has a schema of the front matter of its documents
 27. **Architecture:** six parts, each pluggable: the source file as text,
     editors of that text, renderers of that text, the layout, a recorder
     of the history with replay, and the platforms such as VS Code and the
-    web ([R-GEN-015](#r-gen-015)).
+    web. The functions are in the libraries; the view and the interaction
+    depend on the platform, whose adapter is thin
+    ([R-GEN-015](#r-gen-015)).
 
 ## Open questions
 
