@@ -211,13 +211,18 @@ context of the other decisions and chats ([decision 17](#decisions)).
 ### R-AI-004
 
 **Prompt protocol.** nimblescape Markdown Paper records every prompt and
-its result, as a log of transactions in their order. The user can replay
-the log and go back in time through it, as with Time Machine, and see the
-document as it was at each prompt ([decision 25](#decisions)). The editor
-gives the general parts: an event for each prompt and its result through
-the provider API ([R-AI-002](#r-ai-002)), an event for each proposed change
-that the user accepts or rejects, and the read-only mode to show an earlier
-state of the document ([R-GEN-008](#r-gen-008)).
+its result, in their order, as a saved undo and redo history: the history
+stays after the file is closed, and the user scrolls through it, back and
+forward, as with Time Machine. Each position shows the document as it was
+at that step, and the user can replay the steps. The edits of the user are
+steps too, and each step records whether it came from the user or from the
+AI, so that the history tells the edits of the author and the edits of the
+AI apart ([decision 25](#decisions)). The editor gives the general parts:
+an event for each prompt and its result through the provider API
+([R-AI-002](#r-ai-002)), an event for each proposed change that the user
+accepts or rejects, a way to set the text to a given state as one change
+that can be undone, and marks that show the changes of a step and their
+origin.
 
 ## Theme
 
@@ -328,8 +333,9 @@ has a schema of the front matter of its documents
 24. **Which files open in the editor:** a setting chooses which Markdown
     files open in the editor in VS Code ([R-GEN-004](#r-gen-004)).
 25. **Prompt protocol:** Markdown Paper records every prompt and its result
-    as a log of transactions that the user can replay and go back in time
-    through, as with Time Machine ([R-AI-004](#r-ai-004)).
+    as a saved undo and redo history that the user scrolls through and
+    replays, as with Time Machine; the history tells the edits of the user
+    and the edits of the AI apart ([R-AI-004](#r-ai-004)).
 
 ## Open questions
 
@@ -354,9 +360,10 @@ has a schema of the front matter of its documents
     the cursor, and whether the user can edit the marks.
 12. How the file writes underlined and colored text, which Markdown does not
     have.
-13. Where and in which format Paper stores the prompt protocol, whether a
-    replay sends the prompts to the AI again or shows the recorded results,
-    and whether the edits of the user between two prompts are in the log.
+13. Where and in which format Paper stores the prompt protocol, what happens
+    to the later steps when the user goes back and changes the text, and
+    whether a replay sends the prompts to the AI again or shows the recorded
+    results.
 
 ---
 
