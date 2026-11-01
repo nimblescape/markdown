@@ -40,6 +40,7 @@ in VS Code, on a web page, on the command line and on a server.
 | Intellectual origin | Work that creates content of its own: ideas, claims and their phrasing, structure, design, new code |
 | Mechanics | Work that applies given rules or finds given things: formatting, search, literature research |
 | Code | A value of a coding scheme that the classifier gives an episode, with its reason |
+| Role | What a party does in a part of an episode: direct, produce or judge ([R-EVAL-018](#r-eval-018), proposal) |
 | Indicator | A number of the evaluation that describes the process of work and learning |
 | Assignment | A document or a set of source files with its history, which a student submits |
 
@@ -65,6 +66,30 @@ A question to the AI is classified by the work that it asks for; its answer
 and the changes that the user accepts carry this class with the origin AI.
 Each classification must record its reason, so that a reader can check it.
 
+### R-EVAL-018
+
+*(proposal)* **Roles.** The classifier gives each part of an episode a role,
+with the party that did it, the user or the AI:
+
+- *direct:* set the goal, the limits and the method of a task, for example
+  a question to the AI with its conditions, or the choice of an algorithm
+  for a problem;
+- *produce:* write the content, for example the text, the code or the list
+  of the papers found;
+- *judge:* check, select, correct, accept or reject content, for example
+  test the code of the AI, compare two answers, or correct a claim of the
+  AI.
+
+The two classes of [R-EVAL-002](#r-eval-002) apply to the role produce.
+Direct and judge are intellectual work of the party that did them, and the
+evaluation shows them apart from the intellectual origin of the content:
+who created the content, who directed it and who checked it. With AI,
+checking information, integrating answers and steering the task become a
+large part of the critical thinking of a person (Lee et al., 2025). An
+accept counts as judge only when the history shows a check, for example a
+test run, an edit of the answer or a question about it; an accept without
+a check is recorded as such.
+
 ### R-EVAL-003
 
 *(proposal)* **Three codes.** The classifier codes each episode with three
@@ -83,7 +108,9 @@ codes, and the two classes come from these codes:
 Intellectual origin is create, evaluate, or an analysis with a conclusion of
 its own; decision selection; a meaning change. Mechanics is remember,
 understand, or apply a given rule; information acquisition; an
-implementation by a given rule; a surface change.
+implementation by a given rule; a surface change. New code counts as
+create, also when it implements a known algorithm such as quick sort
+([R-EVAL-002](#r-eval-002)).
 
 ### R-EVAL-004
 
@@ -123,7 +150,8 @@ and for the AI, it gives the episodes, the time and the share of the final
 text of each class, for the whole document or set of files, and for each
 section or file. Changes with the origin "other program" or "probably AI"
 ([R-VSC-004](specification.md#r-vsc-004)) count apart until the user marks
-them.
+them. *(proposal)* With the roles ([R-EVAL-018](#r-eval-018)), it also
+gives the episodes that each party directed and judged.
 
 ### R-EVAL-008
 
@@ -139,6 +167,8 @@ the evaluation: the intellectual episodes of the AI, the mechanics that the
 AI did, and the roles in the terms of CRediT (Brand et al., 2015) and GAIDeT
 (Suchikova et al., 2025). Paper adds the declaration and the views to the
 appendix of the PDF ([R-HIST-005](specification.md#r-hist-005)).
+*(proposal)* With the roles ([R-EVAL-018](#r-eval-018)), the declaration
+also states which work of the AI the user directed and checked.
 
 ## 5. Views
 
@@ -182,6 +212,7 @@ and of the learning efficiency:
 | The share of own intellectual origin, and its trend | Learning effect: the author does more of the intellectual work over time |
 | The cognitive processes of the own episodes, and their trend | Learning effect: the author moves from remember and apply to analyze, evaluate and create |
 | The share of AI answers that the author rejects or changes in their meaning | Critical evaluation of the output of the AI |
+| *(proposal)* The share of AI answers that the author accepts without a check ([R-EVAL-018](#r-eval-018)) | Reliance on the AI without critical evaluation |
 | The share of the time on intellectual work, and the time of mechanics that the AI took over | Learning efficiency: time free for intellectual work |
 
 ### R-EVAL-013
@@ -241,9 +272,10 @@ own.
 
 ## 9. Open questions
 
-1. Classes: only the two classes, with an episode that holds both split into
-   its parts ([R-EVAL-004](#r-eval-004), proposal), or a third class "mixed"
-   or a scale?
+1. Classes and roles: the two classes with the roles direct, produce and
+   judge ([R-EVAL-018](#r-eval-018), proposal), a third class "judgment"
+   without roles, or only the two classes, with an episode that holds both
+   split into its parts ([R-EVAL-004](#r-eval-004))?
 2. Codes: is the scheme of three codes the right basis of the rules
    ([R-EVAL-003](#r-eval-003), proposal)? Which further code fits source
    code, for example the type of a change (a feature, a fix, a refactoring,
@@ -284,6 +316,12 @@ own.
 - Krippendorff, K. (2004). *Content analysis: An introduction to its
   methodology* (2nd ed.), p. 241, as quoted by
   <https://www.statisticshowto.com/krippendorffs-alpha/>
+- Lee, H.-P., Sarkar, A., Tankelevitch, L., Drosos, I., Rintel, S., Banks,
+  R., & Wilson, N. (2025). The impact of generative AI on critical thinking:
+  Self-reported reductions in cognitive effort and confidence effects from a
+  survey of knowledge workers. In *Proceedings of the 2025 CHI Conference on
+  Human Factors in Computing Systems* (pp. 1–22). ACM.
+  <https://doi.org/10.1145/3706598.3713778>
 - Parasuraman, R., Sheridan, T. B., & Wickens, C. D. (2000). A model for
   types and levels of human interaction with automation. *IEEE Transactions
   on Systems, Man, and Cybernetics – Part A: Systems and Humans, 30*(3),
