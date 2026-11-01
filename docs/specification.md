@@ -20,7 +20,7 @@ decided yet: no requirement depends on them.
 | --- | --- | --- | --- |
 | 1 | Setup of the repository: the npm package, an example page for the web, CI with a check of the licenses | [R-GEN-007](#r-gen-007), [R-GEN-011](#r-gen-011) | planned |
 | 2 | The core on ProseMirror: Markdown into the document of the editor and back, with tests of the round trip | [R-GEN-006](#r-gen-006), [R-GEN-009](#r-gen-009) | planned |
-| 3 | Rendered editing of CommonMark and GFM: toolbar, format bar, insert menu, slash menu, block handles, find and replace, read-only mode | [R-GEN-003](#r-gen-003), [R-GEN-008](#r-gen-008) | planned |
+| 3 | Rendered editing of CommonMark and GFM: toolbar, format bar, insert menu, slash menu, block handles, find and replace, read-only mode, the mode to learn Markdown | [R-GEN-003](#r-gen-003), [R-GEN-008](#r-gen-008), [R-GEN-013](#r-gen-013) | planned |
 | 4 | Tables: handles, markers for new rows and columns, the table menu | [R-GEN-003](#r-gen-003) | planned |
 | 5 | The editor of the front matter with both modes and the JSON schema | [R-FM-001](#r-fm-001) to [R-FM-004](#r-fm-004) | planned |
 | 6 | The adapter for the webviews of VS Code and the theme of VS Code | [R-GEN-004](#r-gen-004), [R-THEME-001](#r-theme-001) | planned |
@@ -161,6 +161,13 @@ The Markdown API of VS Code (`markdown.markdownItPlugins`,
 the extension API, so that a markdown-it plugin works in the preview of
 VS Code and in the editor without a change.
 
+### R-GEN-013
+
+**A mode to learn Markdown.** When the user switches this mode on, the
+editor shows the Markdown marks under the rendered text, as other editors do,
+for example `**` around bold text and `#` before a heading
+([decision 20](#decisions)).
+
 ## AI chat
 
 ### R-AI-001
@@ -280,6 +287,8 @@ has a schema of the front matter of its documents
 19. **Two levels of extensions:** extensions that render, or render and
     edit; the Markdown API of VS Code is the reference
     ([R-GEN-012](#r-gen-012)).
+20. **A mode to learn Markdown:** the editor shows the Markdown marks under
+    the rendered text ([R-GEN-013](#r-gen-013)).
 
 ## Open questions
 
@@ -299,6 +308,8 @@ has a schema of the front matter of its documents
 9. How the editor shows the changes that the AI proposes.
 10. Where the memory of the AI is stored (in the repository of the document,
     or for each user), and whether the AI writes it without asking.
+11. Whether the mode to learn Markdown shows all marks or only the marks at
+    the cursor, and whether the user can edit the marks.
 
 ---
 
