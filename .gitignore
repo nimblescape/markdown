@@ -2,8 +2,8 @@
 # © 2026 Hannes Stauss (scalarion@nimblescape.com)
 # Licensed under the MIT License. See LICENSE in the repository root for details.
 
-# Keep the installed development tools, the built files (dist/ and
-# demo/dist/) and the packed npm package out of Git.
+# Keep the installed development tools, the built files (dist/ of each
+# package and demo/dist/) and the packed npm packages out of Git.
 node_modules/
 dist/
 *.tgz

@@ -2,30 +2,31 @@
 // © 2026 Hannes Stauss (scalarion@nimblescape.com)
 // Licensed under the MIT License. See LICENSE in the repository root for details.
 
-// The check of the licenses of the libraries (docs/specification.md, R-GEN-011): the license of each
-// library is decided one by one, and licenses.json lists each package that the editor depends on at run time with the
-// license that was decided for it. The check reads the packages from package-lock.json, without the development
-// tools, and fails for a package that licenses.json does not list or whose license is not the decided one. CI runs it
-// with npm run licenses; --write adds the missing packages to licenses.json with their license, for a review in the
-// pull request.
+// The check of the licenses of the libraries (docs/specification.md, R-GEN-011): the license of each library is decided
+// one by one, and licenses.json lists each package that the packages of the workspaces depend on at run time with the
+// license that was decided for it. The check reads the packages from package-lock.json, without the development tools
+// and without the packages of the workspaces, and fails for a package that licenses.json does not list or whose
+// license is not the decided one. CI runs it with npm run licenses; --write adds the missing packages to licenses.json
+// with their license, for a review in the pull request.
 
 import * as fs from 'node:fs';
 import { pathToFileURL } from 'node:url';
 
 /**
- * runtimePackages returns the packages of a lock file that the editor needs at run time: name, version and license.
+ * runtimePackages returns the packages of a lock file that the libraries need at run time: name, version and license.
+ * The packages of the workspaces of this repository are no libraries of others: their links stay out.
  * @param lock - The content of package-lock.json.
  */
 export function runtimePackages(lock) {
   return Object.entries(lock.packages)
-    .filter(([key, entry]) => key.startsWith('node_modules/') && !entry.dev && !entry.devOptional)
+    .filter(([key, entry]) => /(?:^|\/)node_modules\//.test(key) && !entry.link && !entry.dev && !entry.devOptional)
     .map(([key, entry]) => ({ name: key.slice(key.lastIndexOf('node_modules/') + 'node_modules/'.length), version: entry.version, license: entry.license ?? 'unknown' }))
     .sort((a, b) => a.name.localeCompare(b.name));
 }
 
 /**
  * problems returns the packages whose license licenses.json does not hold as decided.
- * @param packages - The packages that the editor needs at run time.
+ * @param packages - The packages that the libraries need at run time.
  * @param decided - The content of licenses.json.
  */
 export function problems(packages, decided) {

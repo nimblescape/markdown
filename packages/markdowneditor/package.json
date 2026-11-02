@@ -1,0 +1,72 @@
+{
+  "name": "@nimblescape/markdowneditor",
+  "version": "0.1.0",
+  "description": "The editor of rendered Markdown of nimblescape Markdown, for the web and for the webviews of VS Code, built on ProseMirror. It keeps every block of a file that the user does not change byte for byte; other packages extend it with plugins.",
+  "license": "MIT",
+  "author": {
+    "name": "nimblescape e.U.",
+    "url": "https://nimblescape.com"
+  },
+  "homepage": "https://github.com/nimblescape/markdown/tree/main/packages/markdowneditor#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nimblescape/markdown.git",
+    "directory": "packages/markdowneditor"
+  },
+  "bugs": {
+    "url": "https://github.com/nimblescape/markdown/issues"
+  },
+  "keywords": [
+    "markdown",
+    "editor",
+    "wysiwyg",
+    "prosemirror",
+    "vscode"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "nimblescape-source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./markdown.css": "./dist/markdown.css"
+  },
+  "files": [
+    "dist/*.js",
+    "dist/**/*.d.ts",
+    "dist/markdown.css"
+  ],
+  "sideEffects": [
+    "*.css"
+  ],
+  "scripts": {
+    "build": "node ../../esbuild.mjs --production && tsc -p tsconfig.build.json"
+  },
+  "dependencies": {
+    "@nimblescape/markdowntext": "0.1.0",
+    "@tiptap/core": "^3.32.2",
+    "@tiptap/extension-bold": "^3.32.2",
+    "@tiptap/extension-code": "^3.32.2",
+    "@tiptap/extension-code-block": "^3.32.2",
+    "@tiptap/extension-horizontal-rule": "^3.32.2",
+    "@tiptap/extension-image": "^3.32.2",
+    "@tiptap/extension-italic": "^3.32.2",
+    "@tiptap/extension-link": "^3.32.2",
+    "@tiptap/extension-list": "^3.32.2",
+    "@tiptap/extension-strike": "^3.32.2",
+    "@tiptap/extension-table": "^3.32.2",
+    "@tiptap/extension-underline": "^3.32.2",
+    "@tiptap/pm": "^3.32.2",
+    "@tiptap/starter-kit": "^3.32.2",
+    "@types/markdown-it": "^14.2.0",
+    "markdown-it": "^14.3.3",
+    "markdown-it-footnote": "^4.0.0",
+    "markdown-it-task-lists": "^2.1.1",
+    "prosemirror-markdown": "^1.13.9",
+    "string-width": "^8.3.0"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

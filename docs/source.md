@@ -40,6 +40,13 @@ file in YAML (between two lines `---`), in TOML (between two lines `+++`)
 and in JSON (an object at the start of the file). A plugin may add a further
 format.
 
+*(proposal)* The source must read the data of the front matter, change one
+value at a time so that the comments, the order and the quotes of the other
+keys stay ([R-FM-005](editor.md#r-fm-005)), and check the data against a
+JSON schema ([R-FM-004](editor.md#r-fm-004)), without a view. The form of
+the front matter in the editor, the renderer, the layout and the command
+line use this code of the package `@nimblescape/markdowntext`.
+
 ### R-GEN-006
 
 **The file formats.** The source must keep every part of a file that no

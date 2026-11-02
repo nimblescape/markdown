@@ -14,10 +14,21 @@ import type { Editor } from '@tiptap/core';
 import { closeHistory } from '@tiptap/pm/history';
 import type { Node as PmNode } from '@tiptap/pm/model';
 import type { EditorView, NodeView } from '@tiptap/pm/view';
-import { editFrontMatter, readFrontMatter, tomlText, tomlValue } from '../frontMatter/edit';
-import { checkFrontMatter, schemaAt, typeOf, type FrontMatterProblem, type JsonSchema, type JsonSchemaObject } from '../frontMatter/schema';
-import type { FrontMatterEdit, FrontMatterPath } from '../frontMatter/types';
-import type { FrontMatterFormat } from '../markdown/frontMatter';
+import {
+  checkFrontMatter,
+  editFrontMatter,
+  readFrontMatter,
+  schemaAt,
+  tomlText,
+  tomlValue,
+  typeOf,
+  type FrontMatterEdit,
+  type FrontMatterFormat,
+  type FrontMatterPath,
+  type FrontMatterProblem,
+  type JsonSchema,
+  type JsonSchemaObject,
+} from '@nimblescape/markdowntext';
 import { element, icon } from './dom';
 
 /** FrontMatterInputContext is what an input of a plugin gets with the value that it shows. */

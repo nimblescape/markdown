@@ -7,7 +7,8 @@
 // editor. The toolbar of the editor switches the read-only mode and the mode to learn Markdown. The front matter shows
 // as a form with the example schema below; "Edit keys" switches the form to the edit of the keys.
 
-import { MarkdownEditor, type JsonSchema } from '../src/index';
+import { MarkdownEditor } from '@nimblescape/markdowneditor';
+import type { JsonSchema } from '@nimblescape/markdowntext';
 
 /** schema is an example schema of a front matter (docs/editor.md, R-FM-004). */
 const schema: JsonSchema = {

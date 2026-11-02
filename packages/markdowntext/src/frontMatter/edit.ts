@@ -3,13 +3,13 @@
 // Licensed under the MIT License. See LICENSE in the repository root for details.
 
 // The reading and the edits of a front matter (docs/source.md, R-SRC-003; docs/editor.md, R-FM-005) in its three
-// formats. Each edit changes only the text of the edited value: for YAML, the edit of src/frontMatter/yaml.ts; for
-// TOML, `patch` of the library `@decimalturn/toml-patch`; for JSON, the edit of src/frontMatter/json.ts, which also
+// formats. Each edit changes only the text of the edited value: for YAML, the edit of yaml.ts; for
+// TOML, `patch` of the library `@decimalturn/toml-patch`; for JSON, the edit of json.ts, which also
 // keeps the comments of JSONC. The text of a front matter has its fences, as the document of the editor holds it.
 
 import { parse as parseToml, patch as patchToml, stringify as stringifyToml } from '@decimalturn/toml-patch';
 import { parse as parseJson, printParseErrorCode, type ParseError } from 'jsonc-parser';
-import type { FrontMatterFormat } from '../markdown/frontMatter';
+import type { FrontMatterFormat } from './detect';
 import { FrontMatterError, type FrontMatterEdit, type FrontMatterPath } from './types';
 import { editJson } from './json';
 import { editYaml, readYaml } from './yaml';

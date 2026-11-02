@@ -13,7 +13,7 @@ import type { Node, Schema } from '@tiptap/pm/model';
 import type MarkdownIt from 'markdown-it';
 import Token from 'markdown-it/lib/token.mjs';
 import { MarkdownParser, type ParseSpec } from 'prosemirror-markdown';
-import { frontMatterOf } from './frontMatter';
+import { frontMatterOf } from '@nimblescape/markdowntext';
 import { cellColorPattern } from './tableComments';
 
 /** BlockSource is the text of the file of a top-level block of the document. */

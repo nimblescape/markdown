@@ -9,7 +9,7 @@
 
 import { afterEach, describe, expect, it } from 'vitest';
 import { MarkdownEditor, type MarkdownEditorOptions } from '../editor';
-import type { JsonSchema } from '../frontMatter/schema';
+import type { JsonSchema } from '@nimblescape/markdowntext';
 
 let editor: MarkdownEditor | undefined;
 let element: HTMLElement;

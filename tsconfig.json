@@ -7,6 +7,9 @@
     "target": "ES2022",
     "module": "preserve",
     "moduleResolution": "bundler",
+    // The packages of the workspaces resolve each other to their sources, so that the type check, the tests and the
+    // example page need no build (CONTRIBUTING.md, "Packages").
+    "customConditions": ["nimblescape-source"],
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "types": ["node"],
     "strict": true,
@@ -20,5 +23,5 @@
     "resolveJsonModule": true,
     "isolatedModules": true
   },
-  "include": ["src/**/*.ts", "test/**/*.ts", "demo/**/*.ts"]
+  "include": ["packages/*/src/**/*.ts", "demo/**/*.ts"]
 }

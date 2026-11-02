@@ -6,7 +6,8 @@ Licensed under the MIT License. See LICENSE in the repository root for details.
 
 # Corpus of the round-trip tests
 
-The tests of the Markdown of the editor (`src/markdown/codec.test.ts`) read
+The tests of the Markdown of the editor
+(`packages/markdowneditor/src/markdown/codec.test.ts`) read
 each Markdown file of this folder, except this README: the editor must write
 each file back byte for byte when nothing changed, and a file that it writes
 new must show the same HTML in markdown-it.
