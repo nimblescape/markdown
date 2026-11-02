@@ -214,19 +214,21 @@ repository of the course module, it stays in this repository.
 
 **Owners of the products.** nimblescape owns the libraries of nimblescape
 Markdown, the history and all plugins and products that build on them:
-Markdown Notes, Markdown Paper, the reflection tool, the course module and
-the feedback program. Their repositories are
-`nimblescape/markdownnotes-vscode`, `nimblescape/markdownpaper-vscode`,
-`nimblescape/workhistory-vscode`, `nimblescape/workreflection-vscode`
-([R-REFL-017](reflection.md#r-refl-017)), `nimblescape/course-vscode` and
-`nimblescape/course-feedback`; their npm packages start with
-`@nimblescape/`, and the publisher of their VS Code extensions is
-`nimblescape`. majikmate provides the academic context: it owns the
-courses, for example `majikmate/module-ts-2`, which use these products. A
-product of nimblescape does not depend on a course. Until the repositories
-of the course module and of the feedback program move to nimblescape, their
-addresses stay `majikmate/course-vscode` and `majikmate/course-feedback`,
-and GitHub forwards the old address after the move.
+Markdown Notes, Markdown Paper, the reflection tool and the course module.
+Their repositories are `nimblescape/markdownnotes-vscode`,
+`nimblescape/markdownpaper-vscode`, `nimblescape/workhistory-vscode`,
+`nimblescape/workreflection-vscode`
+([R-REFL-017](reflection.md#r-refl-017)) and `nimblescape/course-vscode`;
+their npm packages start with `@nimblescape/`, and the publisher of their
+VS Code extensions is `nimblescape`. majikmate provides the academic
+context: it owns the courses, for example `majikmate/module-ts-2`, and the
+feedback program `majikmate/course-feedback`
+([R-FEED-004](course.md#r-feed-004)), which use these products. A product
+of majikmate may depend on a product of nimblescape, and a product of
+nimblescape does not depend on a product or a course of majikmate. Until
+the repository of the course module moves to nimblescape, its address stays
+`majikmate/course-vscode`, and GitHub forwards the old address after the
+move.
 
 ## 4. Documents
 

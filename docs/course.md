@@ -262,7 +262,7 @@ the feedback links to the analysis of the same state of the work.
 **The feedback program.** A feedback program must read the README with the
 reader of the module ([R-COURSE-009](#r-course-009)) and write the feedback
 file in the form of [R-FEED-001](#r-feed-001). *(proposal)* The first
-feedback program is `nimblescape/course-feedback`
+feedback program is `majikmate/course-feedback`
 ([R-ARCH-005](specification.md#r-arch-005)): it installs
 `@nimblescape/course` from GitHub at a fixed commit, and it keeps its checks,
 skills, engines and prompts, its own rules of the feedback and the rules of
@@ -285,7 +285,7 @@ each course for the feedback.
 5. Integrity: a student can change the history file in `.workhistory/`. Does
    the course protect it like `FEEDBACK.md`, or does the reflection tool
    check it against the commits ([R-COURSE-003](#r-course-003))?
-6. Feedback program: does `nimblescape/course-feedback` stay a program of its
+6. Feedback program: does `majikmate/course-feedback` stay a program of its
    own (proposal), or does it become a part of `course-vscode`
    ([R-FEED-004](#r-feed-004))?
 7. Other files: does the module also define the form of the tutorial pages,
