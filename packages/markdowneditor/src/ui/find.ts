@@ -4,12 +4,14 @@
 
 // Find and replace (docs/editor.md, R-GEN-003): the plugin finds a text in the rendered text of the document, marks
 // each match, and moves the selection to the current match; replace changes the current match or all matches, each as
-// one step of undo. A match never crosses a node that is not text, for example a footnote reference.
+// one step of undo. A match never crosses a node that is not text, for example a footnote reference. Replace leaves a
+// match that holds a piece of a generated part (R-EDIT-011).
 
 import { closeHistory } from '@tiptap/pm/history';
 import type { Node } from '@tiptap/pm/model';
 import { Plugin, PluginKey, TextSelection, type EditorState, type Transaction } from '@tiptap/pm/state';
 import { Decoration, DecorationSet, type EditorView } from '@tiptap/pm/view';
+import { breaks, generatedPartsOf } from '../plugins/generated';
 
 /** Match is a range of the document that matches the searched text. */
 export interface Match {
@@ -158,7 +160,7 @@ export function findNext(view: EditorView, step: 1 | -1): boolean {
 export function replaceMatch(view: EditorView, text: string): boolean {
   const state = findKey.getState(view.state);
   const match = state?.matches[state.current];
-  if (!state || !match || !view.editable) {
+  if (!state || !match || !view.editable || breaksPart(view.state, match)) {
     return false;
   }
   const tr = closeHistory(replaced(view.state, view.state.tr, match, text));
@@ -179,13 +181,20 @@ export function replaceAll(view: EditorView, text: string): number {
     return 0;
   }
   let tr = view.state.tr;
+  // A match in a piece of a generated part stays (docs/editor.md, R-EDIT-011).
+  const matches = state.matches.filter((match) => !breaksPart(view.state, match));
   // From the end, so that the positions of the matches before stay valid.
-  for (const match of [...state.matches].reverse()) {
+  for (const match of [...matches].reverse()) {
     tr = replaced(view.state, tr, match, text);
   }
-  view.dispatch(closeHistory(tr));
-  return state.matches.length;
+  if (matches.length > 0) {
+    view.dispatch(closeHistory(tr));
+  }
+  return matches.length;
 }
+
+/** breaksPart returns true when a match holds a piece of a generated part, which a replace would break. */
+const breaksPart = (state: EditorState, match: Match): boolean => generatedPartsOf(state).some((part) => breaks(match, part));
 
 /** replaced replaces a match with a text that keeps the marks of the first character of the match. */
 function replaced(state: EditorState, tr: Transaction, match: Match, text: string): Transaction {

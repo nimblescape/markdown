@@ -53,6 +53,27 @@ export interface MarkdownEditorRegistration {
    * scroll position and its selection. The default is true.
    */
   readonly retainContextWhenHidden?: boolean;
+  /**
+   * plugins connect the parts of the plugins of the editor in the extension with their parts on the page, by the name
+   * of the plugin (docs/plugins.md, R-PLUGIN-001): each function gets the channel of its plugin in a panel when the
+   * panel opens, and may return what to dispose when the panel closes.
+   */
+  readonly plugins?: Readonly<Record<string, (channel: PluginPanelChannel) => void | vscode.Disposable>>;
+}
+
+/**
+ * PluginPanelChannel is the channel of a plugin of the editor in one panel. The messages of the page come from a page
+ * that shows the content of a file, so the plugin checks each message before it uses it.
+ */
+export interface PluginPanelChannel {
+  /** document is the document of the panel. */
+  readonly document: vscode.TextDocument;
+  /** panel is the webview panel. */
+  readonly panel: vscode.WebviewPanel;
+  /** post sends a message to the part of the plugin on the page. */
+  post(message: unknown): Thenable<boolean>;
+  /** onMessage calls a listener with each message of the part of the plugin on the page. */
+  onMessage(listener: (message: unknown) => void): vscode.Disposable;
 }
 
 /**
@@ -125,6 +146,8 @@ class EditorPanel {
   private disposed = false;
   private selection: TextSelection | undefined;
   private readonly subscriptions: vscode.Disposable[] = [];
+  /** listeners holds the listeners of the messages of the plugins, by the name of the plugin. */
+  private readonly listeners = new Map<string, Set<(message: unknown) => void>>();
 
   constructor(
     private readonly api: VsCode,
@@ -168,6 +191,27 @@ class EditorPanel {
         }
       }),
     );
+    for (const [plugin, connect] of Object.entries(registration.plugins ?? {})) {
+      const disposable = connect(this.channel(plugin));
+      if (disposable) {
+        this.subscriptions.push(disposable);
+      }
+    }
+  }
+
+  /** channel returns the channel of a plugin in this panel. */
+  private channel(plugin: string): PluginPanelChannel {
+    return {
+      document: this.document,
+      panel: this.panel,
+      post: (message) => (this.disposed ? Promise.resolve(false) : this.panel.webview.postMessage({ type: 'plugin', plugin, message } satisfies HostMessage)),
+      onMessage: (listener) => {
+        const listeners = this.listeners.get(plugin) ?? new Set();
+        listeners.add(listener);
+        this.listeners.set(plugin, listeners);
+        return { dispose: () => listeners.delete(listener) };
+      },
+    };
   }
 
   /** uri is the URI of the file. */
@@ -198,6 +242,7 @@ class EditorPanel {
     this.disposed = true;
     this.subscriptions.forEach((subscription) => subscription.dispose());
     this.subscriptions.length = 0;
+    this.listeners.clear();
   }
 
   /** received takes a message of the page. */
@@ -215,6 +260,9 @@ class EditorPanel {
         break;
       case 'openText':
         void this.openText();
+        break;
+      case 'plugin':
+        [...(this.listeners.get(message.plugin) ?? [])].forEach((listener) => listener(message.message));
         break;
     }
   }

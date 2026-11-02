@@ -142,13 +142,17 @@ export const HtmlBlock = Node.create({
   renderHTML: ({ node }) => rawView('html', node.attrs.html as string),
 });
 
-/** RawBlock is text between blocks that no block of Markdown holds, for example the definitions of link references. */
+/**
+ * RawBlock is text between blocks that no block of Markdown holds, for example the definitions of link references, or a
+ * block that the editor keeps as one unit: a block with tokens that no node takes, or that a plugin of the level
+ * "render" shows (docs/plugins.md, R-GEN-012). `rendered` is true for such a block, whose view shows its rendering.
+ */
 export const RawBlock = Node.create({
   name: 'rawBlock',
   group: 'block',
   atom: true,
   selectable: true,
-  addAttributes: () => ({ text: { default: '', rendered: false } }),
+  addAttributes: () => ({ text: { default: '', rendered: false }, rendered: { default: false, rendered: false } }),
   parseHTML: () => [],
   renderHTML: ({ node }) => rawView('text', node.attrs.text as string),
 });

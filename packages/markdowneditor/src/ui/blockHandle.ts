@@ -105,6 +105,8 @@ export interface BlockHandleHost {
   menu: Menu;
   /** insertItems returns the items of the insert menu. */
   insertItems: () => MenuItem[];
+  /** blockItems returns the items that plugins add to the menu of a block. */
+  blockItems?: (block: Block) => MenuItem[];
 }
 
 /** BlockHandles are the "+" and the handle beside the block under the mouse. */
@@ -267,6 +269,7 @@ export class BlockHandles {
           view.focus();
         },
       },
+      ...(this.host.blockItems?.(block) ?? []),
     ];
     const rect = this.grip.getBoundingClientRect();
     this.host.menu.open(items, rect.left, rect.bottom + 4, () => this.hide(), 'block');

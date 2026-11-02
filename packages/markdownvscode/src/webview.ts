@@ -7,5 +7,13 @@
 // creates the editor with the source of the connection, for example
 // `new MarkdownEditor(connection.element, { source: connection.source, editable: connection.editable })`.
 
-export { connectVsCode, vscodeOrigin, type ConnectOptions, type VsCodeConnection, type VsCodeWebviewApi } from './webview/connection';
-export { editorElementId, type HostMessage, type PageFonts, type PageMessage } from './messages';
+export {
+  connectVsCode,
+  vscodeOrigin,
+  type ConnectOptions,
+  type VsCodeConnection,
+  type VsCodePluginChannel,
+  type VsCodePluginHost,
+  type VsCodeWebviewApi,
+} from './webview/connection';
+export { editorElementId, type HostMessage, type PageFonts, type PageMessage, type PluginMessage } from './messages';

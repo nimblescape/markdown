@@ -45,6 +45,22 @@ edit" later, without a change of the file format. The Markdown API of VS
 Code (`markdown.markdownItPlugins`, `markdown.previewStyles`,
 `markdown.previewScripts`) is the reference of the plugin API.
 
+*(proposal)* A block of the level "render" is a top-level block with a
+token that a plugin shows, or with a token that no node of the editor
+takes; the editor keeps it as one unit with its text. Its view shows the
+rendering: the HTML of markdown-it with the syntax of the plugins, and the
+function `render` of a plugin for each kind of token that the plugin shows.
+Raw HTML of the file shows as its text in the rendering, as in the rest of
+the editor. The source opens in a field below the rendering, and each
+change of the source shows in the rendering; leaving the field or Ctrl+Enter
+keeps the new text, Escape restores the text. The editor parses the new text
+in its place in the file, so that it may become other blocks, in one step of
+undo. A block without a rendering, for example the definitions of link
+references, and a block of HTML show their text, and the field takes the
+place of the text. A code block that the user writes with a language that a
+plugin shows becomes such a unit when the cursor leaves it. In the mode to
+learn Markdown, the text of a unit shows below its rendering.
+
 ### R-PLUGIN-001
 
 **The plugin object.** A plugin is one object: `{ name, apiVersion: 1,
@@ -52,6 +68,34 @@ extendMarkdownIt?, styles?, render?, nodes?, marks?, fromMarkdown?,
 toMarkdown?, commands?, keys?, menus?, frontMatterSchema?, activate?(editor,
 host) }`. `activate` gets the API of the editor and of the platform, and
 returns what to dispose.
+
+*(proposal)* Version 1 has these details:
+
+| Member | Content |
+| --- | --- |
+| `name` | The name of the plugin, of letters, digits, `_` and `-`; two plugins of an editor have different names |
+| `apiVersion` | `1`; the editor refuses a plugin of another version |
+| `extendMarkdownIt` | A function that adds syntax to the markdown-it of the editor, as in VS Code |
+| `styles` | The CSS of the plugin; the editor adds it to the page once |
+| `render` | A function `render(source, element, token)` for each kind of token that the plugin shows: the type of a token, or `fence:<language>` for a fenced code block |
+| `nodes`, `marks` | The Tiptap extensions of the nodes and marks of the plugin, with their views and input rules |
+| `fromMarkdown` | Which token becomes which node or mark |
+| `toMarkdown` | How a changed node or mark is written |
+| `commands` | Commands by name; the full name of a command is `plugin.command` |
+| `keys` | A key for a command of the plugin, for example `Mod-Alt-m` |
+| `menus` | The items of the insert menu and of the slash commands, the buttons of the format bar, the items of the block menu and of the table menu |
+| `learnMarks` | The marks of the nodes and marks of the plugin in the mode to learn Markdown ([R-GEN-013](editor.md#r-gen-013)) |
+| `frontMatterSchema`, `frontMatterInputs` | The schema of the front matter and the inputs of keys ([R-FM-004](editor.md#r-fm-004), [R-FM-006](editor.md#r-fm-006)); the schema of the integrating code comes first |
+| `generated` | The generated parts of a document, which are read-only ([R-EDIT-011](editor.md#r-edit-011)) |
+| `threads` | The threads of a document and the function that fills the panel of a thread ([R-GEN-014](editor.md#r-gen-014)) |
+| `activate` | Starts the plugin in an editor |
+
+The API of the editor for the plugins gives the Tiptap editor, the text as
+Markdown, the commands by their full names, the panel of a thread, and a
+refresh of the generated parts and threads after a change of the data of a
+plugin. The API of the platform gives the name of the platform and, for each
+plugin, a channel for messages to the other part of the plugin, for example
+in the extension of VS Code ([R-VSC-001](platforms.md#r-vsc-001)).
 
 ## 3. Markdown Notes
 

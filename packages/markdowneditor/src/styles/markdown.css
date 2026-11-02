@@ -884,3 +884,159 @@ before the table, which hides itself outside the mode to learn Markdown.
   font-size: 13px;
   white-space: pre-wrap;
 }
+
+/*
+The blocks with a source (docs/plugins.md, R-GEN-012): a raw block shows its rendering or its text, and its source opens in
+a field below the rendering, or in place of the text. The text of a rendered block shows in the mode to learn Markdown.
+*/
+
+.nsmd-editor .ProseMirror .nsmd-unit {
+  position: relative;
+  margin: 0 0 1em;
+}
+
+.nsmd-editor .ProseMirror .nsmd-unit > .nsmd-unit-view.nsmd-raw {
+  margin: 0;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.nsmd-editor .ProseMirror .nsmd-unit.ProseMirror-selectednode {
+  outline: 2px solid var(--nsmd-selection);
+  outline-offset: 2px;
+}
+
+.nsmd-editor .ProseMirror .nsmd-rendered > :last-child {
+  margin-bottom: 0;
+}
+
+.nsmd-editor .ProseMirror .nsmd-unit-source {
+  display: none;
+  margin: 6px 0 0;
+  padding: 6px 8px;
+  border-top: 1px dashed var(--nsmd-border);
+  border-radius: 0;
+}
+
+.nsmd-editor .ProseMirror.nsmd-learn .nsmd-unit-rendered:not(.nsmd-unit-editing) > .nsmd-unit-source {
+  display: block;
+}
+
+.nsmd-editor .ProseMirror .nsmd-unit-edit {
+  position: absolute;
+  top: 0;
+  right: 0;
+  visibility: hidden;
+  background: var(--nsmd-surface);
+  box-shadow: var(--nsmd-shadow);
+}
+
+.nsmd-editor .ProseMirror[contenteditable='true'] .nsmd-unit:hover > .nsmd-unit-edit,
+.nsmd-editor .ProseMirror[contenteditable='true'] .nsmd-unit.ProseMirror-selectednode > .nsmd-unit-edit {
+  visibility: visible;
+}
+
+.nsmd-editor .ProseMirror .nsmd-unit-editing > .nsmd-unit-edit,
+.nsmd-editor .ProseMirror .nsmd-unit-editing:not(.nsmd-unit-rendered) > .nsmd-unit-view {
+  display: none;
+}
+
+.nsmd-editor .ProseMirror .nsmd-unit-field {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 6px 0 0;
+  padding: 6px 8px;
+  border: 1px solid var(--nsmd-link);
+  border-radius: 4px;
+  background: var(--nsmd-raw-background);
+  color: var(--nsmd-foreground);
+  font-family: var(--nsmd-code-font-family);
+  font-size: 13px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.nsmd-editor .ProseMirror .nsmd-unit-field:focus {
+  outline: 1px solid var(--nsmd-link);
+  outline-offset: 0;
+}
+
+.nsmd-editor .ProseMirror .nsmd-render-error {
+  color: var(--nsmd-alert-caution);
+}
+
+/* The read-only generated parts (docs/editor.md, R-EDIT-011). */
+
+.nsmd-editor .ProseMirror .nsmd-generated {
+  cursor: default;
+  border-radius: 3px;
+}
+
+.nsmd-editor .ProseMirror[contenteditable='true'] .nsmd-generated:hover {
+  background: var(--nsmd-hover);
+}
+
+/* The threads beside the text (docs/editor.md, R-GEN-014): the icons at the right of the text, and the panel. */
+
+.nsmd-editor .nsmd-box.nsmd-has-threads {
+  padding-right: 2.75rem;
+}
+
+.nsmd-editor .nsmd-threads {
+  position: absolute;
+  top: 0;
+  right: 0.25rem;
+  width: 2.25rem;
+}
+
+.nsmd-editor .nsmd-thread-icon {
+  position: absolute;
+  right: 0;
+  gap: 2px;
+  color: var(--nsmd-muted);
+}
+
+.nsmd-editor .nsmd-thread-icon[aria-expanded='true'] {
+  background: var(--nsmd-active);
+  color: var(--nsmd-link);
+}
+
+.nsmd-editor .nsmd-thread-count {
+  font-size: 11px;
+  line-height: 1;
+}
+
+.nsmd-editor .ProseMirror .nsmd-thread-active {
+  background: var(--nsmd-active);
+}
+
+.nsmd-editor .nsmd-thread-panel {
+  position: absolute;
+  z-index: 4;
+  right: 2.75rem;
+  box-sizing: border-box;
+  width: min(22rem, calc(100% - 4rem));
+  border: 1px solid var(--nsmd-border);
+  border-radius: 8px;
+  background: var(--nsmd-surface);
+  box-shadow: var(--nsmd-shadow);
+  font-family: var(--nsmd-font-family);
+  font-size: 14px;
+}
+
+.nsmd-editor .nsmd-thread-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 4px 4px 10px;
+  border-bottom: 1px solid var(--nsmd-border);
+  color: var(--nsmd-muted);
+}
+
+.nsmd-editor .nsmd-thread-body {
+  padding: 8px 10px;
+  max-height: 60vh;
+  overflow: auto;
+}

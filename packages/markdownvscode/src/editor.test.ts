@@ -10,7 +10,7 @@
 import { MarkdownEditor } from '@nimblescape/markdowneditor';
 import type { TextChange } from '@nimblescape/markdowntext';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { registerMarkdownEditor, type MarkdownEditorRegistration } from './extension/editor';
+import { registerMarkdownEditor, type MarkdownEditorRegistration, type PluginPanelChannel } from './extension/editor';
 import { editorElementId, pageMessage } from './messages';
 import { FakeRange, FakeUri, fakeVsCode, openPanel, type FakeDocument, type FakePanel, type FakeVsCode } from './test/fakeVscode';
 import { connectVsCode, vscodeOrigin, type VsCodeConnection } from './webview/connection';
@@ -260,6 +260,8 @@ describe('the messages of the page', () => {
     expect(pageMessage({ type: 'edit', id: 1, base: 2, patches: [{ from: -1, to: 1, insert: 'a' }] })).toBeUndefined();
     expect(pageMessage({ type: 'edit', id: 1, base: 2, patches: {} })).toBeUndefined();
     expect(pageMessage({ type: 'selection', selection: { anchor: 'x', head: 2 } })).toBeUndefined();
+    expect(pageMessage({ type: 'plugin', plugin: 'notes', message: { ask: 'login' } })).toEqual({ type: 'plugin', plugin: 'notes', message: { ask: 'login' } });
+    expect(pageMessage({ type: 'plugin', plugin: 'not a name', message: 1 })).toBeUndefined();
     expect(pageMessage({ type: 'run', command: 'x' })).toBeUndefined();
     expect(pageMessage('ready')).toBeUndefined();
     expect(pageMessage(null)).toBeUndefined();
@@ -306,10 +308,46 @@ describe('the keys of the page', () => {
   });
 });
 
+describe('the plugins of the editor', () => {
+  it('carry the messages of a plugin between its part on the page and its part in the extension', async () => {
+    const inExtension: unknown[] = [];
+    const disposed: string[] = [];
+    let channel: PluginPanelChannel | undefined;
+    const { panel, connection } = await start(text, {
+      plugins: {
+        notes: (each) => {
+          channel = each;
+          each.onMessage((message) => inExtension.push(message));
+          return { dispose: () => disposed.push('notes') };
+        },
+      },
+    });
+    expect(connection.host.platform).toBe('vscode');
+    const onPage: unknown[] = [];
+    const pageChannel = connection.host.channel('notes');
+    const stopListening = pageChannel.onMessage((message) => onPage.push(message));
+    connection.host.channel('other').onMessage((message) => onPage.push(['other', message]));
+    pageChannel.post({ ask: 'login' });
+    connection.host.channel('unknown').post('dropped');
+    await panel.settle();
+    expect(inExtension).toEqual([{ ask: 'login' }]);
+    expect(channel?.document.getText()).toBe(text);
+    await channel?.post({ login: 'scalarion' });
+    await panel.settle();
+    expect(onPage).toEqual([{ login: 'scalarion' }]);
+    stopListening();
+    await channel?.post('after');
+    await panel.settle();
+    expect(onPage).toEqual([{ login: 'scalarion' }]);
+    panel.dispose();
+    expect(disposed).toEqual(['notes']);
+  });
+});
+
 describe('the editor in the page', () => {
   it('keeps a MarkdownEditor of the page and the document of VS Code the same', async () => {
     const { document, panel, connection } = await start('---\ntitle: A\n---\n\n' + text);
-    const editor = new MarkdownEditor(connection.element, { source: connection.source, editable: connection.editable, id: 'page' });
+    const editor = new MarkdownEditor(connection.element, { source: connection.source, editable: connection.editable, id: 'page', host: connection.host });
     try {
       let at = -1;
       editor.tiptap.state.doc.descendants((node, position) => {

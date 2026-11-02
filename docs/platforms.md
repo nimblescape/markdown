@@ -63,7 +63,10 @@ tab is in the background. On a file system that cannot write, for example
 an older version of a file from Git, the editor is read-only. The side of
 the page is the entry point `@nimblescape/markdownvscode/webview`: its
 function `connectVsCode` gives the source of the document, and the page
-creates the editor with it ([R-EDIT-002](editor.md#r-edit-002)).
+creates the editor with it ([R-EDIT-002](editor.md#r-edit-002)). The
+connection also gives the API of the platform for the plugins of the editor
+([R-PLUGIN-001](plugins.md#r-plugin-001)): the adapter carries the messages
+of each plugin between its part on the page and its part in the extension.
 
 ### R-VSC-002
 

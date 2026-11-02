@@ -35,6 +35,38 @@ editor.setEditable(false); // read-only mode
 editor.setLearnMode(true); // show the Markdown marks
 ```
 
+## Plugins
+
+Plugins extend the editor through the plugin API, version 1
+([docs/plugins.md](../../docs/plugins.md),
+[R-PLUGIN-001](../../docs/plugins.md#r-plugin-001)). A plugin is one object.
+At the level "render", it adds syntax to markdown-it and shows its kinds of
+tokens; the editor keeps such a block byte for byte as one unit, and the
+user changes it through its source ("Edit source" or a double click). At the
+level "render and edit", it adds nodes and marks, how they are read and
+written, commands, keys and items of the menus. A plugin may mark the parts
+that it generates as read-only and show threads beside the text.
+
+```ts
+import { MarkdownEditor, type MarkdownPlugin } from '@nimblescape/markdowneditor';
+
+const diagrams: MarkdownPlugin = {
+  name: 'diagrams',
+  apiVersion: 1,
+  // A fenced code block with the language `mermaid` shows as a diagram.
+  render: { 'fence:mermaid': (source, element) => drawDiagram(source, element) },
+  // The citations, links to `#ref-…`, are generated and read-only.
+  generated: (doc) => citationsOf(doc),
+  threads: { find: (doc) => notesOf(doc), open: (thread, panel) => showThread(thread, panel) },
+};
+
+const editor = new MarkdownEditor(element, { markdown, plugins: [diagrams], host: { platform: 'web' } });
+editor.runCommand('diagrams.someCommand');
+```
+
+The example page of the repository uses the plugin
+[demo/examplePlugin.ts](../../demo/examplePlugin.ts).
+
 The package is not on npmjs.com before the release.
 [CONTRIBUTING.md](../../CONTRIBUTING.md) explains how another repository
 installs it from GitHub.

@@ -26,6 +26,24 @@ declare function acquireVsCodeApi(): VsCodeWebviewApi;
 /** vscodeOrigin is the origin of a change of the document of VS Code: VS Code does not say who made it. */
 export const vscodeOrigin: Origin = Object.freeze({ kind: 'program', name: 'vscode' });
 
+/** VsCodePluginChannel carries the messages of a plugin of the editor between the page and the extension. */
+export interface VsCodePluginChannel {
+  /** post sends a message to the part of the plugin in the extension. */
+  post(message: unknown): void;
+  /** onMessage calls a listener with each message of the part of the plugin in the extension, and returns a function that stops it. */
+  onMessage(listener: (message: unknown) => void): () => void;
+}
+
+/**
+ * VsCodePluginHost is the API of the platform VS Code for the plugins of the editor, the option `host` of the
+ * MarkdownEditor of @nimblescape/markdowneditor (docs/plugins.md, R-PLUGIN-001).
+ */
+export interface VsCodePluginHost {
+  readonly platform: 'vscode';
+  /** channel returns the channel of a plugin to its part in the extension, which `plugins` of the registration connects. */
+  channel(plugin: string): VsCodePluginChannel;
+}
+
 /** VsCodeConnection is the connection of the page to the document of VS Code. */
 export interface VsCodeConnection {
   /** source holds the text of the document: the editors of the page take it as their source. */
@@ -34,6 +52,8 @@ export interface VsCodeConnection {
   readonly editable: boolean;
   /** element is the element of the page for the editor. */
   readonly element: HTMLElement;
+  /** host is the API of the platform for the plugins of the editor. */
+  readonly host: VsCodePluginHost;
   /** openText opens the text editor of the file to the side, with the last selection of the page (R-VSC-002). */
   openText(): void;
   /** dispose ends the connection. */
@@ -114,6 +134,20 @@ class Connection implements VsCodeConnection {
   private resyncing = false;
   private canEdit = true;
   private readonly stop: (() => void)[] = [];
+  /** listeners holds the listeners of the messages of the plugins, by the name of the plugin. */
+  private readonly listeners = new Map<string, Set<(message: unknown) => void>>();
+  readonly host: VsCodePluginHost = {
+    platform: 'vscode',
+    channel: (plugin) => ({
+      post: (message) => this.post({ type: 'plugin', plugin, message }),
+      onMessage: (listener) => {
+        const listeners = this.listeners.get(plugin) ?? new Set();
+        listeners.add(listener);
+        this.listeners.set(plugin, listeners);
+        return () => listeners.delete(listener);
+      },
+    }),
+  };
 
   constructor(
     private readonly api: VsCodeWebviewApi,
@@ -156,6 +190,7 @@ class Connection implements VsCodeConnection {
   dispose(): void {
     this.stop.forEach((stop) => stop());
     this.stop.length = 0;
+    this.listeners.clear();
   }
 
   /** received takes a message of the extension. */
@@ -187,6 +222,9 @@ class Connection implements VsCodeConnection {
         break;
       case 'fonts':
         applyFonts(message.fonts);
+        break;
+      case 'plugin':
+        [...(this.listeners.get(message.plugin) ?? [])].forEach((listener) => listener(message.message));
         break;
     }
   }

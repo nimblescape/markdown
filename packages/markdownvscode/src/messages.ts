@@ -15,6 +15,8 @@
 // - The extension sends each other change of the document as `text`, with the patches from the version that it sent
 //   last.
 // - A message whose patches do not start at the version that the page knows makes the page send `ready` again.
+// - The message `plugin` carries a message of a plugin of the editor between its part on the page and its part in the
+//   extension, in both directions (docs/plugins.md, R-PLUGIN-001).
 
 import type { TextPatch, TextSelection } from '@nimblescape/markdowntext';
 
@@ -43,14 +45,26 @@ export type HostMessage =
       readonly version: number;
       readonly patches: readonly TextPatch[];
     }
-  | { readonly type: 'fonts'; readonly fonts: PageFonts };
+  | { readonly type: 'fonts'; readonly fonts: PageFonts }
+  | PluginMessage;
+
+/** PluginMessage is a message of a plugin of the editor, by the name of the plugin, in both directions. */
+export interface PluginMessage {
+  readonly type: 'plugin';
+  readonly plugin: string;
+  readonly message: unknown;
+}
+
+/** pluginName matches the name of a plugin of the editor. */
+export const pluginName = /^[A-Za-z][\w-]*$/;
 
 /** PageMessage is a message from the page to the extension. */
 export type PageMessage =
   | { readonly type: 'ready' }
   | { readonly type: 'edit'; readonly id: number; readonly base: number; readonly patches: readonly TextPatch[] }
   | { readonly type: 'selection'; readonly selection: TextSelection }
-  | { readonly type: 'openText' };
+  | { readonly type: 'openText' }
+  | PluginMessage;
 
 /** isRecord is true for an object that is no array. */
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -82,6 +96,8 @@ export function pageMessage(value: unknown): PageMessage | undefined {
       return { type: value.type };
     case 'edit':
       return isCount(value.id) && isCount(value.base) && isPatches(value.patches) ? { type: 'edit', id: value.id, base: value.base, patches: value.patches } : undefined;
+    case 'plugin':
+      return typeof value.plugin === 'string' && pluginName.test(value.plugin) ? { type: 'plugin', plugin: value.plugin, message: value.message } : undefined;
     case 'selection': {
       const selection = value.selection;
       return isRecord(selection) && isCount(selection.anchor) && isCount(selection.head)

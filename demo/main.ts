@@ -8,10 +8,12 @@
 // only the blocks whose text changed (docs/source.md, R-SRC-002). The head of the page shows the origin of the last
 // change and the selection of the rendered editor in the text. The toolbar of the editor switches the read-only mode
 // and the mode to learn Markdown. The front matter shows as a form with the example schema below; "Edit keys" switches
-// the form to the edit of the keys.
+// the form to the edit of the keys. The example plugin (examplePlugin.ts) shows the plugin API: a CSV table at the level
+// "render", a read-only citation and a thread beside the text.
 
 import { MarkdownEditor } from '@nimblescape/markdowneditor';
 import { TextSource, type JsonSchema, type TextChange } from '@nimblescape/markdowntext';
+import { examplePlugin } from './examplePlugin';
 
 /** schema is an example schema of a front matter (docs/editor.md, R-FM-004). */
 const schema: JsonSchema = {
@@ -65,6 +67,20 @@ const editor = new MarkdownEditor(element, { markdown });
 
 A footnote.[^1]
 
+## The example plugin
+
+A CSV table that a plugin shows. Double click it to change its text:
+
+\`\`\`csv
+Name, Value
+a, 1
+b, 2
+\`\`\`
+
+A citation that a plugin generates, so it is read-only: as [Levitt, 1972](#ref-levitt-1972) wrote.
+
+TODO: this paragraph has a thread. Its icon is at the right of the text.
+
 [^1]: The text of the footnote.
 `;
 
@@ -77,7 +93,7 @@ if (!textArea || !element || !status) {
 
 /** source is the source of the example file, which both editors share. */
 const source = new TextSource(sample);
-const editor = new MarkdownEditor(element, { source, id: 'rendered', frontMatterSchema: schema });
+const editor = new MarkdownEditor(element, { source, id: 'rendered', frontMatterSchema: schema, plugins: [examplePlugin()] });
 
 // The text field is the second editor of the source: each input becomes a change of the user, and each change from the
 // rendered editor becomes the patches of the text field, from its end, so that the positions before each patch stay.
