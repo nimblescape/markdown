@@ -116,7 +116,10 @@ of answers beside a block, "Add Note", and the buttons Comment and Reaction
 and the removal of the notes from the output to the renderer. It marks the
 parts that it generates as read-only ([R-EDIT-011](editor.md#r-edit-011)):
 the numbers in captions, the text of references (`/ref`), and the code and
-the cite of listings. Notes integrates the AI chat as notes
+the cite of listings. It hides the anchors of the captions and the headings
+and the comments of the listings. Until the libraries show the values of
+the front matter in the text (open question 1), Notes hides their markers
+and marks the values as read-only. Notes integrates the AI chat as notes
 ([R-AI-001](ai.md#r-ai-001)).
 
 ## 4. Markdown Paper
