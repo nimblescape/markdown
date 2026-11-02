@@ -96,7 +96,10 @@ works in the renderer and in the editor.
 The API of the editor for the plugins gives the Tiptap editor, the text as
 Markdown, the commands by their full names, the panel of a thread, and a
 refresh of the generated parts and threads after a change of the data of a
-plugin. The API of the platform gives the name of the platform and, for each
+plugin. A transaction that takes a change of the text from outside has the
+meta `outsideChange`, so that a plugin that guards its parts against the
+edits of the user, for example the notes of Notes, lets such a change pass.
+The API of the platform gives the name of the platform and, for each
 plugin, a channel for messages to the other part of the plugin, for example
 in the extension of VS Code ([R-VSC-001](platforms.md#r-vsc-001)).
 
