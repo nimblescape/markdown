@@ -212,8 +212,9 @@ uses the font of the editor. A change of these settings shows at once.
 3. VS Code: the form of the adapter ([R-VSC-001](#r-vsc-001)), the
    changes between the page and the document
    ([R-VSC-005](#r-vsc-005)), Undo and the keys of the editor
-   ([R-VSC-006](#r-vsc-006)), and the views "Edit" and "Pages"
-   ([R-VSC-007](#r-vsc-007)), all proposals?
+   ([R-VSC-006](#r-vsc-006)), the views "Edit" and "Pages"
+   ([R-VSC-007](#r-vsc-007)), and the plugins of other extensions
+   ([R-VSC-008](#r-vsc-008)), all proposals?
 
 ---
 
