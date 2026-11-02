@@ -38,6 +38,7 @@ packages with their steps of the plan.
 | Package | Part |
 | --- | --- |
 | [`@nimblescape/markdowntext`](packages/markdowntext) | The source: the text of a file with its changes, their origin and the selections of the editors; the front matter in YAML, TOML and JSON, its edits and the check against a JSON schema; without a view |
+| [`@nimblescape/markdownai`](packages/markdownai) | The AI without a view: the provider API that makes any AI pluggable, the context of the document, the tool with which the AI proposes a change, the loop of a chat, and the provider in another process, so that the API key never reaches the page |
 | [`@nimblescape/markdownrender`](packages/markdownrender) | The renderer: the text of a file as HTML without edit functions, from markdown-it 14, with the plugins of the renderer; without the editor and without a page |
 | [`@nimblescape/markdownlayout`](packages/markdownlayout) | The layout: the text of a file in its layout as pages, with the layout code of Markdown Paper, the built-in layout `plain` and Paged.js |
 | [`@nimblescape/markdowneditor`](packages/markdowneditor) | The editor of rendered Markdown for the web and for the webviews of VS Code, built on the renderer |

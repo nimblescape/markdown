@@ -72,6 +72,46 @@ end, or an error. The integrating code registers the providers, and the user
 picks one. The first and for now only provider is the Claude API, with
 streaming and tool use.
 
+*(proposal)* These are the details, in the package
+`@nimblescape/markdownai` ([R-ARCH-002](specification.md#r-arch-002)).
+
+- A provider is `{ name, models(), stream(request, signal) }`. A request has
+  the ID of the model, the instructions of the integrating code, the
+  messages, the context and the tools. A message of the user or of the AI
+  holds text, calls of tools by the AI and the results of the calls. The
+  stream gives parts of the text of the answer, the calls of tools, and the
+  end with its reason (`done`, `toolCalls`, `length`, `refusal`,
+  `stopped`), or an error. A provider gives a failure as an event of the
+  stream.
+- The context is the name and the text of the file, the selection, the JSON
+  schema of the front matter and the format rules of the active plugins
+  ([R-AI-001](#r-ai-001)). Every provider gives the AI the instructions with
+  the context in the same text: the document in a fenced code block, the
+  selected text or the line of the cursor, the schema and the rules.
+- The AI proposes a change with the tool `propose_change`, as the tool to
+  edit a file of Claude Code: it gives a part of the text that occurs once
+  in the document and its new text, not the places in the text. The chat
+  finds the range of that part in the text of the file, with the line
+  breaks of the file, and keeps only the words that change, so that a
+  change of some words shows in the line ([R-AI-006](#r-ai-006)). A part
+  that does not occur, or occurs more than once, is an error for the AI,
+  which then tries again.
+- The loop of a chat asks the provider, gives each proposed change to the
+  editor and waits for its result, runs the other tools of the integrating
+  code, for example the memory ([R-AI-003](#r-ai-003)), and asks again with
+  the results, until the AI finishes, at most 20 requests for one answer.
+  Each request has the context as it is then, so that the AI knows the text
+  after an accepted change. The result of `propose_change` says the AI
+  whether the user accepted or rejected the change. A stop of the user ends
+  the answer; each call of the answer still gets a result, so that the chat
+  can go on.
+- The loop runs where the editor is. A provider in another process is a
+  remote provider: the page sends each request through a channel of
+  messages, for example the channel of a plugin
+  ([R-PLUGIN-001](plugins.md#r-plugin-001)), and the other side answers
+  with the real provider ([R-AI-005](#r-ai-005)). Each side checks the
+  messages of the other side.
+
 ### R-AI-005
 
 **The key stays off the page.** The API key must never reach the page. In VS
@@ -92,7 +132,9 @@ the Claude API; a second tool searches the other notes and chats.
 
 1. Tracked changes: does the editor show proposed changes as tracked changes,
    with the details of [R-AI-006](#r-ai-006) (proposal)?
-2. Memory: the memory in the repository of the document (proposal) or for
+2. Providers: the details of the provider API, the tool `propose_change`
+   and the loop of a chat ([R-AI-002](#r-ai-002), proposal)?
+3. Memory: the memory in the repository of the document (proposal) or for
    each user ([R-AI-003](#r-ai-003))? May the AI write the memory without
    asking (proposal: yes, with a setting that makes it ask)?
 
