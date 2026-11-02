@@ -48,6 +48,8 @@
     "licenses": "node scripts/check-licenses.mjs"
   },
   "dependencies": {
+    "@cfworker/json-schema": "^4.1.1",
+    "@decimalturn/toml-patch": "^3.3.1",
     "@tiptap/core": "^3.32.2",
     "@tiptap/extension-bold": "^3.32.2",
     "@tiptap/extension-code": "^3.32.2",
@@ -59,14 +61,17 @@
     "@tiptap/extension-list": "^3.32.2",
     "@tiptap/extension-strike": "^3.32.2",
     "@tiptap/extension-table": "^3.32.2",
+    "@tiptap/extension-underline": "^3.32.2",
     "@tiptap/pm": "^3.32.2",
     "@tiptap/starter-kit": "^3.32.2",
     "@types/markdown-it": "^14.2.0",
+    "jsonc-parser": "^3.3.1",
     "markdown-it": "^14.3.3",
     "markdown-it-footnote": "^4.0.0",
     "markdown-it-task-lists": "^2.1.1",
     "prosemirror-markdown": "^1.13.9",
-    "string-width": "^8.3.0"
+    "string-width": "^8.3.0",
+    "yaml": "^2.9.1"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

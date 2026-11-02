@@ -34,8 +34,10 @@ Licensed under the MIT License. See LICENSE in the repository root for details.
         min-height: calc(100vh - 3.5em);
       }
       #editor {
-        padding: 1em 2em;
+        height: calc(100vh - 3.5em);
+        padding: 0 2em 1em 0.5em;
         overflow: auto;
+        box-sizing: border-box;
       }
       #markdown {
         width: 100%;
@@ -59,7 +61,6 @@ Licensed under the MIT License. See LICENSE in the repository root for details.
   <body>
     <header>
       <h1>nimblescape Markdown</h1>
-      <label><input id="editable" type="checkbox" checked /> Edit</label>
       <button id="load" type="button">Load the text</button>
     </header>
     <main>

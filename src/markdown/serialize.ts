@@ -12,6 +12,7 @@ import type { Mark, Node } from '@tiptap/pm/model';
 import { MarkdownSerializer, type MarkdownSerializerState } from 'prosemirror-markdown';
 import stringWidth from 'string-width';
 import { type EscapeContext, escapeText } from './escape';
+import { widthsPattern } from './tableComments';
 import type { MarkdownSource } from './parse';
 
 type NodeWriter = (state: MarkdownSerializerState, node: Node, parent: Node, index: number) => void;
@@ -353,6 +354,8 @@ export class MarkdownWriter {
         expelEnclosingWhitespace: true,
       },
       strike: { open: '~~', close: '~~', mixable: true, expelEnclosingWhitespace: true },
+      // Markdown has no underline; GitHub shows `<ins>` underlined (R-EDIT-007).
+      underline: { open: '<ins>', close: '</ins>', mixable: true },
       code: {
         open: (_state, _mark, parent, index) => {
           const text = parent.child(index).text ?? '';
@@ -433,7 +436,10 @@ export class MarkdownWriter {
     table.forEach((row, _offset, rowIndex) => {
       const cells: string[] = [];
       row.forEach((cell) => {
-        cells.push(this.cellText(doc, cell));
+        // The color of a cell is a comment at its start (docs/editor.md, R-EDIT-010).
+        const color = cell.attrs.background ? `<!--cell ${cell.attrs.background as string}-->` : '';
+        const text = this.cellText(doc, cell);
+        cells.push(color && text ? `${color} ${text}` : color || text);
         if (rowIndex === 0) {
           alignments.push((cell.attrs.align as string | null) ?? null);
         }
@@ -469,22 +475,29 @@ export class MarkdownWriter {
    */
   serialize(doc: Node, source?: MarkdownSource, options: SerializeOptions = {}): string {
     this.context = { references: source?.references ?? new Set() };
-    const parts: { text: string; index?: number }[] = [];
+    const parts: { text: string; index?: number; block: Node }[] = [];
     doc.forEach((block) => {
       const original = options.verbatim === false ? undefined : source?.blocks.get(block);
       if (original) {
-        parts.push({ text: original.text, index: original.index });
+        parts.push({ text: original.text, index: original.index, block });
         return;
       }
       const text = this.blockText(doc, block);
       // An empty paragraph, which the editor holds in an empty document, writes no text.
       if (text !== '' || block.type.name !== 'paragraph') {
-        parts.push({ text });
+        parts.push({ text, block });
       }
     });
+    // The comment of the widths of the columns stands on the line right before its table (docs/editor.md, R-EDIT-010).
+    const gapBefore = (position: number): string =>
+      parts[position].block.type.spec.tableRole === 'table' &&
+      parts[position - 1].block.type.name === 'htmlBlock' &&
+      widthsPattern.test(parts[position - 1].text.trim())
+        ? '\n'
+        : '\n\n';
     let out: string;
     if (!source) {
-      out = parts.length > 0 ? `${parts.map((part) => part.text).join('\n\n')}\n` : '';
+      out = parts.length > 0 ? `${parts.map((part, position) => (position > 0 ? gapBefore(position) : '') + part.text).join('')}\n` : '';
       return out;
     }
     if (parts.length === 0) {
@@ -495,7 +508,7 @@ export class MarkdownWriter {
         if (position > 0) {
           const previous = parts[position - 1];
           const adjacent = previous.index !== undefined && part.index === previous.index + 1;
-          out += adjacent ? source.gaps[previous.index as number] : '\n\n';
+          out += adjacent ? source.gaps[previous.index as number] : gapBefore(position);
         }
         out += part.text;
       });

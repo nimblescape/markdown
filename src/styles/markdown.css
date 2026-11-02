@@ -20,6 +20,18 @@ browser. In VS Code, the adapter of the webview sets the tokens from the variabl
   --nsmd-selection: #b6d4fe;
   --nsmd-raw-background: #f6f8fa;
   --nsmd-raw-foreground: #59636e;
+  --nsmd-surface: #ffffff;
+  --nsmd-hover: rgba(129, 139, 152, 0.15);
+  --nsmd-active: rgba(9, 105, 218, 0.12);
+  --nsmd-shadow: 0 4px 16px rgba(31, 35, 40, 0.15);
+  --nsmd-mark: #953800;
+  --nsmd-find-match: rgba(212, 167, 44, 0.35);
+  --nsmd-find-current: rgba(255, 145, 0, 0.6);
+  --nsmd-alert-note: #0969da;
+  --nsmd-alert-tip: #1a7f37;
+  --nsmd-alert-important: #8250df;
+  --nsmd-alert-warning: #9a6700;
+  --nsmd-alert-caution: #d1242f;
   --nsmd-font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
   --nsmd-font-size: 16px;
   --nsmd-line-height: 1.6;
@@ -37,6 +49,18 @@ browser. In VS Code, the adapter of the webview sets the tokens from the variabl
     --nsmd-selection: #264f78;
     --nsmd-raw-background: #151b23;
     --nsmd-raw-foreground: #9198a1;
+    --nsmd-surface: #151b23;
+    --nsmd-hover: rgba(101, 108, 118, 0.2);
+    --nsmd-active: rgba(68, 147, 248, 0.15);
+    --nsmd-shadow: 0 4px 16px rgba(1, 4, 9, 0.6);
+    --nsmd-mark: #ffa657;
+    --nsmd-find-match: rgba(187, 128, 9, 0.4);
+    --nsmd-find-current: rgba(255, 145, 0, 0.6);
+    --nsmd-alert-note: #4493f8;
+    --nsmd-alert-tip: #3fb950;
+    --nsmd-alert-important: #ab7df8;
+    --nsmd-alert-warning: #d29922;
+    --nsmd-alert-caution: #f85149;
   }
 }
 
@@ -168,4 +192,683 @@ selector names .ProseMirror, because Tiptap sets `white-space: normal` for the n
 .nsmd-editor .nsmd-footnote-reference {
   color: var(--nsmd-link);
   font-size: 0.75em;
+}
+
+/* GitHub alerts: the color of the kind, and the name of the kind in place of the marker `[!NOTE]` (R-EDIT-003). */
+.nsmd-editor .nsmd-alert-note {
+  --nsmd-alert-color: var(--nsmd-alert-note);
+}
+
+.nsmd-editor .nsmd-alert-tip {
+  --nsmd-alert-color: var(--nsmd-alert-tip);
+}
+
+.nsmd-editor .nsmd-alert-important {
+  --nsmd-alert-color: var(--nsmd-alert-important);
+}
+
+.nsmd-editor .nsmd-alert-warning {
+  --nsmd-alert-color: var(--nsmd-alert-warning);
+}
+
+.nsmd-editor .nsmd-alert-caution {
+  --nsmd-alert-color: var(--nsmd-alert-caution);
+}
+
+.nsmd-editor blockquote.nsmd-alert {
+  color: var(--nsmd-foreground);
+  border-left-color: var(--nsmd-alert-color);
+}
+
+.nsmd-editor .ProseMirror .nsmd-alert-marker {
+  color: var(--nsmd-alert-color);
+}
+
+.nsmd-editor .ProseMirror .nsmd-alert-marker:not(.nsmd-alert-marker-raw) {
+  font-size: 0;
+}
+
+/* The name of the kind stands on a line of its own, as on GitHub. */
+.nsmd-editor .ProseMirror .nsmd-alert-marker:not(.nsmd-alert-marker-raw)::before {
+  content: attr(data-label);
+  display: block;
+  font-size: var(--nsmd-font-size);
+  font-weight: 600;
+}
+
+.nsmd-editor .ProseMirror .nsmd-alert-marker-raw {
+  font-family: var(--nsmd-code-font-family);
+  font-size: 0.85em;
+}
+
+/*
+The interaction of the editor (R-GEN-003, R-EDIT-007): the header with the toolbar and the bar of find and replace, the
+box of the text, and the parts that show over the text. The box leaves room at the left for the handles of the blocks.
+*/
+.nsmd-editor [hidden] {
+  display: none !important;
+}
+
+.nsmd-editor .nsmd-header {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: var(--nsmd-background);
+  font-family: var(--nsmd-font-family);
+  font-size: 13px;
+}
+
+.nsmd-editor .nsmd-box {
+  position: relative;
+  padding-left: 2.75rem;
+}
+
+.nsmd-editor .nsmd-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--nsmd-border);
+}
+
+.nsmd-editor .nsmd-toolbar-space {
+  flex: 1;
+}
+
+.nsmd-editor .nsmd-separator {
+  width: 1px;
+  height: 18px;
+  margin: 0 4px;
+  background: var(--nsmd-border);
+}
+
+.nsmd-editor .nsmd-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 4px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--nsmd-foreground);
+  font-family: var(--nsmd-font-family);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.nsmd-editor .nsmd-button:hover:not(:disabled) {
+  background: var(--nsmd-hover);
+}
+
+.nsmd-editor .nsmd-button-active {
+  background: var(--nsmd-active);
+  color: var(--nsmd-link);
+}
+
+.nsmd-editor .nsmd-button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.nsmd-editor .nsmd-button:focus-visible {
+  outline: 2px solid var(--nsmd-link);
+  outline-offset: -2px;
+}
+
+.nsmd-editor .nsmd-button-text {
+  padding: 0 8px;
+}
+
+.nsmd-editor .nsmd-icon {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex: none;
+}
+
+.nsmd-editor .nsmd-glyph {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.nsmd-editor .nsmd-glyph-bold {
+  font-weight: 700;
+}
+
+.nsmd-editor .nsmd-glyph-italic {
+  font-style: italic;
+  font-family: Georgia, serif;
+}
+
+.nsmd-editor .nsmd-glyph-underline {
+  text-decoration: underline;
+}
+
+.nsmd-editor .nsmd-glyph-strike {
+  text-decoration: line-through;
+}
+
+.nsmd-editor .nsmd-glyph-code {
+  font-family: var(--nsmd-code-font-family);
+  font-size: 12px;
+}
+
+.nsmd-editor .nsmd-format-bar,
+.nsmd-editor .nsmd-menu,
+.nsmd-editor .nsmd-ask {
+  position: absolute;
+  background: var(--nsmd-surface);
+  color: var(--nsmd-foreground);
+  border: 1px solid var(--nsmd-border);
+  border-radius: 8px;
+  box-shadow: var(--nsmd-shadow);
+  font-family: var(--nsmd-font-family);
+  font-size: 13px;
+}
+
+.nsmd-editor .nsmd-format-bar {
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  white-space: nowrap;
+}
+
+.nsmd-editor .nsmd-menu {
+  z-index: 5;
+  min-width: 220px;
+  max-height: 320px;
+  overflow-y: auto;
+  padding: 4px;
+}
+
+.nsmd-editor .nsmd-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.nsmd-editor .nsmd-menu-item-active {
+  background: var(--nsmd-hover);
+}
+
+.nsmd-editor .nsmd-menu-label {
+  flex: 1;
+}
+
+.nsmd-editor .nsmd-menu-hint {
+  color: var(--nsmd-muted);
+  font-family: var(--nsmd-code-font-family);
+  font-size: 12px;
+}
+
+.nsmd-editor .nsmd-menu-empty {
+  padding: 6px 8px;
+  color: var(--nsmd-muted);
+}
+
+.nsmd-editor .nsmd-ask {
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px;
+}
+
+.nsmd-editor .nsmd-ask-label {
+  color: var(--nsmd-muted);
+}
+
+.nsmd-editor .nsmd-ask-input,
+.nsmd-editor .nsmd-find-input {
+  min-width: 0;
+  padding: 4px 6px;
+  border: 1px solid var(--nsmd-border);
+  border-radius: 4px;
+  background: var(--nsmd-background);
+  color: var(--nsmd-foreground);
+  font-family: var(--nsmd-font-family);
+  font-size: 13px;
+}
+
+.nsmd-editor .nsmd-ask-input {
+  width: 260px;
+}
+
+.nsmd-editor .nsmd-block-handle {
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+}
+
+.nsmd-editor .nsmd-block-handle .nsmd-button {
+  min-width: 20px;
+  height: 24px;
+  padding: 0;
+  color: var(--nsmd-muted);
+}
+
+.nsmd-editor .nsmd-grip {
+  cursor: grab;
+}
+
+.nsmd-editor .nsmd-find {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--nsmd-border);
+}
+
+.nsmd-editor .nsmd-find-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.nsmd-editor .nsmd-find-input {
+  flex: 1 1 180px;
+  max-width: 320px;
+}
+
+.nsmd-editor .nsmd-find-count {
+  min-width: 72px;
+  color: var(--nsmd-muted);
+  font-size: 12px;
+}
+
+.nsmd-editor .nsmd-find-match {
+  background: var(--nsmd-find-match);
+  border-radius: 2px;
+}
+
+.nsmd-editor .nsmd-find-current {
+  background: var(--nsmd-find-current);
+}
+
+/*
+The mode to learn Markdown (R-GEN-013): the marks of the file beside the rendered text, muted, and in full color in the
+block of the cursor. A mark is an inline block, so that the underline or the strikethrough of its text does not cross
+it.
+*/
+.nsmd-editor .ProseMirror .nsmd-learn-mark {
+  display: inline-block;
+  color: var(--nsmd-muted);
+  opacity: 0.7;
+  font-family: var(--nsmd-code-font-family);
+  font-size: 0.85em;
+  font-weight: 400;
+  font-style: normal;
+  white-space: pre;
+  user-select: none;
+}
+
+.nsmd-editor .ProseMirror .nsmd-learn-mark-line {
+  display: block;
+}
+
+.nsmd-editor .ProseMirror .nsmd-learn-current .nsmd-learn-mark {
+  color: var(--nsmd-mark);
+  opacity: 1;
+}
+
+/*
+Tables (R-EDIT-008 to R-EDIT-010): the handles of the rows and the columns, the markers "+" on the borders, the line
+that shows where a dragged row or column goes, the colors of the cells, and the widths of the columns from the comment
+before the table, which hides itself outside the mode to learn Markdown.
+*/
+.nsmd-editor .nsmd-table-grip,
+.nsmd-editor .nsmd-table-marker {
+  position: absolute;
+  z-index: 3;
+  min-width: 0;
+  padding: 0;
+  background: var(--nsmd-surface);
+  border: 1px solid var(--nsmd-border);
+  color: var(--nsmd-muted);
+}
+
+.nsmd-editor .nsmd-table-grip-row {
+  width: 14px;
+  height: 22px;
+  cursor: grab;
+}
+
+.nsmd-editor .nsmd-table-grip-column {
+  width: 22px;
+  height: 14px;
+  cursor: grab;
+}
+
+.nsmd-editor .nsmd-table-grip-column .nsmd-icon {
+  transform: rotate(90deg);
+}
+
+.nsmd-editor .nsmd-table-grip .nsmd-icon {
+  width: 12px;
+  height: 12px;
+}
+
+.nsmd-editor .nsmd-table-marker {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+}
+
+.nsmd-editor .nsmd-table-marker .nsmd-icon {
+  width: 12px;
+  height: 12px;
+}
+
+.nsmd-editor .nsmd-table-drop {
+  position: absolute;
+  z-index: 3;
+  background: var(--nsmd-link);
+  pointer-events: none;
+}
+
+.nsmd-editor .ProseMirror .nsmd-hidden {
+  display: none;
+}
+
+.nsmd-editor .nsmd-table-fixed table {
+  table-layout: fixed;
+  width: 100% !important;
+}
+
+.nsmd-editor .ProseMirror .selectedCell {
+  background: var(--nsmd-selection);
+}
+
+.nsmd-editor td[data-color='gray'],
+.nsmd-editor th[data-color='gray'] {
+  background: rgba(129, 139, 152, 0.18);
+}
+
+.nsmd-editor td[data-color='red'],
+.nsmd-editor th[data-color='red'] {
+  background: rgba(209, 36, 47, 0.14);
+}
+
+.nsmd-editor td[data-color='orange'],
+.nsmd-editor th[data-color='orange'] {
+  background: rgba(219, 109, 40, 0.16);
+}
+
+.nsmd-editor td[data-color='yellow'],
+.nsmd-editor th[data-color='yellow'] {
+  background: rgba(212, 167, 44, 0.22);
+}
+
+.nsmd-editor td[data-color='green'],
+.nsmd-editor th[data-color='green'] {
+  background: rgba(26, 127, 55, 0.14);
+}
+
+.nsmd-editor td[data-color='blue'],
+.nsmd-editor th[data-color='blue'] {
+  background: rgba(9, 105, 218, 0.14);
+}
+
+.nsmd-editor td[data-color='purple'],
+.nsmd-editor th[data-color='purple'] {
+  background: rgba(130, 80, 223, 0.14);
+}
+
+/* The form of the front matter (docs/editor.md, R-FM-001 to R-FM-006). */
+
+.nsmd-editor .ProseMirror .nsmd-fm {
+  margin: 0 0 1em;
+  padding: 8px 12px 10px;
+  border: 1px solid var(--nsmd-border);
+  border-radius: 6px;
+  background: var(--nsmd-raw-background);
+  font-size: 14px;
+  line-height: 1.4;
+  white-space: normal;
+  cursor: default;
+}
+
+.nsmd-editor .ProseMirror .nsmd-fm.ProseMirror-selectednode {
+  outline: 2px solid var(--nsmd-selection);
+}
+
+.nsmd-editor .nsmd-fm-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.nsmd-editor .nsmd-fm-title {
+  font-weight: 600;
+}
+
+.nsmd-editor .nsmd-fm-format,
+.nsmd-editor .nsmd-fm-count {
+  padding: 0 6px;
+  border: 1px solid var(--nsmd-border);
+  border-radius: 10px;
+  color: var(--nsmd-muted);
+  font-size: 12px;
+}
+
+.nsmd-editor .nsmd-fm-count {
+  border-color: var(--nsmd-alert-caution);
+  color: var(--nsmd-alert-caution);
+}
+
+.nsmd-editor .nsmd-fm-spacer {
+  flex: 1 1 auto;
+}
+
+.nsmd-editor .nsmd-fm-mode,
+.nsmd-editor .nsmd-fm-add-item,
+.nsmd-editor .nsmd-fm-add-key,
+.nsmd-editor .nsmd-fm-remove {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border: 1px solid var(--nsmd-border);
+  border-radius: 4px;
+  background: var(--nsmd-surface);
+  color: var(--nsmd-foreground);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.nsmd-editor .nsmd-fm-mode:hover,
+.nsmd-editor .nsmd-fm-add-item:hover,
+.nsmd-editor .nsmd-fm-add-key:hover,
+.nsmd-editor .nsmd-fm-remove:hover {
+  background: var(--nsmd-hover);
+}
+
+.nsmd-editor .nsmd-fm-mode[aria-pressed='true'] {
+  border-color: var(--nsmd-link);
+  background: var(--nsmd-active);
+}
+
+.nsmd-editor .nsmd-fm-remove {
+  padding: 2px 4px;
+  border-color: transparent;
+  background: transparent;
+  color: var(--nsmd-muted);
+}
+
+.nsmd-editor .nsmd-fm-fields {
+  display: grid;
+  grid-template-columns: minmax(6rem, max-content) minmax(0, 1fr) auto;
+  gap: 4px 10px;
+  align-items: start;
+}
+
+.nsmd-editor .nsmd-fm-field {
+  display: contents;
+}
+
+.nsmd-editor .nsmd-fm-key {
+  grid-column: 1;
+  padding-top: 4px;
+  color: var(--nsmd-muted);
+  overflow-wrap: anywhere;
+}
+
+.nsmd-editor .nsmd-fm-missing > .nsmd-fm-key {
+  font-style: italic;
+}
+
+.nsmd-editor .nsmd-fm-required {
+  color: var(--nsmd-alert-caution);
+}
+
+.nsmd-editor .nsmd-fm-value {
+  min-width: 0;
+}
+
+.nsmd-editor .nsmd-fm-field > .nsmd-fm-value {
+  grid-column: 2;
+}
+
+.nsmd-editor .nsmd-fm-field > .nsmd-fm-remove {
+  grid-column: 3;
+}
+
+.nsmd-editor .nsmd-fm-field > .nsmd-fm-problem {
+  grid-column: 2 / span 2;
+}
+
+.nsmd-editor .nsmd-fm-fields > .nsmd-fm-add {
+  grid-column: 1 / -1;
+}
+
+.nsmd-editor .nsmd-fm-value > .nsmd-fm-fields {
+  padding-left: 10px;
+  border-left: 2px solid var(--nsmd-border);
+}
+
+.nsmd-editor .nsmd-fm-input,
+.nsmd-editor .nsmd-fm-key-input,
+.nsmd-editor .nsmd-fm-select,
+.nsmd-editor .nsmd-fm-textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding: 3px 6px;
+  border: 1px solid var(--nsmd-border);
+  border-radius: 4px;
+  background: var(--nsmd-background);
+  color: var(--nsmd-foreground);
+  font-family: var(--nsmd-font-family);
+  font-size: 14px;
+}
+
+.nsmd-editor .nsmd-fm-textarea {
+  resize: vertical;
+}
+
+.nsmd-editor .nsmd-fm-text-view .nsmd-fm-textarea {
+  font-family: var(--nsmd-code-font-family);
+  font-size: 13px;
+}
+
+.nsmd-editor .nsmd-fm-key-input {
+  width: 10rem;
+}
+
+.nsmd-editor .nsmd-fm-select {
+  width: auto;
+  max-width: 100%;
+}
+
+.nsmd-editor .nsmd-fm-check {
+  margin: 6px 0 0;
+}
+
+.nsmd-editor [aria-invalid='true'] {
+  border-color: var(--nsmd-alert-caution);
+}
+
+.nsmd-editor .nsmd-fm-static {
+  display: inline-block;
+  padding-top: 4px;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.nsmd-editor .nsmd-fm-empty {
+  color: var(--nsmd-muted);
+  font-style: italic;
+}
+
+.nsmd-editor .nsmd-fm-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.nsmd-editor .nsmd-fm-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px;
+}
+
+.nsmd-editor .nsmd-fm-item > .nsmd-fm-problem {
+  grid-column: 1 / span 2;
+}
+
+.nsmd-editor .nsmd-fm-add-item {
+  align-self: flex-start;
+}
+
+.nsmd-editor .nsmd-fm-add {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.nsmd-editor .nsmd-fm-add .nsmd-fm-new-key {
+  flex: 1 1 8rem;
+  width: auto;
+}
+
+.nsmd-editor .nsmd-fm-add > .nsmd-fm-problem {
+  flex-basis: 100%;
+}
+
+.nsmd-editor .nsmd-fm-problem {
+  color: var(--nsmd-alert-caution);
+  font-size: 13px;
+}
+
+.nsmd-editor .nsmd-fm-text-view {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.nsmd-editor .nsmd-fm-source {
+  margin: 8px 0 0;
+  padding: 6px 8px;
+  border-top: 1px dashed var(--nsmd-border);
+  color: var(--nsmd-raw-foreground);
+  font-family: var(--nsmd-code-font-family);
+  font-size: 13px;
+  white-space: pre-wrap;
 }

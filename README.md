@@ -14,10 +14,15 @@ own.
 specification: the scope, the architecture, the open questions and the plan
 of the steps, with the documents of the parts, for example
 [docs/editor.md](docs/editor.md) and [docs/history.md](docs/history.md).
-The first steps are built: the npm package and the core, which reads
-Markdown into the document of the editor and writes it back. A block that
-the user does not change keeps its text byte for byte. The toolbars, the
-menus and the plugin API come in the next steps.
+The first steps are built: the npm package; the core, which reads Markdown
+into the document of the editor and writes it back, so that a block that the
+user does not change keeps its text byte for byte; and the interaction of a
+document editor: the toolbar, the format bar over selected text, the insert
+menu "+" and the slash commands, the handles of the blocks, find and
+replace, read-only mode and a mode that shows the Markdown marks beside the
+rendered text; the tables with handles, markers and a table menu; and the
+form of the front matter, with a JSON schema, for YAML, TOML and JSON.
+VS Code and the plugin API come in the next steps.
 
 ## Use
 
@@ -30,7 +35,13 @@ const editor = new MarkdownEditor(document.querySelector('#editor')!, {
   onChange: (changed) => console.log(changed.getMarkdown()),
 });
 editor.setEditable(false); // read-only mode
+editor.setLearnMode(true); // show the Markdown marks
+editor.setFrontMatterSchema({ type: 'object', required: ['title'] }); // the schema of the form of the front matter
 ```
+
+The options `toolbar`, `readOnlyToggle` and `learnToggle` leave out the
+toolbar or its switches, and `learnMode` starts the editor with the
+Markdown marks shown.
 
 The package is not on npmjs.com before the release.
 [CONTRIBUTING.md](CONTRIBUTING.md) explains the development, the example

@@ -1,6 +1,12 @@
 {
   "about": "The license that was decided for each package that the editor needs at run time (docs/specification.md, R-GEN-011). npm run licenses checks package-lock.json against this file.",
   "packages": {
+    "@cfworker/json-schema": {
+      "license": "MIT"
+    },
+    "@decimalturn/toml-patch": {
+      "license": "MIT"
+    },
     "@tiptap/core": {
       "license": "MIT"
     },
@@ -105,6 +111,9 @@
     "get-east-asian-width": {
       "license": "MIT"
     },
+    "jsonc-parser": {
+      "license": "MIT"
+    },
     "linkify-it": {
       "license": "MIT"
     },
@@ -185,6 +194,9 @@
     },
     "w3c-keyname": {
       "license": "MIT"
+    },
+    "yaml": {
+      "license": "ISC"
     }
   }
 }

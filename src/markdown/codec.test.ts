@@ -135,6 +135,30 @@ describe('a text written new', () => {
   });
 });
 
+describe('underline', () => {
+  /** underlinedTexts returns the texts of a document with the mark of underline. */
+  const underlinedTexts = (text: string): string[] => {
+    const found: string[] = [];
+    codec.parse(text).doc.descendants((node) => {
+      if (node.isText && node.marks.some((mark) => mark.type.name === 'underline')) {
+        found.push(node.text ?? '');
+      }
+    });
+    return found;
+  };
+
+  it('reads <ins>text</ins> as underlined text and writes it back', () => {
+    expect(underlinedTexts('A <ins>b **c**</ins> d\n')).toEqual(['b ', 'c']);
+    expect(fresh('A <ins>b **c**</ins> d\n')).toBe('A <ins>b **c**</ins> d\n');
+  });
+
+  it('keeps an <ins> without its pair, or across another mark, as HTML', () => {
+    expect(underlinedTexts('A <ins>b\n')).toEqual([]);
+    expect(underlinedTexts('**a <ins>b** c</ins>\n')).toEqual([]);
+    expect(fresh('**a <ins>b** c</ins>\n')).toBe('**a <ins>b** c</ins>\n');
+  });
+});
+
 describe('a change of one block', () => {
   it('changes only the text of that block', () => {
     const text = '# Title\n\nFirst   paragraph,\nwith two lines.\n\n\n| a |  b |\n|---|---|\n| 1 |  2 |\n\nLast *paragraph*.\n';

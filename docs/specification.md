@@ -225,10 +225,7 @@ context: it owns the courses, for example `majikmate/module-ts-2`, and the
 feedback program `majikmate/course-feedback`
 ([R-FEED-004](course.md#r-feed-004)), which use these products. A product
 of majikmate may depend on a product of nimblescape, and a product of
-nimblescape does not depend on a product or a course of majikmate. Until
-the repository of the course module moves to nimblescape, its address stays
-`majikmate/course-vscode`, and GitHub forwards the old address after the
-move.
+nimblescape does not depend on a product or a course of majikmate.
 
 ## 4. Documents
 
@@ -275,6 +272,10 @@ use:
 | `markdown-it-task-lists` | ISC | Task lists |
 | `prosemirror-markdown` | MIT | The bridge between the tokens of markdown-it and the document of the editor |
 | `string-width` | MIT | The width of the cells of a table |
+| `yaml` *(proposal)* | ISC | The front matter in YAML ([R-FM-005](editor.md#r-fm-005)) |
+| `@decimalturn/toml-patch` *(proposal)* | MIT | The front matter in TOML ([R-FM-005](editor.md#r-fm-005)) |
+| `jsonc-parser` *(proposal)* | MIT | The front matter in JSON, also with comments ([R-FM-005](editor.md#r-fm-005)) |
+| `@cfworker/json-schema` *(proposal)* | MIT | The check of the front matter against its JSON schema, without eval ([R-FM-004](editor.md#r-fm-004)) |
 
 ### R-GEN-007
 
@@ -319,23 +320,29 @@ the [platforms](platforms.md#6-open-questions).
 | --- | --- | --- | --- |
 | 1 | Setup of the repository: the npm package, an example page for the web, CI with a check of the licenses | [R-GEN-007](#r-gen-007), [R-GEN-011](#r-gen-011) | built |
 | 2 | The core on ProseMirror: Markdown into the document of the editor and back, with tests of the round trip | [R-GEN-009](editor.md#r-gen-009), [R-SRC-003](source.md#r-src-003), [R-EDIT-004](editor.md#r-edit-004) to [R-EDIT-006](editor.md#r-edit-006) | built |
-| 3 | Rendered editing of CommonMark and GFM: toolbar, format bar, insert menu, slash menu, block handles, find and replace, read-only mode, the mode to learn Markdown | [R-EDIT-003](editor.md#r-edit-003), [R-GEN-003](editor.md#r-gen-003), [R-EDIT-007](editor.md#r-edit-007), [R-GEN-008](editor.md#r-gen-008), [R-GEN-013](editor.md#r-gen-013) | planned |
-| 4 | Tables: handles, markers for new rows and columns, the table menu | [R-EDIT-008](editor.md#r-edit-008) to [R-EDIT-010](editor.md#r-edit-010) | planned |
-| 5 | The form of the front matter with both modes and the JSON schema | [R-FM-001](editor.md#r-fm-001) to [R-FM-006](editor.md#r-fm-006) | planned |
+| 3 | Rendered editing of CommonMark and GFM: toolbar, format bar, insert menu, slash menu, block handles, find and replace, read-only mode, the mode to learn Markdown | [R-EDIT-003](editor.md#r-edit-003), [R-GEN-003](editor.md#r-gen-003), [R-EDIT-007](editor.md#r-edit-007), [R-GEN-008](editor.md#r-gen-008), [R-GEN-013](editor.md#r-gen-013) | built, without the syntax colors of code blocks |
+| 4 | Tables: handles, markers for new rows and columns, the table menu | [R-EDIT-008](editor.md#r-edit-008) to [R-EDIT-010](editor.md#r-edit-010) | built, without the switch of the header row, because a table without a header row is not in version 1 |
+| 5 | The form of the front matter with both modes and the JSON schema | [R-FM-001](editor.md#r-fm-001) to [R-FM-006](editor.md#r-fm-006) | built |
 | 6 | The adapter for the webviews of VS Code and the theme of VS Code | [R-GEN-004](platforms.md#r-gen-004), [R-VSC-001](platforms.md#r-vsc-001) to [R-VSC-003](platforms.md#r-vsc-003), [R-THEME-001](platforms.md#r-theme-001) | planned |
 | 7 | The plugin API, version 1, with both levels of plugins; the read-only generated parts; the icons of threads beside the text | [R-GEN-005](plugins.md#r-gen-005), [R-GEN-012](plugins.md#r-gen-012), [R-PLUGIN-001](plugins.md#r-plugin-001), [R-EDIT-011](editor.md#r-edit-011), [R-GEN-014](editor.md#r-gen-014) | planned |
 | 8 | The plugins of nimblescape Markdown Notes, in its repository; the editor in the Notes side view | [R-NOTES-001](plugins.md#r-notes-001), [R-GEN-002](editor.md#r-gen-002), [R-GEN-004](platforms.md#r-gen-004) | planned |
 | 9 | The plugins of nimblescape Markdown Paper, in its repository; the schema of each layout | [R-PAPER-001](plugins.md#r-paper-001), [R-FM-004](editor.md#r-fm-004) | planned |
 | 10 | The provider API, the Claude provider and the proposed changes in the editor; in Notes, the AI chat as notes and the memory; the OpenTelemetry events of the AI chat | [R-AI-001](ai.md#r-ai-001) to [R-AI-003](ai.md#r-ai-003), [R-AI-005](ai.md#r-ai-005), [R-AI-006](ai.md#r-ai-006), [R-AI-004](history.md#r-ai-004), [R-EDIT-001](editor.md#r-edit-001) | planned |
 | 11 | The release workflow of the npm packages, the same as for the other nimblescape npm packages | [R-GEN-007](#r-gen-007) | planned |
+| 12 | The npm workspaces: the code of `@nimblescape/markdown` moves into the packages of the parts, first `@nimblescape/markdowneditor` and `@nimblescape/markdowntext`; each other package starts with its step | [R-ARCH-002](#r-arch-002) | planned |
+| 13 | The source: the text, the selections and the changes of a file with their origin, the changes from outside, the front matter and the parts that no plugin knows | [R-SRC-001](source.md#r-src-001) to [R-SRC-003](source.md#r-src-003), [R-GEN-006](source.md#r-gen-006), [R-EDIT-002](editor.md#r-edit-002) | planned |
+| 14 | The renderer: content without edit functions from markdown-it 14, without the editor, with the plugins of the renderer | [R-REN-001](rendering.md#r-ren-001) to [R-REN-003](rendering.md#r-ren-003) | planned |
+| 15 | The layout: the layouts with the schemas of their front matter, the layout code of Markdown Paper, pages and PDF from the same rendering as the view | [R-LAYOUT-001](rendering.md#r-layout-001) to [R-LAYOUT-004](rendering.md#r-layout-004) | planned |
 
-The parts of [section 3](#3-architecture) that the plan does not name yet
-get their steps in the plan: the npm workspaces of
-[R-ARCH-002](#r-arch-002), the source, the renderer and the layout before
-step 3 starts. The history and the reflection tool get their plans in
-their own repositories ([R-ARCH-003](#r-arch-003)); this plan holds only the
-OpenTelemetry events of the AI chat of nimblescape Markdown (step 10), which
-the history reads like those of other AI tools.
+Steps 12 to 15 give the parts of [section 3](#3-architecture) that the
+first plan did not name their steps, so their numbers do not give their
+order. *(proposal)* Steps 12 and 13 come before step 6, because the adapter
+of VS Code is a package of its own and reads and saves the file through the
+source; steps 14 and 15 come before step 9, because the plugins of Paper
+extend the renderer and the layout. The history and the reflection tool get
+their plans in their own repositories ([R-ARCH-003](#r-arch-003)); this plan
+holds only the OpenTelemetry events of the AI chat of nimblescape Markdown
+(step 10), which the history reads like those of other AI tools.
 
 ---
 

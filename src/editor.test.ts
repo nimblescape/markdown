@@ -26,7 +26,8 @@ describe('MarkdownEditor', () => {
     expect(element.querySelector('h1')?.textContent).toBe('Title');
     expect(element.querySelectorAll('ul li')).toHaveLength(2);
     expect(element.querySelector('table td')?.textContent).toBe('1');
-    expect(element.querySelector('pre.nsmd-raw-front-matter')?.textContent).toBe('---\ntitle: A\n---');
+    // The front matter shows as a form (docs/editor.md, R-FM-001).
+    expect(element.querySelector<HTMLInputElement>('.nsmd-fm input[aria-label="title"]')?.value).toBe('A');
   });
 
   it('writes only the changed block new', () => {

@@ -24,17 +24,31 @@ same pull request.
 | File | Purpose |
 | --- | --- |
 | `src/index.ts` | The exports of the npm package. |
-| `src/editor.ts` | `MarkdownEditor`: the editor on a DOM element, with its Markdown text in and out, the read-only mode ([R-GEN-008](docs/editor.md#r-gen-008)) and the event of a change. |
-| `src/extensions/core.ts` | The Tiptap extensions of the document: the nodes and marks of CommonMark and GFM, footnotes, the front matter and the raw nodes for HTML and for text that no block of Markdown holds. Attributes that record the form of the Markdown text, such as the bullet of a list, let a changed block keep its form. |
+| `src/editor.ts` | `MarkdownEditor`: the editor on a DOM element, with its Markdown text in and out, the read-only mode ([R-GEN-008](docs/editor.md#r-gen-008)), the mode to learn Markdown ([R-GEN-013](docs/editor.md#r-gen-013)) and the event of a change. |
+| `src/extensions/core.ts` | The Tiptap extensions of the document: the nodes and marks of CommonMark and GFM, footnotes, the front matter, which stays the first block, and the raw nodes for HTML and for text that no block of Markdown holds. Attributes that record the form of the Markdown text, such as the bullet of a list, let a changed block keep its form. |
 | `src/markdown/markdownIt.ts` | The markdown-it of the editor: HTML, links in the text, footnotes and task lists, and the markdown-it plugins of the extensions ([R-GEN-012](docs/plugins.md#r-gen-012)). |
 | `src/markdown/frontMatter.ts` | The front matter at the start of a file, in YAML, TOML or JSON ([R-SRC-003](docs/source.md#r-src-003)). |
 | `src/markdown/parse.ts` | The Markdown text into the document of the editor, by the tokens of markdown-it and `prosemirror-markdown`. It keeps the text of each top-level block and the blank lines between the blocks. |
 | `src/markdown/serialize.ts` | The document back into Markdown text ([R-EDIT-004](docs/editor.md#r-edit-004), [R-EDIT-005](docs/editor.md#r-edit-005)): each block that the user did not change keeps its text byte for byte; a changed block is written new, in the form of the formatter of nimblescape Markdown Notes. |
+| `src/markdown/tableComments.ts` | The comments of the tables for what GFM cannot store: the color of a cell and the widths of the columns ([R-EDIT-010](docs/editor.md#r-edit-010)). |
 | `src/markdown/escape.ts` | The backslashes of a changed block: only before characters that would otherwise start Markdown syntax. |
 | `src/markdown/codec.ts` | `MarkdownCodec`: the parser and the serializer with one schema and one markdown-it, for the editor and for code without a page. |
+| `src/ui/interaction.ts` | The interaction of a document editor ([R-GEN-003](docs/editor.md#r-gen-003)): it puts the parts below around the text and gives the editor their plugins and keys as one Tiptap extension. |
+| `src/ui/toolbar.ts`, `src/ui/formatBar.ts` | The toolbar at the top of the editor, and the format bar over selected text ([R-EDIT-007](docs/editor.md#r-edit-007)) with the buttons of extensions. |
+| `src/ui/menu.ts`, `src/ui/items.ts`, `src/ui/slash.ts` | The menu of the editor, the items of the insert menu "+", of the slash commands and of the text styles, and the plugin of the slash commands. |
+| `src/ui/blockHandle.ts` | The "+" and the handle beside the block under the mouse: insert, drag and drop, move up and down, duplicate, delete. |
+| `src/ui/find.ts`, `src/ui/findBar.ts` | The plugin and the bar of find and replace. |
+| `src/ui/learnMode.ts` | The mode to learn Markdown: the marks of the file beside the rendered text, as widgets that are not text of the document. |
+| `src/frontMatter/edit.ts`, `src/frontMatter/yaml.ts`, `src/frontMatter/json.ts` | The reading and the edits of a front matter in YAML, TOML and JSON ([R-FM-005](docs/editor.md#r-fm-005)): each edit changes only the text of the edited value, so that the comments, the order and the quotes of the other keys stay. |
+| `src/frontMatter/schema.ts` | The check of a front matter against its JSON schema, with the path of each problem and a message in plain words, and the schema of a value ([R-FM-004](docs/editor.md#r-fm-004)). |
+| `src/ui/frontMatterForm.ts` | The form of the front matter ([R-FM-001](docs/editor.md#r-fm-001) to [R-FM-006](docs/editor.md#r-fm-006)): fixed keys and the edit of the keys, the problems of the schema, the inputs of plugins, and the text of a front matter that does not parse. |
+| `src/ui/alerts.ts` | The GitHub alerts, `> [!NOTE]`, with the name of their kind in place of the marker. |
+| `src/ui/table/grid.ts` | The commands of the tables ([R-EDIT-009](docs/editor.md#r-edit-009)): insert, move, delete, sort, align and color rows, columns and cells, and the widths of the columns. |
+| `src/ui/table/tableHandles.ts`, `src/ui/table/tables.ts` | The handles and the markers "+" of the rows and the columns, the table menu ([R-EDIT-008](docs/editor.md#r-edit-008)), and the view of the widths of the columns from their comment ([R-EDIT-010](docs/editor.md#r-edit-010)). |
+| `src/ui/ask.ts`, `src/ui/dom.ts` | The field that asks for one text, for example the address of a link, and the helpers for elements, buttons and icons. |
 | `src/styles/markdown.css` | The styles of the editor, with the tokens `--nsmd-*` of the theme ([R-THEME-001](docs/platforms.md#r-theme-001)). |
 | `src/types/` | The types of the packages without types of their own. |
-| `src/**/*.test.ts` | The unit tests, with vitest: the round trip of the Markdown (`src/markdown/codec.test.ts`) and the editor in a page of happy-dom (`src/editor.test.ts`). |
+| `src/**/*.test.ts` | The unit tests, with vitest: the round trip of the Markdown (`src/markdown/codec.test.ts`), the edits and the schema of the front matter (`src/frontMatter/*.test.ts`), and the editor, its interaction, its tables and the form of the front matter in a page of happy-dom (`src/editor.test.ts`, `src/ui/interaction.test.ts`, `src/ui/table/grid.test.ts`, `src/ui/frontMatterForm.test.ts`). |
 | `test/corpus/` | The Markdown files of the tests of the round trip: GFM, the front matter in TOML and JSON, the format of Markdown Notes and the documents and layouts of Markdown Paper. [test/corpus/README.md](test/corpus/README.md) explains them. |
 | `demo/index.html`, `demo/main.ts` | The example page: the editor on the left and its Markdown text on the right. |
 | `licenses.json` | The license that was decided for each package that the editor needs at run time ([R-GEN-011](docs/specification.md#r-gen-011)). |
