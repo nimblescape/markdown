@@ -31,7 +31,7 @@ of [section 4](#4-documents) shows the document of each ID. The
 general libraries for text documents. Markdown is the first format. The
 source and the platforms also work for any other text, for example source
 code. The history is a product of its own that serves every file, not only
-Markdown, and the reflection tool of majikmate builds on it
+Markdown, and the reflection tool builds on it
 ([R-ARCH-003](#r-arch-003)). The target
 platforms are VS Code and the web, with the same code; the command line is a
 platform for output without a view, for example `mp build` of nimblescape
@@ -71,7 +71,7 @@ they decide where they use the libraries
 Every edit, in any editor and by the AI, becomes a change of the text in the
 source, which sends it to the renderer and to every other listener. The
 history is a product of its own beside these parts, and the reflection tool
-of majikmate builds on it ([R-ARCH-003](#r-arch-003)). In VS Code, the
+builds on it ([R-ARCH-003](#r-arch-003)). In VS Code, the
 history extension ([R-VSC-004](history.md#r-vsc-004)) records every edit,
 creation and deletion of any file in the workspace, whatever editor made it;
 Markdown Notes and Markdown Paper need it for no file, and the reflection
@@ -110,7 +110,7 @@ flowchart TB
   subgraph historyProduct["History of nimblescape: for every file"]
     history["History<br/>every action, replay, pluggable backends"]
   end
-  subgraph reflectionProduct["Reflection tool of majikmate"]
+  subgraph reflectionProduct["Reflection tool of nimblescape: a plugin of the history"]
     reflection["Reflection tool<br/>classes, views, feedback, API"]
   end
   reflection -- reads --> history
@@ -190,7 +190,7 @@ ignore it. The name of the tool is `workhistory`, with the folder
 form of the other nimblescape extensions with an npm package, and its npm
 package is `@nimblescape/workhistory`, in the same way as the names of the
 packages of nimblescape Markdown start with `markdown`. The reflection tool
-is a product of majikmate that builds on the history
+is a product of its own that builds on the history
 ([R-ARCH-005](#r-arch-005)): it reads the history through its API and its
 file form, and it has its own repository, VS Code extension and npm package
 ([R-REFL-017](reflection.md#r-refl-017)). Until the repositories exist, the
@@ -204,30 +204,29 @@ feedback files, with a comment of the format and instructions for AI agents,
 and it reads these files as structured data
 ([R-COURSE-001](course.md#r-course-001)). It is a product of its own, not a
 part of nimblescape Markdown or of the history: the repository
-`majikmate/course-vscode`, the npm package `@majikmate/course` and the
+`nimblescape/course-vscode`, the npm package `@nimblescape/course` and the
 folder `.course/` ([R-COURSE-002](course.md#r-course-002)). It is the
 adapter of a course for the reflection tool
-([R-COURSE-003](course.md#r-course-003)). Until the repository exists, its
-document stays in this repository.
+([R-COURSE-003](course.md#r-course-003)). Until its document moves to the
+repository of the course module, it stays in this repository.
 
 ### R-ARCH-005
 
-**Owners of the products.** nimblescape provides general infrastructure;
-majikmate provides the academic context and builds on the infrastructure of
-nimblescape. So nimblescape owns the libraries of nimblescape Markdown,
-Markdown Notes and the history, and majikmate owns Markdown Paper, the
-reflection tool and the course module: their repositories are
-`majikmate/markdownpaper-vscode`, `majikmate/workreflection-vscode`
-([R-REFL-017](reflection.md#r-refl-017)) and `majikmate/course-vscode`. A
-product of majikmate may depend on a product of nimblescape, and a product
-of nimblescape does not depend on a product of majikmate: the history
-records the files of Markdown Notes like any other file
-([R-VSC-004](history.md#r-vsc-004)) and knows no reflection tool.
-*(proposal)* The scope of the npm packages and the publisher of the VS Code
-extensions follow the owner, for example `@majikmate/markdownpaper`. Until
-the repository of Markdown Paper moves to majikmate, its address stays
-`nimblescape/markdownpaper-vscode`, and GitHub forwards the old address
-after the move.
+**Owners of the products.** nimblescape owns the libraries of nimblescape
+Markdown, the history and all plugins and products that build on them:
+Markdown Notes, Markdown Paper, the reflection tool, the course module and
+the feedback program. Their repositories are
+`nimblescape/markdownnotes-vscode`, `nimblescape/markdownpaper-vscode`,
+`nimblescape/workhistory-vscode`, `nimblescape/workreflection-vscode`
+([R-REFL-017](reflection.md#r-refl-017)), `nimblescape/course-vscode` and
+`nimblescape/course-feedback`; their npm packages start with
+`@nimblescape/`, and the publisher of their VS Code extensions is
+`nimblescape`. majikmate provides the academic context: it owns the
+courses, for example `majikmate/module-ts-2`, which use these products. A
+product of nimblescape does not depend on a course. Until the repositories
+of the course module and of the feedback program move to nimblescape, their
+addresses stay `majikmate/course-vscode` and `majikmate/course-feedback`,
+and GitHub forwards the old address after the move.
 
 ## 4. Documents
 
@@ -246,7 +245,7 @@ repositories of their own. The same holds for the course module
 | [Editor](editor.md) | The editors of a file and the rendered Markdown editor: the round trip, the interaction, tables, the read-only mode and the read-only generated parts, the mode to learn Markdown, the form of the front matter, threads beside the text | [R-GEN-002](editor.md#r-gen-002), [R-EDIT-001](editor.md#r-edit-001) to [R-EDIT-011](editor.md#r-edit-011), [R-GEN-009](editor.md#r-gen-009), [R-GEN-003](editor.md#r-gen-003), [R-GEN-008](editor.md#r-gen-008), [R-GEN-013](editor.md#r-gen-013), [R-FM-001](editor.md#r-fm-001) to [R-FM-006](editor.md#r-fm-006), [R-GEN-014](editor.md#r-gen-014) |
 | [Renderer and layout](rendering.md) | The renderer: content without edit functions, plugins of the renderer. The layout: layouts, pages and PDF | [R-REN-001](rendering.md#r-ren-001) to [R-REN-003](rendering.md#r-ren-003), [R-LAYOUT-001](rendering.md#r-layout-001) to [R-LAYOUT-004](rendering.md#r-layout-004) |
 | [History](history.md) | The recorder of every action on any file, a product of its own: steps, the API for actions, AI agents in cloud sessions, storage backends, back and forward, replay, the use of the history by plugins, the history extension of VS Code | [R-AI-004](history.md#r-ai-004), [R-HIST-001](history.md#r-hist-001) to [R-HIST-008](history.md#r-hist-008), [R-HIST-010](history.md#r-hist-010), [R-HIST-011](history.md#r-hist-011), [R-VSC-004](history.md#r-vsc-004) |
-| [Reflection tool](reflection.md) | The reflection tool, a product of majikmate that builds on the history: classes and roles of the work, analysis, views, feedback, assignments, API, the package and the extension, scientific basis | [R-REFL-001](reflection.md#r-refl-001) to [R-REFL-021](reflection.md#r-refl-021) |
+| [Reflection tool](reflection.md) | The reflection tool, a plugin of the history and a product of its own: classes and roles of the work, analysis, views, feedback, assignments, API, the package and the extension, scientific basis | [R-REFL-001](reflection.md#r-refl-001) to [R-REFL-022](reflection.md#r-refl-022) |
 | [Course module](course.md) | The course module, a product of its own: the form of the README files and of the feedback files of a course, the comment of the format, the instructions for AI agents, the structured reading, the checks and the adapter of the reflection tool | [R-COURSE-001](course.md#r-course-001) to [R-COURSE-012](course.md#r-course-012), [R-FEED-001](course.md#r-feed-001) to [R-FEED-004](course.md#r-feed-004) |
 | [How the reflection tool works](reflection-guide.md) | The documentation of the reflection tool: how it works, step by step, with the scientific basis of each step; the report links to it and cites no literature | Documentation of [R-REFL-020](reflection.md#r-refl-020) |
 | [Plugins and format extensions](plugins.md) | The plugin API, the levels of a plugin, the plugins of Markdown Notes and Markdown Paper | [R-GEN-005](plugins.md#r-gen-005), [R-GEN-012](plugins.md#r-gen-012), [R-PLUGIN-001](plugins.md#r-plugin-001), [R-NOTES-001](plugins.md#r-notes-001), [R-PAPER-001](plugins.md#r-paper-001) |

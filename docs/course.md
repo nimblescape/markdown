@@ -15,8 +15,9 @@ write these files in the same way. It is normative in the same way as the
 [specification](specification.md): "must" marks a requirement, "should" a
 recommendation, and "may" an option; a requirement marked *(proposal)* is
 not decided yet, and [section 7](#7-open-questions) lists these open
-questions. Each requirement has an ID as its heading. Until the repository
-`majikmate/course-vscode` exists, this document stays in this repository.
+questions. Each requirement has an ID as its heading. Until it moves to
+the repository `nimblescape/course-vscode`, this document stays in this
+repository.
 
 ## 1. Scope
 
@@ -38,11 +39,11 @@ to the feedback program ([R-FEED-004](#r-feed-004)).
 **Product, names and folders.** The course module is a product of its own,
 in the same form as the nimblescape extensions with an npm package
 ([R-GEN-007](specification.md#r-gen-007)): the repository
-`majikmate/course-vscode` ([R-ARCH-005](specification.md#r-arch-005)), a VS
-Code extension, and the folder `.course/` for the files that it keeps in the
-repository of a course. *(proposal)* The npm package is `@majikmate/course`,
-its command is `course`, and the comment of the format names the format
-`majikmate-course`.
+`nimblescape/course-vscode` ([R-ARCH-005](specification.md#r-arch-005)), a
+VS Code extension, and the folder `.course/` for the files that it keeps in
+the repository of a course. *(proposal)* The npm package is
+`@nimblescape/course`, its command is `course`, and the comment of the
+format names the format `nimblescape-course`.
 
 ### R-COURSE-003
 
@@ -82,10 +83,10 @@ as the comment of the format of Markdown Notes
 
 - *(proposal)* The first line names the format, its version, the kind of
   the file and the address of the specification:
-  `<!-- majikmate-course v1.0.0 assignment spec=https://github.com/majikmate/course-vscode/blob/main/docs/format.md`.
+  `<!-- nimblescape-course v1.0.0 assignment spec=https://github.com/nimblescape/course-vscode/blob/main/docs/format.md`.
   The kind is `course`, `chapter`, `assignment` or `feedback`.
 - Short lines of words follow, which tell an AI agent to print the rules of
-  the kind of the file with `npx -y @majikmate/course instructions <kind>`
+  the kind of the file with `npx -y @nimblescape/course instructions <kind>`
   ([R-COURSE-005](#r-course-005)) before it reads, changes or writes the
   file. The last line is `-->`. GitHub and the Markdown preview do not show
   the comment.
@@ -206,8 +207,8 @@ rules that serve each; and the allowed level of AI use and the goals, when
 the course gives them. The README and the feedback file are not parts of the
 work of the student. In VS Code, the course extension registers the adapter
 with the reflection extension ([R-REFL-017](reflection.md#r-refl-017)); on
-the command line and on a server, `@majikmate/course` is the adapter package
-that the reflection tool loads.
+the command line and on a server, `@nimblescape/course` is the adapter
+package that the reflection tool loads.
 
 ### R-COURSE-012
 
@@ -261,8 +262,9 @@ the feedback links to the analysis of the same state of the work.
 **The feedback program.** A feedback program must read the README with the
 reader of the module ([R-COURSE-009](#r-course-009)) and write the feedback
 file in the form of [R-FEED-001](#r-feed-001). *(proposal)* The first
-feedback program is `majikmate/course-feedback`: it installs
-`@majikmate/course` from GitHub at a fixed commit, and it keeps its checks,
+feedback program is `nimblescape/course-feedback`
+([R-ARCH-005](specification.md#r-arch-005)): it installs
+`@nimblescape/course` from GitHub at a fixed commit, and it keeps its checks,
 skills, engines and prompts, its own rules of the feedback and the rules of
 each course for the feedback.
 
@@ -283,7 +285,7 @@ each course for the feedback.
 5. Integrity: a student can change the history file in `.workhistory/`. Does
    the course protect it like `FEEDBACK.md`, or does the reflection tool
    check it against the commits ([R-COURSE-003](#r-course-003))?
-6. Feedback program: does `majikmate/course-feedback` stay a program of its
+6. Feedback program: does `nimblescape/course-feedback` stay a program of its
    own (proposal), or does it become a part of `course-vscode`
    ([R-FEED-004](#r-feed-004))?
 7. Other files: does the module also define the form of the tutorial pages,

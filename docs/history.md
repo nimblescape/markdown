@@ -13,8 +13,8 @@ records every action on any file, saves it through a pluggable backend and
 replays it, and the history extension of VS Code, which records every file
 of the workspace in the same way. The history is general infrastructure: it
 knows no reflection tool, no paper and no course. The reflection tool is a
-product of majikmate that builds on the history and has a document of its
-own, [reflection.md](reflection.md). Until the history has a repository of
+plugin of the history and a product of its own, with a document of its own,
+[reflection.md](reflection.md). Until the history has a repository of
 its own, this document stays with the [specification](specification.md) of
 nimblescape Markdown and is normative in the same way. [Section
 6](#6-open-questions) lists its open questions.
@@ -163,7 +163,7 @@ each step as original work or as routine work, gives each part of a step a
 role (direct, produce or judge), shows the result in views, and gives
 feedback on work and learning, also for student assignments and for source
 code. Its methods rest on published scientific work
-([R-REFL-019](reflection.md#r-refl-019)). It is a product of majikmate that
+([R-REFL-019](reflection.md#r-refl-019)). It is a product of its own that
 builds on the history, with its own VS Code extension
 ([R-REFL-017](reflection.md#r-refl-017)); its specification is
 [reflection.md](reflection.md). The history depends on no plugin.

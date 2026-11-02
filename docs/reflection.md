@@ -7,12 +7,11 @@ Licensed under the MIT License. See LICENSE in the repository root for details.
 # Specification of the reflection tool
 
 This document defines the reflection tool, a plugin of the history. The
-reflection tool is a product of majikmate that builds on the history, which
-is general infrastructure of nimblescape
-([R-ARCH-003](specification.md#r-arch-003)). The reflection tool analyzes
-the history of a file ([history](history.md)): it classifies each step as
-original work or as routine work, gives each part of a step a role, shows
-the result in views, and gives feedback on work and learning. It is
+reflection tool is a product of nimblescape of its own that builds on the
+history ([R-ARCH-003](specification.md#r-arch-003)). The reflection tool
+analyzes the history of a file ([history](history.md)): it classifies each
+step as original work or as routine work, gives each part of a step a role,
+shows the result in views, and gives feedback on work and learning. It is
 normative in the same way as the [specification](specification.md): "must"
 marks a requirement, "should" a recommendation, and "may" an option; a
 requirement marked *(proposal)* is not decided yet, and [section
@@ -382,15 +381,16 @@ rules, context)`, `summarize(analysis, { from, to, part })` and
 
 ### R-REFL-017
 
-**Package and extension.** The reflection tool is a product of majikmate of
-its own that builds on the history
+**Package and extension.** The reflection tool is a product of nimblescape
+of its own that builds on the history
 ([R-ARCH-003](specification.md#r-arch-003),
 [R-ARCH-005](specification.md#r-arch-005)). Its VS Code extension depends on
 the history extension ([R-VSC-004](history.md#r-vsc-004)), reads the history
 through its API, and shows the views. Its npm package runs without the
 recorder and without VS Code, for example on a server. The name of the tool
-is `workreflection`: the repository `majikmate/workreflection-vscode`, the
-npm package `@majikmate/workreflection` and the folder `.workreflection/`.
+is `workreflection`: the repository `nimblescape/workreflection-vscode`,
+the npm package `@nimblescape/workreflection` and the folder
+`.workreflection/`.
 
 ### R-REFL-021
 
@@ -410,13 +410,10 @@ every platform:
   adapter, the reflection tool works on the history alone.
 - *An adapter:* a program that knows one kind of work and reads its files,
   and gives their context in this form. The adapter belongs to the product
-  of that kind of work, and never to the history; when that product is
-  general infrastructure of nimblescape, the adapter belongs to the
-  reflection tool, because a product of nimblescape does not depend on a
-  product of majikmate ([R-ARCH-005](specification.md#r-arch-005)). For
-  example, the course module reads the README files of a course and of its
-  assignments ([R-COURSE-011](course.md#r-course-011)), and Markdown Paper
-  gives the chapters of a paper as its parts.
+  of that kind of work, and never to the history. For example, the course
+  module reads the README files of a course and of its assignments
+  ([R-COURSE-011](course.md#r-course-011)), and Markdown Paper gives the
+  chapters of a paper as its parts.
 - *Platforms:* in VS Code, an adapter is an extension that registers with
   the API of the reflection extension ([R-REFL-017](#r-refl-017)); on the
   command line and on a server, an adapter is an npm package that the run
