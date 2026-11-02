@@ -100,6 +100,13 @@ does:
   supports a given statement, or a literature research about
   "Industrialisierung von Dienstleistungen".
 
+The result decides the class: work is routine work only when a given rule or
+a given source fixes its result, so that a program could do the same work.
+All other work that creates new code or a new statement is original work,
+also when it uses a known pattern, and also when the party has just learned
+this pattern, for example a student who writes a loop that the course has
+just taught.
+
 The term follows the routine tasks of labor economics: tasks that follow
 explicit rules, so that a program can do them (Autor et al., 2003). A
 question to the AI is the role direct of the user
@@ -111,7 +118,7 @@ reader can check it.
 ### R-EVAL-003
 
 *(proposal)* **Three codes.** The classifier codes each episode with three
-codes, and the two classes come from these codes:
+codes, which give the reason of its class:
 
 - the cognitive process, after the revised taxonomy of Bloom (Krathwohl,
   2002): remember, understand, apply, analyze, evaluate, create;
@@ -123,12 +130,17 @@ codes, and the two classes come from these codes:
   the syntax tree, or a refactoring by a tool that keeps the behavior, is a
   surface change; a change of the behavior is a meaning change.
 
-Original work is create, evaluate, or an analysis with a conclusion of its
-own; decision selection; a meaning change. Routine work is remember,
-understand, or apply a given rule; information acquisition; an
-implementation by a given rule; a surface change. New code counts as
-create, also when it implements a known algorithm such as quick sort
-([R-EVAL-002](#r-eval-002)).
+The codes give the reason of a class, and the result decides it
+([R-EVAL-002](#r-eval-002)). Create, evaluate, an analysis with a conclusion
+of its own, decision selection and a meaning change point to original work;
+remember, understand, information acquisition, an implementation by a given
+rule and a surface change point to routine work. Apply points to neither
+class: a student who writes a loop that the course has just taught applies
+what was learned and does original work, because the code is new; a
+formatter applies a given rule and does routine work, because the rule fixes
+the result. The cognitive process is always the process of the party that
+did the work, so that it can be compared with the level of a learning
+objective ([R-EVAL-014](#r-eval-014)).
 
 ### R-EVAL-004
 

@@ -193,14 +193,24 @@ and of AI without a check (Parasuraman & Manzey, 2010; Buçinca et al.,
   list in APA 7, formatted code, a rename by a tool, a paper found for a
   given statement, a literature research.
 
-**From the codes to the class.** *(proposal)* The class comes from the three
-codes:
+**From the codes to the class.** The result decides the class: work is
+routine work only when a given rule or a given source fixes its result, so
+that a program could do the same work. All other work that creates new code
+or a new statement is original work. *(proposal)* The three codes give the
+reason of the class and point to it:
 
-| Code | Original work | Routine work |
+| Code | Points to original work | Points to routine work |
 | --- | --- | --- |
-| Cognitive process | create, evaluate, analyze with a conclusion of its own | remember, understand, apply a given rule |
+| Cognitive process | create, evaluate, analyze with a conclusion of its own | remember, understand |
 | Stage of the work | decision and action selection | information acquisition; action implementation by a given rule |
 | Type of revision | meaning change | surface change |
+
+The cognitive process "apply" points to neither class. A student who writes
+a loop that the course has just taught applies what was learned and does
+original work, because the code is new. A formatter applies a given rule and
+does routine work, because the rule fixes the result. The cognitive process
+is always the process of the party that did the work, so that a report can
+compare it with the level of a learning objective (section 12).
 
 When the codes point to both classes, the classifier splits the episode into
 its parts and classifies each part. The work of an answer of the AI has the
