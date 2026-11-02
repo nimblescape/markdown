@@ -22,9 +22,9 @@ interaction of a document editor: the toolbar, the format bar over selected
 text, the insert menu "+" and the slash commands, the handles of the blocks,
 find and replace, read-only mode and a mode that shows the Markdown marks
 beside the rendered text; the tables with handles, markers and a table menu;
-and the form of the front matter, with a JSON schema, for YAML, TOML and
-JSON.
-VS Code and the plugin API come in the next steps.
+the form of the front matter, with a JSON schema, for YAML, TOML and
+JSON; and the adapter for VS Code, which opens the editor as a custom text
+editor with the theme of VS Code. The plugin API comes in the next step.
 
 ## Packages
 
@@ -37,6 +37,7 @@ packages with their steps of the plan.
 | --- | --- |
 | [`@nimblescape/markdowntext`](packages/markdowntext) | The source: the text of a file with its changes, their origin and the selections of the editors; the front matter in YAML, TOML and JSON, its edits and the check against a JSON schema; without a view |
 | [`@nimblescape/markdowneditor`](packages/markdowneditor) | The editor of rendered Markdown for the web and for the webviews of VS Code |
+| [`@nimblescape/markdownvscode`](packages/markdownvscode) | The adapter for VS Code: the editor as a custom text editor, which keeps the file a text document of VS Code, and the theme of VS Code |
 
 ## Use
 
@@ -70,10 +71,16 @@ The options `toolbar`, `readOnlyToggle` and `learnToggle` leave out the
 toolbar or its switches, and `learnMode` starts the editor with the
 Markdown marks shown.
 
+In VS Code, an extension registers the editor as a custom text editor with
+`registerMarkdownEditor` of `@nimblescape/markdownvscode`; the
+[README of the package](packages/markdownvscode/README.md) shows the
+extension and its page.
+
 The packages are not on npmjs.com before the release.
 [CONTRIBUTING.md](CONTRIBUTING.md) explains the development, the example
-page (`npm run demo`) and how another repository installs the packages from
-GitHub.
+page (`npm run demo`), the example extension for VS Code
+(`npm run demo:vscode`) and how another repository installs the packages
+from GitHub.
 
 ## License
 

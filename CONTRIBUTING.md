@@ -27,7 +27,7 @@ same pull request.
 | `packages/` | The npm workspaces: one npm package for each part ([R-ARCH-002](docs/specification.md#r-arch-002)). Each package has its `package.json`, `src/`, `README.md`, `LICENSE` and `tsconfig.build.json`, and its build writes `dist/`. |
 | `packages/markdowntext/src/index.ts` | The exports of `@nimblescape/markdowntext`, the source. |
 | `packages/markdowntext/src/source/textSource.ts` | `TextSource`: the text of a file, the changes with their origin, the selections of the editors, the listeners and the file ([R-SRC-001](docs/source.md#r-src-001)). |
-| `packages/markdowntext/src/source/patch.ts` | The text patches: apply them, move a position with them, and find the patches between two texts with the line diff of the library `diff` ([R-SRC-002](docs/source.md#r-src-002)). |
+| `packages/markdowntext/src/source/patch.ts` | The text patches: apply them, move a position with them, find the patches between two texts with the line diff of the library `diff`, and merge two changes of the same text ([R-SRC-002](docs/source.md#r-src-002)). |
 | `packages/markdowntext/src/frontMatter/detect.ts` | The front matter at the start of a file, in YAML, TOML or JSON ([R-SRC-003](docs/source.md#r-src-003)). |
 | `packages/markdowntext/src/frontMatter/edit.ts`, `packages/markdowntext/src/frontMatter/yaml.ts`, `packages/markdowntext/src/frontMatter/json.ts`, `packages/markdowntext/src/frontMatter/types.ts` | The reading and the edits of a front matter in YAML, TOML and JSON ([R-FM-005](docs/editor.md#r-fm-005)): each edit changes only the text of the edited value, so that the comments, the order and the quotes of the other keys stay. |
 | `packages/markdowntext/src/frontMatter/schema.ts` | The check of a front matter against its JSON schema, with the path of each problem and a message in plain words, and the schema of a value ([R-FM-004](docs/editor.md#r-fm-004)). |
@@ -54,21 +54,30 @@ same pull request.
 | `packages/markdowneditor/src/ui/ask.ts`, `packages/markdowneditor/src/ui/dom.ts` | The field that asks for one text, for example the address of a link, and the helpers for elements, buttons and icons. |
 | `packages/markdowneditor/src/styles/markdown.css` | The styles of the editor, with the tokens `--nsmd-*` of the theme ([R-THEME-001](docs/platforms.md#r-theme-001)). |
 | `packages/markdowneditor/src/types/` | The types of the packages without types of their own. |
-| `packages/*/src/**/*.test.ts` | The unit tests, with vitest: the source (`packages/markdowntext/src/source/source.test.ts`), the edits and the schema of the front matter (`packages/markdowntext/src/frontMatter/*.test.ts`), the round trip of the Markdown (`packages/markdowneditor/src/markdown/codec.test.ts`), and the editor, two editors of one source, its interaction, its tables and the form of the front matter in a page of happy-dom (`editor.test.ts`, `source.test.ts`, `ui/interaction.test.ts`, `ui/table/grid.test.ts` and `ui/frontMatterForm.test.ts` in `packages/markdowneditor/src/`). |
+| `packages/markdownvscode/src/index.ts`, `packages/markdownvscode/src/webview.ts` | The exports of `@nimblescape/markdownvscode`, the adapter for VS Code: the side of the extension, and the side of the page as `@nimblescape/markdownvscode/webview`. |
+| `packages/markdownvscode/src/extension/editor.ts` | `registerMarkdownEditor`: the custom text editor ([R-VSC-001](docs/platforms.md#r-vsc-001)), the text editor to the side ([R-VSC-002](docs/platforms.md#r-vsc-002)), and the changes between each page and its document ([R-VSC-005](docs/platforms.md#r-vsc-005)). |
+| `packages/markdownvscode/src/extension/page.ts` | The HTML of the page of the webview, with the policy of its content. |
+| `packages/markdownvscode/src/webview/connection.ts` | `connectVsCode`: the source of the page, its changes to and from the document, the fonts, and the keys that stay in the page ([R-VSC-006](docs/platforms.md#r-vsc-006)). |
+| `packages/markdownvscode/src/messages.ts` | The messages between the extension and the page, and the check of the messages of the page. |
+| `packages/markdownvscode/src/styles/vscode.css` | The theme of VS Code: the tokens `--nsmd-*` from the variables `--vscode-*` of the color theme, and the fonts ([R-THEME-001](docs/platforms.md#r-theme-001), [R-THEME-003](docs/platforms.md#r-theme-003)). |
+| `packages/markdownvscode/src/test/fakeVscode.ts` | A small API of VS Code for the tests of the adapter, with a webview panel whose messages wait until a test gives them. |
+| `packages/*/src/**/*.test.ts` | The unit tests, with vitest: the source (`packages/markdowntext/src/source/source.test.ts`), the edits and the schema of the front matter (`packages/markdowntext/src/frontMatter/*.test.ts`), the round trip of the Markdown (`packages/markdowneditor/src/markdown/codec.test.ts`), the editor, two editors of one source, its interaction, its tables and the form of the front matter in a page of happy-dom (`editor.test.ts`, `source.test.ts`, `ui/interaction.test.ts`, `ui/table/grid.test.ts` and `ui/frontMatterForm.test.ts` in `packages/markdowneditor/src/`), and the adapter for VS Code with the small API of VS Code (`packages/markdownvscode/src/editor.test.ts`). |
 | `test/corpus/` | The Markdown files of the tests of the round trip: GFM, the front matter in TOML and JSON, the format of Markdown Notes and the documents and layouts of Markdown Paper. [test/corpus/README.md](test/corpus/README.md) explains them. |
 | `demo/index.html`, `demo/main.ts` | The example page: two editors of one source, the rendered editor on the left and the Markdown text on the right; a change in one shows at once in the other. |
+| `demo/vscode/` | The example extension for VS Code: it opens each Markdown file in the editor, with the adapter. It is never published. |
+| `.vscode/launch.json`, `.vscode/tasks.json` | Runs the example extension in a new window of VS Code, after its build. |
 | `licenses.json` | The license that was decided for each package that the packages of the workspaces need at run time ([R-GEN-011](docs/specification.md#r-gen-011)). |
 | `scripts/check-licenses.mjs`, `scripts/check-licenses.test.mjs` | The check of `package-lock.json` against `licenses.json` and its test. |
-| `scripts/third-party-notices.mjs` | Writes the notices of the packages of a bundle from the installed packages, for the example page. |
-| `esbuild.mjs` | In the folder of a package, builds its `dist/index.js` and a `dist/<name>.css` for each file of `src/styles/`; in the root, with `--demo` or `--serve`, builds the example page in `demo/dist/` from the sources of the packages. |
+| `scripts/third-party-notices.mjs` | Writes the notices of the packages of a bundle from the installed packages, for the example page and the example extension. |
+| `esbuild.mjs` | In the folder of a package, builds a `dist/<name>.js` for each entry point of its exports and a `dist/<name>.css` for each file of `src/styles/`; in the root, with `--demo` or `--serve`, builds the example page in `demo/dist/`, and with `--vscode` the example extension in `demo/vscode/dist/`, from the sources of the packages. |
 | `tsconfig.json`, `packages/*/tsconfig.build.json` | The settings of the type check of all packages, and of the declarations of each package in its `dist/`. |
 | `eslint.config.mjs`, `vitest.config.mts` | The settings of the check of the code style and of the unit tests. |
 | `package.json` | The manifest of the root of the workspaces: private, never published, with the development tools and the commands below. Each package has its own manifest with its libraries. |
 | `package-lock.json` | The locked libraries and development tools. npm writes this file, and nobody edits it by hand. |
 | `.node-version` | The Node release of the development tools. `actions/setup-node` in the workflows and local Node version managers read it. |
-| `.github/workflows/ci.yml` | Checks the types, the code style and the licenses, runs the tests, builds the packages and the example page, and packs the npm packages, for every push to `main` and every pull request. It publishes nothing. |
+| `.github/workflows/ci.yml` | Checks the types, the code style and the licenses, runs the tests, builds the packages, the example page and the example extension, and packs the npm packages, for every push to `main` and every pull request. It publishes nothing. |
 | `.github/dependabot.yml` | Proposes weekly updates of the libraries, of the development tools and of the pinned actions. |
-| `packages/*/dist/`, `demo/dist/` | The built packages and the built example page, kept out of Git. |
+| `packages/*/dist/`, `demo/dist/`, `demo/vscode/dist/` | The built packages, the built example page and the built example extension, kept out of Git. |
 
 ## Development
 
@@ -82,8 +91,9 @@ Node.js release in `.node-version`.
 | `npm run lint` | Checks the code style with ESLint. |
 | `npm run licenses` | Checks the license of each package that the packages of the workspaces need at run time against `licenses.json`. `npm run licenses -- --write` adds a new package with its license to `licenses.json`; the pull request then shows the new decision. |
 | `npm test` | Runs the unit tests with vitest. |
-| `npm run build` | Builds each package in the order of the workspaces in `package.json`, `@nimblescape/markdowntext` first: its `dist/index.js`, its styles and its declarations `dist/**/*.d.ts`. `npm run build -w packages/markdowntext` builds one package. |
+| `npm run build` | Builds each package in the order of the workspaces in `package.json`, `@nimblescape/markdowntext` first: its JavaScript in `dist/`, its styles and its declarations `dist/**/*.d.ts`. `npm run build -w packages/markdowntext` builds one package. |
 | `npm run demo` | Builds the example page and serves it on <http://localhost:8000>; it builds again after each change. `node esbuild.mjs --demo` only builds it. |
+| `npm run demo:vscode` | Builds the example extension for VS Code in `demo/vscode/dist/`. |
 | `npm run pack` | Packs each package from its `dist/` into `nimblescape-<name>-<version>.tgz` in the root, after `npm run build`. |
 
 ## Packages
@@ -98,7 +108,7 @@ Each package exports only its own API: a type of another package that its
 API uses comes from that package.
 
 The exports of each manifest have the condition `nimblescape-source`, which
-points to `src/index.ts`. The type check (`customConditions` in
+points to the source of each entry point, for example `src/index.ts`. The type check (`customConditions` in
 `tsconfig.json`), the tests (`resolve.conditions` in `vitest.config.mts`)
 and the example page (`conditions` in `esbuild.mjs`) use it, so that they
 read the sources of the other packages and need no build. The build of a
@@ -112,6 +122,18 @@ A new package gets its folder with a `package.json` in the form of the
 others, a `tsconfig.build.json`, a `README.md` and a `LICENSE`, and its place
 in `workspaces` of the root `package.json`, after the packages that it
 depends on.
+
+## The example extension for VS Code
+
+`demo/vscode/` is a small extension that opens each Markdown file in the
+editor of rendered Markdown, with `@nimblescape/markdownvscode`
+([R-VSC-001](docs/platforms.md#r-vsc-001)). It is a tool of the development
+and is never published. To try it, open this repository in VS Code and
+start "Example extension" in "Run and Debug" (F5): the task builds it with
+`npm run demo:vscode`, and a new window of VS Code opens with the extension.
+In that window, a Markdown file opens in the editor; the button
+"Open Text Editor to the Side" in the title of the editor opens its text.
+After a change of the code, run the build again and reload the window.
 
 ## The round trip of the Markdown
 
@@ -140,8 +162,10 @@ gets a file in `test/corpus/`.
 Nothing is published before the release
 ([R-GEN-007](docs/specification.md#r-gen-007)): no version of a package on
 npmjs.com and no release tag. Each package holds `dist/index.js`, an ES
-module for browsers and the webviews of VS Code, and its declarations;
-`@nimblescape/markdowneditor` also holds `dist/markdown.css`. A package
+module for browsers, the webviews of VS Code and the extension host of VS
+Code, and its declarations; `@nimblescape/markdowneditor` also holds
+`dist/markdown.css`, and `@nimblescape/markdownvscode` holds
+`dist/webview.js` for the page and `dist/vscode.css`. A package
 bundles only its own code: the other packages of the workspaces, Tiptap,
 ProseMirror and markdown-it stay dependencies, so that the page that uses
 the editor has one copy of ProseMirror, and the bundle of that page carries
@@ -155,8 +179,8 @@ that repository fetches the commit, runs `npm ci --ignore-scripts` and
 `node_modules/@nimblescape/<name>`, for example
 `node_modules/@nimblescape/markdowneditor` and
 `node_modules/@nimblescape/markdowntext`. The packed files of
-`npm run pack` also work: `npm install` with both files in one command
-installs both packages, and the dependency of the editor on
+`npm run pack` also work: `npm install` with the files of all packages in
+one command installs them, and the dependency of a package on
 `@nimblescape/markdowntext` uses the installed package. After the release,
 the packages become dependencies of that repository with their versions,
 and the script goes away.

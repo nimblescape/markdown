@@ -36,8 +36,9 @@ Markdown, and the reflection tool builds on it
 platforms are VS Code and the web, with the same code; the command line is a
 platform for output without a view, for example `mp build` of nimblescape
 Markdown Paper. The libraries are npm packages, one for each part
-([R-ARCH-002](#r-arch-002)); today two exist, `@nimblescape/markdowntext`
-and `@nimblescape/markdowneditor`. nimblescape Markdown
+([R-ARCH-002](#r-arch-002)); today three exist,
+`@nimblescape/markdowntext`, `@nimblescape/markdowneditor` and
+`@nimblescape/markdownvscode`. nimblescape Markdown
 Notes and nimblescape Markdown Paper are format extensions: they add their
 parts through plugins ([plugins and format extensions](plugins.md)), and
 they decide where they use the libraries
@@ -339,7 +340,7 @@ the [platforms](platforms.md#6-open-questions).
 | 3 | Rendered editing of CommonMark and GFM: toolbar, format bar, insert menu, slash menu, block handles, find and replace, read-only mode, the mode to learn Markdown | [R-EDIT-003](editor.md#r-edit-003), [R-GEN-003](editor.md#r-gen-003), [R-EDIT-007](editor.md#r-edit-007), [R-GEN-008](editor.md#r-gen-008), [R-GEN-013](editor.md#r-gen-013) | built, without the syntax colors of code blocks |
 | 4 | Tables: handles, markers for new rows and columns, the table menu | [R-EDIT-008](editor.md#r-edit-008) to [R-EDIT-010](editor.md#r-edit-010) | built, without the switch of the header row, because a table without a header row is not in version 1 |
 | 5 | The form of the front matter with both modes and the JSON schema | [R-FM-001](editor.md#r-fm-001) to [R-FM-006](editor.md#r-fm-006) | built |
-| 6 | The adapter for the webviews of VS Code and the theme of VS Code | [R-GEN-004](platforms.md#r-gen-004), [R-VSC-001](platforms.md#r-vsc-001) to [R-VSC-003](platforms.md#r-vsc-003), [R-THEME-001](platforms.md#r-theme-001) | planned |
+| 6 | The adapter for the webviews of VS Code and the theme of VS Code | [R-GEN-004](platforms.md#r-gen-004), [R-VSC-001](platforms.md#r-vsc-001) to [R-VSC-003](platforms.md#r-vsc-003), [R-VSC-005](platforms.md#r-vsc-005), [R-VSC-006](platforms.md#r-vsc-006), [R-THEME-001](platforms.md#r-theme-001), [R-THEME-003](platforms.md#r-theme-003) | built, with an example extension; the setting of the files that open in the editor comes with Notes (step 8) |
 | 7 | The plugin API, version 1, with both levels of plugins; the read-only generated parts; the icons of threads beside the text | [R-GEN-005](plugins.md#r-gen-005), [R-GEN-012](plugins.md#r-gen-012), [R-PLUGIN-001](plugins.md#r-plugin-001), [R-EDIT-011](editor.md#r-edit-011), [R-GEN-014](editor.md#r-gen-014) | planned |
 | 8 | The plugins of nimblescape Markdown Notes, in its repository; the editor in the Notes side view | [R-NOTES-001](plugins.md#r-notes-001), [R-GEN-002](editor.md#r-gen-002), [R-GEN-004](platforms.md#r-gen-004) | planned |
 | 9 | The plugins of nimblescape Markdown Paper, in its repository; the schema of each layout | [R-PAPER-001](plugins.md#r-paper-001), [R-FM-004](editor.md#r-fm-004) | planned |

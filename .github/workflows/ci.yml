@@ -6,8 +6,9 @@
 # every pull request, on the pinned Node.js release (.node-version). The job
 # installs the locked development tools without install scripts, checks the
 # types, the code style and the licenses of the libraries (licenses.json,
-# R-GEN-011), runs the unit tests, builds the packages of the workspaces and
-# the example page, and packs each package with npm pack (R-ARCH-002). The
+# R-GEN-011), runs the unit tests, builds the packages of the workspaces, the
+# example page and the example extension for VS Code, and packs each package
+# with npm pack (R-ARCH-002). The
 # packages stay a workflow artifact for inspection. This workflow publishes
 # nothing: nothing is published before the release (CONTRIBUTING.md,
 # "Release").
@@ -61,6 +62,10 @@ jobs:
       # The example page bundles all libraries; its build checks that the packages work in a page.
       - name: Build the example page
         run: node esbuild.mjs --demo
+
+      # The example extension bundles the adapter for VS Code; its build checks that the package works in an extension.
+      - name: Build the example extension for VS Code
+        run: npm run demo:vscode
 
       - name: Build the npm packages
         run: npm run pack
