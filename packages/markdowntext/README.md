@@ -7,8 +7,27 @@ Licensed under the MIT License. See LICENSE in the repository root for details.
 # @nimblescape/markdowntext
 
 The source of nimblescape Markdown: the text of a file without a view
-([docs/source.md](../../docs/source.md)). Today the package holds the front
-matter at the start of a text, in YAML, TOML or JSON
+([docs/source.md](../../docs/source.md)).
+
+`TextSource` holds the text of a file and the selections of its editors
+([R-SRC-001](../../docs/source.md#r-src-001)). Each change is a list of text
+patches with its origin: a user in an editor, an AI or another program. The
+source sends each change to every listener, moves the selections of the
+other editors, and reads and saves the file through the object that the
+platform gives. `setText` takes a whole new text, for example from Git, and
+finds the patches of the lines that differ
+([R-SRC-002](../../docs/source.md#r-src-002)).
+
+```ts
+import { TextSource } from '@nimblescape/markdowntext';
+
+const source = new TextSource('a\nb\nc\n');
+source.onChange((change) => console.log(change.origin.kind, change.patches));
+source.setText('a\nB\nc\n', { kind: 'program', name: 'git' });
+// program [{ from: 2, to: 3, insert: 'B' }]
+```
+
+The front matter at the start of a text, in YAML, TOML or JSON
 ([R-SRC-003](../../docs/source.md#r-src-003)):
 
 - `frontMatterOf` finds the front matter and its format.

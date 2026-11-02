@@ -24,12 +24,35 @@ and the selections of every editor of the file. It must apply each change as
 a text patch with its origin: user, AI or other program. It must read and
 save the file through the platform adapter.
 
+*(proposal)* The source is the class `TextSource` of the package
+`@nimblescape/markdowntext`. A change is a list of patches: each patch
+replaces a range of the text before the change with a new text, and the
+positions count the UTF-16 code units of the text, as the strings of
+JavaScript and the offsets of VS Code do. The origin of a change names its
+kind (`user`, `ai` or `program`), the ID of the editor that made it, and the
+name of the program or the AI, for example `git`. The source sends each
+change, with its patches, its origin, the text before and after it and a
+version number, to every listener: the editors, the renderer and, for
+example, a history. A change that a listener makes waits until every
+listener has the change before it, so each listener gets the changes in
+their order. Each editor has its selections in the source, with the
+positions of the text; a change moves the selections of the other editors,
+so that a selection keeps the text that it selects. The platform adapter
+gives the file as an object with the functions `read`, `write` and
+`watch`.
+
 ### R-SRC-002
 
 **Changes from outside.** A change from outside, for example by Git, a
 formatter, an AI agent or another program, must reach every open editor as a
 change of the text. An editor must then replace only the parts whose text
 changed, and keep the cursor.
+
+*(proposal)* A program that gives only the new text, for example the watch
+of the file, makes a change whose patches cover only the lines that differ,
+and inside them only the characters that differ; the line diff of the
+library `diff` finds them. A change of the file from outside has the origin
+`program` with the name `file`.
 
 ## 2. File formats
 

@@ -41,6 +41,18 @@ code editor for source code, the form of the front matter
 ([section 8](#8-front-matter-form)), and the AI ([ai.md](ai.md)), which
 proposes changes.
 
+*(proposal)* Each editor of a file shares the source of the file
+([R-SRC-001](source.md#r-src-001)) and has an ID in it. The rendered
+Markdown editor gives each change of the user to the source as a change
+with the origin `user` and its ID, and takes each change with another
+origin: it parses the new text and replaces only the top-level blocks whose
+text or node changed ([R-SRC-002](source.md#r-src-002)), so that the cursor
+and the views of the other blocks stay. A change from outside does not
+enter Undo of the editor, and Undo keeps the steps of the user. The
+rendered editor gives the source its selection as the range of the text of
+the top-level blocks that the selection touches, because a place in rendered
+text has no exact place in the Markdown text in general.
+
 ## 2. The rendered Markdown editor
 
 ### R-EDIT-003

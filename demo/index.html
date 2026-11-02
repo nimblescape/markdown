@@ -28,6 +28,10 @@ Licensed under the MIT License. See LICENSE in the repository root for details.
         font-size: 1em;
         margin: 0 auto 0 0;
       }
+      #status {
+        font-size: 0.8em;
+        color: GrayText;
+      }
       main {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -61,7 +65,7 @@ Licensed under the MIT License. See LICENSE in the repository root for details.
   <body>
     <header>
       <h1>nimblescape Markdown</h1>
-      <button id="load" type="button">Load the text</button>
+      <output id="status" aria-live="polite"></output>
     </header>
     <main>
       <div id="editor"></div>

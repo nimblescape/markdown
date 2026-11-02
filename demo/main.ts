@@ -2,13 +2,16 @@
 // © 2026 Hannes Stauss (scalarion@nimblescape.com)
 // Licensed under the MIT License. See LICENSE in the repository root for details.
 
-// The example page of the editor (npm run demo): the editor on the left, the Markdown text that it writes on the
-// right. A change in the editor shows at once in the text; "Load the text" shows the text of the right side in the
-// editor. The toolbar of the editor switches the read-only mode and the mode to learn Markdown. The front matter shows
-// as a form with the example schema below; "Edit keys" switches the form to the edit of the keys.
+// The example page of the editor (npm run demo): two editors of one source (docs/editor.md, R-EDIT-002), the rendered
+// editor on the left and the Markdown text in a text field on the right. A change in either editor shows at once in the
+// other one: the text field takes the patches of each change, so that its cursor stays, and the rendered editor changes
+// only the blocks whose text changed (docs/source.md, R-SRC-002). The head of the page shows the origin of the last
+// change and the selection of the rendered editor in the text. The toolbar of the editor switches the read-only mode
+// and the mode to learn Markdown. The front matter shows as a form with the example schema below; "Edit keys" switches
+// the form to the edit of the keys.
 
 import { MarkdownEditor } from '@nimblescape/markdowneditor';
-import type { JsonSchema } from '@nimblescape/markdowntext';
+import { TextSource, type JsonSchema, type TextChange } from '@nimblescape/markdowntext';
 
 /** schema is an example schema of a front matter (docs/editor.md, R-FM-004). */
 const schema: JsonSchema = {
@@ -67,10 +70,40 @@ A footnote.[^1]
 
 const textArea = document.querySelector<HTMLTextAreaElement>('#markdown');
 const element = document.querySelector<HTMLElement>('#editor');
-const load = document.querySelector<HTMLButtonElement>('#load');
-if (!textArea || !element || !load) {
+const status = document.querySelector<HTMLOutputElement>('#status');
+if (!textArea || !element || !status) {
   throw new Error('The example page misses an element.');
 }
-textArea.value = sample;
-const editor = new MarkdownEditor(element, { markdown: sample, frontMatterSchema: schema, onChange: (changed) => (textArea.value = changed.getMarkdown()) });
-load.addEventListener('click', () => editor.setMarkdown(textArea.value));
+
+/** source is the source of the example file, which both editors share. */
+const source = new TextSource(sample);
+const editor = new MarkdownEditor(element, { source, id: 'rendered', frontMatterSchema: schema });
+
+// The text field is the second editor of the source: each input becomes a change of the user, and each change from the
+// rendered editor becomes the patches of the text field, from its end, so that the positions before each patch stay.
+textArea.value = source.text;
+textArea.addEventListener('input', () => source.setText(textArea.value, { kind: 'user', editor: 'text' }));
+for (const event of ['select', 'keyup', 'mouseup']) {
+  textArea.addEventListener(event, () => source.setSelections('text', [{ anchor: textArea.selectionStart, head: textArea.selectionEnd }]));
+}
+source.onChange((change: TextChange) => {
+  if (change.origin.editor !== 'text') {
+    for (const patch of [...change.patches].reverse()) {
+      textArea.setRangeText(patch.insert, patch.from, patch.to, 'preserve');
+    }
+  }
+});
+
+/** showStatus shows the version of the text, the origin of the last change and the selection of the rendered editor. */
+let last = 'none';
+const showStatus = () => {
+  const [selection] = source.selections(editor.id);
+  const range = selection ? `${Math.min(selection.anchor, selection.head)} to ${Math.max(selection.anchor, selection.head)}` : 'none';
+  status.value = `Version ${source.version} · last change: ${last} · selection of the rendered editor in the text: ${range}`;
+};
+source.onChange((change) => {
+  last = `${change.origin.kind}${change.origin.editor ? ` in ${change.origin.editor}` : ''}`;
+  showStatus();
+});
+source.onSelections(showStatus);
+showStatus();
