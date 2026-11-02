@@ -129,6 +129,7 @@ const specs: Record<string, ParseSpec> = {
   image: { node: 'image', getAttrs: (token) => ({ src: token.attrGet('src'), alt: token.content || null, title: token.attrGet('title') || null }) },
   hardbreak: { node: 'hardBreak' },
   html_inline: { node: 'htmlInline', getAttrs: (token) => ({ html: token.content }) },
+  ins: { mark: 'underline' },
   footnote_ref: { node: 'footnoteReference', getAttrs: (token) => ({ label: (token.meta as { label: string }).label }) },
 };
 
@@ -156,14 +157,49 @@ function checkboxOf(inline: Token | undefined): boolean | undefined {
 }
 
 /**
- * prepared returns the tokens of markdown-it in the form that the specs read: the inline content of each cell of a
- * table in a paragraph, because the cells of the document hold blocks, and a bullet list whose items all start with a
- * check box as a task list. In a list with items with and without a check box, the check box stays text.
+ * underlined turns the pairs of `<ins>` and `</ins>` among the children of an inline token into the marks of underline
+ * (R-EDIT-007). A pair counts only when both tags stand at the same level of the other marks, so that the mark holds
+ * the same text as the HTML; any other `<ins>` stays HTML.
+ * @param children - The children of an inline token.
  */
-function prepared(tokens: Token[]): Token[] {
+function underlined(children: Token[]): void {
+  const isTag = (token: Token, tag: string) => token.type === 'html_inline' && token.content.toLowerCase() === tag;
+  for (let open = 0; open < children.length; open++) {
+    if (!isTag(children[open], '<ins>')) {
+      continue;
+    }
+    let depth = 0;
+    for (let close = open + 1; close < children.length && depth >= 0; close++) {
+      const token = children[close];
+      if (isTag(token, '<ins>')) {
+        break;
+      }
+      if (depth === 0 && isTag(token, '</ins>')) {
+        children[open] = new Token('ins_open', 'ins', 1);
+        children[close] = new Token('ins_close', 'ins', -1);
+        open = close;
+        break;
+      }
+      depth += token.nesting;
+    }
+  }
+}
+
+/**
+ * prepared returns the tokens of markdown-it in the form that the specs read: the inline content of each cell of a
+ * table in a paragraph, because the cells of the document hold blocks, a bullet list whose items all start with a
+ * check box as a task list, and `<ins>text</ins>` as underlined text when the schema has underline. In a list with
+ * items with and without a check box, the check box stays text.
+ * @param tokens - The tokens of markdown-it.
+ * @param underline - true when the schema has the mark of underline.
+ */
+function prepared(tokens: Token[], underline: boolean): Token[] {
   const out: Token[] = [];
   for (let index = 0; index < tokens.length; index++) {
     const token = tokens[index];
+    if (underline && token.type === 'inline' && token.children) {
+      underlined(token.children);
+    }
     if ((token.type === 'th_open' || token.type === 'td_open') && tokens[index + 1]?.type === 'inline') {
       out.push(token, new Token('paragraph_open', 'p', 1), tokens[index + 1], new Token('paragraph_close', 'p', -1));
       index++;
@@ -230,6 +266,7 @@ interface Group extends Range {
  */
 export class MarkdownReader {
   private readonly parser: MarkdownParser;
+  private readonly underline: boolean;
   private tokens: Token[] = [];
 
   /**
@@ -244,6 +281,7 @@ export class MarkdownReader {
   ) {
     // The tokens come from parse, which prepares them; the parser only reads them.
     this.parser = new MarkdownParser(schema, { parse: () => this.tokens } as unknown as MarkdownIt, { ...specs, ...extraSpecs });
+    this.underline = Boolean(schema.marks.underline);
   }
 
   /**
@@ -321,7 +359,7 @@ export class MarkdownReader {
       }
       all.push(...group.tokens);
     }
-    this.tokens = prepared(all);
+    this.tokens = prepared(all, this.underline);
     const doc = this.parser.parse('');
     this.tokens = [];
 

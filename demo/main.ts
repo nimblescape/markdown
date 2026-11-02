@@ -4,7 +4,7 @@
 
 // The example page of the editor (npm run demo): the editor on the left, the Markdown text that it writes on the
 // right. A change in the editor shows at once in the text; "Load the text" shows the text of the right side in the
-// editor; "Edit" switches the read-only mode.
+// editor. The toolbar of the editor switches the read-only mode and the mode to learn Markdown.
 
 import { MarkdownEditor } from '../src/index';
 
@@ -14,11 +14,16 @@ title: An example
 
 # nimblescape Markdown
 
-A paragraph with **bold**, *italic*, ~~strikethrough~~, \`code\` and a [link](https://github.com/nimblescape/markdown).
+A paragraph with **bold**, *italic*, <ins>underline</ins>, ~~strikethrough~~, \`code\` and a [link](https://github.com/nimblescape/markdown).
+
+Select some text for the format bar, type \`/\` for the slash commands, or move the mouse left of a block for its handles.
 
 > [!NOTE]
 > Blocks that you do not change stay as the file has them,
 > also these two lines.
+
+> [!TIP]
+> A button of the toolbar shows the Markdown marks beside the text.
 
 - [ ] a task
 - [x] a finished task
@@ -39,12 +44,10 @@ A footnote.[^1]
 
 const textArea = document.querySelector<HTMLTextAreaElement>('#markdown');
 const element = document.querySelector<HTMLElement>('#editor');
-const editable = document.querySelector<HTMLInputElement>('#editable');
 const load = document.querySelector<HTMLButtonElement>('#load');
-if (!textArea || !element || !editable || !load) {
+if (!textArea || !element || !load) {
   throw new Error('The example page misses an element.');
 }
 textArea.value = sample;
 const editor = new MarkdownEditor(element, { markdown: sample, onChange: (changed) => (textArea.value = changed.getMarkdown()) });
-editable.addEventListener('change', () => editor.setEditable(editable.checked));
 load.addEventListener('click', () => editor.setMarkdown(textArea.value));

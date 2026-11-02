@@ -17,6 +17,7 @@ import Image from '@tiptap/extension-image';
 import Italic from '@tiptap/extension-italic';
 import Link from '@tiptap/extension-link';
 import Strike from '@tiptap/extension-strike';
+import Underline from '@tiptap/extension-underline';
 import { BulletList, ListItem, ListKeymap, OrderedList, TaskItem, TaskList } from '@tiptap/extension-list';
 import { Table, TableCell, TableHeader, TableRow } from '@tiptap/extension-table';
 import StarterKit from '@tiptap/starter-kit';
@@ -124,9 +125,10 @@ export const FootnoteReference = Node.create({
 export function coreExtensions(): AnyExtension[] {
   return [
     StarterKit.configure({
-      // Markdown has no underline. The file keeps its blocks as they are, so no empty paragraph is added at its end.
-      underline: false,
+      // The file keeps its blocks as they are, so no empty paragraph is added at its end.
       trailingNode: false,
+      // Markdown has no underline; the version below writes it as `<ins>text</ins>` (R-EDIT-007).
+      underline: false,
       // The extensions below replace these with versions that record the form of the Markdown text, and add the marks
       // in the order in which the serializer nests them, from the outside in: code is the innermost mark.
       bold: false,
@@ -144,6 +146,11 @@ export function coreExtensions(): AnyExtension[] {
     Bold.extend({ addAttributes: () => ({ marker: formAttribute('**') }) }),
     Italic.extend({ addAttributes: () => ({ marker: formAttribute('*') }) }),
     Strike,
+    Underline.extend({
+      parseHTML() {
+        return [...(this.parent?.() ?? []), { tag: 'ins' }];
+      },
+    }),
     CodeBlock.extend({
       addAttributes() {
         // fence is the fence of a fenced code block, for example ``` or ~~~~, and empty for an indented code block;

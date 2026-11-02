@@ -353,6 +353,8 @@ export class MarkdownWriter {
         expelEnclosingWhitespace: true,
       },
       strike: { open: '~~', close: '~~', mixable: true, expelEnclosingWhitespace: true },
+      // Markdown has no underline; GitHub shows `<ins>` underlined (R-EDIT-007).
+      underline: { open: '<ins>', close: '</ins>', mixable: true },
       code: {
         open: (_state, _mark, parent, index) => {
           const text = parent.child(index).text ?? '';

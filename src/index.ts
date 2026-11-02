@@ -13,3 +13,7 @@ export type { BlockSource, MarkdownSource, ParsedMarkdown } from './markdown/par
 export type { Writers } from './markdown/serialize';
 export { MarkdownEditor, type MarkdownEditorOptions } from './editor';
 export type { SerializeOptions } from './markdown/serialize';
+export type { InteractionOptions } from './ui/interaction';
+export type { FormatButton } from './ui/formatBar';
+export type { MenuItem } from './ui/menu';
+export type { LearnMarks, MarkText, NodeText } from './ui/learnMode';

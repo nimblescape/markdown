@@ -92,7 +92,11 @@ document editor of Claude Desktop and of Claude on the web. It must have a
 toolbar, an insert menu "+", and slash commands: `/` in the text opens the
 same list of items, and typed words filter it. It must have handles to move
 blocks, and find and replace. Its code is original: no code and no design
-file of the Claude interface is copied.
+file of the Claude interface is copied. *(proposal)* The toolbar holds undo
+and redo, the text style and the list of the block of the cursor, the
+insert menu, find and replace, and the switches of the mode to learn
+Markdown and of read-only mode. Ctrl+F opens find and replace; Alt+Up and
+Alt+Down move the block of the cursor (Cmd in place of Ctrl on macOS).
 
 ### R-EDIT-007
 
@@ -106,7 +110,7 @@ buttons:
 | Text style | Paragraph, heading 1 to 6 (`#`), quote (`>`), code block | Library |
 | Bold | `**text**` | Library |
 | Italic | `*text*` | Library |
-| Underline | *([open question 1](#10-open-questions))* | Library |
+| Underline | `<ins>text</ins>` *(proposal, [open question 1](#10-open-questions))* | Library |
 | Strikethrough | `~~text~~` | Library |
 | Code | `` `text` `` | Library |
 | Color | *([open question 1](#10-open-questions))* | Notes |
