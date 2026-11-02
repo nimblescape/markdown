@@ -13,7 +13,7 @@ export { MarkdownCodec, type CodecOptions } from './markdown/codec';
 export { createMarkdownIt, type MarkdownItExtension } from '@nimblescape/markdownrender';
 export type { BlockSource, MarkdownSource, ParsedMarkdown } from './markdown/parse';
 export type { Writers } from './markdown/serialize';
-export { MarkdownEditor, type MarkdownEditorOptions } from './editor';
+export { MarkdownEditor, type AiContext, type MarkdownEditorOptions } from './editor';
 export type { SerializeOptions } from './markdown/serialize';
 export type { InteractionOptions } from './ui/interaction';
 export type { FormatButton } from './ui/formatBar';

@@ -91,11 +91,13 @@ works in the renderer and in the editor.
 | `frontMatterSchema`, `frontMatterInputs` | The schema of the front matter and the inputs of keys ([R-FM-004](editor.md#r-fm-004), [R-FM-006](editor.md#r-fm-006)); the schema of the integrating code comes first |
 | `generated` | The generated parts of a document, which are read-only ([R-EDIT-011](editor.md#r-edit-011)) |
 | `threads` | The threads of a document and the function that fills the panel of a thread ([R-GEN-014](editor.md#r-gen-014)) |
+| `formatRules` | *(proposal)* The format rules of the syntax of the plugin for the AI, a text in Markdown ([R-AI-001](ai.md#r-ai-001)) |
 | `activate` | Starts the plugin in an editor |
 
 The API of the editor for the plugins gives the Tiptap editor, the text as
 Markdown, the place in the text of the file of a position of the document,
-exact inside a block, the commands by their full names, the panel of a thread, and a
+exact inside a block (*(proposal)* at the edge of a mark, outside the mark,
+or with the side 1 inside the marks of the text after the position), the commands by their full names, the panel of a thread, and a
 refresh of the generated parts and threads after a change of the data of a
 plugin. *(proposal)* The refresh also asks the plugins again for the schema
 of the front matter, for example after the part of a plugin on the platform

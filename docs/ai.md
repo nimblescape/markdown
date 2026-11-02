@@ -27,6 +27,11 @@ a thread of a note of Markdown Notes: the AI answers in the thread as one
 more author. Notes integrates the chat; the libraries have no chat of their
 own.
 
+*(proposal)* The editor gives this context with `aiContext`: the text of the
+file, the selection as places in the text, the schema of the front matter,
+and the format rules of the plugins, which each plugin gives in its member
+`formatRules` ([R-PLUGIN-001](plugins.md#r-plugin-001)).
+
 ### R-AI-006
 
 *(proposal)* **Tracked changes.** The editor shows each proposed change as a

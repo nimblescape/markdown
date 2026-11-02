@@ -119,8 +119,11 @@ export interface PluginEditor {
   readonly isEditable: boolean;
   /** getMarkdown returns the text of the editor as Markdown. */
   getMarkdown(): string;
-  /** textOffset returns the place in the text of the file of a position of the document, exact inside a block. */
-  textOffset(pos: number): number;
+  /**
+   * textOffset returns the place in the text of the file of a position of the document, exact inside a block; with the
+   * side 1, the place at the edge of a mark is inside the marks of the text after the position.
+   */
+  textOffset(pos: number, side?: -1 | 1): number;
   /** runCommand runs a command of a plugin by its full name, `plugin.command`. */
   runCommand(name: string, ...args: unknown[]): boolean;
   /** openThread opens the panel of a thread beside the text, and closeThread closes it. */
@@ -170,6 +173,11 @@ export interface MarkdownPlugin extends RenderPlugin {
   readonly generated?: (doc: Node) => readonly GeneratedPart[];
   /** threads are the threads of the plugin beside the text (R-GEN-014). */
   readonly threads?: PluginThreads;
+  /**
+   * formatRules are the format rules of the syntax of the plugin for the AI, a text in Markdown, for example how a note
+   * is written (docs/ai.md, R-AI-001).
+   */
+  readonly formatRules?: string;
   /**
    * activate starts the plugin in an editor, after the editor shows its text.
    * @param editor - The API of the editor.

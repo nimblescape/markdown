@@ -7,7 +7,7 @@
 // changes, Accept with the origin of the proposal and one step of Undo, Reject, a proposal that a change of the user or
 // from outside makes outdated, and the line breaks of Windows.
 
-import { TextSource, type TextChange } from '@nimblescape/markdowntext';
+import { TextSource, type JsonSchema, type TextChange } from '@nimblescape/markdowntext';
 import { afterEach, describe, expect, it } from 'vitest';
 import { MarkdownEditor } from '../editor';
 
@@ -220,5 +220,35 @@ describe('the proposed changes', () => {
     editor.destroy();
     editors.length = 0;
     expect(await result).toBe('outdated');
+  });
+});
+
+describe('the context for the AI', () => {
+  it('gives the text of the file, the selection in the text, the schema of the front matter and the format rules', () => {
+    const withFrontMatter = `---\ntitle: A\n---\n\n${text}`;
+    const source = new TextSource(withFrontMatter);
+    const element = document.createElement('div');
+    document.body.append(element);
+    const schema: JsonSchema = { type: 'object', required: ['title'] };
+    const editor = new MarkdownEditor(element, {
+      source,
+      frontMatterSchema: schema,
+      plugins: [
+        { name: 'notes', apiVersion: 1, formatRules: 'A note is a footnote.' },
+        { name: 'empty', apiVersion: 1, formatRules: ' ' },
+      ],
+    });
+    editors.push(editor);
+    const end = positionOf(editor, 'bold');
+    editor.tiptap.commands.setTextSelection({ from: end - 4, to: end });
+    const context = editor.aiContext('docs/a.md');
+    expect(context.document).toEqual({ name: 'docs/a.md', text: withFrontMatter });
+    expect(withFrontMatter.slice(context.selection.from, context.selection.to)).toBe('bold');
+    expect(context.frontMatterSchema).toEqual(schema);
+    expect(context.formatRules).toEqual(['A note is a footnote.']);
+    editor.tiptap.commands.setTextSelection(positionOf(editor, 'Second'));
+    const cursor = editor.aiContext('docs/a.md').selection;
+    expect(cursor.from).toBe(cursor.to);
+    expect(withFrontMatter.slice(0, cursor.from).endsWith('Second')).toBe(true);
   });
 });

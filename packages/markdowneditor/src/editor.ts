@@ -28,7 +28,7 @@ import type { Node } from '@tiptap/pm/model';
 import { closeHistory } from '@tiptap/pm/history';
 import { EditorState, Plugin, Selection, type Transaction } from '@tiptap/pm/state';
 import { Transform } from '@tiptap/pm/transform';
-import type { Origin, TextChange, TextSelection, TextSource } from '@nimblescape/markdowntext';
+import type { JsonSchema, Origin, TextChange, TextSelection, TextSource } from '@nimblescape/markdowntext';
 import { coreExtensions } from './extensions/core';
 import { MarkdownCodec } from './markdown/codec';
 import type { MarkdownSource } from './markdown/parse';
@@ -110,6 +110,17 @@ function withPlugins(options: InteractionOptions, plugins: readonly MarkdownPlug
     frontMatterSchema: options.frontMatterSchema ?? plugins.find((plugin) => plugin.frontMatterSchema)?.frontMatterSchema,
     frontMatterInputs: [...(options.frontMatterInputs ?? []), ...plugins.flatMap((plugin) => plugin.frontMatterInputs ?? [])],
   };
+}
+
+/**
+ * AiContext is what the AI knows of a document: the context of the chat of @nimblescape/markdownai, with the text of the
+ * file, the selection, the schema of the front matter and the format rules of the plugins.
+ */
+export interface AiContext {
+  readonly document: { readonly name: string; readonly text: string };
+  readonly selection: { readonly from: number; readonly to: number };
+  readonly frontMatterSchema?: JsonSchema;
+  readonly formatRules: readonly string[];
 }
 
 /** editorCount counts the editors, for the IDs of the editors. */
@@ -307,10 +318,13 @@ export class MarkdownEditor implements PluginEditor {
    * textOffset returns the place in the text of the file of a position of the document, as the source counts it, for
    * example for a plugin that needs the place of the selected text in the file (docs/plugins.md, R-PLUGIN-001). Inside
    * the text of a top-level block, the place is exact: the editor writes the block with a mark at the position and finds
-   * the mark in the text of the block. A position between top-level blocks gives the start of the next block.
+   * the mark in the text of the block. A position between top-level blocks gives the start of the next block. At the
+   * edge of a mark, for example before bold text, the place is outside the mark; with the side 1, the place is next to
+   * the text after the position, inside the marks of that text, as the start of a selection needs it.
    * @param pos - The position in the document.
+   * @param side - -1, the default, for the marks of the text before the position; 1 for the marks of the text after it.
    */
-  textOffset(pos: number): number {
+  textOffset(pos: number, side: -1 | 1 = -1): number {
     const ranges = this.blockRanges();
     const index = ranges.findIndex((range) => pos >= range.start && pos < range.end);
     const range = index < 0 ? ranges[ranges.length - 1] : ranges[index];
@@ -326,7 +340,7 @@ export class MarkdownEditor implements PluginEditor {
       return range.from;
     }
     // The mark has the marks of the position, so that it stands inside them, for example in bold text.
-    const mark = single.type.schema.text(textMark, $inner.marks());
+    const mark = single.type.schema.text(textMark, side > 0 && $inner.nodeAfter?.isText ? $inner.nodeAfter.marks : $inner.marks());
     const written = this.codec.serialize(new Transform(single).insert(inner, mark).doc).replace(/\n+$/, '');
     const at = written.indexOf(textMark);
     if (at < 0) {
@@ -530,6 +544,23 @@ export class MarkdownEditor implements PluginEditor {
   /** getMarkdown returns the text of the editor as Markdown. */
   getMarkdown(): string {
     return this.codec.serialize(this.tiptap.state.doc, this.source);
+  }
+
+  /**
+   * aiContext returns what the AI knows of the document (docs/ai.md, R-AI-001): the text of the file, the selection
+   * as places in the text, the JSON schema of the front matter, and the format rules of the plugins. It is the context
+   * of the chat of @nimblescape/markdownai.
+   * @param name - The path or the name of the file.
+   */
+  aiContext(name: string): AiContext {
+    const { from, to } = this.tiptap.state.selection;
+    const schema = this.interaction.frontMatterSchema();
+    return {
+      document: { name, text: this.textSource?.text ?? this.getMarkdown() },
+      selection: from === to ? { from: this.textOffset(from), to: this.textOffset(from) } : { from: this.textOffset(from, 1), to: this.textOffset(to) },
+      ...(schema === undefined ? {} : { frontMatterSchema: schema }),
+      formatRules: this.parts.plugins.flatMap((plugin) => (plugin.formatRules?.trim() ? [plugin.formatRules] : [])),
+    };
   }
 
   /** isEditable is false in read-only mode. */
