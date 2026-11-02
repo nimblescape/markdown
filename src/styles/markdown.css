@@ -1,0 +1,171 @@
+/*
+SPDX-License-Identifier: MIT
+© 2026 Hannes Stauss (scalarion@nimblescape.com)
+Licensed under the MIT License. See LICENSE in the repository root for details.
+*/
+
+/*
+The styles of the editor (docs/specification.md, R-THEME-001, R-THEME-002). Every color and font comes from a token
+--nsmd-*. On the web, a page sets the tokens for its theme; the defaults below follow the light or dark scheme of the
+browser. In VS Code, the adapter of the webview sets the tokens from the variables --vscode-* of the theme (step 6).
+*/
+
+.nsmd-editor {
+  --nsmd-background: #ffffff;
+  --nsmd-foreground: #1f2328;
+  --nsmd-muted: #59636e;
+  --nsmd-border: #d1d9e0;
+  --nsmd-code-background: #f6f8fa;
+  --nsmd-link: #0969da;
+  --nsmd-selection: #b6d4fe;
+  --nsmd-raw-background: #f6f8fa;
+  --nsmd-raw-foreground: #59636e;
+  --nsmd-font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --nsmd-font-size: 16px;
+  --nsmd-line-height: 1.6;
+  --nsmd-code-font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  .nsmd-editor {
+    --nsmd-background: #0d1117;
+    --nsmd-foreground: #e6edf3;
+    --nsmd-muted: #9198a1;
+    --nsmd-border: #3d444d;
+    --nsmd-code-background: #151b23;
+    --nsmd-link: #4493f8;
+    --nsmd-selection: #264f78;
+    --nsmd-raw-background: #151b23;
+    --nsmd-raw-foreground: #9198a1;
+  }
+}
+
+.nsmd-editor .ProseMirror {
+  background: var(--nsmd-background);
+  color: var(--nsmd-foreground);
+  font-family: var(--nsmd-font-family);
+  font-size: var(--nsmd-font-size);
+  line-height: var(--nsmd-line-height);
+  outline: none;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.nsmd-editor .ProseMirror ::selection {
+  background: var(--nsmd-selection);
+}
+
+.nsmd-editor a {
+  color: var(--nsmd-link);
+}
+
+.nsmd-editor code,
+.nsmd-editor pre {
+  font-family: var(--nsmd-code-font-family);
+  font-size: 0.875em;
+  background: var(--nsmd-code-background);
+  border-radius: 6px;
+}
+
+.nsmd-editor code {
+  padding: 0.15em 0.35em;
+}
+
+.nsmd-editor pre {
+  padding: 0.75em 1em;
+  overflow-x: auto;
+}
+
+.nsmd-editor pre code {
+  padding: 0;
+  background: none;
+}
+
+.nsmd-editor blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--nsmd-muted);
+  border-left: 0.25em solid var(--nsmd-border);
+}
+
+.nsmd-editor hr {
+  border: none;
+  border-top: 1px solid var(--nsmd-border);
+  margin: 1.5em 0;
+}
+
+.nsmd-editor table {
+  border-collapse: collapse;
+  margin: 0 0 1em;
+}
+
+.nsmd-editor th,
+.nsmd-editor td {
+  border: 1px solid var(--nsmd-border);
+  padding: 0.35em 0.75em;
+  vertical-align: top;
+}
+
+.nsmd-editor th > p,
+.nsmd-editor td > p {
+  margin: 0;
+}
+
+/* The items of a tight list stand closer, as in the preview of the file. */
+.nsmd-editor ul[data-tight] > li > p,
+.nsmd-editor ol[data-tight] > li > p,
+.nsmd-editor ul[data-tight] > li > div > p {
+  margin: 0;
+}
+
+.nsmd-editor ul[data-type='taskList'] {
+  list-style: none;
+  padding-left: 0.5em;
+}
+
+.nsmd-editor ul[data-type='taskList'] li {
+  display: flex;
+  gap: 0.5em;
+}
+
+.nsmd-editor ul[data-type='taskList'] li > div {
+  flex: 1;
+}
+
+.nsmd-editor img {
+  max-width: 100%;
+}
+
+/*
+Raw text: HTML, the front matter and text that no block of Markdown holds, until a plugin shows it its own way. The
+selector names .ProseMirror, because Tiptap sets `white-space: normal` for the nodes that are not editable.
+*/
+.nsmd-editor .ProseMirror .nsmd-raw {
+  color: var(--nsmd-raw-foreground);
+  background: var(--nsmd-raw-background);
+  font-family: var(--nsmd-code-font-family);
+  font-size: 0.8em;
+  white-space: pre-wrap;
+}
+
+.nsmd-editor .ProseMirror span.nsmd-raw {
+  padding: 0 0.25em;
+  border-radius: 4px;
+}
+
+.nsmd-editor .nsmd-footnote {
+  display: flex;
+  gap: 0.5em;
+  font-size: 0.9em;
+  color: var(--nsmd-muted);
+}
+
+.nsmd-editor .nsmd-footnote::before {
+  content: '[^' attr(data-label) ']:';
+  font-family: var(--nsmd-code-font-family);
+}
+
+.nsmd-editor .nsmd-footnote-reference {
+  color: var(--nsmd-link);
+  font-size: 0.75em;
+}
