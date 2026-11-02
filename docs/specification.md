@@ -135,14 +135,19 @@ renderer and the layout run without the editor.
 
 ### R-ARCH-002
 
-*(proposal)* **One npm package for each part:** `@nimblescape/text`
-(source), `@nimblescape/editor` (the editor API and the rendered Markdown
-editor), `@nimblescape/render` (renderer), `@nimblescape/layout` (layout,
-pages, PDF), `@nimblescape/history` (history), and one package for each
-platform, `@nimblescape/vscode` and `@nimblescape/web`; the evaluation
-plugin is `@nimblescape/evaluation`
-([R-EVAL-017](evaluation.md#r-eval-017)). Until the API between the parts
-reaches version 1, they live in one repository as npm workspaces.
+**Names of the npm packages.** The name of each npm package of the
+libraries must start with `markdown` in the scope `@nimblescape`, without a
+hyphen, in the same way as `@nimblescape/markdownnotes` and
+`@nimblescape/markdownpaper`. *(proposal)* **One npm package for each
+part:** `@nimblescape/markdowntext` (source), `@nimblescape/markdowneditor`
+(the editor API and the rendered Markdown editor),
+`@nimblescape/markdownrender` (renderer), `@nimblescape/markdownlayout`
+(layout, pages, PDF), `@nimblescape/markdownhistory` (history), and one
+package for each platform, `@nimblescape/markdownvscode` and
+`@nimblescape/markdownweb`; the evaluation plugin is
+`@nimblescape/markdownevaluation` ([R-EVAL-017](evaluation.md#r-eval-017)).
+Until the API between the parts reaches version 1, they live in one
+repository as npm workspaces.
 
 ## 4. Documents
 
@@ -209,8 +214,8 @@ use:
    each package from the start?
 3. Rendering: is the editor built on the renderer ([R-GEN-010](#r-gen-010),
    proposal), instead of "the renderer is the editor in read-only mode"?
-4. Names: the contribution point `nimblescape.markdown.extensions` and the
-   npm names of [R-ARCH-002](#r-arch-002) (proposal)?
+4. Names: the contribution point `nimblescape.markdown.extensions`
+   (proposal)?
 5. Licenses: `markdown-it-task-lists` (ISC), `entities` (BSD-2-Clause, used
    by markdown-it) and `argparse` (Python-2.0, only in the command line
    program of markdown-it, in no bundle).

@@ -321,8 +321,8 @@ rules)`, `analyze(evaluation, { from, to, part })` and
 ### R-EVAL-017
 
 *(proposal)* **Package.** The plugin is the npm package
-`@nimblescape/evaluation`, a workspace of the repository of nimblescape
-Markdown until version 1 of the API of the history
+`@nimblescape/markdownevaluation`, a workspace of the repository of
+nimblescape Markdown until version 1 of the API of the history
 ([R-ARCH-002](specification.md#r-arch-002)), and later a repository of its
 own.
 
