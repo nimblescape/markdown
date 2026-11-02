@@ -131,7 +131,9 @@ buttons:
 
 A button whose function comes from an extension must show only when that
 extension is active. An extension may add buttons, for example "Cite" of
-Paper. A button must show as active when the whole selection has its format.
+Paper. *(proposal)* A button of an extension may also show only where it
+applies, for example "Research" of Paper only in a paper. A button must show
+as active when the whole selection has its format.
 Bold, italic, strikethrough, code and link must have the keys Ctrl+B,
 Ctrl+I, Ctrl+Shift+S, Ctrl+E and Ctrl+K (Cmd on macOS).
 
