@@ -221,6 +221,15 @@ describe('the form of the front matter', () => {
     opened.setFrontMatterSchema(schema);
     expect(field(['date'])).not.toBeNull();
   });
+
+  it('asks a plugin again for its schema after refreshPlugins', () => {
+    let given: JsonSchema | undefined;
+    const opened = open(text, { plugins: [{ name: 'layouts', apiVersion: 1, frontMatterSchema: () => given }] });
+    expect(field(['date'])).toBeNull();
+    given = schema;
+    opened.refreshPlugins();
+    expect(field(['date'])).not.toBeNull();
+  });
 });
 
 describe('the place of the front matter', () => {

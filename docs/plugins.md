@@ -97,7 +97,9 @@ The API of the editor for the plugins gives the Tiptap editor, the text as
 Markdown, the place in the text of the file of a position of the document,
 exact inside a block, the commands by their full names, the panel of a thread, and a
 refresh of the generated parts and threads after a change of the data of a
-plugin. A transaction that takes a change of the text from outside has the
+plugin. *(proposal)* The refresh also asks the plugins again for the schema
+of the front matter, for example after the part of a plugin on the platform
+sent the schema of the layout of a paper. A transaction that takes a change of the text from outside has the
 meta `outsideChange`, so that a plugin that guards its parts against the
 edits of the user, for example the notes of Notes, lets such a change pass.
 The API of the platform gives the name of the platform and, for each

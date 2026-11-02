@@ -125,7 +125,7 @@ export interface PluginEditor {
   /** openThread opens the panel of a thread beside the text, and closeThread closes it. */
   openThread(id: string): boolean;
   closeThread(): void;
-  /** refreshPlugins asks the plugins again for their generated parts and threads, after a change of their data. */
+  /** refreshPlugins asks the plugins again for their generated parts, threads and schema of the front matter, after a change of their data. */
   refreshPlugins(): void;
 }
 

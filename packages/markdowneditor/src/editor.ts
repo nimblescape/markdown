@@ -335,10 +335,14 @@ export class MarkdownEditor implements PluginEditor {
     return range.from + offset + breaks;
   }
 
-  /** refreshPlugins asks the plugins again for their generated parts and threads, after a change of their data. */
+  /**
+   * refreshPlugins asks the plugins again for their generated parts, their threads and the schema of the front matter,
+   * after a change of their data, for example a schema that a plugin received from its part on the platform.
+   */
   refreshPlugins(): void {
     this.generated.refresh();
     this.threads.refresh();
+    this.interaction.refreshFrontMatter();
     if (!this.tiptap.isDestroyed) {
       this.tiptap.view.dispatch(this.tiptap.state.tr.setMeta(threadsKey, { refresh: true }).setMeta('addToHistory', false));
     }
