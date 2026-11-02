@@ -30,10 +30,15 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./pdf": {
+      "nimblescape-source": "./src/pdf/index.ts",
+      "types": "./dist/pdf/index.d.ts",
+      "node": "./dist/pdf/index.js"
+    },
     "./paged.polyfill.js": "./dist/paged.polyfill.js"
   },
   "files": [
-    "dist/*.js",
+    "dist/**/*.js",
     "dist/**/*.d.ts",
     "dist/THIRD-PARTY-NOTICES.md"
   ],
@@ -47,7 +52,8 @@
     "@types/markdown-it": "^14.2.0",
     "hyphen": "^1.14.1",
     "markdown-it": "^14.3.3",
-    "pagedjs": "^0.4.3"
+    "pagedjs": "^0.4.3",
+    "pdf-lib": "^1.17.1"
   },
   "engines": {
     "node": ">=22"

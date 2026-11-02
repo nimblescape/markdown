@@ -28,7 +28,8 @@ export default tseslint.config(
     languageOptions: { globals: globals.browser },
   },
   {
-    files: ['**/*.mjs', '**/*.mts', 'packages/*/src/**/*.test.ts'],
+    // The tests, the build scripts, and the entry points for Node.js, for example the PDF of the layout part.
+    files: ['**/*.mjs', '**/*.mts', 'packages/*/src/**/*.test.ts', 'packages/*/src/pdf/**/*.ts'],
     languageOptions: { globals: globals.node },
   },
 );

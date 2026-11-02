@@ -15,7 +15,8 @@
 //    language of the layout.
 // 4. Write the page: a policy that lets only the scripts of the page run, the base address of the folder of the file
 //    for its images, the style sheets, the fields as CSS variables and as attributes, the fixed pages and the text, the
-//    script of the layout (src/page/handlers.js), and the scripts of the integrating code, with Paged.js.
+//    data of the placeholders of the plugins (src/pageRenders.ts), the script of the layout (src/page/handlers.js), and
+//    the scripts of the integrating code, with Paged.js.
 //
 // The integrating code reads the files and maps their addresses to the addresses that the page loads: in VS Code
 // through its webview, in a browser through its server, on the command line from the disk. This file uses no API of a
@@ -28,6 +29,7 @@ import { builtinFile, builtinFolder } from './builtin';
 import { fieldValues } from './frontMatter';
 import { fieldsOfSchema, type Layout, layoutFile, layoutName, parseLayout, type Problem, schemaOfFields, withLanguage } from './format';
 import { hyphenatorOf } from './hyphenate';
+import { slotsHtml } from './pageRenders';
 import { escapeHtml, fill, pdfNameOf } from './template';
 import { type LayoutText, renderText } from './text';
 
@@ -456,13 +458,17 @@ export interface Page {
   values: Record<string, string>;
   text: LayoutText;
   problems: Problem[];
+  /** held is true when Paged.js waits for `release` of the integrating code (the option `hold`). */
+  held: boolean;
 }
 
 /** PageOptions are the options of a page. */
 export interface PageOptions {
   /**
    * hold keeps Paged.js from starting until the integrating code calls `window.paperHandlers.release()` in the page,
-   * for code that fills the page after it loaded, for example with the functions of plugins.
+   * for code that fills the page after it loaded, for example with the functions of plugins (showPages). Without it,
+   * the page fills the placeholders of the plugins itself with the functions that a script of the page registers
+   * (registerRenders), as the page of a PDF does.
    */
   hold?: boolean;
   /** env holds values that the plugins find in the environment of markdown-it, as in the Markdown preview of VS Code. */
@@ -532,10 +538,11 @@ ${composed.before}
 <main class="paper-text"${attributes}>
 ${body.html}
 </main>
+${slotsHtml(body.slots)}
 ${composed.after}
 ${scripts.join('\n')}
 </body>
 </html>
 `;
-  return { html, title, pdfName: pdfNameOf(layout.pdfName, values), layout, schema: loaded.schema, values, text: body, problems };
+  return { html, title, pdfName: pdfNameOf(layout.pdfName, values), layout, schema: loaded.schema, values, text: body, problems, held: options.hold === true };
 }

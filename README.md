@@ -98,7 +98,8 @@ showPages(document.querySelector('iframe')!, page, layoutRenderer); // Paged.js 
 ```
 
 The [README of the package](packages/markdownlayout/README.md) explains the
-host, which reads the files of the layouts.
+host, which reads the files of the layouts, and the PDF in Node.js with the
+entry point `@nimblescape/markdownlayout/pdf`.
 
 In VS Code, an extension registers the editor as a custom text editor with
 `registerMarkdownEditor` of `@nimblescape/markdownvscode`; the

@@ -8,12 +8,15 @@
 // package `hyphen`, and the browser breaks a line only there: the same text gives the same lines in the view of the
 // pages and in the PDF, on every computer.
 
-import * as de from 'hyphen/de-1996';
-import * as enGb from 'hyphen/en-gb';
-import * as enUs from 'hyphen/en-us';
-import * as es from 'hyphen/es';
-import * as fr from 'hyphen/fr';
-import * as it from 'hyphen/it';
+// The modules of the languages are CommonJS modules in folders without a package.json, so the imports name their
+// files: Node.js finds no file in a folder for an ECMAScript module, and the default import is the object of the module
+// in Node.js and in the bundles.
+import de from 'hyphen/de-1996/index.js';
+import enGb from 'hyphen/en-gb/index.js';
+import enUs from 'hyphen/en-us/index.js';
+import es from 'hyphen/es/index.js';
+import fr from 'hyphen/fr/index.js';
+import it from 'hyphen/it/index.js';
 
 /** softHyphen is the character of a soft hyphen. */
 export const softHyphen = '\u00ad';

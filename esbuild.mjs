@@ -8,7 +8,8 @@
 // dist/<name>.css from each file src/styles/<name>.css (npm run build of the package); a stylesheet holds the styles that
 // it imports from another package of the workspaces, for example the styles of rendered content of the renderer in the
 // styles of the editor. The modules use no API of Node.js, so that they run in browsers, in the webviews of VS Code and
-// in the extension host of VS Code. A package bundles only its own code: the other packages of the workspaces, Tiptap,
+// in the extension host of VS Code; only an entry point whose export has the condition `node` runs in Node.js, for
+// example `@nimblescape/markdownlayout/pdf`, and esbuild builds it for Node.js. A package bundles only its own code: the other packages of the workspaces, Tiptap,
 // ProseMirror and markdown-it stay dependencies, so that the page that uses the editor has one copy of ProseMirror with
 // its plugins. An import with the suffix `?raw` is the text of its file, which the bundle holds, for example a built-in
 // layout. A package that exports `./paged.polyfill.js` holds a copy of the script of Paged.js in dist/, with the notices
@@ -104,8 +105,12 @@ if (!demo && !vscode) {
     fs.rmSync('dist', { recursive: true, force: true });
   }
   const exports = Object.values(JSON.parse(fs.readFileSync('package.json', 'utf8')).exports ?? {});
-  const entryPoints = exports.map((target) => target?.[source]).filter((file) => typeof file === 'string' && file.endsWith('.ts'));
-  await esbuild.build({ ...common, entryPoints, outdir: 'dist', outbase: 'src', format: 'esm', platform: 'browser', packages: 'external' });
+  const entries = (node) => exports.filter((target) => !!target?.node === node).map((target) => target?.[source]).filter((file) => typeof file === 'string' && file.endsWith('.ts'));
+  await esbuild.build({ ...common, entryPoints: entries(false), outdir: 'dist', outbase: 'src', format: 'esm', platform: 'browser', packages: 'external' });
+  // An entry point with the condition `node` runs in Node.js only, for example the PDF of the layout part.
+  if (entries(true).length > 0) {
+    await esbuild.build({ ...common, entryPoints: entries(true), outdir: 'dist', outbase: 'src', format: 'esm', platform: 'node', packages: 'external' });
+  }
   // A package that exports the script of Paged.js holds a copy of it, with the notices of the packages in it.
   if (exports.includes('./dist/paged.polyfill.js')) {
     copyPagedJs('dist', '../..');

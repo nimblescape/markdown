@@ -55,6 +55,47 @@ schema of the front matter of the layout
 their tokens in the frame, and then Paged.js makes the pages. The same page
 is the page of the PDF ([R-LAYOUT-002](../../docs/rendering.md#r-layout-002)).
 
+## The PDF
+
+The entry point `@nimblescape/markdownlayout/pdf` prints the page of a
+document to a PDF in Node.js, for example on the command line and in the
+extension host of VS Code on the desktop
+([R-LAYOUT-002](../../docs/rendering.md#r-layout-002)). An installed
+browser without a window, Google Chrome, Chromium, Microsoft Edge or Brave,
+loads the page, Paged.js makes the pages, and the browser prints them in the
+size of the pages of the layout. The PDF gets the title, the author, the
+subtitle as its subject and the language of the layout in its metadata.
+
+```ts
+import { pathToFileURL } from 'node:url';
+import { createLayoutRenderer, renderPage } from '@nimblescape/markdownlayout';
+import { fileHost, printPage } from '@nimblescape/markdownlayout/pdf';
+
+const renderer = createLayoutRenderer({ plugins });
+const host = fileHost({ scripts: [{ src: pathToFileURL(pageScript).href }] }); // the files of the disk
+const page = await renderPage(host, renderer, pathToFileURL(file).href, text); // without hold
+const { pdf, messages } = await printPage(page); // the bytes of the PDF, and the errors of the page
+```
+
+`printPage` searches an installed browser; the option `browser` names its
+program, else the environment variable `NIMBLESCAPE_BROWSER`. Without a
+browser, the error `NoBrowserError` says where to get Google Chrome. The
+package downloads no browser.
+
+In the page of the PDF, the page itself shows the tokens of the plugins
+before Paged.js makes the pages. A script of the page registers the
+functions of the plugins; the integrating code bundles it with the same
+plugins as its renderer, and gives it in `scripts` of the host
+(`pageScript` above):
+
+```ts
+import { registerRenders } from '@nimblescape/markdownlayout';
+
+registerRenders(plugins);
+```
+
+## The script of Paged.js
+
 The package holds the script of Paged.js, `paged.polyfill.js`, unchanged,
 with the notices of the packages in it in `dist/THIRD-PARTY-NOTICES.md`.
 The export `@nimblescape/markdownlayout/paged.polyfill.js` names the file:
