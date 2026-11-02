@@ -44,6 +44,7 @@
     "build": "node ../../esbuild.mjs --production && tsc -p tsconfig.build.json"
   },
   "dependencies": {
+    "@nimblescape/markdownrender": "0.1.0",
     "@nimblescape/markdowntext": "0.1.0",
     "@tiptap/core": "^3.32.2",
     "@tiptap/extension-bold": "^3.32.2",
@@ -62,8 +63,6 @@
     "@types/markdown-it": "^14.2.0",
     "diff": "^9.0.0",
     "markdown-it": "^14.3.3",
-    "markdown-it-footnote": "^4.0.0",
-    "markdown-it-task-lists": "^2.1.1",
     "prosemirror-markdown": "^1.13.9",
     "string-width": "^8.3.0"
   },

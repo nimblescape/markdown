@@ -1,0 +1,58 @@
+{
+  "name": "@nimblescape/markdownrender",
+  "version": "0.1.0",
+  "description": "The renderer of nimblescape Markdown: the text of a file as HTML without edit functions, from markdown-it 14 with footnotes and task lists, with the plugins of the renderer. It runs without the editor and without a page, for example in a command line; the editor shows its rendered blocks with it.",
+  "license": "MIT",
+  "author": {
+    "name": "nimblescape e.U.",
+    "url": "https://nimblescape.com"
+  },
+  "homepage": "https://github.com/nimblescape/markdown/tree/main/packages/markdownrender#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nimblescape/markdown.git",
+    "directory": "packages/markdownrender"
+  },
+  "bugs": {
+    "url": "https://github.com/nimblescape/markdown/issues"
+  },
+  "keywords": [
+    "markdown",
+    "markdown-it",
+    "renderer",
+    "html"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "nimblescape-source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./content.css": {
+      "nimblescape-source": "./src/styles/content.css",
+      "default": "./dist/content.css"
+    }
+  },
+  "files": [
+    "dist/*.js",
+    "dist/**/*.d.ts",
+    "dist/content.css"
+  ],
+  "sideEffects": [
+    "*.css"
+  ],
+  "scripts": {
+    "build": "node ../../esbuild.mjs --production && tsc -p tsconfig.build.json"
+  },
+  "dependencies": {
+    "@nimblescape/markdowntext": "0.1.0",
+    "@types/markdown-it": "^14.2.0",
+    "markdown-it": "^14.3.3",
+    "markdown-it-footnote": "^4.0.0",
+    "markdown-it-task-lists": "^2.1.1"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

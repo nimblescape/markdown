@@ -9,9 +9,12 @@
 // change and the selection of the rendered editor in the text. The toolbar of the editor switches the read-only mode
 // and the mode to learn Markdown. The front matter shows as a form with the example schema below; "Edit keys" switches
 // the form to the edit of the keys. The example plugin (examplePlugin.ts) shows the plugin API: a CSV table at the level
-// "render", a read-only citation and a thread beside the text.
+// "render", a read-only citation and a thread beside the text. The button "Rendering" shows the rendering of the
+// renderer (docs/rendering.md, R-REN-001) in place of the text field: the same text as HTML without edit functions,
+// with the same plugin, which follows each change.
 
 import { MarkdownEditor } from '@nimblescape/markdowneditor';
+import { MarkdownRenderer } from '@nimblescape/markdownrender';
 import { TextSource, type JsonSchema, type TextChange } from '@nimblescape/markdowntext';
 import { examplePlugin } from './examplePlugin';
 
@@ -87,13 +90,17 @@ TODO: this paragraph has a thread. Its icon is at the right of the text.
 const textArea = document.querySelector<HTMLTextAreaElement>('#markdown');
 const element = document.querySelector<HTMLElement>('#editor');
 const status = document.querySelector<HTMLOutputElement>('#status');
-if (!textArea || !element || !status) {
+const rendering = document.querySelector<HTMLElement>('#rendering');
+const showText = document.querySelector<HTMLButtonElement>('#show-text');
+const showRendering = document.querySelector<HTMLButtonElement>('#show-rendering');
+if (!textArea || !element || !status || !rendering || !showText || !showRendering) {
   throw new Error('The example page misses an element.');
 }
 
 /** source is the source of the example file, which both editors share. */
 const source = new TextSource(sample);
-const editor = new MarkdownEditor(element, { source, id: 'rendered', frontMatterSchema: schema, plugins: [examplePlugin()] });
+const plugin = examplePlugin();
+const editor = new MarkdownEditor(element, { source, id: 'rendered', frontMatterSchema: schema, plugins: [plugin] });
 
 // The text field is the second editor of the source: each input becomes a change of the user, and each change from the
 // rendered editor becomes the patches of the text field, from its end, so that the positions before each patch stay.
@@ -123,3 +130,30 @@ source.onChange((change) => {
 });
 source.onSelections(showStatus);
 showStatus();
+
+// The rendering of the renderer: the renderer has the same plugin as the editor, and shows the text again 150 ms after
+// a change, while the rendering shows.
+const renderer = new MarkdownRenderer({ plugins: [plugin] });
+let stopRendering: () => void = () => undefined;
+let renderTimer: ReturnType<typeof setTimeout> | undefined;
+const render = () => {
+  stopRendering();
+  stopRendering = renderer.render(source.text, rendering);
+};
+const show = (text: boolean) => {
+  textArea.hidden = !text;
+  rendering.hidden = text;
+  showText.setAttribute('aria-pressed', String(text));
+  showRendering.setAttribute('aria-pressed', String(!text));
+  if (!text) {
+    render();
+  }
+};
+showText.addEventListener('click', () => show(true));
+showRendering.addEventListener('click', () => show(false));
+source.onChange(() => {
+  if (!rendering.hidden) {
+    clearTimeout(renderTimer);
+    renderTimer = setTimeout(render, 150);
+  }
+});

@@ -18,6 +18,7 @@
   "type": "module",
   "workspaces": [
     "packages/markdowntext",
+    "packages/markdownrender",
     "packages/markdowneditor",
     "packages/markdownvscode"
   ],

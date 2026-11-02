@@ -188,6 +188,17 @@ describe('the level "render"', () => {
     expect(unit.querySelector('.nsmd-raw-html')?.textContent).toBe('<img src=x onerror="alert(1)">');
   });
 
+  it('shows a unit with the renderer of the editor, as the renderer shows the whole file', () => {
+    const editor = open('> [!NOTE]\n> The math $a$.\n\n- [x] done $b$\n', [math()]);
+    expect(viewOf(editor).dom.classList.contains('nsmd-content')).toBe(true);
+    const units = element.querySelectorAll('.nsmd-unit-rendered');
+    expect(units[0].querySelector('.markdown-alert-note > .markdown-alert-title')?.textContent).toBe('Note');
+    expect(units[0].querySelector('.nsmd-render')?.textContent).toBe('inline(a)');
+    expect(units[1].querySelector<HTMLInputElement>('input.task-list-item-checkbox')?.checked).toBe(true);
+    // A unit is one block of the file: its headings get no IDs and its blocks no lines.
+    expect(units[0].querySelector('[data-line]')).toBeNull();
+  });
+
   it('shows a block with a token of a markdown-it plugin with the HTML of that plugin', () => {
     const box = (md: MarkdownIt) => {
       md.block.ruler.before('paragraph', 'box', (state, startLine, _endLine, silent) => {

@@ -5,11 +5,12 @@
 // The build of the npm packages of the workspaces (docs/specification.md, R-ARCH-002, R-GEN-007). In the folder of a
 // package, `node ../../esbuild.mjs` builds an ES module dist/<name>.js for each entry point src/<name>.ts that the
 // exports of its package.json name with the condition of the sources, for example dist/index.js from src/index.ts, and
-// dist/<name>.css from each file src/styles/<name>.css (npm run build of the package). The modules use no API of
-// Node.js, so that they run in browsers, in the webviews of VS Code and in the extension host of VS Code. A package
-// bundles only its own code: the other packages of the workspaces, Tiptap, ProseMirror and markdown-it stay
-// dependencies, so that the page that uses the editor has one copy of ProseMirror with its plugins. tsc writes the
-// declarations. The code is readable JavaScript, not minified, so that anyone can compare the package with the source;
+// dist/<name>.css from each file src/styles/<name>.css (npm run build of the package); a stylesheet holds the styles that
+// it imports from another package of the workspaces, for example the styles of rendered content of the renderer in the
+// styles of the editor. The modules use no API of Node.js, so that they run in browsers, in the webviews of VS Code and
+// in the extension host of VS Code. A package bundles only its own code: the other packages of the workspaces, Tiptap,
+// ProseMirror and markdown-it stay dependencies, so that the page that uses the editor has one copy of ProseMirror with
+// its plugins. tsc writes the declarations. The code is readable JavaScript, not minified, so that anyone can compare the package with the source;
 // only a development build writes a source map.
 //
 // In the root of the repository, --demo builds the example page in demo/dist/ with all libraries, from the sources of
@@ -61,11 +62,11 @@ if (!demo && !vscode) {
     fs.rmSync('dist', { recursive: true, force: true });
   }
   const exports = Object.values(JSON.parse(fs.readFileSync('package.json', 'utf8')).exports ?? {});
-  const entryPoints = exports.map((target) => target?.[source]).filter((file) => typeof file === 'string');
+  const entryPoints = exports.map((target) => target?.[source]).filter((file) => typeof file === 'string' && file.endsWith('.ts'));
   await esbuild.build({ ...common, entryPoints, outdir: 'dist', outbase: 'src', format: 'esm', platform: 'browser', packages: 'external' });
   const styles = fs.existsSync('src/styles') ? fs.readdirSync('src/styles').filter((file) => file.endsWith('.css')) : [];
   for (const style of styles) {
-    await esbuild.build({ ...common, entryPoints: [path.join('src/styles', style)], outfile: path.join('dist', style) });
+    await esbuild.build({ ...common, entryPoints: [path.join('src/styles', style)], outfile: path.join('dist', style), conditions: [source] });
   }
 } else if (vscode) {
   const out = 'demo/vscode/dist';
