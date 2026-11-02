@@ -8,6 +8,7 @@
 import { getSchema, type AnyExtension } from '@tiptap/core';
 import type { Node, Schema } from '@tiptap/pm/model';
 import type MarkdownIt from 'markdown-it';
+import type Token from 'markdown-it/lib/token.mjs';
 import type { ParseSpec } from 'prosemirror-markdown';
 import { coreExtensions } from '../extensions/core';
 import { createMarkdownIt, type MarkdownItExtension } from './markdownIt';
@@ -26,6 +27,11 @@ export interface CodecOptions {
   tokens?: Record<string, ParseSpec>;
   /** writers are the ways to write those nodes and marks as Markdown. */
   writers?: Writers;
+  /**
+   * rendered returns true for a token that a plugin of the level "render" shows (docs/plugins.md, R-GEN-012): its
+   * top-level block stays one unit, a raw block that keeps its text.
+   */
+  rendered?: (token: Token) => boolean;
 }
 
 /** MarkdownCodec reads Markdown text into the document of the editor and writes the document back as Markdown text. */
@@ -38,7 +44,7 @@ export class MarkdownCodec {
   constructor(options: CodecOptions = {}) {
     this.schema = options.schema ?? getSchema(options.extensions ?? coreExtensions());
     this.md = createMarkdownIt(options.markdownIt);
-    this.reader = new MarkdownReader(this.schema, this.md, options.tokens);
+    this.reader = new MarkdownReader(this.schema, this.md, options.tokens, options.rendered);
     this.writer = new MarkdownWriter(this.md.utils.normalizeReference, options.writers);
   }
 

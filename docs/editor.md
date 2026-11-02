@@ -199,6 +199,12 @@ undo. A plugin may give a form for the data of a generated part, for
 example the page of a citation. Ctrl+click on a reference goes to its
 target.
 
+*(proposal)* A selection that touches a generated part holds the whole
+part. The user cannot change the format of a piece of a part. Backspace and
+Delete next to a part delete the whole part. Text that the user types at the
+edge of a part does not become a piece of the part. Replace leaves a match
+that holds a piece of a part. A double click on a part opens its form.
+
 ## 7. Mode to learn Markdown
 
 ### R-GEN-013
@@ -296,6 +302,12 @@ the icon opens the thread beside the text. The code that integrates the
 library decides whether it uses these icons or a view of its own: in VS
 Code, Notes can show the threads in its side view; on a web page, the icons
 beside the text show them. The icons are code of this project.
+
+*(proposal)* The icons stand at the right of the text, beside the first
+line of the passage, with the number of answers. The panel of a thread opens
+beside the text at the height of the passage and marks the passage; the
+plugin of the thread fills the panel. The close button, Escape and a second
+click on the icon close it.
 
 ## 10. Open questions
 

@@ -9,6 +9,7 @@
 // The front matter shows as a form (R-FM-001), with the schema and the inputs of plugins that the options give.
 
 import { type Editor, Extension } from '@tiptap/core';
+import type { Node as PmNode } from '@tiptap/pm/model';
 import { Plugin } from '@tiptap/pm/state';
 import type { EditorView } from '@tiptap/pm/view';
 import { readFrontMatter, type FrontMatterFormat, type JsonSchema } from '@nimblescape/markdowntext';
@@ -42,6 +43,10 @@ export interface InteractionOptions {
   formatButtons?: FormatButton[];
   /** insertItems returns the items that extensions add to the insert menu and to the slash commands. */
   insertItems?: (editor: Editor) => MenuItem[];
+  /** blockItems returns the items that extensions add to the menu of a block, under its handle. */
+  blockItems?: (editor: Editor, block: { node: PmNode; pos: number }) => MenuItem[];
+  /** tableItems returns the items that extensions add to the table menu of a table. */
+  tableItems?: (editor: Editor, table: { node: PmNode; pos: number }) => MenuItem[];
   /** learnMarks are the marks that the mode to learn Markdown shows for the nodes and marks of extensions. */
   learnMarks?: LearnMarks;
   /**
@@ -179,7 +184,12 @@ export class Interaction {
     this.findBar = new FindBar(view);
     this.formatBar = new FormatBar({ editor, box: this.box, menu: this.menu, buttons: this.options.formatButtons ?? [], editLink: () => this.editLink() });
     this.box.append(this.formatBar.dom);
-    this.handles = new BlockHandles(view, { box: this.box, menu: this.menu, insertItems: () => this.insertItems() });
+    this.handles = new BlockHandles(view, {
+      box: this.box,
+      menu: this.menu,
+      insertItems: () => this.insertItems(),
+      blockItems: (block) => this.options.blockItems?.(editor, block) ?? [],
+    });
     this.tableHandles = new TableHandles(view, {
       box: this.box,
       menu: this.menu,
@@ -187,6 +197,7 @@ export class Interaction {
       language: () => this.options.language ?? frontMatterLanguage(editor) ?? (document.documentElement.lang || undefined),
       insertItems: () => this.insertItems(),
       menuOpened: () => this.formatBar?.hide(),
+      tableItems: (table) => this.options.tableItems?.(editor, table) ?? [],
     });
     if (this.options.toolbar ?? true) {
       this.toolbar = new Toolbar({

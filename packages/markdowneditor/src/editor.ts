@@ -13,15 +13,36 @@
 // change of the user becomes a change of the text of the source with the origin `user` and the ID of the editor, and
 // each change of the source from another origin replaces only the blocks whose text changed. The editor gives the
 // source its selection as the range of the text of the top-level blocks that the selection touches.
+//
+// Plugins extend the editor through the plugin API (docs/plugins.md, R-GEN-005, R-GEN-012, R-PLUGIN-001;
+// src/plugins/api.ts): the editor combines their parts into its codec, its extensions and its interaction, shows the
+// blocks of the level "render" with their source (src/plugins/render.ts), keeps their generated parts read-only
+// (docs/editor.md, R-EDIT-011) and shows their threads beside the text (R-GEN-014).
 
-import { type AnyExtension, Editor } from '@tiptap/core';
+import { type AnyExtension, Editor, Extension } from '@tiptap/core';
 import type { Node } from '@tiptap/pm/model';
-import { EditorState, type Transaction } from '@tiptap/pm/state';
+import { EditorState, Plugin, type Transaction } from '@tiptap/pm/state';
 import type { TextChange, TextSelection, TextSource } from '@nimblescape/markdowntext';
 import { coreExtensions } from './extensions/core';
 import { MarkdownCodec } from './markdown/codec';
 import type { MarkdownSource } from './markdown/parse';
 import { outsideChange, updated } from './markdown/update';
+import {
+  addStyles,
+  dispose,
+  type Disposable,
+  fenceRender,
+  type GeneratedPart,
+  type MarkdownPlugin,
+  type PluginEditor,
+  type PluginHost,
+  type PluginParts,
+  pluginParts,
+} from './plugins/api';
+import { DocCache } from './plugins/cache';
+import { generatedPlugin, validParts } from './plugins/generated';
+import { BlockRenderer, renderOf, sourceViews } from './plugins/render';
+import { setOpenThread, threadEntries, threadsKey, threadsPlugin, type ThreadEntry } from './plugins/threads';
 import { Interaction, type InteractionOptions } from './ui/interaction';
 
 /** MarkdownEditorOptions configure a MarkdownEditor. */
@@ -41,19 +62,57 @@ export interface MarkdownEditorOptions extends InteractionOptions {
   source?: TextSource;
   /** id is the ID of the editor in the source; the default is a new ID. */
   id?: string;
+  /** plugins are the plugins of the editor (docs/plugins.md, R-PLUGIN-001), in their order. */
+  plugins?: MarkdownPlugin[];
+  /** host is the API of the platform for the plugins; the default is the platform `web` without channels. */
+  host?: PluginHost;
+  /**
+   * threadIcons false leaves out the icons of the threads beside the text, when the integrating code shows the threads
+   * in a view of its own (R-GEN-014); the default is true.
+   */
+  threadIcons?: boolean;
+}
+
+/**
+ * withPlugins returns the options of the interaction with the parts of the plugins: their items of the menus, their
+ * buttons of the format bar, their marks of the mode to learn Markdown and their schema and inputs of the front matter.
+ * The options of the integrating code come first; the first schema wins.
+ */
+function withPlugins(options: InteractionOptions, plugins: readonly MarkdownPlugin[], parts: PluginParts): InteractionOptions {
+  if (plugins.length === 0) {
+    return options;
+  }
+  return {
+    ...options,
+    formatButtons: [...(options.formatButtons ?? []), ...plugins.flatMap((plugin) => plugin.menus?.format ?? [])],
+    insertItems: (editor) => [...(options.insertItems?.(editor) ?? []), ...plugins.flatMap((plugin) => plugin.menus?.insert?.(editor) ?? [])],
+    blockItems: (editor, block) => [...(options.blockItems?.(editor, block) ?? []), ...plugins.flatMap((plugin) => plugin.menus?.block?.(editor, block) ?? [])],
+    tableItems: (editor, table) => [...(options.tableItems?.(editor, table) ?? []), ...plugins.flatMap((plugin) => plugin.menus?.table?.(editor, table) ?? [])],
+    learnMarks: {
+      marks: { ...parts.learnMarks.marks, ...options.learnMarks?.marks },
+      nodes: { ...parts.learnMarks.nodes, ...options.learnMarks?.nodes },
+    },
+    frontMatterSchema: options.frontMatterSchema ?? plugins.find((plugin) => plugin.frontMatterSchema)?.frontMatterSchema,
+    frontMatterInputs: [...(options.frontMatterInputs ?? []), ...plugins.flatMap((plugin) => plugin.frontMatterInputs ?? [])],
+  };
 }
 
 /** editorCount counts the editors, for the IDs of the editors. */
 let editorCount = 0;
 
 /** MarkdownEditor is an editor of rendered Markdown in an element of a page. */
-export class MarkdownEditor {
+export class MarkdownEditor implements PluginEditor {
   /** tiptap is the Tiptap editor, for the extensions of the editor. */
   readonly tiptap: Editor;
   /** id is the ID of the editor in its source. */
   readonly id: string;
   private readonly codec: MarkdownCodec;
   private readonly interaction: Interaction;
+  private readonly parts: PluginParts;
+  private readonly renderer: BlockRenderer;
+  private readonly generated: DocCache<GeneratedPart[]>;
+  private readonly threads: DocCache<ThreadEntry[]>;
+  private readonly disposables: (void | Disposable)[] = [];
   private source: MarkdownSource | undefined;
   private readonly textSource: TextSource | undefined;
   private readonly stopListening: (() => void)[] = [];
@@ -69,10 +128,15 @@ export class MarkdownEditor {
     element.classList.add('nsmd-editor');
     this.id = options.id ?? `markdowneditor-${++editorCount}`;
     this.textSource = options.source;
-    this.interaction = new Interaction(element, options);
+    const plugins = options.plugins ?? [];
+    this.parts = pluginParts(plugins);
+    addStyles(plugins, element.ownerDocument);
+    this.generated = new DocCache((doc) => validParts(doc, plugins.flatMap((plugin) => plugin.generated?.(doc) ?? [])));
+    this.threads = new DocCache((doc) => threadEntries(plugins, doc));
+    this.interaction = new Interaction(element, withPlugins(options, plugins, this.parts));
     this.tiptap = new Editor({
       element: this.interaction.box,
-      extensions: [...(options.extensions ?? coreExtensions()), this.interaction.extension()],
+      extensions: [...(options.extensions ?? coreExtensions()), ...this.parts.extensions, this.pluginExtension(options), this.interaction.extension()],
       editable: options.editable ?? true,
       onUpdate: ({ transaction }) => {
         if (!this.outside && !transaction.getMeta(outsideChange)) {
@@ -81,7 +145,15 @@ export class MarkdownEditor {
       },
     });
     this.interaction.attach(this.tiptap, { toggle: () => this.setEditable(!this.isEditable) });
-    this.codec = new MarkdownCodec({ schema: this.tiptap.schema });
+    const renders = this.parts.renders;
+    this.codec = new MarkdownCodec({
+      schema: this.tiptap.schema,
+      markdownIt: this.parts.markdownIt,
+      tokens: this.parts.tokens,
+      writers: this.parts.writers,
+      rendered: (token) => renderOf(renders, token) !== undefined,
+    });
+    this.renderer = new BlockRenderer(this.codec.md, renders);
     this.show(this.textSource?.text ?? options.markdown ?? '');
     if (this.textSource) {
       const textSource = this.textSource;
@@ -96,6 +168,144 @@ export class MarkdownEditor {
       this.stopListening.push(() => this.tiptap.off('transaction', onTransaction));
       this.stopListening.push(() => textSource.removeEditor(this.id));
     }
+    const host = options.host ?? { platform: 'web' };
+    for (const plugin of plugins) {
+      this.disposables.push(plugin.activate?.(this, host));
+    }
+  }
+
+  /**
+   * pluginExtension returns the Tiptap extension with the parts of the plugins in the view: the keys of their commands,
+   * the views of the blocks with a source, the generated parts and the threads beside the text.
+   */
+  private pluginExtension(options: MarkdownEditorOptions): Extension {
+    const plugins = this.parts.plugins;
+    return Extension.create({
+      name: 'nsmdPlugins',
+      addKeyboardShortcuts: () => Object.fromEntries([...this.parts.keys].map(([key, command]) => [key, () => this.runCommand(command)])),
+      addProseMirrorPlugins: () => [
+        sourceViews({ renderer: () => this.renderer, commit: (pos, text) => this.editSource(pos, text) }),
+        new Plugin({ appendTransaction: (transactions, oldState, newState) => this.unitOfCode(transactions, oldState, newState) }),
+        ...(plugins.some((plugin) => plugin.generated) ? [generatedPlugin(this.generated)] : []),
+        ...(plugins.some((plugin) => plugin.threads)
+          ? [threadsPlugin({ box: this.interaction.box, icons: options.threadIcons ?? true, entries: this.threads, editor: () => this })]
+          : []),
+      ],
+    });
+  }
+
+  /**
+   * unitOfCode makes a top-level code block that the cursor leaves a raw block that keeps its text, when a plugin of the
+   * level "render" shows its language, for example a diagram of Mermaid that the user wrote (R-GEN-012).
+   * @returns The transaction that replaces the code block, or null.
+   */
+  private unitOfCode(transactions: readonly Transaction[], oldState: EditorState, newState: EditorState): Transaction | null {
+    const rawBlock = newState.schema.nodes.rawBlock;
+    const $head = oldState.selection.$head;
+    if (!rawBlock || $head.depth !== 1 || $head.parent.type.name !== 'codeBlock' || !transactions.some((tr) => tr.selectionSet || tr.docChanged)) {
+      return null;
+    }
+    let pos = $head.before(1);
+    for (const tr of transactions) {
+      pos = tr.mapping.map(pos, 1);
+    }
+    const node = newState.doc.nodeAt(pos);
+    const { from, to } = newState.selection;
+    if (node?.type.name !== 'codeBlock' || (from > pos && to < pos + node.nodeSize) || newState.doc.resolve(pos).depth !== 0) {
+      return null;
+    }
+    const language = String(node.attrs.language ?? '').trim();
+    if (!language || !this.parts.renders.has(`${fenceRender}${language}`)) {
+      return null;
+    }
+    const text = this.codec.serialize(newState.doc.type.create(null, node)).replace(/\n$/, '');
+    return newState.tr.replaceWith(pos, pos + node.nodeSize, rawBlock.create({ text, rendered: true }));
+  }
+
+  /**
+   * runCommand runs a command of a plugin (R-PLUGIN-001).
+   * @param name - The full name of the command, `plugin.command`, for example `notes.addNote`.
+   * @param args - The arguments of the command.
+   * @returns What the command returns, or false for a command that no plugin has.
+   */
+  runCommand(name: string, ...args: unknown[]): boolean {
+    const command = this.parts.commands.get(name);
+    return command ? command(this, ...args) : false;
+  }
+
+  /**
+   * openThread opens the panel of a thread beside the text (R-GEN-014).
+   * @param id - The ID of the thread.
+   * @returns false when no plugin has a thread with this ID in the document.
+   */
+  openThread(id: string): boolean {
+    if (!this.threads.get(this.tiptap.state.doc).some((entry) => entry.marker.id === id)) {
+      return false;
+    }
+    setOpenThread(this.tiptap.view, id);
+    return true;
+  }
+
+  /** closeThread closes the panel of the open thread. */
+  closeThread(): void {
+    setOpenThread(this.tiptap.view, undefined);
+  }
+
+  /** refreshPlugins asks the plugins again for their generated parts and threads, after a change of their data. */
+  refreshPlugins(): void {
+    this.generated.refresh();
+    this.threads.refresh();
+    if (!this.tiptap.isDestroyed) {
+      this.tiptap.view.dispatch(this.tiptap.state.tr.setMeta(threadsKey, { refresh: true }).setMeta('addToHistory', false));
+    }
+  }
+
+  /**
+   * editSource gives a block with a source a new text, from the field "Edit source" (R-GEN-012): a top-level block
+   * changes through its text in the text of the file, which the editor parses again, so that the new text may become
+   * other blocks; a block of HTML inside another block takes the new text. The change is one step of Undo.
+   * @param pos - The position of the block.
+   * @param text - The new text of the block.
+   */
+  editSource(pos: number, text: string): void {
+    const { state } = this.tiptap;
+    const node = state.doc.nodeAt(pos);
+    if (!node || !this.source || !this.isEditable) {
+      return;
+    }
+    if (state.doc.resolve(pos).depth > 0) {
+      if (node.type.name === 'htmlBlock') {
+        this.tiptap.view.dispatch(state.tr.setNodeMarkup(pos, undefined, { ...node.attrs, html: text }));
+      }
+      return;
+    }
+    const { source } = this.codec.rebased(state.doc, this.source);
+    const known = source.blocks.get(node);
+    if (!known) {
+      return;
+    }
+    const texts: string[] = [];
+    state.doc.forEach((block) => {
+      const each = source.blocks.get(block);
+      if (each) {
+        texts[each.index] = block === node ? text : each.text;
+      }
+    });
+    const body = source.before + texts.map((each, index) => (index > 0 ? source.gaps[index - 1] : '') + each).join('') + source.after;
+    const file = `${source.bom ? '\ufeff' : ''}${source.lineBreak === '\r\n' ? body.replace(/\n/g, '\r\n') : body}`;
+    const { tr, source: next } = updated(state, source, this.codec.parse(file));
+    if (!tr) {
+      return;
+    }
+    // The change is a change of the user: it enters Undo and goes to the source of the file.
+    tr.setMeta('addToHistory', true).setMeta(outsideChange, false).scrollIntoView();
+    const before = this.source;
+    this.source = next;
+    this.tiptap.view.dispatch(tr);
+    if (this.tiptap.state.doc === state.doc) {
+      this.source = before;
+    }
+    this.tiptap.view.focus();
   }
 
   /**
@@ -260,8 +470,9 @@ export class MarkdownEditor {
     this.interaction.openFind();
   }
 
-  /** destroy removes the editor and its interaction from its element, and the editor from its source. */
+  /** destroy removes the editor and its interaction from its element, the editor from its source, and its plugins. */
   destroy(): void {
+    this.disposables.splice(0).forEach((disposable) => dispose(disposable));
     this.stopListening.forEach((stop) => stop());
     this.stopListening.length = 0;
     this.tiptap.destroy();

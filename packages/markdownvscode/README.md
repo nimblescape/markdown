@@ -97,7 +97,12 @@ import { MarkdownEditor } from '@nimblescape/markdowneditor';
 import { connectVsCode } from '@nimblescape/markdownvscode/webview';
 
 void connectVsCode().then((connection) => {
-  new MarkdownEditor(connection.element, { source: connection.source, editable: connection.editable });
+  new MarkdownEditor(connection.element, {
+    source: connection.source,
+    editable: connection.editable,
+    host: connection.host,
+    plugins: [],
+  });
 });
 ```
 
@@ -108,6 +113,28 @@ document that the page did not make reaches the editor with the origin
 `program` and the name `vscode`. Undo and Redo with the keys undo the steps
 of the editor; a key that the editor handles starts no key binding of VS
 Code ([R-VSC-006](../../docs/platforms.md#r-vsc-006)).
+
+## The plugins
+
+`connection.host` is the API of the platform for the plugins of the editor
+([R-PLUGIN-001](../../docs/plugins.md#r-plugin-001)). The part of a plugin
+on the page sends messages to its part in the extension through
+`host.channel(name)`, and the extension connects that part with `plugins` of
+the registration. The page shows the content of a file, so the extension
+checks each message of the page before it uses it.
+
+```ts
+registerMarkdownEditor(vscode, {
+  // …
+  plugins: {
+    notes: (channel) => channel.onMessage((message) => {
+      if (isLoginRequest(message)) {
+        void channel.post({ login: currentLogin() });
+      }
+    }),
+  },
+});
+```
 
 ## The theme
 
