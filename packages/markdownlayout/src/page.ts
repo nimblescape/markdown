@@ -502,7 +502,7 @@ export async function renderPage(host: Host, renderer: MarkdownRenderer, documen
   const policy = [
     "default-src 'none'",
     `img-src ${host.sources} https: data: blob:`,
-    `font-src ${host.sources} data:`,
+    `font-src ${host.sources} data: blob:`,
     `style-src ${host.sources} 'unsafe-inline'`,
     `script-src 'nonce-${host.nonce}'`,
   ].join('; ');

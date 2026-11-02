@@ -193,6 +193,18 @@ tokens in the frame; Paged.js then starts when the page has not changed for
 stand on a grey background with a gap between them; the PDF has no screen
 styles.
 
+*(proposal)* **The pages follow the text.** While "Pages" shows, the pages
+show again 600 ms after the last change of the text, at the same place of
+the frame; hidden pages make no new pages until they show again. A double
+click on a block of the pages switches to "Edit" and puts the cursor at the
+start of that block. Each block of the pages has the line of its text in
+the attribute `data-line`, which also gives this place. In a webview of VS
+Code, the page in the frame cannot load the files of the webview itself, so
+the view loads the scripts, images, style sheets and fonts of the page and
+gives them to the frame as `blob:` URLs; the files of the layout come
+through the extension, only from the workspace folder of the file and the
+folders of the extension ([R-VSC-007](platforms.md#r-vsc-007)).
+
 ## 5. Open questions
 
 1. Pages: the switch between "Edit" and "Pages"

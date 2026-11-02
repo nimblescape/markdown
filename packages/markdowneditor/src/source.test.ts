@@ -122,6 +122,24 @@ describe('the editor with a source', () => {
     expect(windows.selections('other')).toEqual([{ anchor: 6, head: 7 }]);
   });
 
+  it('goes to the block that holds a place of the text, for example a line from a double click on the pages', () => {
+    const source = new TextSource(text);
+    const editor = open(source, { id: 'rendered' });
+    const blockOf = () => editor.tiptap.state.selection.$head.parent.textContent;
+    editor.goToText(text.indexOf('Second'));
+    expect(blockOf()).toBe('Second paragraph.');
+    expect(editor.tiptap.state.selection.$head.parentOffset).toBe(0);
+    // A place within a block and a place in the gap after it go to that block; the front matter goes to the first block.
+    editor.goToText(text.indexOf('paragraph.'));
+    expect(blockOf()).toBe('First paragraph.');
+    editor.goToText(text.indexOf('First') + 'First paragraph.'.length + 1);
+    expect(blockOf()).toBe('First paragraph.');
+    editor.goToText(0);
+    expect(source.selections('rendered')).toEqual([{ anchor: text.indexOf('# Title'), head: text.indexOf('# Title') + '# Title'.length }]);
+    editor.goToText(text.length + 10);
+    expect(blockOf()).toBe('Second paragraph.');
+  });
+
   it('gives a new text of setMarkdown to the source, and leaves the source when it closes', () => {
     const source = new TextSource(text);
     const editor = open(source, { id: 'rendered' });

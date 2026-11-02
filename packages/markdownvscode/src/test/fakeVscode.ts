@@ -2,8 +2,8 @@
 // © 2026 Hannes Stauss (scalarion@nimblescape.com)
 // Licensed under the MIT License. See LICENSE in the repository root for details.
 
-// A small API of VS Code for the tests of the adapter: URIs, ranges, text documents, workspace edits, the custom
-// editors, the commands and the settings, and a webview panel whose messages wait in queues, so that a test decides
+// A small API of VS Code for the tests of the adapter: URIs, ranges, text documents, workspace edits, the files, the
+// custom editors, the commands and the settings, and a webview panel whose messages wait in queues, so that a test decides
 // when each side gets them. The page side of a test runs in the window of happy-dom.
 
 import type * as vscode from 'vscode';
@@ -29,6 +29,13 @@ export class FakeUri {
   ) {}
   static file(path: string): FakeUri {
     return new FakeUri('file', path);
+  }
+  static parse(value: string): FakeUri {
+    const found = /^([a-z][a-z0-9+.-]*):\/\/(.*)$/.exec(value);
+    if (!found) {
+      throw new Error(`No URI: ${value}`);
+    }
+    return new FakeUri(found[1], found[2]);
   }
   static joinPath(base: FakeUri, ...parts: string[]): FakeUri {
     const segments = base.path.split('/');
@@ -192,6 +199,8 @@ export interface FakeVsCode {
   readonly settings: Record<string, unknown>;
   /** writable is false for a scheme whose file system cannot write. */
   readonly writable: Map<string, boolean>;
+  /** files are the files of the file system, by their URIs. */
+  readonly files: Map<string, Uint8Array>;
   /** applyResult is the result of the next workspace edits. */
   applyResult: boolean;
   /** open returns a new document. */
@@ -211,6 +220,7 @@ export function fakeVsCode(): FakeVsCode {
   const executed: unknown[][] = [];
   const settings: Record<string, unknown> = {};
   const writable = new Map<string, boolean>();
+  const files = new Map<string, Uint8Array>();
   let registered: ReturnType<FakeVsCode['provider']>;
   const fake: FakeVsCode = {
     api: undefined as unknown as VsCode,
@@ -219,6 +229,7 @@ export function fakeVsCode(): FakeVsCode {
     executed,
     settings,
     writable,
+    files,
     applyResult: true,
     open(text, uri = FakeUri.file('/work/docs/file.md')) {
       const document = new FakeDocument(uri, text);
@@ -262,7 +273,13 @@ export function fakeVsCode(): FakeVsCode {
       onDidChangeConfiguration: configuration.event,
       getConfiguration: (section: string) => ({ get: (key: string) => settings[`${section}.${key}`] }),
       getWorkspaceFolder: (uri: FakeUri) => (uri.path.startsWith('/work/') ? { uri: FakeUri.file('/work') } : undefined),
-      fs: { isWritableFileSystem: (scheme: string) => writable.get(scheme) },
+      fs: {
+        isWritableFileSystem: (scheme: string) => writable.get(scheme),
+        readFile: (uri: FakeUri) => {
+          const data = files.get(uri.toString());
+          return data ? Promise.resolve(data) : Promise.reject(new Error(`No file ${uri.toString()}`));
+        },
+      },
       applyEdit: (edit: FakeWorkspaceEdit) => {
         if (!fake.applyResult) {
           return Promise.resolve(false);

@@ -5,15 +5,27 @@
 // The entry point `@nimblescape/markdownvscode/webview`, the side of the page in the webview of VS Code
 // (docs/platforms.md, R-VSC-001, R-VSC-002): the script of the page of an extension connects to the document and
 // creates the editor with the source of the connection, for example
-// `new MarkdownEditor(connection.element, { source: connection.source, editable: connection.editable })`.
+// `new MarkdownEditor(connection.element, { source: connection.source, editable: connection.editable })`, and shows
+// the pages of the file in `connection.pagesFrame` with the host `connection.pages` (docs/rendering.md, R-LAYOUT-003).
 
 export {
   connectVsCode,
   vscodeOrigin,
   type ConnectOptions,
   type VsCodeConnection,
+  type VsCodePagesHost,
   type VsCodePluginChannel,
   type VsCodePluginHost,
   type VsCodeWebviewApi,
 } from './webview/connection';
-export { editorElementId, type HostMessage, type PageFonts, type PageMessage, type PluginMessage } from './messages';
+export {
+  editorElementId,
+  pagesElementId,
+  type HostMessage,
+  type PageFiles,
+  type PageFolder,
+  type PageFonts,
+  type PageMessage,
+  type PageView,
+  type PluginMessage,
+} from './messages';

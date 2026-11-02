@@ -13,10 +13,11 @@
 // renderer (docs/rendering.md, R-REN-001) in place of the text field: the same text as HTML without edit functions,
 // with the same plugin, which follows each change. The button "Pages" shows the pages of the text in the built-in
 // layout plain (R-LAYOUT-001 to R-LAYOUT-003): the title page from the front matter, the numbered headings, the
-// footnotes at the foot of their pages, made by Paged.js in a frame, with the same plugin.
+// footnotes at the foot of their pages, made by Paged.js in a frame, with the same plugin. A double click on a page
+// puts the cursor of the rendered editor at the start of that block.
 
 import { MarkdownEditor } from '@nimblescape/markdowneditor';
-import { createLayoutRenderer, type Host, type PagesView, renderPage, showPages } from '@nimblescape/markdownlayout';
+import { createLayoutRenderer, type Host, LivePages } from '@nimblescape/markdownlayout';
 import { MarkdownRenderer } from '@nimblescape/markdownrender';
 import { TextSource, type JsonSchema, type TextChange } from '@nimblescape/markdowntext';
 import { examplePlugin } from './examplePlugin';
@@ -149,7 +150,6 @@ const render = () => {
 
 // The pages: the example page has no files, so the text has the built-in layout plain, and the page of the pages
 // loads Paged.js from dist/ of the example page. The pages show again 600 ms after a change, at the same place.
-const layoutRenderer = createLayoutRenderer({ plugins: [plugin] });
 const nonce = Array.from(crypto.getRandomValues(new Uint8Array(16)), (byte) => byte.toString(16).padStart(2, '0')).join('');
 const host: Host = {
   reader: { read: async () => undefined },
@@ -158,24 +158,14 @@ const host: Host = {
   scripts: [{ src: new URL('dist/paged.polyfill.js', location.href).href }],
   nonce,
 };
-let view: PagesView | undefined;
-let pagesTimer: ReturnType<typeof setTimeout> | undefined;
-let pagesVersion = -1;
-const renderPages = async () => {
-  const version = source.version;
-  const page = await renderPage(host, layoutRenderer, new URL('example.md', location.href).href, source.text, { hold: true });
-  if (version !== source.version || pages.hidden) {
-    return;
-  }
-  const top = pages.contentWindow?.scrollY ?? 0;
-  view?.dispose();
-  view = showPages(pages, page, layoutRenderer);
-  pagesVersion = version;
-  view.rendered.then(
-    () => pages.contentWindow?.scrollTo(0, top),
-    () => undefined,
-  );
-};
+const livePages = new LivePages(pages, {
+  host,
+  renderer: createLayoutRenderer({ plugins: [plugin] }),
+  document: new URL('example.md', location.href).href,
+  source,
+  onError: (error) => console.error('The pages could not be made.', error),
+  onDoubleClick: ({ offset }) => editor.goToText(offset),
+});
 
 /** show shows the text field, the rendering or the pages on the right side. */
 const show = (side: 'text' | 'rendering' | 'pages') => {
@@ -187,8 +177,11 @@ const show = (side: 'text' | 'rendering' | 'pages') => {
   showPagesButton.setAttribute('aria-pressed', String(side === 'pages'));
   if (side === 'rendering') {
     render();
-  } else if (side === 'pages' && pagesVersion !== source.version) {
-    void renderPages();
+  }
+  if (side === 'pages') {
+    livePages.show();
+  } else {
+    livePages.hide();
   }
 };
 showText.addEventListener('click', () => show('text'));
@@ -198,9 +191,5 @@ source.onChange(() => {
   if (!rendering.hidden) {
     clearTimeout(renderTimer);
     renderTimer = setTimeout(render, 150);
-  }
-  if (!pages.hidden) {
-    clearTimeout(pagesTimer);
-    pagesTimer = setTimeout(() => void renderPages(), 600);
   }
 });

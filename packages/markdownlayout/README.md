@@ -55,6 +55,34 @@ schema of the front matter of the layout
 their tokens in the frame, and then Paged.js makes the pages. The same page
 is the page of the PDF ([R-LAYOUT-002](../../docs/rendering.md#r-layout-002)).
 
+## The pages that follow the text
+
+`LivePages` is the view "Pages" of an editor
+([R-LAYOUT-003](../../docs/rendering.md#r-layout-003)). While it shows, the
+pages show again 600 ms after the last change of the text of the source, at
+the same place of the frame. A double click on a block of the pages gives
+the line of that block in the file and the place in the text where the line
+starts, so that the integrating code can go there in "Edit".
+
+```ts
+import { createLayoutRenderer, LivePages } from '@nimblescape/markdownlayout';
+
+const pages = new LivePages(document.querySelector('iframe')!, {
+  host,
+  renderer: createLayoutRenderer({ plugins }),
+  document: 'file:///project/paper.md',
+  source, // the TextSource of the editor
+  onDoubleClick: ({ offset }) => editor.goToText(offset),
+});
+pages.show(); // the view "Pages"
+pages.hide(); // the view "Edit": the frame keeps the last pages
+```
+
+In a webview of VS Code, the page in the frame cannot load the files of the
+webview itself. The option `embed` names the starts of their addresses:
+the view loads these files and gives them to the page in the frame as
+`blob:` URLs. `@nimblescape/markdownvscode` gives these addresses.
+
 ## The PDF
 
 The entry point `@nimblescape/markdownlayout/pdf` prints the page of a

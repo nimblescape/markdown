@@ -109,6 +109,23 @@ key that the editor handles, for example Ctrl+K for a link or Ctrl+F for
 find, starts no key binding of VS Code; every other key, for example Ctrl+S,
 reaches VS Code.
 
+### R-VSC-007
+
+*(proposal)* **The views "Edit" and "Pages".** A button in the title of the
+editor switches between "Edit" and "Pages"
+([R-LAYOUT-003](rendering.md#r-layout-003)). The extension contributes two
+commands, one for each view, and the adapter registers them; the context
+key `<view type>.pages` is true while the active editor shows the pages, so
+that the title shows the button of the other view. The page of the webview
+holds the editor and a frame for the pages, and shows one of them. The page
+reads the files of the layout through the extension, which reads only files
+in the folders from which the page may load files, that is the workspace
+folder of the file and the folders of the extension, and sends their bytes
+as Base64. The extension names the scripts of the pages, for example
+Paged.js, which it bundles. So that the page in the frame gets these files
+as `blob:` URLs, the page of the webview may also load its own files with
+`fetch` (`connect-src`), and images and fonts may be `blob:` URLs.
+
 ## 3. Web
 
 ### R-WEB-001
@@ -168,8 +185,9 @@ uses the font of the editor. A change of these settings shows at once.
    ([R-THEME-003](#r-theme-003), proposal)?
 3. VS Code: the form of the adapter ([R-VSC-001](#r-vsc-001)), the
    changes between the page and the document
-   ([R-VSC-005](#r-vsc-005)), and Undo and the keys of the editor
-   ([R-VSC-006](#r-vsc-006)), all proposals?
+   ([R-VSC-005](#r-vsc-005)), Undo and the keys of the editor
+   ([R-VSC-006](#r-vsc-006)), and the views "Edit" and "Pages"
+   ([R-VSC-007](#r-vsc-007)), all proposals?
 
 ---
 

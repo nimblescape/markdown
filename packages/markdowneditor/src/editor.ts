@@ -25,7 +25,7 @@
 
 import { type AnyExtension, Editor, Extension } from '@tiptap/core';
 import type { Node } from '@tiptap/pm/model';
-import { EditorState, Plugin, type Transaction } from '@tiptap/pm/state';
+import { EditorState, Plugin, Selection, type Transaction } from '@tiptap/pm/state';
 import type { TextChange, TextSelection, TextSource } from '@nimblescape/markdowntext';
 import { coreExtensions } from './extensions/core';
 import { MarkdownCodec } from './markdown/codec';
@@ -259,6 +259,23 @@ export class MarkdownEditor implements PluginEditor {
   /** closeThread closes the panel of the open thread. */
   closeThread(): void {
     setOpenThread(this.tiptap.view, undefined);
+  }
+
+  /**
+   * goToText puts the cursor at the start of the top-level block that holds a place of the text of the file, shows the
+   * block and focuses the editor, for example after a double click on the pages (docs/rendering.md, R-LAYOUT-003).
+   * @param offset - The place in the text of the file, as the source counts it.
+   */
+  goToText(offset: number): void {
+    const ranges = this.blockRanges();
+    const range = [...ranges].reverse().find((each) => each.from <= offset) ?? ranges[0];
+    if (!range || this.tiptap.isDestroyed) {
+      return;
+    }
+    const { state } = this.tiptap;
+    const selection = Selection.near(state.doc.resolve(Math.min(range.start + 1, state.doc.content.size)));
+    this.tiptap.view.dispatch(state.tr.setSelection(selection).scrollIntoView());
+    this.tiptap.view.focus();
   }
 
   /** refreshPlugins asks the plugins again for their generated parts and threads, after a change of their data. */

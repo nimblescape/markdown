@@ -57,8 +57,9 @@ export {
   type Reader,
   type Script,
 } from './page';
+export { lineAt, LivePages, offsetOfLine, type LivePagesOptions, type PagePlace } from './livePages';
 export { registerRenders, slotsHtml, slotsId, tokenData, type TokenData } from './pageRenders';
-export { showPages, type PagesView } from './pages';
+export { showPages, type PagesView, type ShowPagesOptions } from './pages';
 export { escapeHtml, fileName, fill, pdfNameOf } from './template';
 export {
   createLayoutRenderer,

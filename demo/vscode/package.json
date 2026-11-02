@@ -36,14 +36,46 @@
         "title": "Open Text Editor to the Side",
         "category": "nimblescape Markdown",
         "icon": "$(go-to-file)"
+      },
+      {
+        "command": "nimblescape.markdownExample.showPages",
+        "title": "Switch to Pages",
+        "category": "nimblescape Markdown",
+        "icon": "$(book)"
+      },
+      {
+        "command": "nimblescape.markdownExample.showEdit",
+        "title": "Switch to Edit",
+        "category": "nimblescape Markdown",
+        "icon": "$(edit)"
       }
     ],
     "menus": {
       "editor/title": [
         {
+          "command": "nimblescape.markdownExample.showPages",
+          "when": "activeCustomEditorId == nimblescape.markdownExample.editor && !nimblescape.markdownExample.editor.pages",
+          "group": "navigation"
+        },
+        {
+          "command": "nimblescape.markdownExample.showEdit",
+          "when": "activeCustomEditorId == nimblescape.markdownExample.editor && nimblescape.markdownExample.editor.pages",
+          "group": "navigation"
+        },
+        {
           "command": "nimblescape.markdownExample.openText",
           "when": "activeCustomEditorId == nimblescape.markdownExample.editor",
           "group": "navigation"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "nimblescape.markdownExample.showPages",
+          "when": "activeCustomEditorId == nimblescape.markdownExample.editor"
+        },
+        {
+          "command": "nimblescape.markdownExample.showEdit",
+          "when": "activeCustomEditorId == nimblescape.markdownExample.editor"
         }
       ]
     }

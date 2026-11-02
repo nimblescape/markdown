@@ -10,12 +10,17 @@
 // the page a change of the document (src/messages.ts). VS Code does not say who made a change of the document, so the
 // page gives each such change the origin `program` with the name `vscode`.
 //
+// The page shows the editor ("Edit") or the pages of the file in its layout ("Pages", docs/rendering.md, R-LAYOUT-003).
+// The commands of the extension switch the view of the active panel; the context key `<view type>.pages` is true while
+// the active panel shows the pages, so that the title of the editor shows the button of the other view. For the pages,
+// the page reads the files of the layouts through the extension, only from the folders from which it may load files.
+//
 // The code gets the API of VS Code as a parameter and imports no module `vscode`, so that the tests give it an API of
 // their own; it uses no Node.js API, so that it runs in the extension host of the web as well.
 
 import { applyPatches, mergeTexts, patchesBetween, type TextSelection } from '@nimblescape/markdowntext';
 import type * as vscode from 'vscode';
-import { type HostMessage, type PageFonts, pageMessage, type PageMessage } from '../messages';
+import { type HostMessage, type PageFiles, type PageFolder, type PageFonts, pageMessage, type PageMessage, type PageView, toBase64 } from '../messages';
 import { newNonce, pageHtml } from './page';
 
 /** VsCode is the API of VS Code, the module `vscode` of the extension. */
@@ -48,6 +53,18 @@ export interface MarkdownEditorRegistration {
    * package.json of the extension contributes the command and its button in the title of the editor.
    */
   readonly openTextCommand?: string;
+  /**
+   * showPagesCommand and showEditCommand are the IDs of the commands that switch the active panel to the view "Pages"
+   * and back to "Edit" (docs/rendering.md, R-LAYOUT-003); the package.json of the extension contributes the commands
+   * and their buttons in the title of the editor, with the context key `<view type>.pages`.
+   */
+  readonly showPagesCommand?: string;
+  readonly showEditCommand?: string;
+  /**
+   * pagesScripts are the scripts of the pages, Paged.js last: the extension copies `paged.polyfill.js` of
+   * @nimblescape/markdownlayout to the folder of its scripts. The page may load them.
+   */
+  readonly pagesScripts?: readonly vscode.Uri[];
   /**
    * retainContextWhenHidden keeps the page while its tab is in the background, so that the editor keeps its Undo, its
    * scroll position and its selection. The default is true.
@@ -106,13 +123,25 @@ export function registerMarkdownEditor(api: VsCode, registration: MarkdownEditor
       webviewOptions: { retainContextWhenHidden: registration.retainContextWhenHidden ?? true },
     }),
   ];
+  /** panelOf returns the panel of a file, the active one when no file is given, as for the button in the title. */
+  const panelOf = (uri?: vscode.Uri): EditorPanel | undefined => {
+    const key = uri?.toString();
+    const matching = [...panels].filter((panel) => key === undefined || panel.uri.toString() === key);
+    return matching.find((candidate) => candidate.active) ?? matching[0];
+  };
+  for (const [command, view] of [
+    [registration.showPagesCommand, 'pages'],
+    [registration.showEditCommand, 'edit'],
+  ] as const) {
+    if (command) {
+      disposables.push(api.commands.registerCommand(command, (uri?: vscode.Uri) => panelOf(uri)?.setView(view)));
+    }
+  }
   if (registration.openTextCommand) {
     disposables.push(
       api.commands.registerCommand(registration.openTextCommand, async (uri?: vscode.Uri) => {
         // The button in the title of the editor gives the file; without it, the command takes the active editor.
-        const key = uri?.toString();
-        const matching = [...panels].filter((panel) => key === undefined || panel.uri.toString() === key);
-        const panel = matching.find((candidate) => candidate.active) ?? matching[0];
+        const panel = panelOf(uri);
         if (panel) {
           await panel.openText();
         } else if (uri) {
@@ -130,6 +159,9 @@ export function registerMarkdownEditor(api: VsCode, registration: MarkdownEditor
   };
 }
 
+/** slashed returns the address of a folder with a slash at its end. */
+const slashed = (address: string): string => (address.endsWith('/') ? address : `${address}/`);
+
 /** Sent is a version of the document that the extension sent to the page, with its text. */
 interface Sent {
   readonly version: number;
@@ -145,23 +177,39 @@ class EditorPanel {
   private lost = false;
   private disposed = false;
   private selection: TextSelection | undefined;
+  private view: PageView = 'edit';
+  /** folders are the folders from which the page may load and read files, with their addresses in the webview. */
+  private readonly folders: PageFolder[];
+  private readonly pagesScripts: string[];
+  /** top is the top folder of the search for a layout: the workspace folder of the file, else its folder. */
+  private readonly top: vscode.Uri | undefined;
   private readonly subscriptions: vscode.Disposable[] = [];
   /** listeners holds the listeners of the messages of the plugins, by the name of the plugin. */
   private readonly listeners = new Map<string, Set<(message: unknown) => void>>();
 
   constructor(
     private readonly api: VsCode,
-    registration: MarkdownEditorRegistration,
+    private readonly registration: MarkdownEditorRegistration,
     readonly document: vscode.TextDocument,
     private readonly panel: vscode.WebviewPanel,
   ) {
     const folder = (uri: vscode.Uri) => api.Uri.joinPath(uri, '..');
     const styles = registration.styles ?? [];
+    const scripts = registration.pagesScripts ?? [];
     const workspaceFolder = api.workspace.getWorkspaceFolder(document.uri)?.uri;
     const fileFolder = document.isUntitled ? undefined : folder(document.uri);
     const documentRoot = workspaceFolder ?? fileFolder;
-    const roots = [...(registration.resourceRoots ?? []), folder(registration.script), ...styles.map(folder), ...(documentRoot ? [documentRoot] : [])];
+    this.top = documentRoot;
+    const roots = [
+      ...(registration.resourceRoots ?? []),
+      folder(registration.script),
+      ...styles.map(folder),
+      ...scripts.map(folder),
+      ...(documentRoot ? [documentRoot] : []),
+    ];
     const webview = panel.webview;
+    this.folders = roots.map((root) => ({ folder: slashed(root.toString()), webview: slashed(webview.asWebviewUri(root).toString()) }));
+    this.pagesScripts = scripts.map((script) => webview.asWebviewUri(script).toString());
     webview.options = { enableScripts: true, localResourceRoots: roots };
     webview.html = pageHtml({
       webview,
@@ -188,6 +236,9 @@ class EditorPanel {
         // A message that VS Code could not give the page leaves the page behind: it starts again from the document.
         if (panel.visible && this.lost) {
           this.sendInit();
+        }
+        if (panel.active) {
+          this.showView();
         }
       }),
     );
@@ -222,6 +273,54 @@ class EditorPanel {
   /** active is true while the panel is the active editor. */
   get active(): boolean {
     return this.panel.active;
+  }
+
+  /**
+   * setView switches the page to a view (docs/rendering.md, R-LAYOUT-003).
+   * @param view - The view: "edit" or "pages".
+   */
+  setView(view: PageView): void {
+    this.view = view;
+    this.post({ type: 'view', view });
+    this.showView();
+  }
+
+  /** showView sets the context key of the view of the active panel, for the buttons in the title of the editor. */
+  private showView(): void {
+    if (this.panel.active && (this.registration.showPagesCommand || this.registration.showEditCommand)) {
+      void this.api.commands.executeCommand('setContext', `${this.registration.viewType}.pages`, this.view === 'pages');
+    }
+  }
+
+  /** files returns what the pages of the file need from the extension. */
+  private files(): PageFiles {
+    return {
+      document: this.document.uri.toString(),
+      ...(this.top ? { top: slashed(this.top.toString()) } : {}),
+      folders: this.folders,
+      sources: this.panel.webview.cspSource,
+      scripts: this.pagesScripts,
+    };
+  }
+
+  /**
+   * read answers the question of the page for a file of a layout with its bytes, or with nothing for a file outside
+   * the folders from which the page may load files and for a file that cannot be read.
+   */
+  private async read(message: Extract<PageMessage, { type: 'read' }>): Promise<void> {
+    let data: Uint8Array | undefined;
+    try {
+      const uri = this.api.Uri.parse(message.url, true);
+      const address = uri.toString();
+      if (this.folders.some((folder) => address.startsWith(folder.folder))) {
+        data = await this.api.workspace.fs.readFile(uri);
+      }
+    } catch {
+      data = undefined;
+    }
+    if (!this.disposed) {
+      this.panel.webview.postMessage({ type: 'file', id: message.id, ...(data ? { base64: toBase64(data) } : {}) } satisfies HostMessage).then(undefined, () => undefined);
+    }
   }
 
   /** openText opens the text editor of the file to the side, with the selection of the page (R-VSC-002). */
@@ -261,6 +360,13 @@ class EditorPanel {
       case 'openText':
         void this.openText();
         break;
+      case 'view':
+        this.view = message.view;
+        this.showView();
+        break;
+      case 'read':
+        void this.read(message);
+        break;
       case 'plugin':
         [...(this.listeners.get(message.plugin) ?? [])].forEach((listener) => listener(message.message));
         break;
@@ -298,7 +404,7 @@ class EditorPanel {
     this.texts.clear();
     this.remember(this.document.version, text);
     this.lost = false;
-    this.post({ type: 'init', text, version: this.document.version, editable: this.editable(), fonts: this.fonts() });
+    this.post({ type: 'init', text, version: this.document.version, editable: this.editable(), fonts: this.fonts(), view: this.view, files: this.files() });
   }
 
   /** sendText sends a change of the document that the page did not make. */

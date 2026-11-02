@@ -10,7 +10,7 @@
 import * as vscode from 'vscode';
 import { registerMarkdownEditor } from '@nimblescape/markdownvscode';
 
-/** activate registers the editor and the command that opens the text editor to the side. */
+/** activate registers the editor, the command that opens the text editor to the side and the commands of the views. */
 export function activate(context: vscode.ExtensionContext): void {
   const dist = vscode.Uri.joinPath(context.extensionUri, 'dist');
   context.subscriptions.push(
@@ -19,6 +19,10 @@ export function activate(context: vscode.ExtensionContext): void {
       script: vscode.Uri.joinPath(dist, 'webview.js'),
       styles: [vscode.Uri.joinPath(dist, 'markdown.css'), vscode.Uri.joinPath(dist, 'vscode.css')],
       openTextCommand: 'nimblescape.markdownExample.openText',
+      showPagesCommand: 'nimblescape.markdownExample.showPages',
+      showEditCommand: 'nimblescape.markdownExample.showEdit',
+      // The build copies the script of Paged.js of @nimblescape/markdownlayout to dist/.
+      pagesScripts: [vscode.Uri.joinPath(dist, 'paged.polyfill.js')],
     }),
   );
 }

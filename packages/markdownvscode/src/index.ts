@@ -10,4 +10,15 @@
 
 export { registerMarkdownEditor, type MarkdownEditorRegistration, type PluginPanelChannel, type VsCode } from './extension/editor';
 export { escaped, newNonce, pageHtml, type PageOptions } from './extension/page';
-export { editorElementId, pageMessage, type HostMessage, type PageFonts, type PageMessage, type PluginMessage } from './messages';
+export {
+  editorElementId,
+  pageMessage,
+  pagesElementId,
+  type HostMessage,
+  type PageFiles,
+  type PageFolder,
+  type PageFonts,
+  type PageMessage,
+  type PageView,
+  type PluginMessage,
+} from './messages';

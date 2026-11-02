@@ -114,6 +114,60 @@ document that the page did not make reaches the editor with the origin
 of the editor; a key that the editor handles starts no key binding of VS
 Code ([R-VSC-006](../../docs/platforms.md#r-vsc-006)).
 
+## The pages
+
+The page of the webview also has a frame for the pages of the file in its
+layout ([R-VSC-007](../../docs/platforms.md#r-vsc-007)). The registration
+names two commands, one for each view, and the scripts of the pages, for
+example the script of Paged.js of `@nimblescape/markdownlayout`, which the
+extension copies to its folder `dist/`:
+
+```ts
+registerMarkdownEditor(vscode, {
+  // …
+  showPagesCommand: 'publisher.extension.showPages',
+  showEditCommand: 'publisher.extension.showEdit',
+  pagesScripts: [vscode.Uri.joinPath(dist, 'paged.polyfill.js')],
+});
+```
+
+The context key `publisher.extension.editor.pages`, the view type with
+`.pages`, is true while the active editor shows the pages, so that the title
+of the editor shows the button of the other view:
+
+```json
+{
+  "command": "publisher.extension.showPages",
+  "when": "activeCustomEditorId == publisher.extension.editor && !publisher.extension.editor.pages",
+  "group": "navigation"
+}
+```
+
+On the page, `connection.pages` is the host of the pages, which reads the
+files of the layouts through the extension, and `connection.pagesFrame` is
+the frame. `connection.view` is the view, `connection.onView` tells each
+change of it, and `connection.setView` changes it:
+
+```ts
+import { createLayoutRenderer, LivePages } from '@nimblescape/markdownlayout';
+
+const host = connection.pages;
+const pages = new LivePages(connection.pagesFrame, {
+  host,
+  renderer: createLayoutRenderer({ plugins }),
+  document: host.document,
+  embed: host.embed,
+  source: connection.source,
+  onDoubleClick: ({ offset }) => {
+    connection.setView('edit');
+    editor.goToText(offset);
+  },
+});
+const follow = (view: string) => (view === 'pages' ? pages.show() : pages.hide());
+connection.onView(follow);
+follow(connection.view);
+```
+
 ## The plugins
 
 `connection.host` is the API of the platform for the plugins of the editor

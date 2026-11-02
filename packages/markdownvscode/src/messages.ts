@@ -17,11 +17,20 @@
 // - A message whose patches do not start at the version that the page knows makes the page send `ready` again.
 // - The message `plugin` carries a message of a plugin of the editor between its part on the page and its part in the
 //   extension, in both directions (docs/plugins.md, R-PLUGIN-001).
+// - The message `view` switches the page between the views "Edit" and "Pages" (docs/rendering.md, R-LAYOUT-003), in
+//   both directions: the extension sends it for its commands, the page for a switch of its own, for example after a
+//   double click on a page.
+// - For the pages, the page asks with `read` for a file of a layout, and the extension answers with `file`, the bytes
+//   of the file in Base64 or nothing: VS Code gives the page the messages as JSON, which has no bytes. The extension
+//   reads only the files of the folders from which the page may load files.
 
 import type { TextPatch, TextSelection } from '@nimblescape/markdowntext';
 
 /** editorElementId is the ID of the element of the page that holds the editor. */
 export const editorElementId = 'nsmd-editor';
+
+/** pagesElementId is the ID of the frame of the page that holds the pages of the file. */
+export const pagesElementId = 'nsmd-pages';
 
 /** PageFonts are the fonts of the text, from the settings of the Markdown preview of VS Code (R-THEME-003). */
 export interface PageFonts {
@@ -33,9 +42,42 @@ export interface PageFonts {
   readonly lineHeight?: number;
 }
 
+/** PageView is a view of the page: the editor ("Edit") or the pages of the file in its layout ("Pages"). */
+export type PageView = 'edit' | 'pages';
+
+/** PageFolder is a folder from which the page may load files, with its address in the webview. */
+export interface PageFolder {
+  /** folder is the URI of the folder, with a slash at its end. */
+  readonly folder: string;
+  /** webview is the address of the folder in the webview, with a slash at its end. */
+  readonly webview: string;
+}
+
+/** PageFiles are what the pages of the file need from the extension (docs/rendering.md, R-LAYOUT-003). */
+export interface PageFiles {
+  /** document is the URI of the file. */
+  readonly document: string;
+  /** top is the URI of the top folder of the search for a layout: the workspace folder of the file, else its folder. */
+  readonly top?: string;
+  /** folders are the folders from which the page may load files. */
+  readonly folders: readonly PageFolder[];
+  /** sources is the source of the webview for the policy of a page. */
+  readonly sources: string;
+  /** scripts are the addresses of the scripts of the pages in the webview, Paged.js last. */
+  readonly scripts: readonly string[];
+}
+
 /** HostMessage is a message from the extension to the page. */
 export type HostMessage =
-  | { readonly type: 'init'; readonly text: string; readonly version: number; readonly editable: boolean; readonly fonts: PageFonts }
+  | {
+      readonly type: 'init';
+      readonly text: string;
+      readonly version: number;
+      readonly editable: boolean;
+      readonly fonts: PageFonts;
+      readonly view: PageView;
+      readonly files: PageFiles;
+    }
   | { readonly type: 'text'; readonly from: number; readonly version: number; readonly patches: readonly TextPatch[] }
   | {
       readonly type: 'applied';
@@ -46,6 +88,8 @@ export type HostMessage =
       readonly patches: readonly TextPatch[];
     }
   | { readonly type: 'fonts'; readonly fonts: PageFonts }
+  | { readonly type: 'view'; readonly view: PageView }
+  | { readonly type: 'file'; readonly id: number; readonly base64?: string }
   | PluginMessage;
 
 /** PluginMessage is a message of a plugin of the editor, by the name of the plugin, in both directions. */
@@ -64,7 +108,35 @@ export type PageMessage =
   | { readonly type: 'edit'; readonly id: number; readonly base: number; readonly patches: readonly TextPatch[] }
   | { readonly type: 'selection'; readonly selection: TextSelection }
   | { readonly type: 'openText' }
+  | { readonly type: 'view'; readonly view: PageView }
+  | { readonly type: 'read'; readonly id: number; readonly url: string }
   | PluginMessage;
+
+/**
+ * toBase64 returns the bytes of a file as Base64, in parts, so that a large file does not exceed the number of the
+ * arguments of a function.
+ * @param bytes - The bytes.
+ */
+export function toBase64(bytes: Uint8Array): string {
+  let binary = '';
+  for (let start = 0; start < bytes.length; start += 0x8000) {
+    binary += String.fromCharCode(...bytes.subarray(start, start + 0x8000));
+  }
+  return btoa(binary);
+}
+
+/**
+ * fromBase64 returns the bytes of a text in Base64.
+ * @param text - The text.
+ */
+export function fromBase64(text: string): Uint8Array {
+  const binary = atob(text);
+  const bytes = new Uint8Array(binary.length);
+  for (let index = 0; index < binary.length; index++) {
+    bytes[index] = binary.charCodeAt(index);
+  }
+  return bytes;
+}
 
 /** isRecord is true for an object that is no array. */
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -98,6 +170,10 @@ export function pageMessage(value: unknown): PageMessage | undefined {
       return isCount(value.id) && isCount(value.base) && isPatches(value.patches) ? { type: 'edit', id: value.id, base: value.base, patches: value.patches } : undefined;
     case 'plugin':
       return typeof value.plugin === 'string' && pluginName.test(value.plugin) ? { type: 'plugin', plugin: value.plugin, message: value.message } : undefined;
+    case 'view':
+      return value.view === 'edit' || value.view === 'pages' ? { type: 'view', view: value.view } : undefined;
+    case 'read':
+      return isCount(value.id) && typeof value.url === 'string' ? { type: 'read', id: value.id, url: value.url } : undefined;
     case 'selection': {
       const selection = value.selection;
       return isRecord(selection) && isCount(selection.anchor) && isCount(selection.head)
