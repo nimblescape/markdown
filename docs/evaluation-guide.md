@@ -209,8 +209,10 @@ The cognitive process "apply" points to neither class. A student who writes
 a loop that the course has just taught applies what was learned and does
 original work, because the code is new. A formatter applies a given rule and
 does routine work, because the rule fixes the result. The cognitive process
-is always the process of the party that did the work, so that a report can
-compare it with the level of a learning objective (section 12).
+is always the process of the party that did the work. It is a code of the
+evaluation and not the level of a learning objective of a course: the report
+does not take over the levels of the learning objectives of a course and
+does not compare its codes with them.
 
 When the codes point to both classes, the classifier splits the episode into
 its parts and classifies each part. The work of an answer of the AI has the
@@ -404,6 +406,10 @@ on the command line or on a server. The rules of a course may state:
 - the level of AI use that the assignment allows, and the report shows the
   work beside this level;
 - goals, for example a minimum share of own intellectual work;
+- *(proposal)* the learning objectives of the assignment and the parts of
+  the work that belong to each, for example the requirements of its README;
+  the report then groups the measures by these objectives, without their
+  levels;
 - whether the teacher may see an overview of the course that compares
   students.
 

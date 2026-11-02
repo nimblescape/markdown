@@ -139,8 +139,9 @@ class: a student who writes a loop that the course has just taught applies
 what was learned and does original work, because the code is new; a
 formatter applies a given rule and does routine work, because the rule fixes
 the result. The cognitive process is always the process of the party that
-did the work, so that it can be compared with the level of a learning
-objective ([R-EVAL-014](#r-eval-014)).
+did the work. It is a code of the evaluation and not the level of a learning
+objective of a course: the evaluation does not take over the levels of the
+learning objectives of a course and does not compare its codes with them.
 
 ### R-EVAL-004
 
@@ -321,7 +322,11 @@ The student sees the same evaluation as the teacher. *(proposal)* A teacher
 evaluates all assignments of a course in one run, on the command line or on
 a server. The rules of a course may state the level of AI use that the
 assignment allows, after the AI Assessment Scale (Perkins et al., 2024), and
-the evaluation shows the work beside this level.
+the evaluation shows the work beside this level. *(proposal)* The rules of a
+course may name the learning objectives of an assignment and the parts of
+the work that belong to each, for example the requirements of its README;
+the evaluation then groups its measures by these objectives, without their
+levels ([R-EVAL-003](#r-eval-003)).
 
 ### R-EVAL-015
 
