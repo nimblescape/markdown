@@ -1,0 +1,32 @@
+{
+  "format": "nimblescape-layout 1.0.0",
+  "name": "Plain",
+  "language": "en-US",
+  "stylesheets": ["page.css"],
+  "before": ["title.html"],
+  "after": [],
+  "fields": {
+    "title": {
+      "description": "The title of the document: on the first page, in the title of the PDF and in the name of its file.",
+      "required": true
+    },
+    "subtitle": {
+      "description": "The subtitle, below the title. Leave it out for no subtitle."
+    },
+    "author": {
+      "description": "The name of the author, below the title, in the footer and in the metadata of the PDF."
+    },
+    "date": {
+      "description": "The date of the document as it shows below the author, for example 30 October 2026."
+    }
+  },
+  "headings": {
+    "numbered": true,
+    "depth": 3
+  },
+  "contents": {
+    "depth": 3
+  },
+  "hyphenate": true,
+  "pdfName": "{{file}}"
+}

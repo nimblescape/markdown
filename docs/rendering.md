@@ -97,11 +97,54 @@ example the layout `plain` and the layouts of PHT. Each layout has a JSON
 schema of the front matter of its documents
 ([R-FM-004](editor.md#r-fm-004)).
 
+*(proposal)* The layout part is the package `@nimblescape/markdownlayout`. A
+layout is a folder with `layout.json` in the layout folder format
+`nimblescape-layout` of Markdown Paper, version 1.1.0: its style sheets, the
+templates of its fixed pages, its fields, its language and its rules for
+headings, contents, hyphens, listings and the name of the PDF. Version 1.1.0
+adds the field `frontMatterSchema`, the file of the JSON schema of the front
+matter in the layout folder; the layout gets its fields from the schema when
+`layout.json` gives none, and a layout without the file gets the schema of
+its fields. The package reads the layouts of the format 1.0.0 of Paper
+without a change. A document names its layout with the field `layout` of
+its front matter: the folder `layouts/<name>/` in the folder of the document
+or in a folder above it, up to the top folder of the search; a layout that
+the integrating code finds, for a name with `/`, for example a layout on
+GitHub in its clone; else a built-in layout. A document without the field,
+or with a layout that does not exist, gets the built-in layout `plain`,
+which the package holds. The fields of the front matter in YAML, TOML or
+JSON fill the templates, and the field `lang` gives the layout its language.
+The page of a document is one HTML page with the style sheets of the layout,
+the fields as CSS variables and attributes, the filled templates, the text
+and the scripts; it lets only its own scripts run, and a template holds no
+script.
+
 ### R-LAYOUT-004
 
 **The layout code of Paper.** The layout part must hold the layout code of
 Markdown Paper: Paper adds only its own parts to the layout, through its
 plugins ([R-PAPER-001](plugins.md#r-paper-001)).
+
+*(proposal)* The layout is a plugin of the renderer
+([R-REN-002](#r-ren-002)) whose rule works only in a rendering with a
+layout, so that the same renderer renders a text with and without a layout.
+In a rendering with a layout, each footnote goes to the foot of the page of
+its first reference, and a link to the outside with its own text gets its
+address in a footnote; the headings get numbers to the depth of the layout,
+except the special sections (table of contents, lists of figures, tables
+and listings, reference list, declaration, abstract, acknowledgements,
+foreword, appendix), which the words of the language or a marker such as
+`{BIB}` name; the document has a front part, a body and an appendix part;
+the captions of figures, tables and listings keep the numbers of the file
+and get the next number otherwise, with the letter of the appendix in the
+appendix part; the special section of a list shows the list; a link whose
+text is a word and a number gets the label of its target; and the text gets
+soft hyphens by the language of the layout. The headings keep the IDs that
+GitHub gives them. The classes, the IDs and the event `paper-rendered` are
+those of the layout folder format of Paper, so that the layouts of Paper
+work without a change. The removal of the notes is a plugin of Markdown
+Notes, and the cite of the source of a listing with its link is a plugin of
+Paper, which writes the cite after the caption.
 
 ## 4. Pages and PDF
 
@@ -118,12 +161,22 @@ editor between "Edit" and "Pages"; in "Pages", the highlights of the notes
 and "Add Note" work, and a double click on a page goes to that place in
 "Edit".
 
+*(proposal)* The view of the pages shows the page of the document in a
+frame, so that the style sheets of the layout change only the frame. The
+page holds Paged.js until the functions of the plugins have shown their
+tokens in the frame; Paged.js then starts when the page has not changed for
+200 ms, at the latest 10 s after the page loaded. On a screen, the pages
+stand on a grey background with a gap between them; the PDF has no screen
+styles.
+
 ## 5. Open questions
 
 1. Pages: the switch between "Edit" and "Pages"
    ([R-LAYOUT-003](#r-layout-003), proposal)?
-2. Schema of a layout: the file `frontmatter.schema.json` in the layout
-   folder, named in `layout.json`, replaces the field `fields` (proposal)?
+2. Schema of a layout: the file of the schema in the layout folder, for
+   example `frontmatter.schema.json`, named in the field
+   `frontMatterSchema` of `layout.json`, gives the fields when `layout.json`
+   has none (format 1.1.0, [R-LAYOUT-001](#r-layout-001), proposal)?
 3. Raw HTML in a rendering: the safe way with a fixed list of elements by
    default ([R-REN-001](#r-ren-001), proposal), or a sanitizer library, whose
    license needs a decision ([R-GEN-011](specification.md#r-gen-011))?

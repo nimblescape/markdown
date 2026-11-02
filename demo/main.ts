@@ -11,9 +11,12 @@
 // the form to the edit of the keys. The example plugin (examplePlugin.ts) shows the plugin API: a CSV table at the level
 // "render", a read-only citation and a thread beside the text. The button "Rendering" shows the rendering of the
 // renderer (docs/rendering.md, R-REN-001) in place of the text field: the same text as HTML without edit functions,
-// with the same plugin, which follows each change.
+// with the same plugin, which follows each change. The button "Pages" shows the pages of the text in the built-in
+// layout plain (R-LAYOUT-001 to R-LAYOUT-003): the title page from the front matter, the numbered headings, the
+// footnotes at the foot of their pages, made by Paged.js in a frame, with the same plugin.
 
 import { MarkdownEditor } from '@nimblescape/markdowneditor';
+import { createLayoutRenderer, type Host, type PagesView, renderPage, showPages } from '@nimblescape/markdownlayout';
 import { MarkdownRenderer } from '@nimblescape/markdownrender';
 import { TextSource, type JsonSchema, type TextChange } from '@nimblescape/markdowntext';
 import { examplePlugin } from './examplePlugin';
@@ -34,6 +37,7 @@ const schema: JsonSchema = {
 
 const sample = `---
 title: An example  # the title
+author: nimblescape
 date: 2026-11-02
 lang: en
 tags:
@@ -93,7 +97,9 @@ const status = document.querySelector<HTMLOutputElement>('#status');
 const rendering = document.querySelector<HTMLElement>('#rendering');
 const showText = document.querySelector<HTMLButtonElement>('#show-text');
 const showRendering = document.querySelector<HTMLButtonElement>('#show-rendering');
-if (!textArea || !element || !status || !rendering || !showText || !showRendering) {
+const pages = document.querySelector<HTMLIFrameElement>('#pages');
+const showPagesButton = document.querySelector<HTMLButtonElement>('#show-pages');
+if (!textArea || !element || !status || !rendering || !showText || !showRendering || !pages || !showPagesButton) {
   throw new Error('The example page misses an element.');
 }
 
@@ -140,20 +146,61 @@ const render = () => {
   stopRendering();
   stopRendering = renderer.render(source.text, rendering);
 };
-const show = (text: boolean) => {
-  textArea.hidden = !text;
-  rendering.hidden = text;
-  showText.setAttribute('aria-pressed', String(text));
-  showRendering.setAttribute('aria-pressed', String(!text));
-  if (!text) {
+
+// The pages: the example page has no files, so the text has the built-in layout plain, and the page of the pages
+// loads Paged.js from dist/ of the example page. The pages show again 600 ms after a change, at the same place.
+const layoutRenderer = createLayoutRenderer({ plugins: [plugin] });
+const nonce = Array.from(crypto.getRandomValues(new Uint8Array(16)), (byte) => byte.toString(16).padStart(2, '0')).join('');
+const host: Host = {
+  reader: { read: async () => undefined },
+  resource: (url) => url,
+  sources: location.origin,
+  scripts: [{ src: new URL('dist/paged.polyfill.js', location.href).href }],
+  nonce,
+};
+let view: PagesView | undefined;
+let pagesTimer: ReturnType<typeof setTimeout> | undefined;
+let pagesVersion = -1;
+const renderPages = async () => {
+  const version = source.version;
+  const page = await renderPage(host, layoutRenderer, new URL('example.md', location.href).href, source.text, { hold: true });
+  if (version !== source.version || pages.hidden) {
+    return;
+  }
+  const top = pages.contentWindow?.scrollY ?? 0;
+  view?.dispose();
+  view = showPages(pages, page, layoutRenderer);
+  pagesVersion = version;
+  view.rendered.then(
+    () => pages.contentWindow?.scrollTo(0, top),
+    () => undefined,
+  );
+};
+
+/** show shows the text field, the rendering or the pages on the right side. */
+const show = (side: 'text' | 'rendering' | 'pages') => {
+  textArea.hidden = side !== 'text';
+  rendering.hidden = side !== 'rendering';
+  pages.hidden = side !== 'pages';
+  showText.setAttribute('aria-pressed', String(side === 'text'));
+  showRendering.setAttribute('aria-pressed', String(side === 'rendering'));
+  showPagesButton.setAttribute('aria-pressed', String(side === 'pages'));
+  if (side === 'rendering') {
     render();
+  } else if (side === 'pages' && pagesVersion !== source.version) {
+    void renderPages();
   }
 };
-showText.addEventListener('click', () => show(true));
-showRendering.addEventListener('click', () => show(false));
+showText.addEventListener('click', () => show('text'));
+showRendering.addEventListener('click', () => show('rendering'));
+showPagesButton.addEventListener('click', () => show('pages'));
 source.onChange(() => {
   if (!rendering.hidden) {
     clearTimeout(renderTimer);
     renderTimer = setTimeout(render, 150);
+  }
+  if (!pages.hidden) {
+    clearTimeout(pagesTimer);
+    pagesTimer = setTimeout(() => void renderPages(), 600);
   }
 });

@@ -19,6 +19,7 @@
   "workspaces": [
     "packages/markdowntext",
     "packages/markdownrender",
+    "packages/markdownlayout",
     "packages/markdowneditor",
     "packages/markdownvscode"
   ],

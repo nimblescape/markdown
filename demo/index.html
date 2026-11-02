@@ -58,6 +58,13 @@ Licensed under the MIT License. See LICENSE in the repository root for details.
         box-sizing: border-box;
         border-left: 1px solid GrayText;
       }
+      #pages {
+        width: 100%;
+        height: calc(100vh - 3.5em);
+        box-sizing: border-box;
+        border: none;
+        border-left: 1px solid GrayText;
+      }
       #markdown {
         width: 100%;
         box-sizing: border-box;
@@ -84,12 +91,14 @@ Licensed under the MIT License. See LICENSE in the repository root for details.
       <div role="group" aria-label="The right side">
         <button id="show-text" type="button" aria-pressed="true">Text</button>
         <button id="show-rendering" type="button" aria-pressed="false">Rendering</button>
+        <button id="show-pages" type="button" aria-pressed="false">Pages</button>
       </div>
     </header>
     <main>
       <div id="editor"></div>
       <textarea id="markdown" spellcheck="false" aria-label="The Markdown text of the editor"></textarea>
       <div id="rendering" class="nsmd-document nsmd-content" aria-label="The rendering of the renderer" hidden></div>
+      <iframe id="pages" title="The pages of the text in the layout plain" hidden></iframe>
     </main>
     <script src="dist/demo.js"></script>
   </body>

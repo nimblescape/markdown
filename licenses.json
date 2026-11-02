@@ -1,6 +1,12 @@
 {
   "about": "The license that was decided for each package that the packages of the workspaces need at run time (docs/specification.md, R-GEN-011). npm run licenses checks package-lock.json against this file.",
   "packages": {
+    "@babel/polyfill": {
+      "license": "MIT"
+    },
+    "@babel/runtime": {
+      "license": "MIT"
+    },
     "@cfworker/json-schema": {
       "license": "MIT"
     },
@@ -104,6 +110,18 @@
       "license": "Python-2.0",
       "note": "Only the command line program of markdown-it uses it; no bundle of the editor holds it."
     },
+    "clear-cut": {
+      "license": "MIT"
+    },
+    "core-js": {
+      "license": "MIT"
+    },
+    "css-tree": {
+      "license": "MIT"
+    },
+    "d": {
+      "license": "ISC"
+    },
     "diff": {
       "license": "BSD-3-Clause"
     },
@@ -111,8 +129,29 @@
       "license": "BSD-2-Clause",
       "note": "markdown-it decodes character references with it; the notices of a bundle hold its license."
     },
+    "es5-ext": {
+      "license": "ISC"
+    },
+    "es6-iterator": {
+      "license": "MIT"
+    },
+    "es6-symbol": {
+      "license": "ISC"
+    },
+    "esniff": {
+      "license": "ISC"
+    },
+    "event-emitter": {
+      "license": "MIT"
+    },
+    "ext": {
+      "license": "ISC"
+    },
     "get-east-asian-width": {
       "license": "MIT"
+    },
+    "hyphen": {
+      "license": "ISC"
     },
     "jsonc-parser": {
       "license": "MIT"
@@ -132,10 +171,19 @@
     "markdown-it-task-lists": {
       "license": "ISC"
     },
+    "mdn-data": {
+      "license": "CC0-1.0"
+    },
     "mdurl": {
       "license": "MIT"
     },
+    "next-tick": {
+      "license": "ISC"
+    },
     "orderedmap": {
+      "license": "MIT"
+    },
+    "pagedjs": {
       "license": "MIT"
     },
     "prosemirror-changeset": {
@@ -183,14 +231,23 @@
     "punycode.js": {
       "license": "MIT"
     },
+    "regenerator-runtime": {
+      "license": "MIT"
+    },
     "rope-sequence": {
       "license": "MIT"
+    },
+    "source-map": {
+      "license": "BSD-3-Clause"
     },
     "string-width": {
       "license": "MIT"
     },
     "strip-ansi": {
       "license": "MIT"
+    },
+    "type": {
+      "license": "ISC"
     },
     "uc.micro": {
       "license": "MIT"
