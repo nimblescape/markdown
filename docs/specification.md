@@ -155,8 +155,7 @@ layout run without the editor.
 
 **Names of the npm packages.** The name of each npm package of the libraries
 must start with `markdown` in the scope `@nimblescape`, without a hyphen, in
-the same way as `@nimblescape/markdownnotes` and
-`@nimblescape/markdownpaper`.
+the same way as `@nimblescape/markdownnotes`.
 
 **One npm package for each part.** The libraries must have one npm package
 for each part: `@nimblescape/markdowntext` (source),
@@ -183,10 +182,11 @@ tool must not be `history`, because its folder `.history/`
 ([R-GEN-007](#r-gen-007)) is the folder of the VS Code extension "Local
 History", and the gitignore template of GitHub for Visual Studio lets Git
 ignore it. The name of the tool is `workhistory`, with the folder
-`.workhistory/`: the repository is `nimblescape/workhistory-vscode`, in the
-form of the other nimblescape extensions with an npm package, and its npm
-packages are `@nimblescape/workhistory` (the history) and
-`@nimblescape/workhistoryevaluation` (the evaluation plugin), in the same
+`.workhistory/`: the repository is `majikmate/workhistory-vscode`
+([R-ARCH-005](#r-arch-005)), in the form of the other nimblescape extensions
+with an npm package, and its npm packages are `@majikmate/workhistory` (the
+history) and `@majikmate/workhistoryevaluation` (the evaluation plugin), in
+the same
 way as the names of the packages of nimblescape Markdown start with
 `markdown`. Until the repository exists, the documents of the history and
 of the evaluation plugin stay in this repository.
@@ -199,11 +199,23 @@ feedback files, with a comment of the format and instructions for AI agents,
 and it reads these files as structured data
 ([R-COURSE-001](course.md#r-course-001)). It is a product of its own, not a
 part of nimblescape Markdown or of the history: the repository
-`nimblescape/course-vscode`, the npm package `@nimblescape/course` and the
+`majikmate/course-vscode`, the npm package `@majikmate/course` and the
 folder `.course/` ([R-COURSE-002](course.md#r-course-002)). Its extension
 builds on the history extension, and it is the adapter of a course for the
 evaluation ([R-COURSE-003](course.md#r-course-003)). Until the repository
 exists, its document stays in this repository.
+
+### R-ARCH-005
+
+**Owners of the products.** majikmate owns Markdown Paper, the history with
+its evaluation and the course module: their repositories are
+`majikmate/markdownpaper-vscode`, `majikmate/workhistory-vscode` and
+`majikmate/course-vscode`. nimblescape owns the libraries of nimblescape
+Markdown and Markdown Notes. *(proposal)* The scope of the npm packages and
+the publisher of the VS Code extensions follow the owner, for example
+`@majikmate/markdownpaper`. Until the repository of Markdown Paper moves to
+majikmate, its address stays `nimblescape/markdownpaper-vscode`, and GitHub
+forwards the old address after the move.
 
 ## 4. Documents
 
@@ -217,7 +229,7 @@ repository of its own. The same holds for the course module
 
 | Document | Content | Requirements |
 | --- | --- | --- |
-| [Specification](specification.md), this document | Scope, terms, architecture, libraries, licenses and release, plan | [R-GEN-001](#r-gen-001), [R-GEN-015](#r-gen-015), [R-ARCH-001](#r-arch-001), [R-GEN-010](#r-gen-010), [R-ARCH-002](#r-arch-002), [R-ARCH-003](#r-arch-003), [R-ARCH-004](#r-arch-004), [R-GEN-011](#r-gen-011), [R-GEN-007](#r-gen-007) |
+| [Specification](specification.md), this document | Scope, terms, architecture, libraries, licenses and release, plan | [R-GEN-001](#r-gen-001), [R-GEN-015](#r-gen-015), [R-ARCH-001](#r-arch-001), [R-GEN-010](#r-gen-010), [R-ARCH-002](#r-arch-002), [R-ARCH-003](#r-arch-003), [R-ARCH-004](#r-arch-004), [R-ARCH-005](#r-arch-005), [R-GEN-011](#r-gen-011), [R-GEN-007](#r-gen-007) |
 | [Source](source.md) | The text, the selections and the changes; the formats of the front matter and of the files | [R-SRC-001](source.md#r-src-001) to [R-SRC-003](source.md#r-src-003), [R-GEN-006](source.md#r-gen-006) |
 | [Editor](editor.md) | The editors of a file and the rendered Markdown editor: the round trip, the interaction, tables, the read-only mode and the read-only generated parts, the mode to learn Markdown, the form of the front matter, threads beside the text | [R-GEN-002](editor.md#r-gen-002), [R-EDIT-001](editor.md#r-edit-001) to [R-EDIT-011](editor.md#r-edit-011), [R-GEN-009](editor.md#r-gen-009), [R-GEN-003](editor.md#r-gen-003), [R-GEN-008](editor.md#r-gen-008), [R-GEN-013](editor.md#r-gen-013), [R-FM-001](editor.md#r-fm-001) to [R-FM-006](editor.md#r-fm-006), [R-GEN-014](editor.md#r-gen-014) |
 | [Renderer and layout](rendering.md) | The renderer: content without edit functions, plugins of the renderer. The layout: layouts, pages and PDF | [R-REN-001](rendering.md#r-ren-001) to [R-REN-003](rendering.md#r-ren-003), [R-LAYOUT-001](rendering.md#r-layout-001) to [R-LAYOUT-004](rendering.md#r-layout-004) |

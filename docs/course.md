@@ -16,7 +16,7 @@ write these files in the same way. It is normative in the same way as the
 recommendation, and "may" an option; a requirement marked *(proposal)* is
 not decided yet, and [section 7](#7-open-questions) lists these open
 questions. Each requirement has an ID as its heading. Until the repository
-`nimblescape/course-vscode` exists, this document stays in this repository.
+`majikmate/course-vscode` exists, this document stays in this repository.
 
 ## 1. Scope
 
@@ -36,12 +36,13 @@ to the feedback program ([R-FEED-004](#r-feed-004)).
 ### R-COURSE-002
 
 **Product, names and folders.** The course module is a product of its own,
-in the form of the other nimblescape extensions with an npm package
+in the same form as the nimblescape extensions with an npm package
 ([R-GEN-007](specification.md#r-gen-007)): the repository
-`nimblescape/course-vscode`, the npm package `@nimblescape/course`, a VS Code
-extension, and the folder `.course/` for the files that it keeps in the
-repository of a course. *(proposal)* The command of the package is `course`,
-and the comment of the format names the format `nimblescape-course`.
+`majikmate/course-vscode` ([R-ARCH-005](specification.md#r-arch-005)), a VS
+Code extension, and the folder `.course/` for the files that it keeps in the
+repository of a course. *(proposal)* The npm package is `@majikmate/course`,
+its command is `course`, and the comment of the format names the format
+`majikmate-course`.
 
 ### R-COURSE-003
 
@@ -82,10 +83,10 @@ as the comment of the format of Markdown Notes
 
 - *(proposal)* The first line names the format, its version, the kind of
   the file and the address of the specification:
-  `<!-- nimblescape-course v1.0.0 assignment spec=https://github.com/nimblescape/course-vscode/blob/main/docs/format.md`.
+  `<!-- majikmate-course v1.0.0 assignment spec=https://github.com/majikmate/course-vscode/blob/main/docs/format.md`.
   The kind is `course`, `chapter`, `assignment` or `feedback`.
 - Short lines of words follow, which tell an AI agent to print the rules of
-  the kind of the file with `npx -y @nimblescape/course instructions <kind>`
+  the kind of the file with `npx -y @majikmate/course instructions <kind>`
   ([R-COURSE-005](#r-course-005)) before it reads, changes or writes the
   file. The last line is `-->`. GitHub and the Markdown preview do not show
   the comment.
@@ -137,8 +138,9 @@ columns number, learning objective, description and level:
   whole course.
 - *(proposal)* The level is `K<n> – <name>`, with the six levels of the
   revised taxonomy (Krathwohl, 2002): K1 Remember, K2 Understand, K3 Apply,
-  K4 Analyze, K5 Evaluate, K6 Create; in German Erinnern, Verstehen,
-  Anwenden, Analysieren, Bewerten, Erschaffen. A program reads the level
+  K4 Analyze (Analyse in a course in British English), K5 Evaluate, K6
+  Create; in German Erinnern, Verstehen, Anwenden, Analysieren, Bewerten,
+  Erschaffen. A program reads the level
   only from its number; the name is for people.
 - The description says how the objective shows in the work of the student.
 
@@ -205,7 +207,7 @@ rules that serve each; and the allowed level of AI use and the goals, when
 the course gives them. The README and the feedback file are not parts of the
 work of the student. In VS Code, the course extension registers the adapter
 with the history extension; on the command line and on a server,
-`@nimblescape/course` is the adapter package that the evaluation loads.
+`@majikmate/course` is the adapter package that the evaluation loads.
 
 ### R-COURSE-012
 
@@ -260,14 +262,14 @@ feedback links to the evaluation of the same state of the work.
 reader of the module ([R-COURSE-009](#r-course-009)) and write the feedback
 file in the form of [R-FEED-001](#r-feed-001). *(proposal)* The first
 feedback program is `majikmate/course-feedback`: it installs
-`@nimblescape/course` from GitHub at a fixed commit, and it keeps its checks,
+`@majikmate/course` from GitHub at a fixed commit, and it keeps its checks,
 skills, engines and prompts, its own rules of the feedback and the rules of
 each course for the feedback.
 
 ## 7. Open questions
 
-1. Names: is `nimblescape` the owner of `course-vscode`, and is `course` the
-   name of the command ([R-COURSE-002](#r-course-002))?
+1. Names: is `course` the name of the command
+   ([R-COURSE-002](#r-course-002))?
 2. Level of AI use: where does an assignment state the level of AI use that
    it allows: a line at the head of its README, its chapter, or
    `.course/course.yml` ([R-COURSE-011](#r-course-011))?

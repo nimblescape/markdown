@@ -374,7 +374,7 @@ history ([R-ARCH-003](specification.md#r-arch-003)): it lives in the
 repository of the history, and the history extension of VS Code holds it and
 shows its views ([R-VSC-004](history.md#r-vsc-004)). It must be a package of
 its own, so that it runs without the recorder, for example on a server.
-The npm package is `@nimblescape/workhistoryevaluation`.
+The npm package is `@majikmate/workhistoryevaluation`.
 
 ### R-EVAL-021
 
