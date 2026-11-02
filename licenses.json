@@ -104,6 +104,9 @@
       "license": "Python-2.0",
       "note": "Only the command line program of markdown-it uses it; no bundle of the editor holds it."
     },
+    "diff": {
+      "license": "BSD-3-Clause"
+    },
     "entities": {
       "license": "BSD-2-Clause",
       "note": "markdown-it decodes character references with it; the notices of a bundle hold its license."

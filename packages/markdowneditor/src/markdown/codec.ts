@@ -60,4 +60,14 @@ export class MarkdownCodec {
   serialize(doc: Node, source?: MarkdownSource, options?: SerializeOptions): string {
     return this.writer.serialize(doc, source, options);
   }
+
+  /**
+   * rebased returns the Markdown text of a document and a source for this text in which each top-level block has its
+   * text as written, without a new parse.
+   * @param doc - The document.
+   * @param source - The source of the text that the document holds now.
+   */
+  rebased(doc: Node, source: MarkdownSource): { text: string; source: MarkdownSource } {
+    return this.writer.rebased(doc, source);
+  }
 }

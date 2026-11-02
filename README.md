@@ -14,14 +14,16 @@ own.
 specification: the scope, the architecture, the open questions and the plan
 of the steps, with the documents of the parts, for example
 [docs/editor.md](docs/editor.md) and [docs/history.md](docs/history.md).
-The first steps are built: the npm workspaces; the core, which reads Markdown
-into the document of the editor and writes it back, so that a block that the
-user does not change keeps its text byte for byte; and the interaction of a
-document editor: the toolbar, the format bar over selected text, the insert
-menu "+" and the slash commands, the handles of the blocks, find and
-replace, read-only mode and a mode that shows the Markdown marks beside the
-rendered text; the tables with handles, markers and a table menu; and the
-form of the front matter, with a JSON schema, for YAML, TOML and JSON.
+The first steps are built: the npm workspaces; the source of a file, with
+its changes and their origin, which several editors share; the core, which
+reads Markdown into the document of the editor and writes it back, so that a
+block that the user does not change keeps its text byte for byte; and the
+interaction of a document editor: the toolbar, the format bar over selected
+text, the insert menu "+" and the slash commands, the handles of the blocks,
+find and replace, read-only mode and a mode that shows the Markdown marks
+beside the rendered text; the tables with handles, markers and a table menu;
+and the form of the front matter, with a JSON schema, for YAML, TOML and
+JSON.
 VS Code and the plugin API come in the next steps.
 
 ## Packages
@@ -33,7 +35,7 @@ packages with their steps of the plan.
 
 | Package | Part |
 | --- | --- |
-| [`@nimblescape/markdowntext`](packages/markdowntext) | The source: the front matter in YAML, TOML and JSON, its edits and the check against a JSON schema, without a view |
+| [`@nimblescape/markdowntext`](packages/markdowntext) | The source: the text of a file with its changes, their origin and the selections of the editors; the front matter in YAML, TOML and JSON, its edits and the check against a JSON schema; without a view |
 | [`@nimblescape/markdowneditor`](packages/markdowneditor) | The editor of rendered Markdown for the web and for the webviews of VS Code |
 
 ## Use
@@ -49,6 +51,19 @@ const editor = new MarkdownEditor(document.querySelector('#editor')!, {
 editor.setEditable(false); // read-only mode
 editor.setLearnMode(true); // show the Markdown marks
 editor.setFrontMatterSchema({ type: 'object', required: ['title'] }); // the schema of the form of the front matter
+```
+
+Several editors of one file share its source: each change of the user
+becomes a change of the text with its origin, and each change from another
+editor or from outside changes only the blocks whose text changed.
+
+```ts
+import { TextSource } from '@nimblescape/markdowntext';
+
+const source = new TextSource('# Title\n');
+const rendered = new MarkdownEditor(document.querySelector('#left')!, { source });
+source.onChange((change) => console.log(change.origin, change.patches));
+source.setText('# New title\n', { kind: 'program', name: 'git' }); // the rendered editor shows it
 ```
 
 The options `toolbar`, `readOnlyToggle` and `learnToggle` leave out the

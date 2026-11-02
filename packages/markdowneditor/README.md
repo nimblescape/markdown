@@ -14,7 +14,11 @@ format bar over selected text, an insert menu and slash commands, handles of
 the blocks, find and replace, tables with handles and a table menu, a
 read-only mode, a mode that shows the Markdown marks beside the rendered
 text, and a form of the front matter with a JSON schema. The front matter
-code comes from [`@nimblescape/markdowntext`](../markdowntext).
+code comes from [`@nimblescape/markdowntext`](../markdowntext). With the
+option `source`, the editor is one of several editors of a file: it gives
+each change of the user to the `TextSource` and shows each change from
+another editor or from outside, with only the blocks whose text changed
+([R-EDIT-002](../../docs/editor.md#r-edit-002)).
 
 ```ts
 import { MarkdownEditor } from '@nimblescape/markdowneditor';

@@ -209,6 +209,19 @@ function delimiter(width: number, alignment: string | null): string {
   }
 }
 
+/** Written is a document as text: the text, the top-level blocks with their text, and the text around them. */
+interface Written {
+  /** text is the whole text, with the line breaks and the byte order mark of the file. */
+  text: string;
+  /** parts are the blocks that write text, with the index of their block in the source when they kept its text. */
+  parts: { text: string; index?: number; block: Node }[];
+  /** separators holds the text between each part and the next one. */
+  separators: string[];
+  /** before is the text before the first part, and after the text after the last part, with line feeds. */
+  before: string;
+  after: string;
+}
+
 /**
  * MarkdownWriter writes the document of the editor as Markdown text.
  */
@@ -474,8 +487,38 @@ export class MarkdownWriter {
    * @param options - How to write the document.
    */
   serialize(doc: Node, source?: MarkdownSource, options: SerializeOptions = {}): string {
+    return this.write(doc, source, options).text;
+  }
+
+  /**
+   * rebased returns the Markdown text of a document and a new source for this text, in which each top-level block of
+   * the document has its text as written. The source then needs no parse of the text: a later change of the document
+   * keeps the text of each block that it does not change, and the text of each block is known, for example to find the
+   * blocks that a change from outside changes (docs/source.md, R-SRC-002).
+   * @param doc - The document.
+   * @param source - The source of the text that the document holds now.
+   */
+  rebased(doc: Node, source: MarkdownSource): { text: string; source: MarkdownSource } {
+    const { text, parts, separators, before, after } = this.write(doc, source, {});
+    const next: MarkdownSource = {
+      blocks: new WeakMap(),
+      count: parts.length,
+      before,
+      gaps: separators,
+      after,
+      text: parts.length === 0 ? text : before + parts.map((part, index) => (index > 0 ? separators[index - 1] : '') + part.text).join('') + after,
+      lineBreak: source.lineBreak,
+      bom: source.bom,
+      references: source.references,
+    };
+    parts.forEach((part, index) => next.blocks.set(part.block, { index, text: part.text }));
+    return { text, source: next };
+  }
+
+  /** write returns the text of a document with its parts: the blocks with their text and the text between them. */
+  private write(doc: Node, source: MarkdownSource | undefined, options: SerializeOptions): Written {
     this.context = { references: source?.references ?? new Set() };
-    const parts: { text: string; index?: number; block: Node }[] = [];
+    const parts: Written['parts'] = [];
     doc.forEach((block) => {
       const original = options.verbatim === false ? undefined : source?.blocks.get(block);
       if (original) {
@@ -495,26 +538,27 @@ export class MarkdownWriter {
       widthsPattern.test(parts[position - 1].text.trim())
         ? '\n'
         : '\n\n';
-    let out: string;
+    const separators = parts.slice(1).map((part, offset) => {
+      const previous = parts[offset];
+      const adjacent = source !== undefined && previous.index !== undefined && part.index === previous.index + 1;
+      return adjacent ? source.gaps[previous.index as number] : gapBefore(offset + 1);
+    });
     if (!source) {
-      out = parts.length > 0 ? `${parts.map((part, position) => (position > 0 ? gapBefore(position) : '') + part.text).join('')}\n` : '';
-      return out;
+      const text = parts.length > 0 ? `${parts.map((part, position) => (position > 0 ? separators[position - 1] : '') + part.text).join('')}\n` : '';
+      return { text, parts, separators, before: '', after: parts.length > 0 ? '\n' : '' };
     }
+    let before = '';
+    let after = '';
+    let out: string;
     if (parts.length === 0) {
       out = source.count === 0 && doc.childCount <= 1 ? source.text : '';
     } else {
-      out = parts[0].index === 0 ? source.before : '';
-      parts.forEach((part, position) => {
-        if (position > 0) {
-          const previous = parts[position - 1];
-          const adjacent = previous.index !== undefined && part.index === previous.index + 1;
-          out += adjacent ? source.gaps[previous.index as number] : gapBefore(position);
-        }
-        out += part.text;
-      });
+      before = parts[0].index === 0 ? source.before : '';
       const last = parts[parts.length - 1];
-      out += last.index === source.count - 1 ? source.after : source.text.endsWith('\n') || source.text === '' ? '\n' : '';
+      after = last.index === source.count - 1 ? source.after : source.text.endsWith('\n') || source.text === '' ? '\n' : '';
+      out = before + parts.map((part, position) => (position > 0 ? separators[position - 1] : '') + part.text).join('') + after;
     }
-    return `${source.bom ? '﻿' : ''}${source.lineBreak === '\r\n' ? out.replace(/\n/g, '\r\n') : out}`;
+    const text = `${source.bom ? '\ufeff' : ''}${source.lineBreak === '\r\n' ? out.replace(/\n/g, '\r\n') : out}`;
+    return { text, parts, separators, before, after };
   }
 }
