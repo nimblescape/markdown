@@ -77,8 +77,11 @@ at the end of each turn adds this file to the next commit, so that the
 details travel with the commits of the agent. The repository holds these
 hooks and the script that they run: `.claude/settings.json` for Claude Code,
 which the Copilot CLI also reads, `.github/hooks/*.json` for Copilot, and
-`.codex/hooks.json` for Codex where it runs hooks. The other way is an HTTP
-hook that sends each step to a server backend of the history
+`.codex/hooks.json` for Codex where it runs hooks. Claude Code runs the
+hooks of `.claude/settings.json` in a cloud session with one repository
+outside a project, but not in a thread of a project or in a session with
+several repositories; there only the commits record the session. The other
+way is an HTTP hook that sends each step to a server backend of the history
 ([R-HIST-002](#r-hist-002)). It stays an option, because it needs settings
 outside the repository: an allowed host in the network settings of the cloud
 environment and a token as a secret of that environment.
@@ -210,7 +213,9 @@ and the user confirms it.
    hooks in the repository that write the details into the history file of
    the repository, which goes with the next commit
    ([R-HIST-011](#r-hist-011), proposal)? Does each agent commit this file
-   reliably? This needs a test with each agent.
+   reliably? This needs a test with each agent. How does the history get the
+   details of a thread of a project of Claude Code, where the hooks of the
+   repository do not run?
 
 ---
 
