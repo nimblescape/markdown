@@ -3,9 +3,9 @@
 # Licensed under the MIT License. See LICENSE in the repository root for details.
 
 # Dependabot: weekly updates of the development tools, in one group, of the
-# libraries of the editor, and of the pinned actions of the workflows. A new
-# library or a new version can bring another license; the CI checks it against
-# licenses.json (R-GEN-011).
+# libraries of the packages of the workspaces (one lock file in the root), and
+# of the pinned actions of the workflows. A new library or a new version can
+# bring another license; the CI checks it against licenses.json (R-GEN-011).
 version: 2
 updates:
   - package-ecosystem: npm

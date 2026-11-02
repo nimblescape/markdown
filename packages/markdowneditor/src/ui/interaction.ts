@@ -11,9 +11,7 @@
 import { type Editor, Extension } from '@tiptap/core';
 import { Plugin } from '@tiptap/pm/state';
 import type { EditorView } from '@tiptap/pm/view';
-import { readFrontMatter } from '../frontMatter/edit';
-import type { JsonSchema } from '../frontMatter/schema';
-import type { FrontMatterFormat } from '../markdown/frontMatter';
+import { readFrontMatter, type FrontMatterFormat, type JsonSchema } from '@nimblescape/markdowntext';
 import { alertsPlugin } from './alerts';
 import { Asker } from './ask';
 import { BlockHandles, moveCurrentBlock } from './blockHandle';

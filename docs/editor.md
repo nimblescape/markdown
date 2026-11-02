@@ -262,9 +262,10 @@ one step of undo. *(proposal)* For YAML, the library `yaml` gives the
 place of each value, and the edit replaces only the lines of that value; a
 value inside a flow collection, for example `[a, b]`, changes the text of
 that collection. For TOML, the library `@decimalturn/toml-patch` changes the
-text. For JSON, the library `jsonc-parser` replaces a value, and the editor
+text. For JSON, the library `jsonc-parser` replaces a value, and own code
 inserts and removes keys and items line by line. A new text keeps the
-quotes of the text that it replaces.
+quotes of the text that it replaces. The edits are code of the source
+([R-SRC-003](source.md#r-src-003)); the form uses them.
 
 ### R-FM-006
 

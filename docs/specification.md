@@ -35,8 +35,9 @@ Markdown, and the reflection tool builds on it
 ([R-ARCH-003](#r-arch-003)). The target
 platforms are VS Code and the web, with the same code; the command line is a
 platform for output without a view, for example `mp build` of nimblescape
-Markdown Paper. Today the libraries are one npm package,
-`@nimblescape/markdown` ([R-ARCH-002](#r-arch-002)). nimblescape Markdown
+Markdown Paper. The libraries are npm packages, one for each part
+([R-ARCH-002](#r-arch-002)); today two exist, `@nimblescape/markdowntext`
+and `@nimblescape/markdowneditor`. nimblescape Markdown
 Notes and nimblescape Markdown Paper are format extensions: they add their
 parts through plugins ([plugins and format extensions](plugins.md)), and
 they decide where they use the libraries
@@ -171,6 +172,20 @@ editor), `@nimblescape/markdownrender` (renderer),
 platform, `@nimblescape/markdownvscode` and `@nimblescape/markdownweb`.
 Until the API between the parts reaches version 1, all packages must live in
 this repository as npm workspaces.
+
+*(proposal)* **Form of the workspaces.** Each package must live in the
+folder `packages/<name>/` with its own `package.json`, `src/`, README and
+license file, and its build must write its files to `dist/`. The root
+package of the repository is private and is never published. A package must
+use another package of the workspaces by its npm name, never by a path to
+its files. Each package exports only its own API: a type of another package
+that its API uses comes from that package, for example the type of the JSON
+schema of the options of the editor from `@nimblescape/markdowntext`. A
+package must bundle only its own code; the other packages of the workspaces
+and the other libraries stay its dependencies. The export condition
+`nimblescape-source` of each package points to its sources, so that the
+type check, the tests and the example page need no build; the build of a
+package uses the built files of the packages that it depends on.
 
 ### R-ARCH-003
 
@@ -329,7 +344,7 @@ the [platforms](platforms.md#6-open-questions).
 | 9 | The plugins of nimblescape Markdown Paper, in its repository; the schema of each layout | [R-PAPER-001](plugins.md#r-paper-001), [R-FM-004](editor.md#r-fm-004) | planned |
 | 10 | The provider API, the Claude provider and the proposed changes in the editor; in Notes, the AI chat as notes and the memory; the OpenTelemetry events of the AI chat | [R-AI-001](ai.md#r-ai-001) to [R-AI-003](ai.md#r-ai-003), [R-AI-005](ai.md#r-ai-005), [R-AI-006](ai.md#r-ai-006), [R-AI-004](history.md#r-ai-004), [R-EDIT-001](editor.md#r-edit-001) | planned |
 | 11 | The release workflow of the npm packages, the same as for the other nimblescape npm packages | [R-GEN-007](#r-gen-007) | planned |
-| 12 | The npm workspaces: the code of `@nimblescape/markdown` moves into the packages of the parts, first `@nimblescape/markdowneditor` and `@nimblescape/markdowntext`; each other package starts with its step | [R-ARCH-002](#r-arch-002) | planned |
+| 12 | The npm workspaces: the code moves into the packages of the parts, first `@nimblescape/markdowneditor` and `@nimblescape/markdowntext`; each other package starts with its step | [R-ARCH-002](#r-arch-002) | built |
 | 13 | The source: the text, the selections and the changes of a file with their origin, the changes from outside, the front matter and the parts that no plugin knows | [R-SRC-001](source.md#r-src-001) to [R-SRC-003](source.md#r-src-003), [R-GEN-006](source.md#r-gen-006), [R-EDIT-002](editor.md#r-edit-002) | planned |
 | 14 | The renderer: content without edit functions from markdown-it 14, without the editor, with the plugins of the renderer | [R-REN-001](rendering.md#r-ren-001) to [R-REN-003](rendering.md#r-ren-003) | planned |
 | 15 | The layout: the layouts with the schemas of their front matter, the layout code of Markdown Paper, pages and PDF from the same rendering as the view | [R-LAYOUT-001](rendering.md#r-layout-001) to [R-LAYOUT-004](rendering.md#r-layout-004) | planned |

@@ -19,7 +19,7 @@ const codec = new MarkdownCodec();
 const examples = spec.tests.map((example) => ({ ...example, markdown: example.markdown.replace(/→/g, '\t') }));
 
 /** corpus holds the files of test/corpus. */
-const corpusFolder = join(__dirname, '../../test/corpus');
+const corpusFolder = join(__dirname, '../../../../test/corpus');
 const corpus = readdirSync(corpusFolder)
   .filter((file) => file.endsWith('.md') && file !== 'README.md')
   .map((file) => ({ file, text: readFileSync(join(corpusFolder, file), 'utf8') }));
