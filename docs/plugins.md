@@ -62,8 +62,11 @@ hidden markers, the hidden form, and the comment of the format, hidden. It
 adds the threads of the notes ([R-GEN-014](editor.md#r-gen-014)), the number
 of answers beside a block, "Add Note", and the buttons Comment and Reaction
 ([R-EDIT-007](editor.md#r-edit-007)). It adds its formatter to the source
-and the removal of the notes from the output to the renderer. Notes
-integrates the AI chat as notes ([R-AI-001](ai.md#r-ai-001)).
+and the removal of the notes from the output to the renderer. It marks the
+parts that it generates as read-only ([R-EDIT-011](editor.md#r-edit-011)):
+the numbers in captions, the text of references (`/ref`), and the code and
+the cite of listings. Notes integrates the AI chat as notes
+([R-AI-001](ai.md#r-ai-001)).
 
 ## 4. Markdown Paper
 
@@ -76,7 +79,9 @@ layout, and `layout` and `repos` read-only with Ctrl+click to the clone
 special sections. It adds the generated lists, the layouts, the pages and
 the PDF through the layout ([R-LAYOUT-001](rendering.md#r-layout-001)), and
 the prompt protocol through the history
-([R-HIST-005](history.md#r-hist-005)).
+([R-HIST-005](history.md#r-hist-005)). It marks the parts that it generates
+as read-only ([R-EDIT-011](editor.md#r-edit-011)): the text of citations,
+the reference list and the generated lists.
 
 ## 5. Open questions
 

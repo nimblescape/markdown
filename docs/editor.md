@@ -146,7 +146,7 @@ start of the cell, `<!--cell red-->`; the widths of the columns are a
 comment on the line before the table, `<!-- table: widths=30,70 -->`. Lists
 in cells, a dropdown and a table without a header row are not in version 1.
 
-## 6. Read-only mode
+## 6. Read-only mode and generated parts
 
 ### R-GEN-008
 
@@ -156,6 +156,27 @@ available at all and in which mode the editor starts, so that it can make
 the editor a viewer only, also through a setting of its user. In read-only
 mode, the format bar must show only the buttons that do not change the text,
 such as Comment of Notes.
+
+### R-EDIT-011
+
+**Generated parts are read-only.** A part of the text that a plugin
+generates must be read-only in the editor. Generated parts are, for
+example, the text of a citation, the reference list, the text of a
+reference to a section, a figure, a table or a listing, the number in a
+caption, the generated lists (table of contents, lists of figures, tables
+and listings) and the code of a listing from a source file. The user cannot
+type in a generated part, delete a piece of it or paste into it. The user
+changes it through what it is generated from, for example the entry of a
+source in the database, a caption, a heading or the source file of a
+listing, and the plugin then writes the part again. The plugin that
+generates a part marks it as read-only through the plugin API
+([R-PLUGIN-001](plugins.md#r-plugin-001)). A change from outside, for
+example by the formatter, may change a generated part
+([R-SRC-002](source.md#r-src-002)). *(proposal)* The cursor jumps over a
+generated part, and the user deletes it only as a whole, in one step of
+undo. A plugin may give a form for the data of a generated part, for
+example the page of a citation. Ctrl+click on a reference goes to its
+target.
 
 ## 7. Mode to learn Markdown
 
