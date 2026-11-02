@@ -69,7 +69,10 @@ toMarkdown?, commands?, keys?, menus?, frontMatterSchema?, activate?(editor,
 host) }`. `activate` gets the API of the editor and of the platform, and
 returns what to dispose.
 
-*(proposal)* Version 1 has these details:
+*(proposal)* Version 1 has these details. The members `name`,
+`apiVersion`, `extendMarkdownIt`, `styles` and `render` are the plugin of
+the renderer ([R-REN-002](rendering.md#r-ren-002)), so that the same object
+works in the renderer and in the editor.
 
 | Member | Content |
 | --- | --- |

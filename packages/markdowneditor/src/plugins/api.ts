@@ -14,27 +14,18 @@
 
 import type { AnyExtension, Editor } from '@tiptap/core';
 import type { Node } from '@tiptap/pm/model';
-import type Token from 'markdown-it/lib/token.mjs';
 import type { ParseSpec } from 'prosemirror-markdown';
+import { renderParts, type MarkdownItExtension, type RenderFunction, type RenderPlugin } from '@nimblescape/markdownrender';
 import type { JsonSchema } from '@nimblescape/markdowntext';
-import type { MarkdownItExtension } from '../markdown/markdownIt';
 import type { Writers } from '../markdown/serialize';
 import type { FormatButton } from '../ui/formatBar';
 import type { FrontMatterInput } from '../ui/frontMatterForm';
 import type { LearnMarks } from '../ui/learnMode';
 import type { MenuItem } from '../ui/menu';
 
-/** pluginApiVersion is the version of the plugin API of this editor. */
-export const pluginApiVersion = 1;
-
-/**
- * RenderFunction shows a token of a block of the level "render" in an element (R-REN-002). It may return a function
- * that removes what it added, for example a listener.
- * @param source - The text of the token, for example the code of a diagram.
- * @param element - The empty element in place of the token: a `div` for a block, a `span` for an inline token.
- * @param token - The token of markdown-it.
- */
-export type RenderFunction = (source: string, element: HTMLElement, token: Token) => void | (() => void);
+// The level "render" of a plugin is a plugin of the renderer of @nimblescape/markdownrender (docs/rendering.md,
+// R-REN-002): its members, the version of the plugin API and the function that shows a token come from there.
+export { pluginApiVersion, type RenderFunction } from '@nimblescape/markdownrender';
 
 /** Disposable is what a plugin returns to dispose: a function or an object with a function `dispose`. */
 export type Disposable = (() => void) | { dispose(): void };
@@ -136,16 +127,12 @@ export interface PluginEditor {
   refreshPlugins(): void;
 }
 
-/** MarkdownPlugin is a plugin of the editor (R-PLUGIN-001). */
-export interface MarkdownPlugin {
-  /** name names the plugin, for example `notes`; it is the first part of the full names of its commands. */
-  readonly name: string;
-  /** apiVersion is the version of the plugin API that the plugin was written for. */
-  readonly apiVersion: 1;
-  /** extendMarkdownIt adds syntax to the markdown-it of the editor, as `extendMarkdownIt` of the VS Code preview. */
-  readonly extendMarkdownIt?: MarkdownItExtension;
-  /** styles is the CSS of the plugin, which the editor adds to the page once. */
-  readonly styles?: string;
+/**
+ * MarkdownPlugin is a plugin of the editor (R-PLUGIN-001): a plugin of the renderer, the level "render", with the
+ * members of the level "render and edit". `name` names the plugin, for example `notes`; it is the first part of the
+ * full names of its commands.
+ */
+export interface MarkdownPlugin extends RenderPlugin {
   /**
    * render shows the kinds of tokens of the plugin at the level "render": by the type of a token that has no children,
    * for example `math_block`, or `fence:<language>` for a fenced code block, for example `fence:mermaid`. A top-level
@@ -197,9 +184,6 @@ export interface PluginParts {
   readonly learnMarks: Required<LearnMarks>;
 }
 
-/** fenceRender is the start of the key of `render` for a fenced code block with a language. */
-export const fenceRender = 'fence:';
-
 /** dispose disposes what a plugin returned. */
 export function dispose(disposable: void | Disposable | undefined): void {
   if (typeof disposable === 'function') {
@@ -215,38 +199,22 @@ export function dispose(disposable: void | Disposable | undefined): void {
  * @param plugins - The plugins, in their order.
  */
 export function pluginParts(plugins: readonly MarkdownPlugin[]): PluginParts {
-  const names = new Set<string>();
+  const { markdownIt, renders } = renderParts(plugins, 'editor');
   const parts: PluginParts = {
     plugins,
-    markdownIt: [],
+    markdownIt,
     tokens: {},
     writers: { nodes: {}, marks: {} },
-    renders: new Map(),
+    renders,
     extensions: [],
     commands: new Map(),
     keys: new Map(),
     learnMarks: { marks: {}, nodes: {} },
   };
   for (const plugin of plugins) {
-    if (typeof plugin.name !== 'string' || !/^[A-Za-z][\w-]*$/.test(plugin.name)) {
-      throw new Error(`A plugin of the editor needs a name of letters, digits, "_" and "-": ${String(plugin.name)}.`);
-    }
-    if (names.has(plugin.name)) {
-      throw new Error(`The editor has two plugins with the name ${plugin.name}.`);
-    }
-    names.add(plugin.name);
-    if (plugin.apiVersion !== pluginApiVersion) {
-      throw new Error(`The plugin ${plugin.name} needs the plugin API version ${String(plugin.apiVersion)}; the editor has the version ${pluginApiVersion}.`);
-    }
-    if (plugin.extendMarkdownIt) {
-      parts.markdownIt.push(plugin.extendMarkdownIt);
-    }
     Object.assign(parts.tokens, plugin.fromMarkdown);
     Object.assign(parts.writers.nodes, plugin.toMarkdown?.nodes);
     Object.assign(parts.writers.marks, plugin.toMarkdown?.marks);
-    for (const [kind, render] of Object.entries(plugin.render ?? {})) {
-      parts.renders.set(kind, render);
-    }
     parts.extensions.push(...(plugin.nodes ?? []), ...(plugin.marks ?? []));
     for (const [name, command] of Object.entries(plugin.commands ?? {})) {
       parts.commands.set(`${plugin.name}.${name}`, command);
@@ -261,22 +229,4 @@ export function pluginParts(plugins: readonly MarkdownPlugin[]): PluginParts {
     Object.assign(parts.learnMarks.nodes, plugin.learnMarks?.nodes);
   }
   return parts;
-}
-
-/**
- * addStyles adds the CSS of the plugins to a page, once for each plugin: a later editor on the same page finds the
- * element of the styles of a plugin by its name.
- * @param plugins - The plugins.
- * @param page - The document of the page.
- */
-export function addStyles(plugins: readonly MarkdownPlugin[], page: Document): void {
-  for (const plugin of plugins) {
-    if (!plugin.styles || page.head.querySelector(`style[data-nsmd-plugin="${plugin.name}"]`)) {
-      continue;
-    }
-    const style = page.createElement('style');
-    style.dataset.nsmdPlugin = plugin.name;
-    style.textContent = plugin.styles;
-    page.head.append(style);
-  }
 }

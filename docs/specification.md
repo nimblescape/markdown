@@ -36,9 +36,9 @@ Markdown, and the reflection tool builds on it
 platforms are VS Code and the web, with the same code; the command line is a
 platform for output without a view, for example `mp build` of nimblescape
 Markdown Paper. The libraries are npm packages, one for each part
-([R-ARCH-002](#r-arch-002)); today three exist,
-`@nimblescape/markdowntext`, `@nimblescape/markdowneditor` and
-`@nimblescape/markdownvscode`. nimblescape Markdown
+([R-ARCH-002](#r-arch-002)); today four exist,
+`@nimblescape/markdowntext`, `@nimblescape/markdownrender`,
+`@nimblescape/markdowneditor` and `@nimblescape/markdownvscode`. nimblescape Markdown
 Notes and nimblescape Markdown Paper are format extensions: they add their
 parts through plugins ([plugins and format extensions](plugins.md)), and
 they decide where they use the libraries
@@ -158,6 +158,13 @@ the editor, the pages and the PDF must use the same views of the same
 plugins. The editor must be built on the renderer: it shows each block with
 the view of the renderer and adds the edit functions; the renderer and the
 layout run without the editor.
+
+*(proposal)* The editor reads the text with the markdown-it of its renderer,
+and shows each block of the level "render" with its renderer and the
+plugins ([R-GEN-012](plugins.md#r-gen-012)). The other blocks are nodes of
+the editor; they have the styles of rendered content of the renderer
+(`content.css`), the same as a rendering, so that the editor and the
+rendering look the same.
 
 ### R-ARCH-002
 
@@ -348,7 +355,7 @@ the [platforms](platforms.md#6-open-questions).
 | 11 | The release workflow of the npm packages, the same as for the other nimblescape npm packages | [R-GEN-007](#r-gen-007) | planned |
 | 12 | The npm workspaces: the code moves into the packages of the parts, first `@nimblescape/markdowneditor` and `@nimblescape/markdowntext`; each other package starts with its step | [R-ARCH-002](#r-arch-002) | built |
 | 13 | The source: the text, the selections and the changes of a file with their origin, the changes from outside, the front matter and the parts that no plugin knows | [R-SRC-001](source.md#r-src-001) to [R-SRC-003](source.md#r-src-003), [R-GEN-006](source.md#r-gen-006), [R-EDIT-002](editor.md#r-edit-002) | built; each platform adapter gives the files in its own step |
-| 14 | The renderer: content without edit functions from markdown-it 14, without the editor, with the plugins of the renderer | [R-REN-001](rendering.md#r-ren-001) to [R-REN-003](rendering.md#r-ren-003) | planned |
+| 14 | The renderer: content without edit functions from markdown-it 14, without the editor, with the plugins of the renderer | [R-REN-001](rendering.md#r-ren-001) to [R-REN-003](rendering.md#r-ren-003) | built; the editor is built on it, and the example page shows its rendering |
 | 15 | The layout: the layouts with the schemas of their front matter, the layout code of Markdown Paper, pages and PDF from the same rendering as the view | [R-LAYOUT-001](rendering.md#r-layout-001) to [R-LAYOUT-004](rendering.md#r-layout-004) | planned |
 
 Steps 12 to 15 give the parts of [section 3](#3-architecture) that the

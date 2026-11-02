@@ -13,7 +13,8 @@ colors. The text takes the fonts of the settings of the Markdown preview, which 
 markdown.css, so that these values win over its defaults for the light and the dark scheme of the browser.
 */
 
-:root .nsmd-editor {
+:root .nsmd-editor,
+:root .nsmd-document {
   --nsmd-background: var(--vscode-editor-background);
   --nsmd-foreground: var(--vscode-editor-foreground);
   --nsmd-muted: var(--vscode-descriptionForeground);

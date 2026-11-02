@@ -18,7 +18,12 @@ code comes from [`@nimblescape/markdowntext`](../markdowntext). With the
 option `source`, the editor is one of several editors of a file: it gives
 each change of the user to the `TextSource` and shows each change from
 another editor or from outside, with only the blocks whose text changed
-([R-EDIT-002](../../docs/editor.md#r-edit-002)).
+([R-EDIT-002](../../docs/editor.md#r-edit-002)). The editor is built on the
+renderer [`@nimblescape/markdownrender`](../markdownrender): it reads the
+text with the markdown-it of the renderer, shows the blocks of plugins with
+the renderer, and `markdown.css` holds the styles of rendered content of the
+renderer, so that the editor and a rendering look the same
+([R-GEN-010](../../docs/specification.md#r-gen-010)).
 
 ```ts
 import { MarkdownEditor } from '@nimblescape/markdowneditor';

@@ -138,8 +138,11 @@ adds teal.
 
 *(proposal)* The palette is the variables `--nsmd-color-gray` to
 `--nsmd-color-purple`; the colors of the alerts come from it. The style
-sheet `vscode.css` of `@nimblescape/markdownvscode` maps the variables; the
-page loads it after the style sheet of the editor. A theme may give the
+sheet `vscode.css` of `@nimblescape/markdownvscode` maps the variables, for
+the editor and for a rendering of the renderer (the class `nsmd-document`);
+the page loads it after the style sheet of the editor. The style sheet of the
+editor holds the styles of rendered content of the renderer
+([R-GEN-010](specification.md#r-gen-010)). A theme may give the
 selected text its own color with `--nsmd-selection-foreground`, as the
 themes of high contrast of VS Code do; without it, the selected text keeps
 its color.

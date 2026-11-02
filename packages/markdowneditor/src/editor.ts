@@ -18,6 +18,10 @@
 // src/plugins/api.ts): the editor combines their parts into its codec, its extensions and its interaction, shows the
 // blocks of the level "render" with their source (src/plugins/render.ts), keeps their generated parts read-only
 // (docs/editor.md, R-EDIT-011) and shows their threads beside the text (R-GEN-014).
+//
+// The editor is built on the renderer of @nimblescape/markdownrender (docs/specification.md, R-GEN-010): it reads the
+// text with the markdown-it of its renderer, shows the blocks of the level "render" with the renderer and the plugins,
+// and its text has the styles of rendered content (content.css, the class nsmd-content).
 
 import { type AnyExtension, Editor, Extension } from '@tiptap/core';
 import type { Node } from '@tiptap/pm/model';
@@ -27,11 +31,10 @@ import { coreExtensions } from './extensions/core';
 import { MarkdownCodec } from './markdown/codec';
 import type { MarkdownSource } from './markdown/parse';
 import { outsideChange, updated } from './markdown/update';
+import { addStyles, fenceRender, MarkdownRenderer, renderOf } from '@nimblescape/markdownrender';
 import {
-  addStyles,
   dispose,
   type Disposable,
-  fenceRender,
   type GeneratedPart,
   type MarkdownPlugin,
   type PluginEditor,
@@ -41,7 +44,7 @@ import {
 } from './plugins/api';
 import { DocCache } from './plugins/cache';
 import { generatedPlugin, validParts } from './plugins/generated';
-import { BlockRenderer, renderOf, sourceViews } from './plugins/render';
+import { sourceViews } from './plugins/render';
 import { setOpenThread, threadEntries, threadsKey, threadsPlugin, type ThreadEntry } from './plugins/threads';
 import { Interaction, type InteractionOptions } from './ui/interaction';
 
@@ -109,7 +112,7 @@ export class MarkdownEditor implements PluginEditor {
   private readonly codec: MarkdownCodec;
   private readonly interaction: Interaction;
   private readonly parts: PluginParts;
-  private readonly renderer: BlockRenderer;
+  private readonly renderer: MarkdownRenderer;
   private readonly generated: DocCache<GeneratedPart[]>;
   private readonly threads: DocCache<ThreadEntry[]>;
   private readonly disposables: (void | Disposable)[] = [];
@@ -138,6 +141,8 @@ export class MarkdownEditor implements PluginEditor {
       element: this.interaction.box,
       extensions: [...(options.extensions ?? coreExtensions()), ...this.parts.extensions, this.pluginExtension(options), this.interaction.extension()],
       editable: options.editable ?? true,
+      // The text has the styles of rendered content of the renderer (content.css).
+      editorProps: { attributes: { class: 'nsmd-content' } },
       onUpdate: ({ transaction }) => {
         if (!this.outside && !transaction.getMeta(outsideChange)) {
           options.onChange?.(this);
@@ -146,14 +151,19 @@ export class MarkdownEditor implements PluginEditor {
     });
     this.interaction.attach(this.tiptap, { toggle: () => this.setEditable(!this.isEditable) });
     const renders = this.parts.renders;
+    // A rendered block is one block of the file in its place: its footnotes stay where it has them, its raw HTML shows
+    // as its text, and its first lines are no front matter.
+    this.renderer = new MarkdownRenderer(
+      { plugins, footnotes: 'inPlace', rawHtml: 'text', headingIds: false, lines: false, frontMatter: 'text' },
+      'editor',
+    );
     this.codec = new MarkdownCodec({
       schema: this.tiptap.schema,
-      markdownIt: this.parts.markdownIt,
+      md: this.renderer.markdownIt,
       tokens: this.parts.tokens,
       writers: this.parts.writers,
       rendered: (token) => renderOf(renders, token) !== undefined,
     });
-    this.renderer = new BlockRenderer(this.codec.md, renders);
     this.show(this.textSource?.text ?? options.markdown ?? '');
     if (this.textSource) {
       const textSource = this.textSource;

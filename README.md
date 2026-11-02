@@ -23,8 +23,10 @@ text, the insert menu "+" and the slash commands, the handles of the blocks,
 find and replace, read-only mode and a mode that shows the Markdown marks
 beside the rendered text; the tables with handles, markers and a table menu;
 the form of the front matter, with a JSON schema, for YAML, TOML and
-JSON; and the adapter for VS Code, which opens the editor as a custom text
-editor with the theme of VS Code. The plugin API comes in the next step.
+JSON; the adapter for VS Code, which opens the editor as a custom text
+editor with the theme of VS Code; the plugin API, version 1; and the
+renderer, which shows the text as HTML without edit functions, without the
+editor, and on which the editor is built. The layout comes in the next step.
 
 ## Packages
 
@@ -36,7 +38,8 @@ packages with their steps of the plan.
 | Package | Part |
 | --- | --- |
 | [`@nimblescape/markdowntext`](packages/markdowntext) | The source: the text of a file with its changes, their origin and the selections of the editors; the front matter in YAML, TOML and JSON, its edits and the check against a JSON schema; without a view |
-| [`@nimblescape/markdowneditor`](packages/markdowneditor) | The editor of rendered Markdown for the web and for the webviews of VS Code |
+| [`@nimblescape/markdownrender`](packages/markdownrender) | The renderer: the text of a file as HTML without edit functions, from markdown-it 14, with the plugins of the renderer; without the editor and without a page |
+| [`@nimblescape/markdowneditor`](packages/markdowneditor) | The editor of rendered Markdown for the web and for the webviews of VS Code, built on the renderer |
 | [`@nimblescape/markdownvscode`](packages/markdownvscode) | The adapter for VS Code: the editor as a custom text editor, which keeps the file a text document of VS Code, and the theme of VS Code |
 
 ## Use
@@ -70,6 +73,18 @@ source.setText('# New title\n', { kind: 'program', name: 'git' }); // the render
 The options `toolbar`, `readOnlyToggle` and `learnToggle` leave out the
 toolbar or its switches, and `learnMode` starts the editor with the
 Markdown marks shown.
+
+The renderer shows the same text without edit functions, for example for a
+view or a command line:
+
+```ts
+import { MarkdownRenderer } from '@nimblescape/markdownrender';
+import '@nimblescape/markdownrender/content.css';
+
+const renderer = new MarkdownRenderer();
+const { html } = renderer.toHtml('# Title\n\n> [!NOTE]\n> A note.\n'); // without a page
+renderer.render('# Title\n', document.querySelector('#rendering')!); // in a page, with the plugins
+```
 
 In VS Code, an extension registers the editor as a custom text editor with
 `registerMarkdownEditor` of `@nimblescape/markdownvscode`; the
