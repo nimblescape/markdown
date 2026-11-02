@@ -253,14 +253,10 @@ and the roles in the terms of CRediT (Brand et al., 2015) and GAIDeT
 declaration also states which work of the AI the user directed and checked.
 The declaration comes from the history and not from memory, because people
 who write with AI declare themselves as authors even when they do not feel
-ownership of the text of the AI (Draxler et al., 2024). *(proposal)* For a
-paper of Markdown Paper, the reflection tool writes the declaration and its
-views as a Markdown file with images into the repository of the paper, and
-the paper includes this file as an appendix like any other file, so that
-Markdown Paper, a product of nimblescape, knows no reflection tool
-([R-HIST-005](history.md#r-hist-005),
-[R-ARCH-005](specification.md#r-arch-005)). The declaration cites no
-literature and links to the documentation ([R-REFL-020](#r-refl-020)).
+ownership of the text of the AI (Draxler et al., 2024). Paper adds the
+declaration and the views to the appendix of the PDF
+([R-HIST-005](history.md#r-hist-005)). The declaration cites no literature
+and links to the documentation ([R-REFL-020](#r-refl-020)).
 
 ## 5. Views
 
@@ -419,9 +415,8 @@ every platform:
   reflection tool, because a product of nimblescape does not depend on a
   product of majikmate ([R-ARCH-005](specification.md#r-arch-005)). For
   example, the course module reads the README files of a course and of its
-  assignments ([R-COURSE-011](course.md#r-course-011)), and *(proposal)* the
-  adapter of the reflection tool for Markdown Paper reads the chapters of a
-  paper as its parts.
+  assignments ([R-COURSE-011](course.md#r-course-011)), and Markdown Paper
+  gives the chapters of a paper as its parts.
 - *Platforms:* in VS Code, an adapter is an extension that registers with
   the API of the reflection extension ([R-REFL-017](#r-refl-017)); on the
   command line and on a server, an adapter is an npm package that the run

@@ -215,19 +215,19 @@ document stays in this repository.
 **Owners of the products.** nimblescape provides general infrastructure;
 majikmate provides the academic context and builds on the infrastructure of
 nimblescape. So nimblescape owns the libraries of nimblescape Markdown,
-Markdown Notes, Markdown Paper and the history, and majikmate owns the
+Markdown Notes and the history, and majikmate owns Markdown Paper, the
 reflection tool and the course module: their repositories are
-`majikmate/workreflection-vscode` ([R-REFL-017](reflection.md#r-refl-017))
-and `majikmate/course-vscode`. Markdown Paper stays with nimblescape for
-now, in `nimblescape/markdownpaper-vscode`. A product of majikmate may
-depend on a product of nimblescape, and a product of nimblescape does not
-depend on a product of majikmate: the history records the files of Markdown
-Notes like any other file ([R-VSC-004](history.md#r-vsc-004)) and knows no
-reflection tool, and Markdown Paper knows no reflection tool either
-([R-REFL-009](reflection.md#r-refl-009),
-[R-REFL-021](reflection.md#r-refl-021)). *(proposal)* The scope of the npm
-packages and the publisher of the VS Code extensions follow the owner, for
-example `@majikmate/course` and `@nimblescape/markdownpaper`.
+`majikmate/markdownpaper-vscode`, `majikmate/workreflection-vscode`
+([R-REFL-017](reflection.md#r-refl-017)) and `majikmate/course-vscode`. A
+product of majikmate may depend on a product of nimblescape, and a product
+of nimblescape does not depend on a product of majikmate: the history
+records the files of Markdown Notes like any other file
+([R-VSC-004](history.md#r-vsc-004)) and knows no reflection tool.
+*(proposal)* The scope of the npm packages and the publisher of the VS Code
+extensions follow the owner, for example `@majikmate/markdownpaper`. Until
+the repository of Markdown Paper moves to majikmate, its address stays
+`nimblescape/markdownpaper-vscode`, and GitHub forwards the old address
+after the move.
 
 ## 4. Documents
 

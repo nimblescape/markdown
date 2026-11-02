@@ -150,10 +150,9 @@ again. "Run again" sends a recorded question to the AI as a new question.
 
 **The prompt protocol of Paper.** Markdown Paper uses the history for the
 prompt protocol of a paper; `mp build` may add the history, or a list of the
-questions to the AI, as an appendix of the PDF. Paper knows no reflection
-tool: the declaration of the use of AI and the views of the reflection tool
-reach the appendix as a file of the paper
-([R-REFL-009](reflection.md#r-refl-009)).
+questions to the AI, with the analysis and the declaration of the use of AI
+of the reflection tool ([R-REFL-009](reflection.md#r-refl-009)), as an
+appendix of the PDF.
 
 ### R-HIST-007
 
