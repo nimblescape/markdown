@@ -94,7 +94,8 @@ works in the renderer and in the editor.
 | `activate` | Starts the plugin in an editor |
 
 The API of the editor for the plugins gives the Tiptap editor, the text as
-Markdown, the commands by their full names, the panel of a thread, and a
+Markdown, the place in the text of the file of a position of the document,
+exact inside a block, the commands by their full names, the panel of a thread, and a
 refresh of the generated parts and threads after a change of the data of a
 plugin. A transaction that takes a change of the text from outside has the
 meta `outsideChange`, so that a plugin that guards its parts against the

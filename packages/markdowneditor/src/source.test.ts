@@ -140,6 +140,26 @@ describe('the editor with a source', () => {
     expect(blockOf()).toBe('Second paragraph.');
   });
 
+  it('gives the exact place in the text of a position inside a block, also after a change and with CRLF', () => {
+    const marked = '# Title\n\nSome **bold** and `code` [link](https://example.com) text.\n\n- item one\n- item two\n';
+    const source = new TextSource(marked);
+    const editor = open(source, { id: 'rendered' });
+    expect(editor.textOffset(positionOf(editor, 'bo'))).toBe(marked.indexOf('ld**'));
+    expect(editor.textOffset(positionOf(editor, 'co'))).toBe(marked.indexOf('de`'));
+    expect(editor.textOffset(positionOf(editor, 'li'))).toBe(marked.indexOf('nk]'));
+    expect(editor.textOffset(positionOf(editor, ' te'))).toBe(marked.indexOf('xt.'));
+    expect(editor.textOffset(positionOf(editor, 'item t'))).toBe(marked.indexOf('wo\n'));
+    // A position between blocks is the start of the next block, and the end of the document is the end of the text.
+    expect(editor.textOffset(0)).toBe(0);
+    expect(editor.textOffset(editor.tiptap.state.doc.content.size)).toBe(marked.length - 1);
+    editor.tiptap.chain().setTextSelection(positionOf(editor, 'Some')).insertContent(' new').run();
+    expect(editor.textOffset(positionOf(editor, 'bo'))).toBe(source.text.indexOf('ld**'));
+    const windows = new TextSource('a\r\nb c\r\n\r\nd e\r\n');
+    const other = open(windows, { id: 'other' });
+    expect(other.textOffset(positionOf(other, 'b'))).toBe(4);
+    expect(other.textOffset(positionOf(other, 'd'))).toBe(windows.text.indexOf(' e'));
+  });
+
   it('gives a new text of setMarkdown to the source, and leaves the source when it closes', () => {
     const source = new TextSource(text);
     const editor = open(source, { id: 'rendered' });

@@ -26,6 +26,7 @@
 import { type AnyExtension, Editor, Extension } from '@tiptap/core';
 import type { Node } from '@tiptap/pm/model';
 import { EditorState, Plugin, Selection, type Transaction } from '@tiptap/pm/state';
+import { Transform } from '@tiptap/pm/transform';
 import type { TextChange, TextSelection, TextSource } from '@nimblescape/markdowntext';
 import { coreExtensions } from './extensions/core';
 import { MarkdownCodec } from './markdown/codec';
@@ -47,6 +48,9 @@ import { generatedPlugin, validParts } from './plugins/generated';
 import { sourceViews } from './plugins/render';
 import { setOpenThread, threadEntries, threadsKey, threadsPlugin, type ThreadEntry } from './plugins/threads';
 import { Interaction, type InteractionOptions } from './ui/interaction';
+
+/** textMark is the character that marks a position in the text of a block for textOffset, a character of private use. */
+const textMark = '\uE000';
 
 /** MarkdownEditorOptions configure a MarkdownEditor. */
 export interface MarkdownEditorOptions extends InteractionOptions {
@@ -283,6 +287,52 @@ export class MarkdownEditor implements PluginEditor {
     const selection = Selection.near(state.doc.resolve(Math.min(range.start + 1, state.doc.content.size)));
     this.tiptap.view.dispatch(state.tr.setSelection(selection).scrollIntoView());
     this.tiptap.view.focus();
+  }
+
+  /**
+   * textOffset returns the place in the text of the file of a position of the document, as the source counts it, for
+   * example for a plugin that needs the place of the selected text in the file (docs/plugins.md, R-PLUGIN-001). Inside
+   * the text of a top-level block, the place is exact: the editor writes the block with a mark at the position and finds
+   * the mark in the text of the block. A position between top-level blocks gives the start of the next block.
+   * @param pos - The position in the document.
+   */
+  textOffset(pos: number): number {
+    const ranges = this.blockRanges();
+    const index = ranges.findIndex((range) => pos >= range.start && pos < range.end);
+    const range = index < 0 ? ranges[ranges.length - 1] : ranges[index];
+    if (!range || index < 0) {
+      return range?.to ?? 0;
+    }
+    const block = this.tiptap.state.doc.child(index);
+    const text = this.source?.blocks.get(block)?.text;
+    const single = this.tiptap.state.doc.type.create(null, block);
+    const inner = pos - range.start;
+    const $inner = inner > 0 ? single.resolve(inner) : undefined;
+    if (text === undefined || !$inner?.parent.inlineContent) {
+      return range.from;
+    }
+    // The mark has the marks of the position, so that it stands inside them, for example in bold text.
+    const mark = single.type.schema.text(textMark, $inner.marks());
+    const written = this.codec.serialize(new Transform(single).insert(inner, mark).doc).replace(/\n+$/, '');
+    const at = written.indexOf(textMark);
+    if (at < 0) {
+      return range.from;
+    }
+    const before = written.slice(0, at);
+    const after = written.slice(at + textMark.length);
+    let offset: number;
+    if (text.startsWith(before)) {
+      offset = before.length;
+    } else if (text.endsWith(after)) {
+      offset = text.length - after.length;
+    } else {
+      offset = 0;
+      while (offset < before.length && offset < text.length && text[offset] === before[offset]) {
+        offset++;
+      }
+    }
+    const breaks = this.source?.lineBreak === '\r\n' ? text.slice(0, offset).split('\n').length - 1 : 0;
+    return range.from + offset + breaks;
   }
 
   /** refreshPlugins asks the plugins again for their generated parts and threads, after a change of their data. */

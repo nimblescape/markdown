@@ -118,6 +118,8 @@ export interface PluginEditor {
   readonly isEditable: boolean;
   /** getMarkdown returns the text of the editor as Markdown. */
   getMarkdown(): string;
+  /** textOffset returns the place in the text of the file of a position of the document, exact inside a block. */
+  textOffset(pos: number): number;
   /** runCommand runs a command of a plugin by its full name, `plugin.command`. */
   runCommand(name: string, ...args: unknown[]): boolean;
   /** openThread opens the panel of a thread beside the text, and closeThread closes it. */
