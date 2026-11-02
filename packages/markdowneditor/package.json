@@ -30,6 +30,11 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./bundle": {
+      "nimblescape-source": "./src/bundle.ts",
+      "types": "./dist/bundle.d.ts",
+      "default": "./dist/bundle.js"
+    },
     "./markdown.css": "./dist/markdown.css"
   },
   "files": [

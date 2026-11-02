@@ -37,3 +37,4 @@ export {
 } from './plugins/api';
 export { generatedWrite } from './plugins/generated';
 export { outsideChange } from './markdown/update';
+export { loadPlugins, sharedModules, type LoadOptions } from './plugins/shared';

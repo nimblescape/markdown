@@ -3,14 +3,14 @@
 // © 2026 Hannes Stauss (scalarion@nimblescape.com)
 // Licensed under the MIT License. See LICENSE in the repository root for details.
 
-// The tests of the adapter for VS Code (docs/platforms.md, R-GEN-004, R-VSC-001 to R-VSC-003, R-THEME-003): the custom
+// The tests of the adapter for VS Code (docs/platforms.md, R-GEN-004, R-VSC-001 to R-VSC-008, R-THEME-003): the custom
 // text editor with its page, the text and the changes between the page and the document, also when both change at the
 // same time, the read-only mode, the fonts, the text editor to the side, and a MarkdownEditor in the page.
 
 import { MarkdownEditor } from '@nimblescape/markdowneditor';
 import type { TextChange } from '@nimblescape/markdowntext';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { registerMarkdownEditor, type MarkdownEditorRegistration, type PluginPanelChannel } from './extension/editor';
+import { registerMarkdownEditor, type MarkdownEditorHandle, type MarkdownEditorRegistration, type PluginPanelChannel } from './extension/editor';
 import { editorElementId, pageMessage, pagesElementId } from './messages';
 import { FakeRange, FakeUri, fakeVsCode, openPanel, type FakeDocument, type FakePanel, type FakeVsCode } from './test/fakeVscode';
 import { connectVsCode, vscodeOrigin, type VsCodeConnection } from './webview/connection';
@@ -19,7 +19,7 @@ const text = '# Title\n\nFirst paragraph.\n\nSecond paragraph.\n';
 const viewType = 'nimblescape.test.editor';
 
 let fake: FakeVsCode;
-let stop: { dispose(): void } | undefined;
+let stop: MarkdownEditorHandle | undefined;
 const connections: VsCodeConnection[] = [];
 
 beforeEach(() => {
@@ -400,6 +400,79 @@ describe('the plugins of the editor', () => {
     expect(onPage).toEqual([{ login: 'scalarion' }]);
     panel.dispose();
     expect(disposed).toEqual(['notes']);
+  });
+
+  it('give the page the scripts that other extensions contribute, only with the option and only from the folders of the extensions', async () => {
+    const contributes = (editorScripts: unknown) => ({ contributes: { 'nimblescape.markdown.extensions': { editorScripts } } });
+    fake.extensions.push(
+      { id: 'nimblescape.nimblescape-markdownpaper', extensionUri: FakeUri.file('/ext/paper'), packageJSON: contributes(['dist/editorPlugins.js', '../notes/dist/webview.js', 'dist/paper.css', 7]) },
+      { id: 'other.plain', extensionUri: FakeUri.file('/ext/plain'), packageJSON: {} },
+      { id: 'a.first', extensionUri: FakeUri.file('/ext/first'), packageJSON: contributes(['main.js']) },
+      { id: 'b.broken', extensionUri: FakeUri.file('/ext/broken'), packageJSON: contributes('main.js') },
+    );
+    const { panel, connection } = await start(text, { contributedPlugins: true });
+    expect(connection.pluginScripts).toEqual(['https://webview.test/ext/first/main.js', 'https://webview.test/ext/paper/dist/editorPlugins.js']);
+    expect(connection.nonce).toBe('abc');
+    const roots = panel.webview.options.localResourceRoots?.map((root) => root.toString());
+    expect(roots).toContain('file:///ext/paper/dist');
+    expect(roots).not.toContain('file:///ext/notes/dist');
+    // The page reads no file of the folders of the plugins through the extension.
+    expect(connection.pages.embed).not.toContain('https://webview.test/ext/paper/dist/');
+    stop?.dispose();
+    connections.forEach((each) => each.dispose());
+    connections.length = 0;
+    const without = await start(text);
+    expect(without.connection.pluginScripts).toEqual([]);
+  });
+
+  it('connect the part of a plugin of another extension later, and give it the messages that the page sent before', async () => {
+    const { document, panel, connection } = await start(text);
+    const pageChannel = connection.host.channel('paper');
+    const onPage: unknown[] = [];
+    pageChannel.onMessage((message) => onPage.push(message));
+    pageChannel.post('first');
+    pageChannel.post('second');
+    await panel.settle();
+    const received: unknown[] = [];
+    const documents: string[] = [];
+    const disposed: string[] = [];
+    const added = stop!.addPlugin('paper', (channel) => {
+      documents.push(channel.document.uri.toString());
+      channel.onMessage((message) => received.push(message));
+      void channel.post('hello');
+      return { dispose: () => disposed.push(channel.document.uri.toString()) };
+    });
+    await panel.settle();
+    expect(received).toEqual(['first', 'second']);
+    expect(onPage).toEqual(['hello']);
+    pageChannel.post('third');
+    await panel.settle();
+    expect(received).toEqual(['first', 'second', 'third']);
+    // A panel that opens later connects the plugin as well.
+    const other = fake.open(text, FakeUri.file('/work/docs/other.md'));
+    await openPanel(fake, other);
+    expect(documents).toEqual([document.uri.toString(), other.uri.toString()]);
+    added.dispose();
+    expect(disposed).toEqual([document.uri.toString(), other.uri.toString()]);
+    pageChannel.post('after');
+    await panel.settle();
+    expect(received).toEqual(['first', 'second', 'third']);
+    expect(() => stop!.addPlugin('no name', () => undefined)).toThrow();
+  });
+
+  it('keep at most 100 messages of the page for plugins without a listener', async () => {
+    const { panel, connection } = await start(text);
+    const pageChannel = connection.host.channel('late');
+    for (let index = 0; index < 120; index++) {
+      pageChannel.post(index);
+    }
+    await panel.settle();
+    const received: unknown[] = [];
+    stop!.addPlugin('late', (channel) => {
+      channel.onMessage((message) => received.push(message));
+    });
+    await Promise.resolve();
+    expect(received).toEqual(Array.from({ length: 100 }, (_, index) => index));
   });
 });
 

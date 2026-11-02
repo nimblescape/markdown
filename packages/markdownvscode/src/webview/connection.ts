@@ -91,6 +91,15 @@ export interface VsCodeConnection {
   readonly pagesFrame: HTMLIFrameElement;
   /** pages is the host of the pages for the layout part. */
   readonly pages: VsCodePagesHost;
+  /**
+   * pluginScripts are the addresses of the scripts of the plugins of the editor that other extensions contribute
+   * (docs/plugins.md, R-PLUGIN-002), when the registration of the editor asks for them: the page loads them with
+   * `loadPlugins(connection.pluginScripts, { nonce: connection.nonce })` of @nimblescape/markdowneditor, and gives
+   * the plugins to its editor.
+   */
+  readonly pluginScripts: readonly string[];
+  /** nonce is the nonce of the scripts of the page, which the policy of its content asks for. */
+  readonly nonce: string;
   /** onView calls a listener after each switch of the view, and returns a function that stops it. */
   onView(listener: (view: PageView) => void): () => void;
   /** setView switches the view of the page, for example to "edit" after a double click on a page. */
@@ -176,6 +185,7 @@ class Connection implements VsCodeConnection {
   private canEdit = true;
   private shownView: PageView = 'edit';
   private files: PageFiles | undefined;
+  private scripts: readonly string[] = [];
   private reads = 0;
   /** waiting holds the reads of files that wait for the answer of the extension, by their IDs. */
   private readonly waiting = new Map<number, (data: Uint8Array | undefined) => void>();
@@ -256,7 +266,6 @@ class Connection implements VsCodeConnection {
       }
     };
     const folders = files.folders.map((folder) => ({ folder: normal(folder.folder), webview: normal(folder.webview) }));
-    const script = document.querySelector<HTMLScriptElement>('script[nonce]');
     return {
       document: normal(files.document),
       reader: { read: (url) => this.read(url) },
@@ -268,9 +277,19 @@ class Connection implements VsCodeConnection {
       },
       sources: files.sources,
       scripts: files.scripts.map((src) => ({ src: normal(src) })),
-      nonce: script?.nonce || script?.getAttribute('nonce') || '',
+      nonce: this.nonce,
       embed: folders.map((folder) => folder.webview),
     };
+  }
+
+  get pluginScripts(): readonly string[] {
+    return this.scripts;
+  }
+
+  get nonce(): string {
+    // The browser hides the attribute of the nonce after the script ran, and keeps it in the property.
+    const script = document.querySelector<HTMLScriptElement>('script[nonce]');
+    return script?.nonce || script?.getAttribute('nonce') || '';
   }
 
   onView(listener: (view: PageView) => void): () => void {
@@ -383,6 +402,8 @@ class Connection implements VsCodeConnection {
       this.show(message.text);
       return;
     }
+    // The page loads the scripts of the plugins once, before it creates the editor.
+    this.scripts = Array.isArray(message.plugins) ? message.plugins.filter((script): script is string => typeof script === 'string') : [];
     const source = new TextSource(message.text);
     this.textSource = source;
     this.stop.push(

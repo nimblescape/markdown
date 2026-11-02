@@ -8,7 +8,16 @@
 // document. The entry point `@nimblescape/markdownvscode/webview` is the side of the page, and
 // `@nimblescape/markdownvscode/vscode.css` is the theme of VS Code for the editor.
 
-export { registerMarkdownEditor, type MarkdownEditorRegistration, type PluginPanelChannel, type VsCode } from './extension/editor';
+export {
+  contributedPluginScripts,
+  pluginContribution,
+  registerMarkdownEditor,
+  type MarkdownEditorHandle,
+  type MarkdownEditorRegistration,
+  type PluginConnect,
+  type PluginPanelChannel,
+  type VsCode,
+} from './extension/editor';
 export { escaped, newNonce, pageHtml, type PageOptions } from './extension/page';
 export {
   editorElementId,

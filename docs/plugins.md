@@ -104,6 +104,26 @@ The API of the platform gives the name of the platform and, for each
 plugin, a channel for messages to the other part of the plugin, for example
 in the extension of VS Code ([R-VSC-001](platforms.md#r-vsc-001)).
 
+### R-PLUGIN-002
+
+*(proposal)* **The plugins of other bundles.** A page that uses the editor
+can load plugins that another bundle holds, for example the plugins of Paper
+in the editor of Notes. The bundle of such plugins is a script that holds no
+copy of Tiptap, ProseMirror or the libraries: it uses the modules of the
+page, because the editor compares their classes. The page gives these
+modules and a function to register a plugin on its global
+`nimblescapeMarkdown`; the bundle registers each plugin with
+`registerPlugin` of `@nimblescape/markdowneditor/bundle`. The plugin of
+esbuild `sharedModulesPlugin` of the same entry point builds such a bundle:
+each import of `@tiptap/core`, of a module of `@tiptap/pm` (or of the same
+package of ProseMirror), of `@nimblescape/markdowneditor` and of
+`@nimblescape/markdowntext` reads the module of the page. The page loads the
+scripts with `loadPlugins`, one after the other, before it creates the
+editor, and gives the editor its own plugins and these. A script that does
+not load, and a value that is no plugin of version 1, add no plugin. In VS
+Code, the extensions contribute such scripts
+([R-VSC-008](platforms.md#r-vsc-008)).
+
 ## 3. Markdown Notes
 
 ### R-NOTES-001

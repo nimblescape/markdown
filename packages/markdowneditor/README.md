@@ -74,6 +74,28 @@ const editor = new MarkdownEditor(element, { markdown, plugins: [diagrams], host
 editor.runCommand('diagrams.someCommand');
 ```
 
+### Plugins of other bundles
+
+A page can load plugins that another bundle holds, for example the plugins
+of Paper in the editor of Notes
+([R-PLUGIN-002](../../docs/plugins.md#r-plugin-002)). Such a bundle holds no
+copy of Tiptap, ProseMirror or the libraries: it uses the modules of the
+page. The bundle registers its plugins with `registerPlugin` of the entry
+point `@nimblescape/markdowneditor/bundle`, and its build uses the plugin of
+esbuild `sharedModulesPlugin` of the same entry point.
+
+```ts
+// The bundle of the plugins, built with esbuild:
+// esbuild.build({ entryPoints: ['src/editorPlugins.ts'], bundle: true, format: 'iife', plugins: [sharedModulesPlugin()] })
+import { registerPlugin } from '@nimblescape/markdowneditor/bundle';
+registerPlugin(citations);
+
+// The page loads the scripts before it creates the editor.
+import { loadPlugins, MarkdownEditor } from '@nimblescape/markdowneditor';
+const extra = await loadPlugins(['https://…/editorPlugins.js'], { nonce });
+const editor = new MarkdownEditor(element, { markdown, plugins: [...ownPlugins, ...extra] });
+```
+
 The example page of the repository uses the plugin
 [demo/examplePlugin.ts](../../demo/examplePlugin.ts).
 

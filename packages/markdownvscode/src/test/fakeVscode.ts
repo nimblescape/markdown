@@ -203,6 +203,8 @@ export interface FakeVsCode {
   readonly files: Map<string, Uint8Array>;
   /** applyResult is the result of the next workspace edits. */
   applyResult: boolean;
+  /** extensions are the installed extensions, with their folders and the content of their package.json. */
+  readonly extensions: { id: string; extensionUri: FakeUri; packageJSON: unknown }[];
   /** open returns a new document. */
   open(text: string, uri?: FakeUri): FakeDocument;
   /** change changes a document from outside, as the text editor or Git. */
@@ -231,6 +233,7 @@ export function fakeVsCode(): FakeVsCode {
     writable,
     files,
     applyResult: true,
+    extensions: [],
     open(text, uri = FakeUri.file('/work/docs/file.md')) {
       const document = new FakeDocument(uri, text);
       documents.set(uri.toString(), document);
@@ -252,6 +255,11 @@ export function fakeVsCode(): FakeVsCode {
     WorkspaceEdit: FakeWorkspaceEdit,
     ViewColumn: { Active: -1, Beside: -2, One: 1, Two: 2 },
     env: { language: 'de' },
+    extensions: {
+      get all() {
+        return fake.extensions;
+      },
+    },
     window: {
       registerCustomEditorProvider: (viewType: string, provider: vscode.CustomTextEditorProvider, options: unknown) => {
         registered = { viewType, provider, options };

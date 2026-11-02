@@ -190,6 +190,35 @@ registerMarkdownEditor(vscode, {
 });
 ```
 
+### The plugins of other extensions
+
+Another extension can contribute plugins of the editor
+([R-VSC-008](../../docs/platforms.md#r-vsc-008),
+[R-PLUGIN-002](../../docs/plugins.md#r-plugin-002)): its package.json names
+their scripts, and the extension that registers the editor asks for them
+with `contributedPlugins`. The page loads them before it creates the
+editor. The part of such a plugin in the other extension connects with
+`addPlugin` of the handle of the registration, also after panels opened;
+the messages that the page sent before wait for it.
+
+```jsonc
+// The package.json of the other extension, for example Paper.
+"contributes": {
+  "nimblescape.markdown.extensions": { "editorScripts": ["dist/editorPlugins.js"] }
+}
+```
+
+```ts
+// The extension that registers the editor, for example Notes.
+const editor = registerMarkdownEditor(vscode, { /* … */ contributedPlugins: true });
+// Its API gives the other extensions `editor.addPlugin(name, connect)`.
+
+// The page of the editor.
+const connection = await connectVsCode();
+const extra = await loadPlugins(connection.pluginScripts, { nonce: connection.nonce });
+const markdownEditor = new MarkdownEditor(connection.element, { source: connection.source, host: connection.host, plugins: [...ownPlugins, ...extra] });
+```
+
 ## The theme
 
 `@nimblescape/markdownvscode/vscode.css` sets the variables `--nsmd-*` of

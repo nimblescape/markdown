@@ -132,6 +132,26 @@ Paged.js, which it bundles. So that the page in the frame gets these files
 as `blob:` URLs, the page of the webview may also load its own files with
 `fetch` (`connect-src`), and images and fonts may be `blob:` URLs.
 
+### R-VSC-008
+
+*(proposal)* **The plugins of other extensions.** An extension contributes
+plugins of the editor ([R-PLUGIN-002](plugins.md#r-plugin-002)) in its
+package.json, for example Paper:
+`"contributes": { "nimblescape.markdown.extensions": { "editorScripts":
+["dist/editorPlugins.js"] } }`. An extension that registers the editor with
+the option `contributedPlugins`, for example Notes, gives its page these
+scripts of all enabled extensions, in the order of the IDs of the
+extensions; a script must be a file `.js` in the folder of its extension.
+The page may load these scripts, with the nonce of its policy, and reads no
+other file of these folders through the extension. The scripts of an
+extension run with the rights that the extension already has in VS Code.
+The other part of such a plugin runs in its own extension: the handle of
+the registration connects it with `addPlugin(name, connect)` in each open
+panel and in each panel that opens later, for example through the API of
+Notes for Paper. Until then, the panel keeps at most 100 messages of the
+page for the plugins without a listener, and gives them to the first
+listener of the plugin.
+
 ## 3. Web
 
 ### R-WEB-001

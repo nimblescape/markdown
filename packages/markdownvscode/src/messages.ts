@@ -7,7 +7,9 @@
 // changes the text gives the patches against the text of a version that the other side knows, so that a message holds
 // only the change and not the whole text:
 //
-// - The page sends `ready` when it starts; the extension answers with `init`, the whole text and its version.
+// - The page sends `ready` when it starts; the extension answers with `init`, the whole text and its version, and the
+//   scripts of the plugins of the editor of other extensions (docs/plugins.md, R-PLUGIN-002), which the page loads
+//   before it creates the editor.
 // - The page sends each change of the user as `edit`, with the patches against the text of the version `base`, and
 //   sends the next change only after the answer `applied`. The extension merges the change with the changes of the
 //   document since `base` and answers with `applied`: the patches from the version that it sent last to the version
@@ -77,6 +79,8 @@ export type HostMessage =
       readonly fonts: PageFonts;
       readonly view: PageView;
       readonly files: PageFiles;
+      /** plugins are the addresses of the scripts of the plugins of the editor of other extensions in the webview. */
+      readonly plugins: readonly string[];
     }
   | { readonly type: 'text'; readonly from: number; readonly version: number; readonly patches: readonly TextPatch[] }
   | {
