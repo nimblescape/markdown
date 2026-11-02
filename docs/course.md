@@ -46,14 +46,14 @@ its command is `course`, and the comment of the format names the format
 
 ### R-COURSE-003
 
-**The course, the history and the evaluation.** The history extension
+**The course, the history and the reflection tool.** The history extension
 records the work of the student in every file of an assignment, as in any
 workspace, without a report of the course extension
 ([R-VSC-004](history.md#r-vsc-004)). The course module is the adapter of a
-course for the evaluation ([R-EVAL-021](evaluation.md#r-eval-021)): it gives
-the evaluation the context of each assignment from the README files
-([R-COURSE-011](#r-course-011)). The history and the evaluation know no
-course, and the course module uses no method of the evaluation.
+course for the reflection tool ([R-REFL-021](reflection.md#r-refl-021)): it
+gives the reflection tool the context of each assignment from the README
+files ([R-COURSE-011](#r-course-011)). The history and the reflection tool
+know no course, and the course module uses no method of the reflection tool.
 
 ## 2. Terms
 
@@ -168,7 +168,7 @@ rules and criteria:
 - The criteria are items `- **<name>:** <text>`; a program numbers them C1
   to Cm in their order.
 
-## 5. Reading, checks and the evaluation
+## 5. Reading, checks and the reflection tool
 
 ### R-COURSE-009
 
@@ -180,8 +180,8 @@ objectives, requirements (R1 to Rn, with their group, text and objectives),
 rules (with their objectives), criteria (C1 to Cm), example run and the
 files of its workspace; and the feedback of each assignment
 ([R-FEED-002](#r-feed-002)). The feedback program, the adapter of the
-evaluation and the course extension read the files of a course only through
-this reader, so that no program reads a README by rules of its own.
+reflection tool and the course extension read the files of a course only
+through this reader, so that no program reads a README by rules of its own.
 *(proposal)* The functions are `readCourse(folder)`,
 `readAssignment(folder)` and `readFeedback(file)`.
 
@@ -197,24 +197,24 @@ a pause in typing. *(proposal)* A workflow of the course runs
 
 ### R-COURSE-011
 
-**The adapter of the evaluation.** The course module must give the
-evaluation the context of each assignment
-([R-EVAL-021](evaluation.md#r-eval-021)) from the reader: the assignment as
+**The adapter of the reflection tool.** The course module must give the
+reflection tool the context of each assignment
+([R-REFL-021](reflection.md#r-refl-021)) from the reader: the assignment as
 a task; its requirements, its rules and the files of its workspace as its
 parts; its learning objectives with their levels, and the requirements and
 rules that serve each; and the allowed level of AI use and the goals, when
 the course gives them. The README and the feedback file are not parts of the
 work of the student. In VS Code, the course extension registers the adapter
-with the evaluation extension ([R-EVAL-017](evaluation.md#r-eval-017)); on
+with the reflection extension ([R-REFL-017](reflection.md#r-refl-017)); on
 the command line and on a server, `@majikmate/course` is the adapter package
-that the evaluation loads.
+that the reflection tool loads.
 
 ### R-COURSE-012
 
 **The course extension.** *(proposal)* The course extension of VS Code shows
 the structure of a course: its chapters, learning objectives, assignments
 and requirements, each with a link to its place in the README. For an
-assignment, it opens the feedback and the evaluation. It writes the comment
+assignment, it opens the feedback and the analysis. It writes the comment
 of the format with the save of a README of a course, in the same way as
 Markdown Notes writes its comment.
 
@@ -250,11 +250,11 @@ capped the score.
 
 ### R-FEED-003
 
-**The feedback and the evaluation.** The feedback says whether the work
-meets the requirements; the evaluation says who did the intellectual work
-([R-EVAL-002](evaluation.md#r-eval-002)). Both use the same numbers of the
-requirements and of the learning objectives. *(proposal)* The summary of the
-feedback links to the evaluation of the same state of the work.
+**The feedback and the reflection tool.** The feedback says whether the work
+meets the requirements; the reflection tool shows who did the intellectual
+work ([R-REFL-002](reflection.md#r-refl-002)). Both use the same numbers of
+the requirements and of the learning objectives. *(proposal)* The summary of
+the feedback links to the analysis of the same state of the work.
 
 ### R-FEED-004
 
@@ -281,8 +281,8 @@ each course for the feedback.
    course first and the comment of the notes after it, with a new minor
    version of the format of Markdown Notes ([R-COURSE-004](#r-course-004))?
 5. Integrity: a student can change the history file in `.workhistory/`. Does
-   the course protect it like `FEEDBACK.md`, or does the evaluation check it
-   against the commits ([R-COURSE-003](#r-course-003))?
+   the course protect it like `FEEDBACK.md`, or does the reflection tool
+   check it against the commits ([R-COURSE-003](#r-course-003))?
 6. Feedback program: does `majikmate/course-feedback` stay a program of its
    own (proposal), or does it become a part of `course-vscode`
    ([R-FEED-004](#r-feed-004))?

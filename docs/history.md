@@ -12,12 +12,12 @@ beside nimblescape Markdown ([R-ARCH-003](specification.md#r-arch-003)) that
 records every action on any file, saves it through a pluggable backend and
 replays it, and the history extension of VS Code, which records every file
 of the workspace in the same way. The history is general infrastructure: it
-knows no evaluation, no paper and no course. The evaluation is a product of
-majikmate that builds on the history and has a document of its own,
-[evaluation.md](evaluation.md). Until the history has a repository of its
-own, this document stays with the [specification](specification.md) of
-nimblescape Markdown and is normative in the same way.
-[Section 6](#6-open-questions) lists its open questions.
+knows no reflection tool, no paper and no course. The reflection tool is a
+product of majikmate that builds on the history and has a document of its
+own, [reflection.md](reflection.md). Until the history has a repository of
+its own, this document stays with the [specification](specification.md) of
+nimblescape Markdown and is normative in the same way. [Section
+6](#6-open-questions) lists its open questions.
 
 ## 1. Steps
 
@@ -150,30 +150,31 @@ again. "Run again" sends a recorded question to the AI as a new question.
 
 **The prompt protocol of Paper.** Markdown Paper uses the history for the
 prompt protocol of a paper; `mp build` may add the history, or a list of the
-questions to the AI, as an appendix of the PDF. Paper knows no evaluation:
-the declaration of the use of AI and the views of the evaluation reach the
-appendix as a file of the paper ([R-EVAL-009](evaluation.md#r-eval-009)).
+questions to the AI, as an appendix of the PDF. Paper knows no reflection
+tool: the declaration of the use of AI and the views of the reflection tool
+reach the appendix as a file of the paper
+([R-REFL-009](reflection.md#r-refl-009)).
 
 ### R-HIST-007
 
 **Plugins of the history.** Plugins of the history read the steps through
 the API of the history and may add data of their own to a step, for example
-a class and its reason. The evaluation is such a plugin: it classifies each
-step as original work or as routine work, gives each part of a step a role
-(direct, produce or judge), shows the result in views, and gives feedback on
-work and learning, also for student assignments and for source code. Its
-methods rest on published scientific work
-([R-EVAL-019](evaluation.md#r-eval-019)). It is a product of majikmate that
+a class and its reason. The reflection tool is such a plugin: it classifies
+each step as original work or as routine work, gives each part of a step a
+role (direct, produce or judge), shows the result in views, and gives
+feedback on work and learning, also for student assignments and for source
+code. Its methods rest on published scientific work
+([R-REFL-019](reflection.md#r-refl-019)). It is a product of majikmate that
 builds on the history, with its own VS Code extension
-([R-EVAL-017](evaluation.md#r-eval-017)); its specification is
-[evaluation.md](evaluation.md). The history depends on no plugin.
+([R-REFL-017](reflection.md#r-refl-017)); its specification is
+[reflection.md](reflection.md). The history depends on no plugin.
 
 ### R-HIST-008
 
 **A history without the editor.** The history must have an API that reads
 the steps of a history, with their texts, changes, times and origins, on
 every platform, and the file form of a history must be readable without the
-editor, so that a plugin can evaluate a history on its own, for example the
+editor, so that a plugin can analyze a history on its own, for example the
 history that a student submits with an assignment.
 
 ## 5. The history extension of VS Code
@@ -191,9 +192,9 @@ Git or by a program outside VS Code; every creation, deletion and rename of
 a file, also by Git or by a program outside VS Code; the selections in every
 text editor; the settings; and the commands in the terminal, where the shell
 integration of VS Code reports them. It shows the history for any file and
-for the whole workspace. It knows no plugin of the history: the evaluation
-has its own extension, which reads the history through its API
-([R-EVAL-017](evaluation.md#r-eval-017)).
+for the whole workspace. It knows no plugin of the history: the reflection
+tool has its own extension, which reads the history through its API
+([R-REFL-017](reflection.md#r-refl-017)).
 
 An AI tool that reports its actions through hooks gives its prompts, answers
 and edits with the origin AI and the name of the tool, for example Claude

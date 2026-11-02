@@ -4,38 +4,39 @@ SPDX-License-Identifier: MIT
 Licensed under the MIT License. See LICENSE in the repository root for details.
 -->
 
-# Specification of the evaluation plugin
+# Specification of the reflection tool
 
-This document defines the evaluation plugin of the history. The evaluation
-is a product of majikmate that builds on the history, which is general
-infrastructure of nimblescape ([R-ARCH-003](specification.md#r-arch-003)).
-The plugin evaluates the history of a file ([history](history.md)): it
-classifies each step as original work or as routine work, gives each part of
-a step a role, shows the result in views, and gives feedback on work and
-learning. It is normative in the same way as the
-[specification](specification.md): "must" marks a requirement, "should" a
-recommendation, and "may" an option; a requirement marked *(proposal)* is
-not decided yet, and [section 9](#9-open-questions) lists these open
-questions. Each requirement has an ID as its heading. The documentation [How
-the evaluation works](evaluation-guide.md) describes in detail how the
-evaluation works ([R-EVAL-020](#r-eval-020)).
+This document defines the reflection tool, a plugin of the history. The
+reflection tool is a product of majikmate that builds on the history, which
+is general infrastructure of nimblescape
+([R-ARCH-003](specification.md#r-arch-003)). The reflection tool analyzes
+the history of a file ([history](history.md)): it classifies each step as
+original work or as routine work, gives each part of a step a role, shows
+the result in views, and gives feedback on work and learning. It is
+normative in the same way as the [specification](specification.md): "must"
+marks a requirement, "should" a recommendation, and "may" an option; a
+requirement marked *(proposal)* is not decided yet, and [section
+9](#9-open-questions) lists these open questions. Each requirement has an ID
+as its heading. The documentation [How the reflection tool
+works](reflection-guide.md) describes in detail how the reflection tool
+works ([R-REFL-020](#r-refl-020)).
 
 ## 1. Scope
 
-### R-EVAL-022
+### R-REFL-022
 
-**A supportive tool for learners.** The evaluation must be a tool that
-supports learners: it shows learners how their use of AI affects their work
-and their learning, so that they understand this impact and decide how they
-use AI. It must not judge a person: it gives no grade, no score and no
-ranking, and its words describe the work and do not rate the person. It must
-not capture data about a person for others: the history and the results stay
-with the learner, and only the learner decides what to share
-([R-EVAL-015](#r-eval-015)).
+**A supportive tool for learners.** The reflection tool must support
+learners: it shows learners how their use of AI affects their work and their
+learning, so that they understand this impact and decide how they use AI. It
+must not judge a person: it gives no grade, no score and no ranking, and its
+words describe the work and do not rate the person. It must not capture data
+about a person for others: the history and the results stay with the
+learner, and only the learner decides what to share
+([R-REFL-015](#r-refl-015)).
 
-### R-EVAL-001
+### R-REFL-001
 
-**An evaluation of a history.** The evaluation plugin evaluates the history
+**An analysis of a history.** The reflection tool analyzes the history
 of any file: a Markdown document, a paper of Markdown Paper, source code of
 any language, or another file of the workspace, which the history records in
 VS Code ([R-VSC-004](history.md#r-vsc-004)). It serves two uses: the author
@@ -46,7 +47,7 @@ file form of the history ([R-HIST-007](history.md#r-hist-007),
 [R-HIST-008](history.md#r-hist-008)), so it runs without the editor: in VS
 Code, on a web page, on the command line and on a server.
 
-### R-EVAL-019
+### R-REFL-019
 
 **Scientific basis.** Each method of the plugin that classifies work,
 measures it or interprets it for learning must rest on published scientific
@@ -59,25 +60,25 @@ learning, because counts of activity alone are no valid measure of learning
 (Gašević et al., 2015).
 
 [Section 10](#10-scientific-basis) lists the basis and its status for each
-requirement. The requirements on the software ([R-EVAL-016](#r-eval-016),
-[R-EVAL-017](#r-eval-017)) are technical decisions and follow the rules of
+requirement. The requirements on the software ([R-REFL-016](#r-refl-016),
+[R-REFL-017](#r-refl-017)) are technical decisions and follow the rules of
 all nimblescape repositories ([R-GEN-007](specification.md#r-gen-007)).
 
-### R-EVAL-020
+### R-REFL-020
 
 **A documentation, and a report without citations.** The plugin must have a
-documentation of its own that describes in detail how the evaluation works,
-for the people who read a report: the author, the student and the teacher.
-It describes each step, from the history to the episodes, the codes, the
-roles, the classes, the origin of the final text, the measures and the
-indicators, to the views, the feedback and the declaration, and the check of
-the rules, the corrections, the assignments and the limits; each step with
-the scientific work that it rests on, its status
-([section 10](#10-scientific-basis)) and its sources. The report of an
-evaluation, with its views and its declaration, cites no literature: each
-view and the declaration link to the section of the documentation that
-explains them. Until the repository of the history exists, the documentation
-is [How the evaluation works](evaluation-guide.md).
+documentation of its own that describes in detail how the reflection tool
+works, for the people who read a report: the author, the student and the
+teacher. It describes each step, from the history to the episodes, the
+codes, the roles, the classes, the origin of the final text, the measures
+and the indicators, to the views, the feedback and the declaration, and the
+check of the rules, the corrections, the assignments and the limits; each
+step with the scientific work that it rests on, its status ([section
+10](#10-scientific-basis)) and its sources. The report of the reflection
+tool, with its views and its declaration, cites no literature: each view and
+the declaration link to the section of the documentation that explains them.
+Until the repository of the history exists, the documentation is [How the
+reflection tool works](reflection-guide.md).
 
 ## 2. Terms
 
@@ -86,15 +87,15 @@ is [How the evaluation works](evaluation-guide.md).
 | Episode | A question to the AI, its answer, the decision of the user, and the edits that follow on the same text; or a group of edits without the AI, by the undo groups of the editor |
 | Original work | Work that creates content that did not exist in this form: ideas, claims and their phrasing, structure, design, new code |
 | Routine work | Work that applies a given rule or finds a given thing: formatting, search, literature research |
-| Role | What a party does in a part of an episode: direct, produce or judge ([R-EVAL-018](#r-eval-018)) |
-| Intellectual work | Original work and the roles direct and judge: the thinking that the evaluation counts for a party |
+| Role | What a party does in a part of an episode: direct, produce or judge ([R-REFL-018](#r-refl-018)) |
+| Intellectual work | Original work and the roles direct and judge: the thinking that the reflection tool counts for a party |
 | Code | A value of a coding scheme that the classifier gives an episode, with its reason |
-| Indicator | A number of the evaluation that describes the process of work and learning |
+| Indicator | A number of the reflection tool that describes the process of work and learning |
 | Assignment | A document or a set of source files with its history, which a student submits |
 
 ## 3. Classification
 
-### R-EVAL-002
+### R-REFL-002
 
 **Two classes.** The plugin must classify each episode that creates or
 changes content as original work or as routine work, by the work that it
@@ -121,12 +122,12 @@ just taught.
 The term follows the routine tasks of labor economics: tasks that follow
 explicit rules, so that a program can do them (Autor et al., 2003). A
 question to the AI is the role direct of the user
-([R-EVAL-018](#r-eval-018)); the answer and the changes that the user
+([R-REFL-018](#r-refl-018)); the answer and the changes that the user
 accepts are the role produce of the AI, with the class of the work that the
 question asks for. Each classification must record its reason, so that a
 reader can check it.
 
-### R-EVAL-003
+### R-REFL-003
 
 *(proposal)* **Three codes.** The classifier codes each episode with three
 codes, which give the reason of its class:
@@ -142,7 +143,7 @@ codes, which give the reason of its class:
   surface change; a change of the behavior is a meaning change.
 
 The codes give the reason of a class, and the result decides it
-([R-EVAL-002](#r-eval-002)). Create, evaluate, an analysis with a conclusion
+([R-REFL-002](#r-refl-002)). Create, evaluate, an analysis with a conclusion
 of its own, decision selection and a meaning change point to original work;
 remember, understand, information acquisition, an implementation by a given
 rule and a surface change point to routine work. Apply points to neither
@@ -151,18 +152,18 @@ what was learned and does original work, because the code is new; a
 formatter applies a given rule and does routine work, because the rule fixes
 the result. The cognitive process is always the process that the party
 carried out, on the six levels of the revised taxonomy. *(proposal)* The
-context of a work ([R-EVAL-021](#r-eval-021)) may give the levels of its
+context of a work ([R-REFL-021](#r-refl-021)) may give the levels of its
 learning objectives on the same scale, or with a mapping to it, and the
-evaluation then compares the processes of the author and of the AI with
-these levels ([R-EVAL-014](#r-eval-014)).
+reflection tool then compares the processes of the author and of the AI with
+these levels ([R-REFL-014](#r-refl-014)).
 
-### R-EVAL-004
+### R-REFL-004
 
 **The classifier.** The classifier is pluggable and may use an AI through
 the provider API of the libraries ([R-AI-002](ai.md#r-ai-002)).
 Large language models can code text with an accuracy and an agreement above
 those of crowd workers (Gilardi et al., 2023), but the result depends on the
-task, so the classifier must pass the check of [R-EVAL-006](#r-eval-006).
+task, so the classifier must pass the check of [R-REFL-006](#r-refl-006).
 Its rules are a file with a definition and examples of each class, role and
 code, in the form of a codebook of qualitative analysis (MacQueen et al.,
 1998), so that an institution, a course or a layout of Paper can give rules
@@ -171,19 +172,19 @@ analysis of logs of the writing process (Leijten & Van Waes, 2013) and of
 logs of writing sessions with a language model (Lee et al., 2022). The
 classifier must compare the text before and after an episode, and must not
 judge a question to the AI alone. *(proposal)* The library brings default
-rules with the examples of [R-EVAL-002](#r-eval-002). The classifier
+rules with the examples of [R-REFL-002](#r-refl-002). The classifier
 classifies each episode when the history records it, and again when the
 rules change. An episode that holds both classes is split into its parts.
 
-### R-EVAL-005
+### R-REFL-005
 
 *(proposal)* **Corrections.** The author may correct a classification with a
 reason, in the way of member checking, where the participants of a study
 check the interpretation of their own data (Birt et al., 2016). The
-correction is a step of the history, and the evaluation shows the
+correction is a step of the history, and the reflection tool shows the
 classification and the correction; in an assignment, the teacher sees both.
 
-### R-EVAL-006
+### R-REFL-006
 
 **Check against people.** The classifier must be checked against people: two
 people code a sample of episodes on their own, and Krippendorff's alpha
@@ -192,9 +193,9 @@ Krippendorff, 2007). The rules and their examples improve until alpha
 reaches 0.800, the usual limit for reliable data; an alpha from 0.667 allows
 only tentative conclusions (Krippendorff, 2004, p. 241). The plugin shows
 the alpha of the rules in use, marks the results of rules with an alpha
-below 0.800 as tentative, and does not evaluate with rules below 0.667.
+below 0.800 as tentative, and does not analyze with rules below 0.667.
 
-### R-EVAL-018
+### R-REFL-018
 
 **Roles.** The classifier must give each part of an episode a role, with
 the party that did it, the user or the AI:
@@ -208,64 +209,64 @@ the party that did it, the user or the AI:
   test the code of the AI, compare two answers, or correct a claim of the
   AI.
 
-The two classes of [R-EVAL-002](#r-eval-002) apply to the role produce.
+The two classes of [R-REFL-002](#r-refl-002) apply to the role produce.
 Direct and judge are intellectual work of the party that did them, as
-original work is, and the evaluation must show the three apart: who created
-the content, who directed it and who checked it. Roles are the established
-form to attribute contributions in research (Brand et al., 2015). With AI,
-checking information, integrating answers and steering the task become a
-large part of the critical thinking of a person (Lee et al., 2025).
-*(proposal)* An accept counts as judge only when the history shows a check,
-for example a test run, an edit of the answer or a question about it; an
-accept without a check is recorded as such, because people often accept the
-output of automation and of AI without a check (Parasuraman & Manzey, 2010;
-Buçinca et al., 2021).
+original work is, and the reflection tool must show the three apart: who
+created the content, who directed it and who checked it. Roles are the
+established form to attribute contributions in research (Brand et al.,
+2015). With AI, checking information, integrating answers and steering the
+task become a large part of the critical thinking of a person (Lee et al.,
+2025). *(proposal)* An accept counts as judge only when the history shows a
+check, for example a test run, an edit of the answer or a question about it;
+an accept without a check is recorded as such, because people often accept
+the output of automation and of AI without a check (Parasuraman & Manzey,
+2010; Buçinca et al., 2021).
 
-## 4. Evaluation
+## 4. Analysis
 
-### R-EVAL-007
+### R-REFL-007
 
-**Class and origin.** The evaluation must combine the class with the origin
-of each episode ([R-HIST-001](history.md#r-hist-001)): for the user
+**Class and origin.** The reflection tool must combine the class with the
+origin of each episode ([R-HIST-001](history.md#r-hist-001)): for the user
 and for the AI, it gives the episodes, the time and the share of the final
 text of each class, for the whole document or set of files, and for each
 section or file. Changes with the origin "other program" or "probably AI"
-([R-VSC-004](history.md#r-vsc-004)) count apart until the user marks
-them. With the roles ([R-EVAL-018](#r-eval-018)), it also gives the episodes
-that each party directed and judged. This shows which cognitive work the
-author moved to the AI, in the sense of cognitive offloading: an action that
+([R-VSC-004](history.md#r-vsc-004)) count apart until the user marks them.
+With the roles ([R-REFL-018](#r-refl-018)), it also gives the episodes that
+each party directed and judged. This shows which cognitive work the author
+moved to the AI, in the sense of cognitive offloading: an action that
 reduces the cognitive demand of a task (Risko & Gilbert, 2016).
 
-### R-EVAL-008
+### R-REFL-008
 
 **Origin of the final text.** Each character of the final text belongs to
 the episode that wrote it. A later meaning change by the other party makes
 that text original work of that party; a surface change does not (Faigley &
 Witte, 1981).
 
-### R-EVAL-009
+### R-REFL-009
 
 **Declaration.** The plugin must write a declaration of the use of AI from
-the evaluation: the original work of the AI, the routine work that the AI
-did, and the roles in the terms of CRediT (Brand et al., 2015) and GAIDeT
-(Suchikova et al., 2025). With the roles ([R-EVAL-018](#r-eval-018)), the
+the analysis: the original work of the AI, the routine work that the AI did,
+and the roles in the terms of CRediT (Brand et al., 2015) and GAIDeT
+(Suchikova et al., 2025). With the roles ([R-REFL-018](#r-refl-018)), the
 declaration also states which work of the AI the user directed and checked.
 The declaration comes from the history and not from memory, because people
 who write with AI declare themselves as authors even when they do not feel
 ownership of the text of the AI (Draxler et al., 2024). *(proposal)* For a
-paper of Markdown Paper, the evaluation writes the declaration and its views
-as a Markdown file with images into the repository of the paper, and the
-paper includes this file as an appendix like any other file, so that
-Markdown Paper, a product of nimblescape, knows no evaluation
+paper of Markdown Paper, the reflection tool writes the declaration and its
+views as a Markdown file with images into the repository of the paper, and
+the paper includes this file as an appendix like any other file, so that
+Markdown Paper, a product of nimblescape, knows no reflection tool
 ([R-HIST-005](history.md#r-hist-005),
 [R-ARCH-005](specification.md#r-arch-005)). The declaration cites no
-literature and links to the documentation ([R-EVAL-020](#r-eval-020)).
+literature and links to the documentation ([R-REFL-020](#r-refl-020)).
 
 ## 5. Views
 
-### R-EVAL-010
+### R-REFL-010
 
-**The views.** The plugin must show the evaluation in views:
+**The views.** The plugin must show the analysis in views:
 
 | View | What it shows |
 | --- | --- |
@@ -283,11 +284,11 @@ colors come from the theme ([R-THEME-001](platforms.md#r-theme-001)), and
 every view also tells the classes and the origins apart without color: about
 8% of men of European origin have a red-green color deficiency (Birch,
 2012). The views cite no literature; each view links to the section of the
-documentation that explains it ([R-EVAL-020](#r-eval-020)).
+documentation that explains it ([R-REFL-020](#r-refl-020)).
 
 ## 6. Feedback on learning
 
-### R-EVAL-011
+### R-REFL-011
 
 **Formative feedback.** The views must serve as feedback on the work and the
 learning of the author, along the three questions of feedback (Hattie &
@@ -295,31 +296,32 @@ Timperley, 2007): where am I going (the goals), how am I going (the shares
 and their trend), and where to next (the sections, files and episodes that
 hold intellectual work of the AI, and in an assignment the learning
 objectives whose level the AI reached in place of the student,
-[R-EVAL-014](#r-eval-014)). They support the self-reflection of
+[R-REFL-014](#r-refl-014)). They support the self-reflection of
 self-regulated learning (Zimmerman, 2002), and they should lead from
 awareness to reflection, sensemaking and a change of behavior (Verbert et
 al., 2013). Dashboards of learning analytics are rarely grounded in learning
 theory and rarely evaluated well (Matcha et al., 2020); the views therefore
 take their questions from the theories above, and their effect needs the
-study of [R-EVAL-013](#r-eval-013).
+study of [R-REFL-013](#r-refl-013).
 
-### R-EVAL-012
+### R-REFL-012
 
-**Indicators.** The evaluation must give indicators of the learning effect
-and of the learning efficiency. No study shows yet that these indicators
-measure learning; each one is a hypothesis with the basis in the table, and
-the views must label it as a hypothesis ([R-EVAL-019](#r-eval-019)):
+**Indicators.** The reflection tool must give indicators of the learning
+effect and of the learning efficiency. No study shows yet that these
+indicators measure learning; each one is a hypothesis with the basis in the
+table, and the views must label it as a hypothesis
+([R-REFL-019](#r-refl-019)):
 
 | Indicator | Hypothesis | Basis |
 | --- | --- | --- |
 | The share of own intellectual work, and its trend | Learning effect: the author does more of the intellectual work over time | Offloading of work to AI can harm learning (Bastani et al., 2025) and goes with less critical thinking (Gerlich, 2025) |
 | The cognitive processes of the own episodes, and their trend | Learning effect: the author moves from remember and apply to analyze, evaluate and create | The revised taxonomy of Bloom (Krathwohl, 2002) |
-| *(proposal)* In an assignment, for each learning objective, the share of its work at its level that the student did ([R-EVAL-014](#r-eval-014)) | Learning effect: the student does the thinking that the objective aims at | Learning objectives on the levels of the revised taxonomy of Bloom (Krathwohl, 2002); offloading of work to AI can harm learning (Bastani et al., 2025) |
+| *(proposal)* In an assignment, for each learning objective, the share of its work at its level that the student did ([R-REFL-014](#r-refl-014)) | Learning effect: the student does the thinking that the objective aims at | Learning objectives on the levels of the revised taxonomy of Bloom (Krathwohl, 2002); offloading of work to AI can harm learning (Bastani et al., 2025) |
 | The share of AI answers that the author rejects or changes in their meaning | Critical evaluation of the output of the AI | Checking and integrating AI answers as critical thinking (Lee et al., 2025) |
-| *(proposal)* The share of AI answers that the author accepts without a check ([R-EVAL-018](#r-eval-018)) | Reliance on the AI without critical evaluation | Automation bias (Parasuraman & Manzey, 2010) and overreliance on AI (Buçinca et al., 2021) |
+| *(proposal)* The share of AI answers that the author accepts without a check ([R-REFL-018](#r-refl-018)) | Reliance on the AI without critical evaluation | Automation bias (Parasuraman & Manzey, 2010) and overreliance on AI (Buçinca et al., 2021) |
 | The share of the time on intellectual work, and the time of routine work that the AI took over | Learning efficiency: time free for intellectual work | Offloading reduces the cognitive demand of a task (Risko & Gilbert, 2016), but it can also harm learning (Bastani et al., 2025) |
 
-### R-EVAL-013
+### R-REFL-013
 
 **Limits of the indicators.** The views must state that the indicators
 describe the process of the work in the editor and not what the author has
@@ -331,34 +333,34 @@ compares them with tests or grades.
 
 ## 7. Student assignments
 
-### R-EVAL-014
+### R-REFL-014
 
 **Assignments.** A teacher must be able to evaluate a submitted assignment
 with its history: a written text, a paper of Paper, or a programming
 assignment. The plugin reads the history that the student submits with the
-assignment, applies the rules of the course, and gives the evaluation, the
-views and the declaration of [R-EVAL-009](#r-eval-009) for each assignment.
-The student sees the same evaluation as the teacher. *(proposal)* A teacher
+assignment, applies the rules of the course, and gives the analysis, the
+views and the declaration of [R-REFL-009](#r-refl-009) for each assignment.
+The student sees the same analysis as the teacher. *(proposal)* A teacher
 evaluates all assignments of a course in one run, on the command line or on
-a server. The context of an assignment ([R-EVAL-021](#r-eval-021)) may state
+a server. The context of an assignment ([R-REFL-021](#r-refl-021)) may state
 the level of AI use that the assignment allows, after the AI Assessment
-Scale (Perkins et al., 2024), and the evaluation shows the work beside this
-level. *(proposal)* The context of an assignment may name its learning
+Scale (Perkins et al., 2024), and the reflection tool shows the work beside
+this level. *(proposal)* The context of an assignment may name its learning
 objectives, each with the level that it aims at on the scale of the
-cognitive process ([R-EVAL-003](#r-eval-003)), and the parts of the work
+cognitive process ([R-REFL-003](#r-refl-003)), and the parts of the work
 that serve each objective, for example the requirements of its README. The
-evaluation then shows for each objective its level next to the cognitive
-processes that the student and the AI carried out on its work, and the
-feedback names the objectives whose level the AI reached in place of the
-student ([R-EVAL-011](#r-eval-011)). The level of an objective is the aim of
+reflection tool then shows for each objective its level next to the
+cognitive processes that the student and the AI carried out on its work, and
+the feedback names the objectives whose level the AI reached in place of the
+student ([R-REFL-011](#r-refl-011)). The level of an objective is the aim of
 the task; a process below or above it is no error and no grade
-([R-EVAL-013](#r-eval-013)).
+([R-REFL-013](#r-refl-013)).
 
-### R-EVAL-015
+### R-REFL-015
 
 **Data of the students.** The plugin must support the rules of the
-institution on data protection: it evaluates a history only when the student
-submits or shares it, it can delete a history and its evaluation, and its
+institution on data protection: it analyzes a history only when the student
+submits or shares it, it can delete a history and its analysis, and its
 views compare no persons with each other unless the rules of the course
 allow it. These rules follow the ethics of learning analytics: informed
 consent, transparency, privacy and the management of the data (Slade &
@@ -367,7 +369,7 @@ Prinsloo, 2013), and the DELICATE checklist for trusted learning analytics
 
 ## 8. API and platforms
 
-### R-EVAL-016
+### R-REFL-016
 
 **An API for every platform.** The plugin must be a library with an API, the
 same on every platform, whose results are JSON: the episodes with their
@@ -378,94 +380,94 @@ platform adapter only places the views: a panel in VS Code for a document or
 for the source files of a workspace, an element of a web page, the figures
 of the appendix of the PDF with `mp build`, or the report of a course on a
 server. Other programs may read the JSON, for example a learning management
-system of an institution. *(proposal)* The functions are `evaluate(history,
-rules, context)`, `analyze(evaluation, { from, to, part })` and
-`declare(evaluation)`.
+system of an institution. *(proposal)* The functions are `analyze(history,
+rules, context)`, `summarize(analysis, { from, to, part })` and
+`declare(analysis)`.
 
-### R-EVAL-017
+### R-REFL-017
 
-**Package and extension.** The evaluation is a product of majikmate of its
-own that builds on the history ([R-ARCH-003](specification.md#r-arch-003),
+**Package and extension.** The reflection tool is a product of majikmate of
+its own that builds on the history
+([R-ARCH-003](specification.md#r-arch-003),
 [R-ARCH-005](specification.md#r-arch-005)). Its VS Code extension depends on
 the history extension ([R-VSC-004](history.md#r-vsc-004)), reads the history
 through its API, and shows the views. Its npm package runs without the
 recorder and without VS Code, for example on a server. The name of the tool
-is `workevaluation`: the repository
-`majikmate/workevaluation-vscode`, the npm package
-`@majikmate/workevaluation` and the folder `.workevaluation/`.
+is `workreflection`: the repository `majikmate/workreflection-vscode`, the
+npm package `@majikmate/workreflection` and the folder `.workreflection/`.
 
-### R-EVAL-021
+### R-REFL-021
 
-*(proposal)* **Adapters for the context of a work.** The evaluation knows no
-course, no paper and no other kind of work. What it knows about the purpose
-of a work, it gets from adapters through one interface, the same on every
-platform:
+*(proposal)* **Adapters for the context of a work.** The reflection tool
+knows no course, no paper and no other kind of work. What it knows about the
+purpose of a work, it gets from adapters through one interface, the same on
+every platform:
 
-- *The context:* the data form that the evaluation defines, as JSON: the
-  tasks of a work, for example an assignment or a paper, each with the parts
-  of the work that belong to it, for example files, sections or
+- *The context:* the data form that the reflection tool defines, as JSON:
+  the tasks of a work, for example an assignment or a paper, each with the
+  parts of the work that belong to it, for example files, sections or
   requirements; the learning objectives with the level that each aims at
-  ([R-EVAL-003](#r-eval-003)) and the parts that serve each; the level of AI
-  use that a task allows and the goals ([R-EVAL-014](#r-eval-014)); and
+  ([R-REFL-003](#r-refl-003)) and the parts that serve each; the level of AI
+  use that a task allows and the goals ([R-REFL-014](#r-refl-014)); and
   examples of the levels for the rules of the classifier
-  ([R-EVAL-004](#r-eval-004)). Each field may be missing. Without an
-  adapter, the evaluation works on the history alone.
+  ([R-REFL-004](#r-refl-004)). Each field may be missing. Without an
+  adapter, the reflection tool works on the history alone.
 - *An adapter:* a program that knows one kind of work and reads its files,
   and gives their context in this form. The adapter belongs to the product
   of that kind of work, and never to the history; when that product is
   general infrastructure of nimblescape, the adapter belongs to the
-  evaluation, because a product of nimblescape does not depend on a product
-  of majikmate ([R-ARCH-005](specification.md#r-arch-005)). For example, the
-  course module reads the README files of a course and of its assignments
-  ([R-COURSE-011](course.md#r-course-011)), and *(proposal)* the adapter of
-  the evaluation for Markdown Paper reads the chapters of a paper as its
-  parts.
+  reflection tool, because a product of nimblescape does not depend on a
+  product of majikmate ([R-ARCH-005](specification.md#r-arch-005)). For
+  example, the course module reads the README files of a course and of its
+  assignments ([R-COURSE-011](course.md#r-course-011)), and *(proposal)* the
+  adapter of the reflection tool for Markdown Paper reads the chapters of a
+  paper as its parts.
 - *Platforms:* in VS Code, an adapter is an extension that registers with
-  the API of the evaluation extension ([R-EVAL-017](#r-eval-017)); on
-  the command line and on a server, an adapter is an npm package that the
-  run loads. The evaluation passes the context to its functions
-  ([R-EVAL-016](#r-eval-016)).
+  the API of the reflection extension ([R-REFL-017](#r-refl-017)); on the
+  command line and on a server, an adapter is an npm package that the run
+  loads. The reflection tool passes the context to its functions
+  ([R-REFL-016](#r-refl-016)).
 - *Use of the context:* the classifier also gives each episode the parts of
-  the work that it works on, each with a reason ([R-EVAL-004](#r-eval-004));
-  the author may correct it ([R-EVAL-005](#r-eval-005)), and the check of
-  the rules covers it ([R-EVAL-006](#r-eval-006)). The views and the
+  the work that it works on, each with a reason ([R-REFL-004](#r-refl-004));
+  the author may correct it ([R-REFL-005](#r-refl-005)), and the check of
+  the rules covers it ([R-REFL-006](#r-refl-006)). The views and the
   feedback group the work by the tasks and the learning objectives of the
-  context ([R-EVAL-014](#r-eval-014)).
+  context ([R-REFL-014](#r-refl-014)).
 
 ## 9. Open questions
 
-1. Checks: does an accept count as judge only when the history shows a
-   check ([R-EVAL-018](#r-eval-018), proposal), and which signs count as a
-   check: a test run, an edit of the answer, a question about it, or the
-   time to read it?
+1. Checks: does an accept count as judge only when the history shows a check
+   ([R-REFL-018](#r-refl-018), proposal), and which signs count as a check:
+   a test run, an edit of the answer, a question about it, or the time to
+   read it?
 2. Codes: is the scheme of three codes the right basis of the rules
-   ([R-EVAL-003](#r-eval-003), proposal)? Which further code fits source
+   ([R-REFL-003](#r-refl-003), proposal)? Which further code fits source
    code, for example the type of a change (a feature, a fix, a refactoring,
    a test)?
 3. Classifier: does it run when an episode is recorded (proposal), or only
-   when a history is evaluated? Which AI does a teacher use on a server, and
+   when a history is analyzed? Which AI does a teacher use on a server, and
    who pays for it?
 4. Rules: default rules in the library (proposal), or always the rules of
    the institution or of the course?
 5. Corrections: may the author correct a classification
-   ([R-EVAL-005](#r-eval-005), proposal: yes, as a step of its own)?
+   ([R-REFL-005](#r-refl-005), proposal: yes, as a step of its own)?
 6. Views: which views in version 1 (proposal: timeline, shares over time,
    map)? Who sets the goals: the author, the teacher or the rules (proposal:
    all three, shown apart)?
 7. Indicators: does a study compare them with tests or grades before they
-   are used in teaching ([R-EVAL-013](#r-eval-013), proposal: yes)?
+   are used in teaching ([R-REFL-013](#r-refl-013), proposal: yes)?
 8. Assignments: may a teacher see an overview of a course that compares
    students? How does a student submit the history with an assignment: the
    file of the history in the repository, or an export?
-9. Documentation: the details that the documentation marks as proposal,
-   for example the limits of an episode, the time of an episode, the share
-   of intellectual work and the trend of an indicator
-   ([R-EVAL-020](#r-eval-020))?
+9. Documentation: the details that the documentation marks as proposal, for
+   example the limits of an episode, the time of an episode, the share of
+   intellectual work and the trend of an indicator
+   ([R-REFL-020](#r-refl-020))?
 10. Adapters: may an adapter also give rules of its own for the classifier,
-    such as codes ([R-EVAL-004](#r-eval-004)), or only the context
-    ([R-EVAL-021](#r-eval-021))? When several adapters know the same work,
+    such as codes ([R-REFL-004](#r-refl-004)), or only the context
+    ([R-REFL-021](#r-refl-021))? When several adapters know the same work,
     for example a paper that is also an assignment of a course, does the
-    evaluation join their contexts and keep the parts of each apart
+    reflection tool join their contexts and keep the parts of each apart
     (proposal)?
 
 ## 10. Scientific basis
@@ -473,28 +475,28 @@ platform:
 The status tells how far the science carries a requirement: *established* is
 an established method, theory or framework; *finding* is an empirical
 result; *new* combines established work in a new way and needs the check of
-[R-EVAL-006](#r-eval-006); *hypothesis* is not tested by any study yet.
+[R-REFL-006](#r-refl-006); *hypothesis* is not tested by any study yet.
 
 | Requirement | Basis | Status |
 | --- | --- | --- |
-| [R-EVAL-002](#r-eval-002) Two classes | Krathwohl (2002); Autor et al. (2003) | New: established terms; the border for work with AI comes from the rules and their check |
-| [R-EVAL-003](#r-eval-003) Three codes | Krathwohl (2002); Parasuraman et al. (2000); Faigley & Witte (1981) | New: established schemes in a new combination |
-| [R-EVAL-004](#r-eval-004) The classifier | Gilardi et al. (2023); MacQueen et al. (1998); Leijten & Van Waes (2013); Lee et al. (2022) | Established methods; the accuracy for this task is known only after the check |
-| [R-EVAL-005](#r-eval-005) Corrections | Birt et al. (2016) | Established method |
-| [R-EVAL-006](#r-eval-006) Check against people | Hayes & Krippendorff (2007); Krippendorff (2004) | Established method |
-| [R-EVAL-018](#r-eval-018) Roles | Brand et al. (2015); Lee et al. (2025); Parasuraman & Manzey (2010); Buçinca et al. (2021) | New: established roles and findings, used as codes of a history |
-| [R-EVAL-007](#r-eval-007) Class and origin | Risko & Gilbert (2016) | Established theory |
-| [R-EVAL-008](#r-eval-008) Origin of the final text | Faigley & Witte (1981) | Established method |
-| [R-EVAL-009](#r-eval-009) Declaration | Brand et al. (2015); Suchikova et al. (2025); Draxler et al. (2024) | Established taxonomies and a finding |
-| [R-EVAL-010](#r-eval-010) Views | Leijten & Van Waes (2013); Verbert et al. (2013); Birch (2012) | Established methods and a finding |
-| [R-EVAL-011](#r-eval-011) Formative feedback | Hattie & Timperley (2007); Zimmerman (2002); Verbert et al. (2013); Matcha et al. (2020) | Established theories; the effect of the views is a hypothesis |
-| [R-EVAL-012](#r-eval-012) Indicators | The column "Basis" of its table | Hypothesis |
-| [R-EVAL-013](#r-eval-013) Limits of the indicators | Gašević et al. (2015) | Established position |
-| [R-EVAL-014](#r-eval-014) Assignments | Perkins et al. (2024); Draxler et al. (2024); Krathwohl (2002) | Established framework and taxonomy, and a finding |
-| [R-EVAL-015](#r-eval-015) Data of the students | Slade & Prinsloo (2013); Drachsler & Greller (2016) | Established frameworks |
-| [R-EVAL-016](#r-eval-016), [R-EVAL-017](#r-eval-017) API and package | None: technical decisions | Not applicable |
-| [R-EVAL-021](#r-eval-021) Adapters for the context | None: technical decisions | Not applicable |
-| [R-EVAL-020](#r-eval-020) Documentation | None: the documentation holds the basis of the other requirements | Not applicable |
+| [R-REFL-002](#r-refl-002) Two classes | Krathwohl (2002); Autor et al. (2003) | New: established terms; the border for work with AI comes from the rules and their check |
+| [R-REFL-003](#r-refl-003) Three codes | Krathwohl (2002); Parasuraman et al. (2000); Faigley & Witte (1981) | New: established schemes in a new combination |
+| [R-REFL-004](#r-refl-004) The classifier | Gilardi et al. (2023); MacQueen et al. (1998); Leijten & Van Waes (2013); Lee et al. (2022) | Established methods; the accuracy for this task is known only after the check |
+| [R-REFL-005](#r-refl-005) Corrections | Birt et al. (2016) | Established method |
+| [R-REFL-006](#r-refl-006) Check against people | Hayes & Krippendorff (2007); Krippendorff (2004) | Established method |
+| [R-REFL-018](#r-refl-018) Roles | Brand et al. (2015); Lee et al. (2025); Parasuraman & Manzey (2010); Buçinca et al. (2021) | New: established roles and findings, used as codes of a history |
+| [R-REFL-007](#r-refl-007) Class and origin | Risko & Gilbert (2016) | Established theory |
+| [R-REFL-008](#r-refl-008) Origin of the final text | Faigley & Witte (1981) | Established method |
+| [R-REFL-009](#r-refl-009) Declaration | Brand et al. (2015); Suchikova et al. (2025); Draxler et al. (2024) | Established taxonomies and a finding |
+| [R-REFL-010](#r-refl-010) Views | Leijten & Van Waes (2013); Verbert et al. (2013); Birch (2012) | Established methods and a finding |
+| [R-REFL-011](#r-refl-011) Formative feedback | Hattie & Timperley (2007); Zimmerman (2002); Verbert et al. (2013); Matcha et al. (2020) | Established theories; the effect of the views is a hypothesis |
+| [R-REFL-012](#r-refl-012) Indicators | The column "Basis" of its table | Hypothesis |
+| [R-REFL-013](#r-refl-013) Limits of the indicators | Gašević et al. (2015) | Established position |
+| [R-REFL-014](#r-refl-014) Assignments | Perkins et al. (2024); Draxler et al. (2024); Krathwohl (2002) | Established framework and taxonomy, and a finding |
+| [R-REFL-015](#r-refl-015) Data of the students | Slade & Prinsloo (2013); Drachsler & Greller (2016) | Established frameworks |
+| [R-REFL-016](#r-refl-016), [R-REFL-017](#r-refl-017) API and package | None: technical decisions | Not applicable |
+| [R-REFL-021](#r-refl-021) Adapters for the context | None: technical decisions | Not applicable |
+| [R-REFL-020](#r-refl-020) Documentation | None: the documentation holds the basis of the other requirements | Not applicable |
 
 ## Sources
 

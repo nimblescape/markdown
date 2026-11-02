@@ -4,23 +4,24 @@ SPDX-License-Identifier: MIT
 Licensed under the MIT License. See LICENSE in the repository root for details.
 -->
 
-# How the evaluation works
+# How the reflection tool works
 
-This is the documentation of the evaluation of a history. It describes in
-detail how the evaluation works, step by step, and the scientific work that
-each step rests on. It is written for the people who read an evaluation
-report: the author of a text or of code, a student, and a teacher. The
-report itself cites no literature; each view and the declaration link to
-their section here ([R-EVAL-020](evaluation.md#r-eval-020)). The rules that
-the evaluation must follow are in its [specification](evaluation.md). A
-detail that the specification does not decide yet is marked *(proposal)*.
+This is the documentation of the reflection tool, which analyzes a history.
+It describes in detail how the reflection tool works, step by step, and the
+scientific work that each step rests on. It is written for the people who
+read a report of the reflection tool: the author of a text or of code, a
+student, and a teacher. The report itself cites no literature; each view and
+the declaration link to their section here
+([R-REFL-020](reflection.md#r-refl-020)). The rules that the reflection tool
+must follow are in its [specification](reflection.md). A detail that the
+specification does not decide yet is marked *(proposal)*.
 
 ## 1. Overview
 
-The evaluation reads the history of a file or of a set of files and answers
-three questions: who did which part of the work, the author or the AI; which
-kind of work it was; and how this changes over time. It works in eight
-steps:
+The reflection tool reads the history of a file or of a set of files and
+answers three questions: who did which part of the work, the author or the
+AI; which kind of work it was; and how this changes over time. It works in
+eight steps:
 
 | Step | What it does | Section |
 | --- | --- | --- |
@@ -36,7 +37,7 @@ steps:
 Two procedures make the result trustworthy: the check of the rules against
 people ([section 10](#10-the-check-of-the-rules)) and the corrections by the
 author ([section 11](#11-corrections)). [Section 12](#12-assignments)
-describes the evaluation of student assignments, and
+describes the use for student assignments, and
 [section 13](#13-data-and-limits) the data and the limits.
 
 The status at the end of each section tells how far the science carries the
@@ -51,7 +52,7 @@ step:
 
 ## 2. Step 1: read the history
 
-**Input.** The evaluation reads three things:
+**Input.** The reflection tool reads three things:
 
 - the *history*: its steps, each with its time, its author and its origin
   (user, AI or other program). A step is an edit with its change as a text
@@ -78,9 +79,9 @@ as routine work of that program.
 
 ## 3. Step 2: form the episodes
 
-**What an episode is.** The evaluation does not judge single key strokes. It
-groups the steps into episodes, and an episode is the unit of every code,
-role and class. There are two kinds:
+**What an episode is.** The reflection tool does not judge single key
+strokes. It groups the steps into episodes, and an episode is the unit of
+every code, role and class. There are two kinds:
 
 - an *AI episode*: a question to the AI, its answer, the decision of the
   user, and the edits that follow on the same text;
@@ -97,9 +98,9 @@ role and class. There are two kinds:
 3. An edit episode joins the undo groups of the editor on the same block,
    until the author moves to another block or pauses for more than 2
    minutes.
-4. A command in the terminal that runs or tests the program, for example
-   `ts main.ts`, belongs to the episode before it; the evaluation uses it as
-   a sign of a check ([section 5](#5-step-4-give-the-roles)).
+4. A command in the terminal that runs or tests the program, for example `ts
+   main.ts`, belongs to the episode before it; the reflection tool uses it
+   as a sign of a check ([section 5](#5-step-4-give-the-roles)).
 
 **Basis.** This unit follows the analysis of logs of the writing process
 (Leijten & Van Waes, 2013) and of logs of writing sessions with a language
@@ -177,7 +178,8 @@ research (Brand et al., 2015). With AI, checking information, integrating
 answers and steering the task become a large part of the critical thinking
 of a person (Lee et al., 2025). People often accept the output of automation
 and of AI without a check (Parasuraman & Manzey, 2010; Buçinca et al.,
-2021); for this reason the evaluation shows an accept without a check apart.
+2021); for this reason the reflection tool shows an accept without a check
+apart.
 
 *Status:* new. Established roles and findings, used as codes of a history.
 
@@ -219,7 +221,7 @@ its parts and classifies each part. The work of an answer of the AI has the
 class of the work that the question asks for.
 
 **Intellectual work.** Original work, directing and judging together are the
-intellectual work of a party: the thinking that the evaluation counts for
+intellectual work of a party: the thinking that the reflection tool counts for
 the author and for the AI.
 
 **Basis.** The term "routine work" follows the routine tasks of labor
@@ -233,7 +235,7 @@ for work with AI comes from the rules and their check.
 ## 7. Step 6: the origin of the final text
 
 **How it works.** Each character of the final text carries the episode that
-wrote it, and through the episode its party and its class. The evaluation
+wrote it, and through the episode its party and its class. The reflection tool
 follows each character through all later edits, in the way that `git blame`
 follows the lines of a file. When the other party later makes a meaning
 change on a sentence of a text or on a statement of code, this sentence or
@@ -252,8 +254,8 @@ the taxonomy of revisions of Faigley and Witte (1981).
 
 ## 8. Step 7: measures and indicators
 
-**Measures.** For the scope of the report, the evaluation computes for the
-author, for the AI and for the steps of unknown source:
+**Measures.** For the scope of the report, the reflection tool computes for
+the author, for the AI and for the steps of unknown source:
 
 | Measure | How it is computed |
 | --- | --- |
@@ -267,7 +269,7 @@ author, for the AI and for the steps of unknown source:
 Every measure is also computed for each section of a document, for each file
 of a set of files, and for each session or week, for the views.
 
-**Indicators.** From the measures, the evaluation gives indicators of the
+**Indicators.** From the measures, the reflection tool gives indicators of the
 learning effect and of the learning efficiency. No study shows yet that they
 measure learning; each one is a hypothesis, and the report labels it so:
 
@@ -342,8 +344,8 @@ takes its questions from these theories.
 
 ### The declaration of the use of AI
 
-The declaration is a text that the evaluation writes from the measures, not
-from memory. It states the AI tools and models from the history, the
+The declaration is a text that the reflection tool writes from the measures,
+not from memory. It states the AI tools and models from the history, the
 original work and the routine work of the AI with their shares and their
 sections or files, and the roles in the terms of CRediT and GAIDeT: for each
 role, the author, the AI, or both, and which work of the AI the author
@@ -371,7 +373,7 @@ they do not feel ownership of the text of the AI (Draxler et al., 2024).
    improve, and the check runs again with a new sample.
 4. The report shows the alpha of the rules in use. From 0.800 the results
    are reliable. From 0.667 they are tentative, and the report marks them
-   so. Below 0.667 the evaluation does not use the rules.
+   so. Below 0.667 the reflection tool does not use the rules.
 
 An institution or a course may bring rules of its own; they need their own
 check.
@@ -400,11 +402,11 @@ al., 2016).
 ## 12. Assignments
 
 **How it works.** A student works on an assignment, a text or a program, and
-submits it with its history. The teacher runs the evaluation with the rules
-of the course, and the student sees the same report as the teacher.
+submits it with its history. The teacher runs the reflection tool with the
+rules of the course, and the student sees the same report as the teacher.
 *(proposal)* The teacher evaluates all submissions of a course in one run,
 on the command line or on a server. The rules of a course, which reach the
-evaluation through an adapter (see below), may state:
+reflection tool through an adapter (see below), may state:
 
 - the level of AI use that the assignment allows, and the report shows the
   work beside this level;
@@ -418,16 +420,16 @@ evaluation through an adapter (see below), may state:
 - whether the teacher may see an overview of the course that compares
   students.
 
-**Where the context comes from.** *(proposal)* The evaluation knows no
+**Where the context comes from.** *(proposal)* The reflection tool knows no
 course. The learning objectives, their levels, the parts of the work and the
 allowed level of AI use come from an adapter: a program of the course, of
 Markdown Paper or of another kind of work that reads its files and gives
-this context to the evaluation. For example, an extension of a course reads
-the README files of the course and of the assignment. With this context, the
-classifier also gives each episode the parts of the work that it works on,
-so that each part of the work belongs to an objective. Without an adapter,
-the report shows the work without objectives
-([R-EVAL-021](evaluation.md#r-eval-021)).
+this context to the reflection tool. For example, an extension of a course
+reads the README files of the course and of the assignment. With this
+context, the classifier also gives each episode the parts of the work that
+it works on, so that each part of the work belongs to an objective. Without
+an adapter, the report shows the work without objectives
+([R-REFL-021](reflection.md#r-refl-021)).
 
 **Basis.** The levels of AI use come from the AI Assessment Scale (Perkins
 et al., 2024). The levels of the learning objectives use the revised
@@ -437,12 +439,12 @@ taxonomy of Bloom (Krathwohl, 2002).
 
 ## 13. Data and limits
 
-**Data.** The evaluation uses a history only when the student submits or
-shares it. It can delete a history and its evaluation. Its views compare no
+**Data.** The reflection tool uses a history only when the student submits or
+shares it. It can delete a history and its analysis. Its views compare no
 persons unless the rules of the course allow it.
 
-**Limits.** The evaluation describes how a text or a program was made in the
-editor. It does not measure what the author has learned, and it is no
+**Limits.** The reflection tool describes how a text or a program was made
+in the editor. It does not measure what the author has learned, and it is no
 grade. Work outside the editor, on paper, in talks or with other AI tools,
 is not in the history. *(proposal)* Before the indicators are used in
 teaching, a study compares them with tests or grades.
