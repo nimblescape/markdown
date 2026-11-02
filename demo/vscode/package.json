@@ -1,0 +1,51 @@
+{
+  "name": "nimblescape-markdown-example",
+  "displayName": "nimblescape Markdown (example)",
+  "description": "The example extension of nimblescape Markdown: it opens each Markdown file in the editor of rendered Markdown, to try the adapter for VS Code during the development. It is never published.",
+  "private": true,
+  "version": "0.0.0",
+  "publisher": "nimblescape",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.125.0"
+  },
+  "main": "./dist/extension.cjs",
+  "browser": "./dist/extension.cjs",
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": true
+    },
+    "virtualWorkspaces": true
+  },
+  "contributes": {
+    "customEditors": [
+      {
+        "viewType": "nimblescape.markdownExample.editor",
+        "displayName": "nimblescape Markdown (example)",
+        "selector": [
+          {
+            "filenamePattern": "*.md"
+          }
+        ],
+        "priority": "default"
+      }
+    ],
+    "commands": [
+      {
+        "command": "nimblescape.markdownExample.openText",
+        "title": "Open Text Editor to the Side",
+        "category": "nimblescape Markdown",
+        "icon": "$(go-to-file)"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "nimblescape.markdownExample.openText",
+          "when": "activeCustomEditorId == nimblescape.markdownExample.editor",
+          "group": "navigation"
+        }
+      ]
+    }
+  }
+}

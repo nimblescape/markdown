@@ -5,9 +5,10 @@ Licensed under the MIT License. See LICENSE in the repository root for details.
 */
 
 /*
-The styles of the editor (docs/specification.md, R-THEME-001, R-THEME-002). Every color and font comes from a token
+The styles of the editor (docs/platforms.md, R-THEME-001, R-THEME-002). Every color and font comes from a token
 --nsmd-*. On the web, a page sets the tokens for its theme; the defaults below follow the light or dark scheme of the
-browser. In VS Code, the adapter of the webview sets the tokens from the variables --vscode-* of the theme (step 6).
+browser. The palette of seven colors, --nsmd-color-*, gives the colors of the alerts and of the plugins. In VS Code,
+vscode.css of @nimblescape/markdownvscode sets the tokens from the variables --vscode-* of the theme.
 */
 
 .nsmd-editor {
@@ -27,11 +28,18 @@ browser. In VS Code, the adapter of the webview sets the tokens from the variabl
   --nsmd-mark: #953800;
   --nsmd-find-match: rgba(212, 167, 44, 0.35);
   --nsmd-find-current: rgba(255, 145, 0, 0.6);
-  --nsmd-alert-note: #0969da;
-  --nsmd-alert-tip: #1a7f37;
-  --nsmd-alert-important: #8250df;
-  --nsmd-alert-warning: #9a6700;
-  --nsmd-alert-caution: #d1242f;
+  --nsmd-color-gray: #59636e;
+  --nsmd-color-red: #d1242f;
+  --nsmd-color-orange: #bc4c00;
+  --nsmd-color-yellow: #9a6700;
+  --nsmd-color-green: #1a7f37;
+  --nsmd-color-blue: #0969da;
+  --nsmd-color-purple: #8250df;
+  --nsmd-alert-note: var(--nsmd-color-blue);
+  --nsmd-alert-tip: var(--nsmd-color-green);
+  --nsmd-alert-important: var(--nsmd-color-purple);
+  --nsmd-alert-warning: var(--nsmd-color-yellow);
+  --nsmd-alert-caution: var(--nsmd-color-red);
   --nsmd-font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
   --nsmd-font-size: 16px;
   --nsmd-line-height: 1.6;
@@ -56,11 +64,13 @@ browser. In VS Code, the adapter of the webview sets the tokens from the variabl
     --nsmd-mark: #ffa657;
     --nsmd-find-match: rgba(187, 128, 9, 0.4);
     --nsmd-find-current: rgba(255, 145, 0, 0.6);
-    --nsmd-alert-note: #4493f8;
-    --nsmd-alert-tip: #3fb950;
-    --nsmd-alert-important: #ab7df8;
-    --nsmd-alert-warning: #d29922;
-    --nsmd-alert-caution: #f85149;
+    --nsmd-color-gray: #9198a1;
+    --nsmd-color-red: #f85149;
+    --nsmd-color-orange: #db6d28;
+    --nsmd-color-yellow: #d29922;
+    --nsmd-color-green: #3fb950;
+    --nsmd-color-blue: #4493f8;
+    --nsmd-color-purple: #ab7df8;
   }
 }
 
@@ -75,8 +85,10 @@ browser. In VS Code, the adapter of the webview sets the tokens from the variabl
   word-wrap: break-word;
 }
 
+/* A theme may give the selected text its own color, for example a theme of high contrast; else the text keeps its color. */
 .nsmd-editor .ProseMirror ::selection {
   background: var(--nsmd-selection);
+  color: var(--nsmd-selection-foreground, inherit);
 }
 
 .nsmd-editor a {

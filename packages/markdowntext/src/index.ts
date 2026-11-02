@@ -13,5 +13,5 @@ export { frontMatterOf, type FrontMatter, type FrontMatterFormat } from './front
 export { editFrontMatter, readFrontMatter, tomlText, tomlValue } from './frontMatter/edit';
 export { FrontMatterError, type FrontMatterEdit, type FrontMatterPath } from './frontMatter/types';
 export { checkFrontMatter, schemaAt, typeOf, type FrontMatterProblem, type JsonSchema, type JsonSchemaObject, type JsonType } from './frontMatter/schema';
-export { applyPatches, mapPosition, patchesBetween, type TextPatch } from './source/patch';
+export { applyPatches, mapPosition, mergeTexts, patchesBetween, type TextPatch } from './source/patch';
 export { TextSource, type Origin, type OriginKind, type TextChange, type TextFile, type TextSelection } from './source/textSource';

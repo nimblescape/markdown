@@ -1,7 +1,7 @@
 {
   "name": "@nimblescape/markdowntext",
   "version": "0.1.0",
-  "description": "The source of nimblescape Markdown: the text of a file without a view. Today the package reads the front matter of a text in YAML, TOML or JSON, changes one value so that the comments, the order and the quotes of the other keys stay, and checks it against a JSON schema.",
+  "description": "The source of nimblescape Markdown: the text of a file without a view, its changes as text patches with their origin, the selections of its editors and the merge of two changes at the same time; and the front matter in YAML, TOML or JSON, whose edits keep the comments, the order and the quotes of the other keys, with the check against a JSON schema.",
   "license": "MIT",
   "author": {
     "name": "nimblescape e.U.",

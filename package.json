@@ -18,11 +18,13 @@
   "type": "module",
   "workspaces": [
     "packages/markdowntext",
-    "packages/markdowneditor"
+    "packages/markdowneditor",
+    "packages/markdownvscode"
   ],
   "scripts": {
     "build": "npm run build --workspaces",
     "demo": "node esbuild.mjs --serve",
+    "demo:vscode": "node esbuild.mjs --vscode",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test": "vitest run",
@@ -32,6 +34,7 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/node": "^24.19.2",
+    "@types/vscode": "~1.125.0",
     "commonmark-spec": "^0.31.2",
     "esbuild": "^0.28.2",
     "eslint": "^10.14.0",

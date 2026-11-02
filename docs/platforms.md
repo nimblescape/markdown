@@ -47,11 +47,34 @@ custom text editor of VS Code, so that the file stays a normal text
 document: save, the dirty mark, hot exit, Git diffs, the timeline and other
 extensions work as for the text editor.
 
+*(proposal)* The package `@nimblescape/markdownvscode` is the adapter. The
+function `registerMarkdownEditor` of the extension side registers the editor
+for the view type of the extension, with the script of the page that the
+extension bundles, the style sheets and a function that decides which
+documents open in it ([R-GEN-004](#r-gen-004)); a document that does not
+open in it opens in the text editor in the same place. The adapter gets the
+API of VS Code as a parameter and uses no API of Node.js, so that it runs in
+the extension host of the desktop and of the web. The page of the webview
+allows only the script of the extension with a random nonce, the style
+sheets and fonts of the extension, and images from the folder of the file,
+from https and as data; the base of the page is the folder of the file, so
+that an image with a relative path shows. The page keeps its state while its
+tab is in the background. On a file system that cannot write, for example
+an older version of a file from Git, the editor is read-only. The side of
+the page is the entry point `@nimblescape/markdownvscode/webview`: its
+function `connectVsCode` gives the source of the document, and the page
+creates the editor with it ([R-EDIT-002](editor.md#r-edit-002)).
+
 ### R-VSC-002
 
 **Text editor and save.** A button must open the text editor of the same
 file to the side. Ctrl+S saves the file; the format on save of Notes runs,
 and the editor takes over the changed blocks.
+
+*(proposal)* The button is in the title of the editor; the extension
+contributes it with a command, which the adapter registers. The text editor
+opens with the selection of the editor. The page may also open it, for
+example from a button of its own.
 
 ### R-VSC-003
 
@@ -59,6 +82,29 @@ and the editor takes over the changed blocks.
 Restricted Mode and virtual workspaces, sends no telemetry and has no
 network address of its own. It may require a newer VS Code version than
 1.125 when that makes the work simpler.
+
+### R-VSC-005
+
+*(proposal)* **The page and the document.** The document of VS Code holds
+the text of the file; the page of the webview holds a source with the same
+text. Each message that changes the text gives only the patches against a
+version that the other side knows. The page sends one change of the user at
+a time; a change that the user makes before the answer waits for it. A
+change of the document since the version of a change of the page merges
+with it ([R-SRC-002](source.md#r-src-002)). Each change of the document that
+the page did not make reaches the editor with the origin `program` and the
+name `vscode`, because VS Code does not say who made a change. When the page
+misses a message, for example while VS Code cannot give it, the page starts
+again from the whole text of the document.
+
+### R-VSC-006
+
+*(proposal)* **Undo and the keys of the editor.** Undo and Redo with the
+keys in the editor undo and redo the steps of the editor, as the user made
+them. Undo from the menu of VS Code undoes the changes of the document. A
+key that the editor handles, for example Ctrl+K for a link or Ctrl+F for
+find, starts no key binding of VS Code; every other key, for example Ctrl+S,
+reaches VS Code.
 
 ## 3. Web
 
@@ -87,6 +133,14 @@ from the active color theme: the adapter maps each variable to a variable
 yellow, green, blue, purple) comes from the chart colors of the theme; Notes
 adds teal.
 
+*(proposal)* The palette is the variables `--nsmd-color-gray` to
+`--nsmd-color-purple`; the colors of the alerts come from it. The style
+sheet `vscode.css` of `@nimblescape/markdownvscode` maps the variables; the
+page loads it after the style sheet of the editor. A theme may give the
+selected text its own color with `--nsmd-selection-foreground`, as the
+themes of high contrast of VS Code do; without it, the selected text keeps
+its color.
+
 ### R-THEME-002
 
 **Themes on the web.** On the web, the editor must be themable: the package
@@ -95,9 +149,9 @@ change any variable or bring a theme of its own.
 
 ### R-THEME-003
 
-*(proposal)* **Fonts in VS Code.** In VS Code, the text uses the font and
-size of the settings of the Markdown preview, and code uses the font of the
-editor.
+*(proposal)* **Fonts in VS Code.** In VS Code, the text uses the font, the
+size and the line height of the settings of the Markdown preview, and code
+uses the font of the editor. A change of these settings shows at once.
 
 ## 6. Open questions
 
@@ -106,6 +160,10 @@ editor.
    default of the setting ([R-GEN-004](#r-gen-004))?
 2. Fonts: the fonts of the settings of the Markdown preview in VS Code
    ([R-THEME-003](#r-theme-003), proposal)?
+3. VS Code: the form of the adapter ([R-VSC-001](#r-vsc-001)), the
+   changes between the page and the document
+   ([R-VSC-005](#r-vsc-005)), and Undo and the keys of the editor
+   ([R-VSC-006](#r-vsc-006)), all proposals?
 
 ---
 

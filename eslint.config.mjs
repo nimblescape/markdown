@@ -12,7 +12,7 @@ import tseslint from 'typescript-eslint';
 export default tseslint.config(
   {
     // The built files and the installed packages are no sources.
-    ignores: ['packages/*/dist/', 'demo/dist/', '**/node_modules/'],
+    ignores: ['packages/*/dist/', 'demo/dist/', 'demo/vscode/dist/', '**/node_modules/'],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,

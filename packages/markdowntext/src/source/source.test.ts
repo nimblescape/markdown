@@ -3,11 +3,11 @@
 // Licensed under the MIT License. See LICENSE in the repository root for details.
 
 // The tests of the source (docs/source.md, R-SRC-001, R-SRC-002): the patches between two texts, the positions after a
-// change, the changes with their origin, the selections of the editors, the order of the changes for the listeners,
+// change, the merge of two changes of the same text, the changes with their origin, the selections of the editors, the order of the changes for the listeners,
 // and the file.
 
 import { describe, expect, it } from 'vitest';
-import { applyPatches, mapPosition, patchesBetween, type TextPatch } from './patch';
+import { applyPatches, mapPosition, mergeTexts, patchesBetween, type TextPatch } from './patch';
 import { TextSource, type TextChange, type TextFile } from './textSource';
 
 const user = { kind: 'user', editor: 'a' } as const;
@@ -92,6 +92,74 @@ describe('the positions after a change', () => {
         { from: 0, to: 1, insert: '' },
       ]),
     ).toThrow(RangeError);
+  });
+});
+
+describe('the merge of two changes of the same text', () => {
+  const base = '# Title\n\nFirst paragraph.\n\nSecond paragraph.\n';
+  it('keeps both changes when they change different places', () => {
+    const ours = base.replace('First', 'First new');
+    const theirs = base.replace('Second', 'Last');
+    expect(mergeTexts(base, ours, theirs)).toBe('# Title\n\nFirst new paragraph.\n\nLast paragraph.\n');
+    // Two places in the same line.
+    expect(mergeTexts('one two three', 'One two three', 'one two Three')).toBe('One two Three');
+  });
+
+  it('takes the other text when one side did not change', () => {
+    expect(mergeTexts(base, base, 'other')).toBe('other');
+    expect(mergeTexts(base, 'mine', base)).toBe('mine');
+    expect(mergeTexts(base, 'same', 'same')).toBe('same');
+  });
+
+  it('counts a patch that both changes make once', () => {
+    const both = base.replace('First', 'Fist');
+    expect(mergeTexts(base, both, both.replace('Second', 'Last'))).toBe(both.replace('Second', 'Last'));
+    expect(mergeTexts('a\n\nb\n', 'aX\n\nb\n', 'aX\n\nb!\n')).toBe('aX\n\nb!\n');
+  });
+
+  it('puts the text of theirs first when both insert at the same place', () => {
+    expect(mergeTexts('ab', 'aOb', 'aTb')).toBe('aTOb');
+  });
+
+  it('keeps theirs where the two changes overlap', () => {
+    expect(mergeTexts('one two three', 'one 2 three', 'one deux three')).toBe('one deux three');
+    expect(mergeTexts('one two three', 'one tw!o three', 'one 2 three')).toBe('one 2 three');
+    // A change of ours that overlaps stays out, and a change of ours elsewhere stays.
+    expect(mergeTexts('a\n\nbcd\ne\n', 'A\n\nbXd\ne\n', 'a\n\nb-c-d\ne\n')).toBe('A\n\nb-c-d\ne\n');
+  });
+
+  it('merges texts of many random edits: changes apart give both, and a change of ours that overlaps gives theirs', () => {
+    let seed = 11;
+    const random = (limit: number) => {
+      seed = (seed * 1103515245 + 12345) % 2147483648;
+      return seed % limit;
+    };
+    const words = ['a', 'b', 'text', '\n', '\n\n', '# ', '- ', ' '];
+    const edit = (text: string) => {
+      const at = random(text.length + 1);
+      return text.slice(0, at) + words[random(words.length)] + text.slice(at + random(3));
+    };
+    let apartCount = 0;
+    for (let round = 0; round < 300; round++) {
+      let text = '';
+      for (let count = 10 + random(30); count > 0; count--) {
+        text += words[random(words.length)];
+      }
+      const ours = edit(text);
+      const theirs = edit(text);
+      const merged = mergeTexts(text, ours, theirs);
+      const mine = patchesBetween(text, ours);
+      const other = patchesBetween(text, theirs);
+      if (mine.every((a) => other.every((b) => a.to < b.from || b.to < a.from))) {
+        apartCount++;
+        const both = [...mine, ...other].sort((a, b) => a.from - b.from);
+        expect(merged).toBe(applyPatches(text, both));
+        expect(mergeTexts(text, theirs, ours)).toBe(merged);
+      } else if (mine.every((a) => other.some((b) => a.from < b.to && b.from < a.to))) {
+        expect(merged).toBe(theirs);
+      }
+    }
+    expect(apartCount).toBeGreaterThan(100);
   });
 });
 

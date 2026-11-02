@@ -27,6 +27,17 @@ source.setText('a\nB\nc\n', { kind: 'program', name: 'git' });
 // program [{ from: 2, to: 3, insert: 'B' }]
 ```
 
+`mergeTexts` merges two changes of the same text that came at the same
+time, for example a change in an editor and a change of the file; where
+both change the same characters, the second change stays.
+
+```ts
+import { mergeTexts } from '@nimblescape/markdowntext';
+
+mergeTexts('one two three', 'One two three', 'one two Three');
+// 'One two Three'
+```
+
 The front matter at the start of a text, in YAML, TOML or JSON
 ([R-SRC-003](../../docs/source.md#r-src-003)):
 
