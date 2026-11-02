@@ -232,6 +232,10 @@ use:
   commit.
 - The npm packages use the same structure, build and release workflow as the
   other nimblescape npm packages.
+- A tool keeps the files that it writes into a repository in a folder with
+  the name of the tool and a leading dot, for example `.markdownpaper/` of
+  Markdown Paper, `.markdownnotes/` of Markdown Notes and `.history/` of the
+  history, and not in a shared folder such as `.nimblescape/`.
 
 ## 6. Open questions
 
@@ -243,6 +247,10 @@ use:
 3. Names of the history: the repository `nimblescape/history-vscode` and
    the npm packages `@nimblescape/history` and
    `@nimblescape/historyevaluation` ([R-ARCH-003](#r-arch-003), proposal)?
+   The folder of the history in a repository follows the name of the tool
+   ([R-GEN-007](#r-gen-007)): `.history/` with these names. The VS Code
+   extension "Local History" also writes copies of files into `.history/`
+   of the workspace, and its users often let Git ignore this folder.
 
 The documents of the parts list their own open questions: the
 [editor](editor.md#10-open-questions), the

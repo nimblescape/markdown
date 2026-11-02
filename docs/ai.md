@@ -56,7 +56,7 @@ of VS Code. On the web, the page calls its own server.
 
 **Memory.** The AI must use a memory, so that a decision in a chat has the
 context of the other decisions and chats. *(proposal)* The memory is a
-folder of the repository of the document, `.notes/memory/`, with one
+folder of the repository of the document, `.markdownnotes/memory/`, with one
 Markdown file for each subject, read and written through the memory tool of
 the Claude API; a second tool searches the other notes and chats.
 
