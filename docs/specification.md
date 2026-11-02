@@ -36,9 +36,10 @@ Markdown, and the reflection tool builds on it
 platforms are VS Code and the web, with the same code; the command line is a
 platform for output without a view, for example `mp build` of nimblescape
 Markdown Paper. The libraries are npm packages, one for each part
-([R-ARCH-002](#r-arch-002)); today four exist,
+([R-ARCH-002](#r-arch-002)); today five exist,
 `@nimblescape/markdowntext`, `@nimblescape/markdownrender`,
-`@nimblescape/markdowneditor` and `@nimblescape/markdownvscode`. nimblescape Markdown
+`@nimblescape/markdownlayout`, `@nimblescape/markdowneditor` and
+`@nimblescape/markdownvscode`. nimblescape Markdown
 Notes and nimblescape Markdown Paper are format extensions: they add their
 parts through plugins ([plugins and format extensions](plugins.md)), and
 they decide where they use the libraries
@@ -300,6 +301,8 @@ use:
 | `jsonc-parser` *(proposal)* | MIT | The front matter in JSON, also with comments ([R-FM-005](editor.md#r-fm-005)) |
 | `@cfworker/json-schema` *(proposal)* | MIT | The check of the front matter against its JSON schema, without eval ([R-FM-004](editor.md#r-fm-004)) |
 | `diff` *(proposal)* | BSD-3-Clause | The patches between two texts, and the blocks that a change from outside changes ([R-SRC-002](source.md#r-src-002)) |
+| `pagedjs` *(proposal)* | MIT | The pages of a layout ([R-LAYOUT-003](rendering.md#r-layout-003)); the layout package holds its script `paged.polyfill.js`, which holds `event-emitter`, `d`, `es5-ext`, `type` and `es6-symbol` (MIT and ISC), `css-tree` (MIT) with `mdn-data` (CC0-1.0) and `source-map` (BSD-3-Clause), and `clear-cut` (MIT) |
+| `hyphen` *(proposal)* | ISC | The soft hyphens of the text of the pages by the language of the layout ([R-LAYOUT-004](rendering.md#r-layout-004)); its patterns come from the hyphenation patterns of TeX (hyph-utf8), each language with its own authors and license |
 
 ### R-GEN-007
 
@@ -356,7 +359,7 @@ the [platforms](platforms.md#6-open-questions).
 | 12 | The npm workspaces: the code moves into the packages of the parts, first `@nimblescape/markdowneditor` and `@nimblescape/markdowntext`; each other package starts with its step | [R-ARCH-002](#r-arch-002) | built |
 | 13 | The source: the text, the selections and the changes of a file with their origin, the changes from outside, the front matter and the parts that no plugin knows | [R-SRC-001](source.md#r-src-001) to [R-SRC-003](source.md#r-src-003), [R-GEN-006](source.md#r-gen-006), [R-EDIT-002](editor.md#r-edit-002) | built; each platform adapter gives the files in its own step |
 | 14 | The renderer: content without edit functions from markdown-it 14, without the editor, with the plugins of the renderer | [R-REN-001](rendering.md#r-ren-001) to [R-REN-003](rendering.md#r-ren-003) | built; the editor is built on it, and the example page shows its rendering |
-| 15 | The layout: the layouts with the schemas of their front matter, the layout code of Markdown Paper, pages and PDF from the same rendering as the view | [R-LAYOUT-001](rendering.md#r-layout-001) to [R-LAYOUT-004](rendering.md#r-layout-004) | planned |
+| 15 | The layout: the layouts with the schemas of their front matter, the layout code of Markdown Paper, pages and PDF from the same rendering as the view | [R-LAYOUT-001](rendering.md#r-layout-001) to [R-LAYOUT-004](rendering.md#r-layout-004) | 15a built: the package `@nimblescape/markdownlayout` with the layouts, the text in pages, the page for Paged.js and the view of the pages, shown in the example page; 15b, the PDF, and 15c, the switch between "Edit" and "Pages" in VS Code, planned |
 
 Steps 12 to 15 give the parts of [section 3](#3-architecture) that the
 first plan did not name their steps, so their numbers do not give their

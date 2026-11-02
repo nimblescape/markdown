@@ -162,6 +162,21 @@ describe('the output as GitHub writes it', () => {
     expect(html('# Title\n', { headingIds: false })).toBe('<h1>Title</h1>\n');
   });
 
+  it('keeps the ID that a plugin gave a heading, and the next heading of the same text gets the next ID', () => {
+    // A plugin such as the layout gives a heading its ID before it changes the text of the heading.
+    const own: RenderPlugin = {
+      name: 'own',
+      apiVersion: 1,
+      extendMarkdownIt: (md) => {
+        md.core.ruler.push('own', (state) => {
+          const open = state.tokens.find((token) => token.type === 'heading_open');
+          open?.attrSet('id', 'teil');
+        });
+      },
+    };
+    expect(html('# Part\n\n# Teil\n', { plugins: [own] })).toBe('<h1 id="teil">Part</h1>\n<h1 id="teil-1">Teil</h1>\n');
+  });
+
   it('shows the color of a cell and the widths of the columns from the comments of the table', () => {
     const rendering = html('<!-- table: widths=60,40 -->\n| a | <!--cell red--> b |\n|---|---|\n| <!--cell yellow--> c | d |\n');
     expect(rendering).toBe(

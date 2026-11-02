@@ -1,0 +1,55 @@
+{
+  "name": "@nimblescape/markdownlayout",
+  "version": "0.1.0",
+  "description": "The layout of nimblescape Markdown: the rendered text of a file in a layout, with the styles, the templates of the fixed pages and the fields of the front matter, the numbers of the headings, figures, tables and listings, the generated lists, and the pages of Paged.js.",
+  "license": "MIT",
+  "author": {
+    "name": "nimblescape e.U.",
+    "url": "https://nimblescape.com"
+  },
+  "homepage": "https://github.com/nimblescape/markdown/tree/main/packages/markdownlayout#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nimblescape/markdown.git",
+    "directory": "packages/markdownlayout"
+  },
+  "bugs": {
+    "url": "https://github.com/nimblescape/markdown/issues"
+  },
+  "keywords": [
+    "markdown",
+    "layout",
+    "paged-media",
+    "pagedjs",
+    "pdf"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "nimblescape-source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./paged.polyfill.js": "./dist/paged.polyfill.js"
+  },
+  "files": [
+    "dist/*.js",
+    "dist/**/*.d.ts",
+    "dist/THIRD-PARTY-NOTICES.md"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "node ../../esbuild.mjs --production && tsc -p tsconfig.build.json"
+  },
+  "dependencies": {
+    "@nimblescape/markdownrender": "0.1.0",
+    "@nimblescape/markdowntext": "0.1.0",
+    "@types/markdown-it": "^14.2.0",
+    "hyphen": "^1.14.1",
+    "markdown-it": "^14.3.3",
+    "pagedjs": "^0.4.3"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

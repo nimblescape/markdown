@@ -66,7 +66,7 @@ export interface Rendering {
 
 /** withoutFrontMatter returns a text without its byte order mark, with blank lines in place of its front matter. */
 function withoutFrontMatter(text: string): string {
-  const body = text.startsWith('﻿') ? text.slice(1) : text;
+  const body = text.startsWith('\ufeff') ? text.slice(1) : text;
   const lines = body.split('\n');
   const front = frontMatterOf(lines.map((line) => (line.endsWith('\r') ? line.slice(0, -1) : line)));
   return front ? [...Array<string>(front.lines).fill(''), ...lines.slice(front.lines)].join('\n') : body;

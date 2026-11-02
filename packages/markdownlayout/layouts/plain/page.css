@@ -1,0 +1,377 @@
+/*
+SPDX-License-Identifier: MIT
+© 2026 Hannes Stauss (scalarion@nimblescape.com)
+Licensed under the MIT License. See LICENSE in the repository root for details.
+
+The pages of the layout "plain": A4, a serif font for the text and a sans-serif font for the headings, justified
+text, numbered headings, the page number at the foot of each page, and the footnotes below a short line. The fonts are
+the fonts of the computer: Liberation Serif and Liberation Sans, which have the metrics of Times New Roman and Arial,
+else these.
+*/
+
+@page {
+  size: A4;
+  margin: 25mm 25mm 25mm 25mm;
+
+  @bottom-left {
+    content: var(--field-author);
+    font-family: "Liberation Sans", Arial, Helvetica, sans-serif;
+    font-size: 8.5pt;
+    color: #555;
+  }
+
+  @bottom-right {
+    content: counter(page);
+    font-family: "Liberation Sans", Arial, Helvetica, sans-serif;
+    font-size: 8.5pt;
+    color: #555;
+  }
+
+  @footnote {
+    border-top: 0.5pt solid #444;
+    padding-top: 2mm;
+    margin-top: 4mm;
+  }
+}
+
+html {
+  font-family: "Liberation Serif", "Times New Roman", Times, serif;
+  font-size: 11pt;
+  line-height: 1.45;
+  color: #111;
+}
+
+body {
+  margin: 0;
+  /* Lines break only at the soft hyphens of the renderer. */
+  hyphens: manual;
+}
+
+/* The title block of title.html. */
+.title-block {
+  margin: 0 0 10mm 0;
+}
+
+.title-block .title {
+  font-family: "Liberation Sans", Arial, Helvetica, sans-serif;
+  font-size: 22pt;
+  font-weight: bold;
+  line-height: 1.15;
+  text-align: left;
+  margin: 0 0 3mm 0;
+}
+
+.title-block .subtitle {
+  font-size: 14pt;
+  text-align: left;
+  margin: 0 0 4mm 0;
+}
+
+.title-block .author,
+.title-block .date {
+  text-align: left;
+  margin: 0;
+}
+
+/* The text. */
+p {
+  text-align: justify;
+  margin: 0 0 0.6em 0;
+  orphans: 2;
+  widows: 2;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Liberation Sans", Arial, Helvetica, sans-serif;
+  line-height: 1.2;
+  break-after: avoid;
+  break-inside: avoid;
+}
+
+h1 {
+  font-size: 16pt;
+  margin: 1.2em 0 0.5em 0;
+}
+
+h2 {
+  font-size: 13pt;
+  margin: 1em 0 0.4em 0;
+}
+
+h3 {
+  font-size: 11.5pt;
+  margin: 0.9em 0 0.3em 0;
+}
+
+h4,
+h5,
+h6 {
+  font-size: 11pt;
+  margin: 0.8em 0 0.3em 0;
+}
+
+.heading-number {
+  display: inline-block;
+  min-width: 2.2em;
+}
+
+ul,
+ol {
+  margin: 0 0 0.6em 0;
+  padding-left: 1.6em;
+}
+
+li {
+  margin: 0 0 0.2em 0;
+}
+
+blockquote {
+  margin: 0 0 0.8em 1.5em;
+  font-size: 10pt;
+  line-height: 1.3;
+}
+
+/* An alert of GitHub (> [!NOTE] and the others): a box with a line on the left in the color of its kind. */
+.markdown-alert {
+  margin: 0 0 0.8em 0;
+  padding: 0.3em 0.8em;
+  border-left: 3pt solid #0969da;
+  font-size: 10pt;
+  line-height: 1.3;
+  break-inside: avoid;
+}
+
+.markdown-alert > p {
+  margin: 0 0 0.3em 0;
+}
+
+.markdown-alert > p:last-child {
+  margin-bottom: 0;
+}
+
+.markdown-alert-title {
+  font-weight: bold;
+  color: #0969da;
+}
+
+.markdown-alert-tip { border-left-color: #1a7f37; }
+.markdown-alert-tip .markdown-alert-title { color: #1a7f37; }
+.markdown-alert-important { border-left-color: #8250df; }
+.markdown-alert-important .markdown-alert-title { color: #8250df; }
+.markdown-alert-warning { border-left-color: #9a6700; }
+.markdown-alert-warning .markdown-alert-title { color: #9a6700; }
+.markdown-alert-caution { border-left-color: #cf222e; }
+.markdown-alert-caution .markdown-alert-title { color: #cf222e; }
+
+code,
+pre {
+  font-family: "Liberation Mono", Consolas, Menlo, monospace;
+  font-size: 9pt;
+}
+
+pre {
+  white-space: pre-wrap;
+  background: #f4f4f4;
+  padding: 2mm 3mm;
+  break-inside: avoid;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+hr {
+  border: 0;
+  border-top: 0.5pt solid #999;
+  margin: 1em 0;
+}
+
+/* Figures: the caption above the image, as in APA 7. */
+figure.figure {
+  margin: 1em 0;
+  text-align: center;
+  break-inside: avoid;
+}
+
+figure.figure img {
+  display: block;
+  margin: 0 auto;
+  max-height: 160mm;
+}
+
+figcaption {
+  font-size: 9.5pt;
+  margin-bottom: 2mm;
+  text-align: center;
+}
+
+.caption-label {
+  font-weight: bold;
+}
+
+/* Tables, with their caption above them. */
+p.table-caption {
+  font-size: 9.5pt;
+  text-align: left;
+  margin: 1em 0 1.5mm 0;
+  break-after: avoid;
+}
+
+/* Listings: the caption above the code, with the source of the code after it, and the numbers of the lines. */
+p.listing-caption {
+  font-size: 9.5pt;
+  text-align: left;
+  margin: 1em 0 1.5mm 0;
+  break-after: avoid;
+}
+
+.caption-source {
+  color: #555;
+}
+
+pre.listing {
+  margin-top: 0;
+}
+
+.line-number {
+  display: inline-block;
+  width: 2.2em;
+  margin-right: 0.8em;
+  text-align: right;
+  color: #888;
+  font-style: normal;
+  font-weight: normal;
+  user-select: none;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 9.5pt;
+  line-height: 1.3;
+  margin: 0 0 1em 0;
+}
+
+th,
+td {
+  border-top: 0.5pt solid #999;
+  border-bottom: 0.5pt solid #999;
+  padding: 1mm 2mm;
+  text-align: left;
+  vertical-align: top;
+}
+
+thead th {
+  border-top: 1pt solid #111;
+  border-bottom: 1pt solid #111;
+}
+
+tr {
+  break-inside: avoid;
+}
+
+/* Footnotes at the foot of the page, and a second reference to a footnote. Paged.js copies the classes of a footnote
+   to its call in the text, so the rule leaves out the call: the number in the text keeps the size of its text. */
+.footnote:not([data-footnote-call]) {
+  font-size: 8.5pt;
+  line-height: 1.3;
+  text-align: left;
+}
+
+.footnote-paragraph {
+  display: block;
+}
+
+/* The first paragraph of a footnote stands on the line of its number. */
+.footnote-paragraph:first-child {
+  display: inline;
+}
+
+::footnote-marker {
+  content: counter(footnote-marker) "\2002";
+}
+
+sup.footnote-again {
+  font-size: 65%;
+  line-height: 0;
+}
+
+/* The generated lists: table of contents, list of figures, list of tables. */
+nav ol {
+  list-style: none;
+  margin: 0 0 1em 0;
+  padding: 0;
+}
+
+nav li {
+  margin: 0 0 0.25em 0;
+}
+
+nav a {
+  display: flex;
+  align-items: baseline;
+}
+
+nav a::after {
+  margin-left: auto;
+  padding-left: 1em;
+}
+
+.contents-level-1 {
+  font-weight: bold;
+  margin-top: 0.4em;
+}
+
+.contents-level-2 {
+  padding-left: 2.2em;
+}
+
+.contents-level-3 {
+  padding-left: 4.4em;
+}
+
+.contents-number {
+  min-width: 2.2em;
+  flex: 0 0 auto;
+}
+
+nav .caption-label {
+  font-weight: normal;
+}
+
+nav .appendix-label {
+  display: inline;
+}
+
+/* The reference list: hanging indent, left-aligned. The entries are the paragraphs directly in the section; an alert in
+   the section keeps its own form. */
+.references > p {
+  text-align: left;
+  padding-left: 1.27cm;
+  text-indent: -1.27cm;
+  overflow-wrap: anywhere;
+}
+
+/* The appendix part starts on a new page, and each appendix on a new page, with its label above its title. */
+h1.section-apx {
+  break-before: page;
+}
+
+h2.appendix {
+  break-before: page;
+  text-align: center;
+}
+
+h1.section-apx + h2.appendix {
+  break-before: auto;
+}
+
+.appendix-label {
+  display: block;
+}

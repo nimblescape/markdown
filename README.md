@@ -39,6 +39,7 @@ packages with their steps of the plan.
 | --- | --- |
 | [`@nimblescape/markdowntext`](packages/markdowntext) | The source: the text of a file with its changes, their origin and the selections of the editors; the front matter in YAML, TOML and JSON, its edits and the check against a JSON schema; without a view |
 | [`@nimblescape/markdownrender`](packages/markdownrender) | The renderer: the text of a file as HTML without edit functions, from markdown-it 14, with the plugins of the renderer; without the editor and without a page |
+| [`@nimblescape/markdownlayout`](packages/markdownlayout) | The layout: the text of a file in its layout as pages, with the layout code of Markdown Paper, the built-in layout `plain` and Paged.js |
 | [`@nimblescape/markdowneditor`](packages/markdowneditor) | The editor of rendered Markdown for the web and for the webviews of VS Code, built on the renderer |
 | [`@nimblescape/markdownvscode`](packages/markdownvscode) | The adapter for VS Code: the editor as a custom text editor, which keeps the file a text document of VS Code, and the theme of VS Code |
 
@@ -85,6 +86,19 @@ const renderer = new MarkdownRenderer();
 const { html } = renderer.toHtml('# Title\n\n> [!NOTE]\n> A note.\n'); // without a page
 renderer.render('# Title\n', document.querySelector('#rendering')!); // in a page, with the plugins
 ```
+
+The layout shows the text in its layout as pages, in a frame of the page:
+
+```ts
+import { createLayoutRenderer, renderPage, showPages } from '@nimblescape/markdownlayout';
+
+const layoutRenderer = createLayoutRenderer();
+const page = await renderPage(host, layoutRenderer, 'file:///project/paper.md', text, { hold: true });
+showPages(document.querySelector('iframe')!, page, layoutRenderer); // Paged.js makes the pages
+```
+
+The [README of the package](packages/markdownlayout/README.md) explains the
+host, which reads the files of the layouts.
 
 In VS Code, an extension registers the editor as a custom text editor with
 `registerMarkdownEditor` of `@nimblescape/markdownvscode`; the

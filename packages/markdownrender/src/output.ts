@@ -146,13 +146,20 @@ function placeTableComments(tokens: Token[]): void {
 }
 
 /**
- * placeHeadingIds gives each heading the ID that GitHub gives it.
+ * placeHeadingIds gives each heading the ID that GitHub gives it. A heading that a plugin gave an ID keeps it, for
+ * example a heading of the layout (R-LAYOUT-001), which gives its headings their IDs before it removes the markers of
+ * the special sections from their texts.
  * @param tokens - The tokens of the text.
  */
 function placeHeadingIds(tokens: readonly Token[]): void {
   const ids = new Set<string>();
   for (let index = 0; index < tokens.length; index++) {
     if (tokens[index].type !== 'heading_open') {
+      continue;
+    }
+    const own = tokens[index].attrGet('id');
+    if (own !== null) {
+      ids.add(own);
       continue;
     }
     const base = slug(headingText(tokens[index + 1]?.children ?? []));

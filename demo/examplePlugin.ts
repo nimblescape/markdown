@@ -15,6 +15,8 @@ import type { MarkdownPlugin } from '@nimblescape/markdowneditor';
 
 /** csvTable shows the lines of a CSV text as a table, with the first line as the header row. */
 function csvTable(source: string, target: HTMLElement): void {
+  // The element can be in another document than the script, for example in the frame of the pages.
+  const document = target.ownerDocument;
   const rows = source
     .split('\n')
     .filter((line) => line.trim() !== '')

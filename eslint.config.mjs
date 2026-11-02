@@ -23,7 +23,8 @@ export default tseslint.config(
     },
   },
   {
-    files: ['packages/*/src/**/*.ts', 'demo/**/*.ts'],
+    // The scripts of the pages, also the script of the page of the layout part, which the page holds as its text.
+    files: ['packages/*/src/**/*.ts', 'packages/*/src/**/*.js', 'demo/**/*.ts'],
     languageOptions: { globals: globals.browser },
   },
   {
