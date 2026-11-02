@@ -140,9 +140,10 @@ what was learned and does original work, because the code is new; a
 formatter applies a given rule and does routine work, because the rule fixes
 the result. The cognitive process is always the process that the party
 carried out, on the six levels of the revised taxonomy. *(proposal)* The
-rules of a course give the levels of its learning objectives on the same
-scale, or with a mapping to it, and the evaluation compares the processes of
-the student and of the AI with these levels ([R-EVAL-014](#r-eval-014)).
+context of a work ([R-EVAL-021](#r-eval-021)) may give the levels of its
+learning objectives on the same scale, or with a mapping to it, and the
+evaluation then compares the processes of the author and of the AI with
+these levels ([R-EVAL-014](#r-eval-014)).
 
 ### R-EVAL-004
 
@@ -324,18 +325,18 @@ assignment, applies the rules of the course, and gives the evaluation, the
 views and the declaration of [R-EVAL-009](#r-eval-009) for each assignment.
 The student sees the same evaluation as the teacher. *(proposal)* A teacher
 evaluates all assignments of a course in one run, on the command line or on
-a server. The rules of a course may state the level of AI use that the
-assignment allows, after the AI Assessment Scale (Perkins et al., 2024), and
-the evaluation shows the work beside this level. *(proposal)* The rules of a
-course may name the learning objectives of an assignment, each with the
-level that it aims at on the scale of the cognitive process
-([R-EVAL-003](#r-eval-003)), and the parts of the work that serve each
-objective, for example the requirements of its README. The evaluation then
-shows for each objective its level next to the cognitive processes that the
-student and the AI carried out on its work, and the feedback names the
-objectives whose level the AI reached in place of the student
-([R-EVAL-011](#r-eval-011)). The level of an objective is the aim of the
-task; a process below or above it is no error and no grade
+a server. The context of an assignment ([R-EVAL-021](#r-eval-021)) may state
+the level of AI use that the assignment allows, after the AI Assessment
+Scale (Perkins et al., 2024), and the evaluation shows the work beside this
+level. *(proposal)* The context of an assignment may name its learning
+objectives, each with the level that it aims at on the scale of the
+cognitive process ([R-EVAL-003](#r-eval-003)), and the parts of the work
+that serve each objective, for example the requirements of its README. The
+evaluation then shows for each objective its level next to the cognitive
+processes that the student and the AI carried out on its work, and the
+feedback names the objectives whose level the AI reached in place of the
+student ([R-EVAL-011](#r-eval-011)). The level of an objective is the aim of
+the task; a process below or above it is no error and no grade
 ([R-EVAL-013](#r-eval-013)).
 
 ### R-EVAL-015
@@ -348,34 +349,6 @@ allow it. These rules follow the ethics of learning analytics: informed
 consent, transparency, privacy and the management of the data (Slade &
 Prinsloo, 2013), and the DELICATE checklist for trusted learning analytics
 (Drachsler & Greller, 2016).
-
-### R-EVAL-021
-
-*(proposal)* **A course.** A course connects to the evaluation in four ways:
-
-- *Course data:* the rules of a course are the file `.workhistory/rules.yml`
-  in the repository of the course ([R-GEN-007](specification.md#r-gen-007)).
-  For each assignment, it holds the learning objectives with their levels
-  ([R-EVAL-003](#r-eval-003)), the requirements with the objectives that
-  each serves, the level of AI use that the assignment allows, and the goals
-  ([R-EVAL-014](#r-eval-014)). A step of the workflow of the course writes
-  the file from the README files of the course, so that these stay the only
-  source; the evaluation reads only the file.
-- *Episodes and requirements:* in an assignment, the classifier also gives
-  each episode the requirements that it works on, each with a reason
-  ([R-EVAL-004](#r-eval-004)). The student may correct it
-  ([R-EVAL-005](#r-eval-005)), and the check of the rules covers it
-  ([R-EVAL-006](#r-eval-006)). The rules may take the examples of the six
-  levels from the descriptions of the levels in the course.
-- *Recording and running:* the history extension records the work in the
-  development environment of the course, and each push submits the history
-  with the work ([R-HIST-006](history.md#r-hist-006)). The workflow that
-  gives feedback on the requirements after each push runs the evaluation
-  too, and a teacher runs it for all repositories of the students of a
-  course on the command line ([R-EVAL-014](#r-eval-014),
-  [R-EVAL-016](#r-eval-016)).
-- *Report:* the feedback on the requirements links to the evaluation, and
-  the views open in the editor of the course.
 
 ## 8. API and platforms
 
@@ -391,7 +364,7 @@ for the source files of a workspace, an element of a web page, the figures
 of the appendix of the PDF with `mp build`, or the report of a course on a
 server. Other programs may read the JSON, for example a learning management
 system of an institution. *(proposal)* The functions are `evaluate(history,
-rules)`, `analyze(evaluation, { from, to, part })` and
+rules, context)`, `analyze(evaluation, { from, to, part })` and
 `declare(evaluation)`.
 
 ### R-EVAL-017
@@ -402,6 +375,39 @@ repository of the history, and the history extension of VS Code holds it and
 shows its views ([R-VSC-004](history.md#r-vsc-004)). It must be a package of
 its own, so that it runs without the recorder, for example on a server.
 The npm package is `@nimblescape/workhistoryevaluation`.
+
+### R-EVAL-021
+
+*(proposal)* **Adapters for the context of a work.** The evaluation knows no
+course, no paper and no other kind of work. What it knows about the purpose
+of a work, it gets from adapters through one interface, the same on every
+platform:
+
+- *The context:* the data form that the evaluation defines, as JSON: the
+  tasks of a work, for example an assignment or a paper, each with the parts
+  of the work that belong to it, for example files, sections or
+  requirements; the learning objectives with the level that each aims at
+  ([R-EVAL-003](#r-eval-003)) and the parts that serve each; the level of AI
+  use that a task allows and the goals ([R-EVAL-014](#r-eval-014)); and
+  examples of the levels for the rules of the classifier
+  ([R-EVAL-004](#r-eval-004)). Each field may be missing. Without an
+  adapter, the evaluation works on the history alone.
+- *An adapter:* a program that knows one kind of work and reads its files,
+  and gives their context in this form. The adapter belongs to the product
+  of that kind of work and not to the history. For example, an extension of
+  a course reads the README files of the course and of its assignments, and
+  Markdown Paper gives the chapters of a paper as its parts.
+- *Platforms:* in VS Code, an adapter is an extension that registers with
+  the API of the history extension ([R-VSC-004](history.md#r-vsc-004)); on
+  the command line and on a server, an adapter is an npm package that the
+  run loads. The evaluation passes the context to its functions
+  ([R-EVAL-016](#r-eval-016)).
+- *Use of the context:* the classifier also gives each episode the parts of
+  the work that it works on, each with a reason ([R-EVAL-004](#r-eval-004));
+  the author may correct it ([R-EVAL-005](#r-eval-005)), and the check of
+  the rules covers it ([R-EVAL-006](#r-eval-006)). The views and the
+  feedback group the work by the tasks and the learning objectives of the
+  context ([R-EVAL-014](#r-eval-014)).
 
 ## 9. Open questions
 
@@ -432,10 +438,12 @@ The npm package is `@nimblescape/workhistoryevaluation`.
    for example the limits of an episode, the time of an episode, the share
    of intellectual work and the trend of an indicator
    ([R-EVAL-020](#r-eval-020))?
-10. Course: where does the evaluation get the objectives, levels and
-    requirements of a course: a rules file that the workflow of the course
-    writes from the README files (proposal), the README files directly, or a
-    rules file written by hand ([R-EVAL-021](#r-eval-021))?
+10. Adapters: may an adapter also give rules of its own for the classifier,
+    such as codes ([R-EVAL-004](#r-eval-004)), or only the context
+    ([R-EVAL-021](#r-eval-021))? When several adapters know the same work,
+    for example a paper that is also an assignment of a course, does the
+    evaluation join their contexts and keep the parts of each apart
+    (proposal)?
 
 ## 10. Scientific basis
 
@@ -461,8 +469,8 @@ result; *new* combines established work in a new way and needs the check of
 | [R-EVAL-013](#r-eval-013) Limits of the indicators | Gašević et al. (2015) | Established position |
 | [R-EVAL-014](#r-eval-014) Assignments | Perkins et al. (2024); Draxler et al. (2024); Krathwohl (2002) | Established framework and taxonomy, and a finding |
 | [R-EVAL-015](#r-eval-015) Data of the students | Slade & Prinsloo (2013); Drachsler & Greller (2016) | Established frameworks |
-| [R-EVAL-021](#r-eval-021) A course | None: technical decisions that connect the requirements above | Not applicable |
 | [R-EVAL-016](#r-eval-016), [R-EVAL-017](#r-eval-017) API and package | None: technical decisions | Not applicable |
+| [R-EVAL-021](#r-eval-021) Adapters for the context | None: technical decisions | Not applicable |
 | [R-EVAL-020](#r-eval-020) Documentation | None: the documentation holds the basis of the other requirements | Not applicable |
 
 ## Sources

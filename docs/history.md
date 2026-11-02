@@ -179,7 +179,10 @@ program outside VS Code; the selections in every text editor; the settings;
 and the commands in the terminal, where the shell integration of VS Code
 reports them. It shows the history for any file and for the whole workspace.
 It also holds the evaluation plugin and shows its views
-([R-EVAL-017](evaluation.md#r-eval-017)).
+([R-EVAL-017](evaluation.md#r-eval-017)). *(proposal)* Its API lets other
+extensions register adapters that give the evaluation the context of a work,
+for example an extension of a course
+([R-EVAL-021](evaluation.md#r-eval-021)).
 
 An AI tool that reports its actions through hooks gives its prompts, answers
 and edits with the origin AI and the name of the tool, for example Claude

@@ -210,7 +210,7 @@ a loop that the course has just taught applies what was learned and does
 original work, because the code is new. A formatter applies a given rule and
 does routine work, because the rule fixes the result. The cognitive process
 is always the process that the party carried out. *(proposal)* In an
-assignment, the rules of the course give the levels of its learning
+assignment, the context of the assignment gives the levels of its learning
 objectives on the same scale, and the report compares the processes with
 these levels ([section 12](#12-assignments)).
 
@@ -403,7 +403,8 @@ al., 2016).
 submits it with its history. The teacher runs the evaluation with the rules
 of the course, and the student sees the same report as the teacher.
 *(proposal)* The teacher evaluates all submissions of a course in one run,
-on the command line or on a server. The rules of a course may state:
+on the command line or on a server. The rules of a course, which reach the
+evaluation through an adapter (see below), may state:
 
 - the level of AI use that the assignment allows, and the report shows the
   work beside this level;
@@ -417,16 +418,16 @@ on the command line or on a server. The rules of a course may state:
 - whether the teacher may see an overview of the course that compares
   students.
 
-**How a course connects.** *(proposal)* The course keeps its objectives,
-their levels and its requirements in the README files. A step of the
-workflow of the course writes them into the rules file
-`.workhistory/rules.yml`, which the evaluation reads. In an assignment, the
-classifier also gives each episode the requirements that it works on, so
-that each part of the work belongs to an objective. The history extension
-records the work in the development environment of the course, and each push
-submits the history. The workflow that writes the feedback on the
-requirements after each push runs the evaluation too, and the feedback links
-to it ([R-EVAL-021](evaluation.md#r-eval-021)).
+**Where the context comes from.** *(proposal)* The evaluation knows no
+course. The learning objectives, their levels, the parts of the work and the
+allowed level of AI use come from an adapter: a program of the course, of
+Markdown Paper or of another kind of work that reads its files and gives
+this context to the evaluation. For example, an extension of a course reads
+the README files of the course and of the assignment. With this context, the
+classifier also gives each episode the parts of the work that it works on,
+so that each part of the work belongs to an objective. Without an adapter,
+the report shows the work without objectives
+([R-EVAL-021](evaluation.md#r-eval-021)).
 
 **Basis.** The levels of AI use come from the AI Assessment Scale (Perkins
 et al., 2024). The levels of the learning objectives use the revised
