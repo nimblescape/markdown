@@ -146,17 +146,17 @@ reaches version 1, they live in one repository as npm workspaces.
 
 ## 4. Documents
 
-Each part of [section 3](#3-architecture) has a document of its own, and so
-have the evaluation plugin of the history, the plugins of the format
-extensions, the AI and the platforms.
+Each part of [section 3](#3-architecture) has a document of its own, except
+the renderer and the layout, which share one document; the evaluation plugin
+of the history, the plugins of the format extensions, the AI and the
+platforms have documents of their own too.
 
 | Document | Content | Requirements |
 | --- | --- | --- |
 | [Specification](specification.md), this document | Scope, terms, architecture, libraries, licenses and release, plan | [R-GEN-001](#r-gen-001), [R-GEN-015](#r-gen-015), [R-ARCH-001](#r-arch-001), [R-GEN-010](#r-gen-010), [R-ARCH-002](#r-arch-002), [R-GEN-011](#r-gen-011), [R-GEN-007](#r-gen-007) |
 | [Source](source.md) | The text, the selections and the changes; the formats of the front matter and of the files | [R-SRC-001](source.md#r-src-001) to [R-SRC-003](source.md#r-src-003), [R-GEN-006](source.md#r-gen-006) |
 | [Editor](editor.md) | The editors of a file and the rendered Markdown editor: the round trip, the interaction, tables, the read-only mode, the mode to learn Markdown, the form of the front matter, threads beside the text | [R-GEN-002](editor.md#r-gen-002), [R-EDIT-001](editor.md#r-edit-001) to [R-EDIT-010](editor.md#r-edit-010), [R-GEN-009](editor.md#r-gen-009), [R-GEN-003](editor.md#r-gen-003), [R-GEN-008](editor.md#r-gen-008), [R-GEN-013](editor.md#r-gen-013), [R-FM-001](editor.md#r-fm-001) to [R-FM-006](editor.md#r-fm-006), [R-GEN-014](editor.md#r-gen-014) |
-| [Renderer](renderer.md) | Content without edit functions, plugins of the renderer | [R-REN-001](renderer.md#r-ren-001) to [R-REN-003](renderer.md#r-ren-003) |
-| [Layout](layout.md) | Layouts, pages and PDF | [R-LAYOUT-001](layout.md#r-layout-001) to [R-LAYOUT-003](layout.md#r-layout-003) |
+| [Renderer and layout](rendering.md) | The renderer: content without edit functions, plugins of the renderer. The layout: layouts, pages and PDF | [R-REN-001](rendering.md#r-ren-001) to [R-REN-003](rendering.md#r-ren-003), [R-LAYOUT-001](rendering.md#r-layout-001) to [R-LAYOUT-003](rendering.md#r-layout-003) |
 | [History](history.md) | Steps, storage backends, back and forward, replay, the use of the history by plugins, the history extension of VS Code | [R-AI-004](history.md#r-ai-004), [R-HIST-001](history.md#r-hist-001) to [R-HIST-008](history.md#r-hist-008), [R-VSC-004](history.md#r-vsc-004) |
 | [Evaluation plugin](evaluation.md) | Classes and roles of the work in a history, evaluation, views, feedback, assignments, API, scientific basis | [R-EVAL-001](evaluation.md#r-eval-001) to [R-EVAL-019](evaluation.md#r-eval-019) |
 | [Plugins and format extensions](plugins.md) | The plugin API, the levels of a plugin, the plugins of Markdown Notes and Markdown Paper | [R-GEN-005](plugins.md#r-gen-005), [R-GEN-012](plugins.md#r-gen-012), [R-PLUGIN-001](plugins.md#r-plugin-001), [R-NOTES-001](plugins.md#r-notes-001), [R-PAPER-001](plugins.md#r-paper-001) |
@@ -217,7 +217,7 @@ use:
 
 The documents of the parts list their own open questions: the
 [editor](editor.md#10-open-questions), the
-[layout](layout.md#3-open-questions), the
+[renderer and the layout](rendering.md#5-open-questions), the
 [history](history.md#6-open-questions), the
 [evaluation plugin](evaluation.md#9-open-questions), the
 [plugins](plugins.md#5-open-questions), the [AI](ai.md#4-open-questions) and
@@ -243,7 +243,7 @@ The parts of [section 3](#3-architecture) that the plan does not name yet,
 the source, the renderer, the layout, the history with its backends and its
 VS Code extension, and the evaluation plugin, get their steps when the open
 questions 1 to 3 of [section 6](#6-open-questions), question 1 of the
-[layout](layout.md#3-open-questions), the question of the
+[layout](rendering.md#5-open-questions), the question of the
 [history](history.md#6-open-questions) and the questions of the
 [evaluation plugin](evaluation.md#9-open-questions) have answers.
 

@@ -29,7 +29,7 @@ general functions; a plugin adds only the functions of its extension.
 **Extensions that render, or render and edit.** A plugin works at one of two
 levels:
 
-- *Render:* a plugin of the renderer ([R-REN-002](renderer.md#r-ren-002)).
+- *Render:* a plugin of the renderer ([R-REN-002](rendering.md#r-ren-002)).
   The editor must keep the text of such a block byte for byte as one unit.
   The user changes it through its source (double click or "Edit source"),
   and the editor then parses this block again.
@@ -74,8 +74,9 @@ layout, and `layout` and `repos` read-only with Ctrl+click to the clone
 ([R-FM-006](editor.md#r-fm-006)). It adds citations: `/cite` with Zotero,
 `/research`, the hidden comment of the sources, and the hidden codes of the
 special sections. It adds the generated lists, the layouts, the pages and
-the PDF through the layout ([layout](layout.md)), and the prompt protocol
-through the history ([R-HIST-005](history.md#r-hist-005)).
+the PDF through the layout ([R-LAYOUT-001](rendering.md#r-layout-001)), and
+the prompt protocol through the history
+([R-HIST-005](history.md#r-hist-005)).
 
 ## 5. Open questions
 

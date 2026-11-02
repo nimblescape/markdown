@@ -10,12 +10,12 @@ API.
 
 [docs/specification.md](docs/specification.md) is the normative
 specification: the scope, the architecture, the open questions and the plan
-of the steps, with one document for each part, for example
+of the steps, with the documents of the parts, for example
 [docs/editor.md](docs/editor.md) and [docs/history.md](docs/history.md).
 The first steps are built: the npm package and the core, which reads
-Markdown into the document of the editor and writes it back. A block that the user does not
-change keeps its text byte for byte. The toolbars, the menus and the plugin
-API come in the next steps.
+Markdown into the document of the editor and writes it back. A block that
+the user does not change keeps its text byte for byte. The toolbars, the
+menus and the plugin API come in the next steps.
 
 ## Use
 

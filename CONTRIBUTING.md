@@ -11,8 +11,8 @@ npm package `@nimblescape/markdown` before its release.
 [docs/specification.md](docs/specification.md) is the normative
 specification: what the libraries must, should and may do, each requirement
 with an ID, the open questions and the plan of the steps. It gives the scope
-and the architecture, and its section "Documents" lists one document for
-each part, for example [docs/editor.md](docs/editor.md),
+and the architecture, and its section "Documents" lists the documents of
+the parts, for example [docs/editor.md](docs/editor.md),
 [docs/history.md](docs/history.md) and, for the evaluation plugin of the
 history, [docs/evaluation.md](docs/evaluation.md). A requirement is the
 clean summary of a decision, without the texts of the discussion. A change
