@@ -21,6 +21,8 @@ import { insertItems } from './items';
 import { isLearning, type LearnMarks, learnPlugin, setLearning } from './learnMode';
 import { Menu, type MenuItem } from './menu';
 import { slashPlugin } from './slash';
+import { TableHandles } from './table/tableHandles';
+import { tablesPlugin } from './table/tables';
 import { Toolbar } from './toolbar';
 
 /** InteractionOptions configure the interaction of the editor. */
@@ -39,6 +41,20 @@ export interface InteractionOptions {
   insertItems?: (editor: Editor) => MenuItem[];
   /** learnMarks are the marks that the mode to learn Markdown shows for the nodes and marks of extensions. */
   learnMarks?: LearnMarks;
+  /**
+   * language is the language of the document, for example `de`, for the order of the texts of a sorted column. The
+   * default is the key `lang` of the front matter, else the language of the page.
+   */
+  language?: string;
+}
+
+/** frontMatterLanguage returns the key `lang` or `language` of the front matter of a document. */
+function frontMatterLanguage(editor: Editor): string | undefined {
+  const first = editor.state.doc.firstChild;
+  if (first?.type.name !== 'frontMatter') {
+    return undefined;
+  }
+  return /^\s*"?(?:lang|language)"?\s*[:=]\s*["']?([A-Za-z]{2,3}(?:-[A-Za-z0-9]+)*)/m.exec((first.attrs.text as string) ?? '')?.[1];
 }
 
 /** Interaction holds the parts of the interaction of one editor. */
@@ -53,6 +69,7 @@ export class Interaction {
   private editor: Editor | undefined;
   private formatBar: FormatBar | undefined;
   private handles: BlockHandles | undefined;
+  private tableHandles: TableHandles | undefined;
   private toolbar: Toolbar | undefined;
   private findBar: FindBar | undefined;
 
@@ -82,6 +99,7 @@ export class Interaction {
       findPlugin(),
       learnPlugin(() => this.learning, this.options.learnMarks),
       alertsPlugin(isLearning),
+      tablesPlugin(isLearning),
       new Plugin({
         view: () => ({ update: (view) => this.update(view) }),
         props: {
@@ -124,6 +142,14 @@ export class Interaction {
     this.formatBar = new FormatBar({ editor, box: this.box, menu: this.menu, buttons: this.options.formatButtons ?? [], editLink: () => this.editLink() });
     this.box.append(this.formatBar.dom);
     this.handles = new BlockHandles(view, { box: this.box, menu: this.menu, insertItems: () => this.insertItems() });
+    this.tableHandles = new TableHandles(view, {
+      box: this.box,
+      menu: this.menu,
+      ask: (label, value) => this.ask(label, value),
+      language: () => this.options.language ?? frontMatterLanguage(editor) ?? (document.documentElement.lang || undefined),
+      insertItems: () => this.insertItems(),
+      menuOpened: () => this.formatBar?.hide(),
+    });
     if (this.options.toolbar ?? true) {
       this.toolbar = new Toolbar({
         editor,
@@ -169,6 +195,7 @@ export class Interaction {
     }
     this.menu.close();
     this.handles?.hide();
+    this.tableHandles?.hide();
     this.findBar?.search();
     this.update(this.editor.view);
   }
@@ -178,6 +205,7 @@ export class Interaction {
     document.removeEventListener('mousedown', this.onDocumentDown, true);
     document.removeEventListener('mouseup', this.onDocumentUp, true);
     this.handles?.destroy();
+    this.tableHandles?.destroy();
     this.menu.destroy();
     this.asker.destroy();
     this.header.remove();

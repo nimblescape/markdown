@@ -7,6 +7,7 @@
 // delete. A block is a top-level block, or the item of a list under the mouse. Alt+Up and Alt+Down move the block of
 // the cursor. Each move is one step of undo (R-EDIT-001).
 
+import { closeHistory } from '@tiptap/pm/history';
 import type { Node } from '@tiptap/pm/model';
 import { NodeSelection, TextSelection, type EditorState, type Transaction } from '@tiptap/pm/state';
 import type { EditorView } from '@tiptap/pm/view';
@@ -77,7 +78,8 @@ export function moveBlock(state: EditorState, block: Block, step: -1 | 1, dispat
     const length = selection.to - selection.from;
     tr.setSelection(TextSelection.create(tr.doc, insertAt + offset, insertAt + offset + length));
   }
-  dispatch(tr.scrollIntoView());
+  // Each move is one step of undo, also right after another move (R-EDIT-001).
+  dispatch(closeHistory(tr).scrollIntoView());
   return true;
 }
 

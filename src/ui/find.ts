@@ -6,6 +6,7 @@
 // each match, and moves the selection to the current match; replace changes the current match or all matches, each as
 // one step of undo. A match never crosses a node that is not text, for example a footnote reference.
 
+import { closeHistory } from '@tiptap/pm/history';
 import type { Node } from '@tiptap/pm/model';
 import { Plugin, PluginKey, TextSelection, type EditorState, type Transaction } from '@tiptap/pm/state';
 import { Decoration, DecorationSet, type EditorView } from '@tiptap/pm/view';
@@ -160,7 +161,7 @@ export function replaceMatch(view: EditorView, text: string): boolean {
   if (!state || !match || !view.editable) {
     return false;
   }
-  const tr = replaced(view.state, view.state.tr, match, text);
+  const tr = closeHistory(replaced(view.state, view.state.tr, match, text));
   const next = findKey.getState(view.state.apply(tr));
   const nextMatch = next?.matches[next.current];
   view.dispatch(nextMatch ? selectMatch(tr, nextMatch) : tr);
@@ -182,7 +183,7 @@ export function replaceAll(view: EditorView, text: string): number {
   for (const match of [...state.matches].reverse()) {
     tr = replaced(view.state, tr, match, text);
   }
-  view.dispatch(tr);
+  view.dispatch(closeHistory(tr));
   return state.matches.length;
 }
 

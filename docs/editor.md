@@ -141,13 +141,18 @@ column or the table, sort a column, align a column, color cells, switch the
 header row, and insert items. Sort must keep the header row, compare numbers
 as numbers, and compare text in the order of the language of the document.
 Align must write the alignment of the column into the delimiter row of GFM
-(`:---`, `:---:`, `---:`).
+(`:---`, `:---:`, `---:`). *(proposal)* Sort puts numbers before texts and
+empty cells last; the language of the document is the key `lang` of the
+front matter, else the language that the integrating code gives. Each
+command of the table menu is one step of undo.
 
 ### R-EDIT-010
 
 *(proposal)* **What GFM cannot store.** A cell color is a comment at the
 start of the cell, `<!--cell red-->`; the widths of the columns are a
-comment on the line before the table, `<!-- table: widths=30,70 -->`. Lists
+comment on the line before the table, `<!-- table: widths=30,70 -->`, in
+percent of the width of the text. The colors are gray, red, orange, yellow,
+green, blue and purple. Lists
 in cells, a dropdown and a table without a header row are not in version 1.
 
 ## 6. Read-only mode and generated parts

@@ -42,6 +42,16 @@ const alignAttribute = {
   renderHTML: (attributes: Record<string, unknown>) => (attributes.align ? { style: `text-align: ${attributes.align as string}` } : {}),
 };
 
+/**
+ * backgroundAttribute is the color of a cell of a table, which the comment `<!--cell red-->` at the start of the cell
+ * records (docs/editor.md, R-EDIT-010) and the cell shows as `data-color`.
+ */
+const backgroundAttribute = {
+  default: null,
+  parseHTML: (element: HTMLElement) => element.getAttribute('data-color'),
+  renderHTML: (attributes: Record<string, unknown>) => (attributes.background ? { 'data-color': attributes.background as string } : {}),
+};
+
 /** rawView returns the DOM of a raw text: its text in a block or a span that plugins can replace with their own view. */
 const rawView = (kind: string, text: string, inline = false): [string, Record<string, string>, string] => [
   inline ? 'span' : 'pre',
@@ -191,12 +201,12 @@ export function coreExtensions(): AnyExtension[] {
     TableRow,
     TableHeader.extend({
       addAttributes() {
-        return { ...this.parent?.(), align: alignAttribute };
+        return { ...this.parent?.(), align: alignAttribute, background: backgroundAttribute };
       },
     }),
     TableCell.extend({
       addAttributes() {
-        return { ...this.parent?.(), align: alignAttribute };
+        return { ...this.parent?.(), align: alignAttribute, background: backgroundAttribute };
       },
     }),
     FrontMatter,

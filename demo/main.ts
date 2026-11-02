@@ -28,10 +28,12 @@ Select some text for the format bar, type \`/\` for the slash commands, or move 
 - [ ] a task
 - [x] a finished task
 
+<!-- table: widths=60,40 -->
 | Column | Value |
 |:-------|------:|
 | a      |     1 |
-| b      |     2 |
+| <!--cell yellow--> b |     2 |
+| c      |    10 |
 
 \`\`\`ts
 const editor = new MarkdownEditor(element, { markdown });

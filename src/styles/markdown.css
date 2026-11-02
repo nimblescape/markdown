@@ -523,3 +523,106 @@ it.
   color: var(--nsmd-mark);
   opacity: 1;
 }
+
+/*
+Tables (R-EDIT-008 to R-EDIT-010): the handles of the rows and the columns, the markers "+" on the borders, the line
+that shows where a dragged row or column goes, the colors of the cells, and the widths of the columns from the comment
+before the table, which hides itself outside the mode to learn Markdown.
+*/
+.nsmd-editor .nsmd-table-grip,
+.nsmd-editor .nsmd-table-marker {
+  position: absolute;
+  z-index: 3;
+  min-width: 0;
+  padding: 0;
+  background: var(--nsmd-surface);
+  border: 1px solid var(--nsmd-border);
+  color: var(--nsmd-muted);
+}
+
+.nsmd-editor .nsmd-table-grip-row {
+  width: 14px;
+  height: 22px;
+  cursor: grab;
+}
+
+.nsmd-editor .nsmd-table-grip-column {
+  width: 22px;
+  height: 14px;
+  cursor: grab;
+}
+
+.nsmd-editor .nsmd-table-grip-column .nsmd-icon {
+  transform: rotate(90deg);
+}
+
+.nsmd-editor .nsmd-table-grip .nsmd-icon {
+  width: 12px;
+  height: 12px;
+}
+
+.nsmd-editor .nsmd-table-marker {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+}
+
+.nsmd-editor .nsmd-table-marker .nsmd-icon {
+  width: 12px;
+  height: 12px;
+}
+
+.nsmd-editor .nsmd-table-drop {
+  position: absolute;
+  z-index: 3;
+  background: var(--nsmd-link);
+  pointer-events: none;
+}
+
+.nsmd-editor .ProseMirror .nsmd-hidden {
+  display: none;
+}
+
+.nsmd-editor .nsmd-table-fixed table {
+  table-layout: fixed;
+  width: 100% !important;
+}
+
+.nsmd-editor .ProseMirror .selectedCell {
+  background: var(--nsmd-selection);
+}
+
+.nsmd-editor td[data-color='gray'],
+.nsmd-editor th[data-color='gray'] {
+  background: rgba(129, 139, 152, 0.18);
+}
+
+.nsmd-editor td[data-color='red'],
+.nsmd-editor th[data-color='red'] {
+  background: rgba(209, 36, 47, 0.14);
+}
+
+.nsmd-editor td[data-color='orange'],
+.nsmd-editor th[data-color='orange'] {
+  background: rgba(219, 109, 40, 0.16);
+}
+
+.nsmd-editor td[data-color='yellow'],
+.nsmd-editor th[data-color='yellow'] {
+  background: rgba(212, 167, 44, 0.22);
+}
+
+.nsmd-editor td[data-color='green'],
+.nsmd-editor th[data-color='green'] {
+  background: rgba(26, 127, 55, 0.14);
+}
+
+.nsmd-editor td[data-color='blue'],
+.nsmd-editor th[data-color='blue'] {
+  background: rgba(9, 105, 218, 0.14);
+}
+
+.nsmd-editor td[data-color='purple'],
+.nsmd-editor th[data-color='purple'] {
+  background: rgba(130, 80, 223, 0.14);
+}

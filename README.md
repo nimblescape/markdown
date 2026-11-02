@@ -20,8 +20,9 @@ user does not change keeps its text byte for byte; and the interaction of a
 document editor: the toolbar, the format bar over selected text, the insert
 menu "+" and the slash commands, the handles of the blocks, find and
 replace, read-only mode and a mode that shows the Markdown marks beside the
-rendered text. Tables, the form of the front matter, VS Code and the plugin
-API come in the next steps.
+rendered text; and the tables with handles, markers and a table menu. The
+form of the front matter, VS Code and the plugin API come in the next
+steps.
 
 ## Use
 
