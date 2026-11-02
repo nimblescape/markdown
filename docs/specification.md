@@ -117,7 +117,7 @@ flowchart TB
   subgraph courseProduct["Course module: a product of its own"]
     course["Course module<br/>forms of README and FEEDBACK.md,<br/>instructions, reader, checks"]
   end
-  feedback["Feedback program<br/>writes FEEDBACK.md"]
+  feedback["Feedback program of majikmate<br/>writes FEEDBACK.md"]
   course -- context through an adapter --> reflection
   feedback -- reads with --> course
   courseExtension -- adapter --> courseProduct
