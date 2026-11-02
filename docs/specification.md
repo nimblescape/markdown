@@ -207,12 +207,16 @@ exists, its document stays in this repository.
 
 ### R-ARCH-005
 
-**Owners of the products.** majikmate owns Markdown Paper, the history with
-its evaluation and the course module: their repositories are
+**Owners of the products.** nimblescape provides general infrastructure;
+majikmate provides the academic context and builds on the infrastructure of
+nimblescape. So nimblescape owns the libraries of nimblescape Markdown and
+Markdown Notes, and majikmate owns Markdown Paper, the history with its
+evaluation and the course module: their repositories are
 `majikmate/markdownpaper-vscode`, `majikmate/workhistory-vscode` and
-`majikmate/course-vscode`. nimblescape owns the libraries of nimblescape
-Markdown and Markdown Notes. *(proposal)* The scope of the npm packages and
-the publisher of the VS Code extensions follow the owner, for example
+`majikmate/course-vscode`. A product of majikmate may depend on a product of
+nimblescape. *(proposal)* A product of nimblescape does not depend on a
+product of majikmate. The scope of the npm packages and the publisher of
+the VS Code extensions follow the owner, for example
 `@majikmate/markdownpaper`. Until the repository of Markdown Paper moves to
 majikmate, its address stays `nimblescape/markdownpaper-vscode`, and GitHub
 forwards the old address after the move.
@@ -291,6 +295,13 @@ use:
 2. Licenses: `markdown-it-task-lists` (ISC), `entities` (BSD-2-Clause, used
    by markdown-it) and `argparse` (Python-2.0, only in the command line
    program of markdown-it, in no bundle).
+3. Owners: Markdown Notes of nimblescape builds on the history extension of
+   majikmate ([R-VSC-004](history.md#r-vsc-004)), and the source gives its
+   changes to the history ([R-HIST-010](history.md#r-hist-010)). Does
+   nimblescape provide a general API for changes and actions, which the
+   history of majikmate uses, so that no product of nimblescape depends on
+   a product of majikmate (proposal), or does the history recorder stay
+   with nimblescape ([R-ARCH-005](#r-arch-005))?
 
 The documents of the parts list their own open questions: the
 [editor](editor.md#10-open-questions), the
