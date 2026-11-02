@@ -326,7 +326,7 @@ history ([R-ARCH-003](specification.md#r-arch-003)): it lives in the
 repository of the history, and the history extension of VS Code holds it and
 shows its views ([R-VSC-004](history.md#r-vsc-004)). It must be a package of
 its own, so that it runs without the recorder, for example on a server.
-*(proposal)* The npm package is `@nimblescape/historyevaluation`.
+*(proposal)* The npm package is `@nimblescape/workhistoryevaluation`.
 
 ## 9. Open questions
 
@@ -353,7 +353,7 @@ its own, so that it runs without the recorder, for example on a server.
 8. Assignments: may a teacher see an overview of a course that compares
    students? How does a student submit the history with an assignment: the
    file of the history in the repository, or an export?
-9. Name: is `@nimblescape/historyevaluation` the name of the npm package
+9. Name: is `@nimblescape/workhistoryevaluation` the name of the npm package
    ([R-EVAL-017](#r-eval-017), proposal)?
 
 ## 10. Scientific basis

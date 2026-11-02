@@ -166,14 +166,18 @@ the workspace and every creation and deletion of a file
 ([R-VSC-004](history.md#r-vsc-004)), and which evaluates the history
 ([R-EVAL-017](evaluation.md#r-eval-017)). The source of nimblescape
 Markdown gives every change, with its origin, to the history through the
-API of the history ([R-HIST-010](history.md#r-hist-010)). *(proposal)* The
-repository is `nimblescape/history-vscode`, in the form of the other
-nimblescape extensions with an npm package. Its npm packages are
-`@nimblescape/history` (the history) and `@nimblescape/historyevaluation`
-(the evaluation plugin): their names start with `history`, in the same way
-as the names of the packages of nimblescape Markdown start with `markdown`.
-Until the repository exists, the documents of the history and of the
-evaluation plugin stay in this repository.
+API of the history ([R-HIST-010](history.md#r-hist-010)). The name of the
+tool must not be `history`, because its folder `.history/`
+([R-GEN-007](#r-gen-007)) is the folder of the VS Code extension "Local
+History", and the gitignore template of GitHub for Visual Studio lets Git
+ignore it. *(proposal)* The name of the tool is `workhistory`: the
+repository is `nimblescape/workhistory-vscode`, in the form of the other
+nimblescape extensions with an npm package, and its npm packages are
+`@nimblescape/workhistory` (the history) and
+`@nimblescape/workhistoryevaluation` (the evaluation plugin), in the same
+way as the names of the packages of nimblescape Markdown start with
+`markdown`. Until the repository exists, the documents of the history and
+of the evaluation plugin stay in this repository.
 
 ## 4. Documents
 
@@ -234,8 +238,9 @@ use:
   other nimblescape npm packages.
 - A tool keeps the files that it writes into a repository in a folder with
   the name of the tool and a leading dot, for example `.markdownpaper/` of
-  Markdown Paper, `.markdownnotes/` of Markdown Notes and `.history/` of the
-  history, and not in a shared folder such as `.nimblescape/`.
+  Markdown Paper, `.markdownnotes/` of Markdown Notes and `.workhistory/` of
+  the history, and not in a shared folder such as `.nimblescape/`. The name
+  of a tool must give a folder that no other common tool uses.
 
 ## 6. Open questions
 
@@ -244,13 +249,11 @@ use:
 2. Licenses: `markdown-it-task-lists` (ISC), `entities` (BSD-2-Clause, used
    by markdown-it) and `argparse` (Python-2.0, only in the command line
    program of markdown-it, in no bundle).
-3. Names of the history: the repository `nimblescape/history-vscode` and
-   the npm packages `@nimblescape/history` and
-   `@nimblescape/historyevaluation` ([R-ARCH-003](#r-arch-003), proposal)?
-   The folder of the history in a repository follows the name of the tool
-   ([R-GEN-007](#r-gen-007)): `.history/` with these names. The VS Code
-   extension "Local History" also writes copies of files into `.history/`
-   of the workspace, and its users often let Git ignore this folder.
+3. Name of the history: the tool name `workhistory`, with the folder
+   `.workhistory/`, the repository `nimblescape/workhistory-vscode` and the
+   npm packages `@nimblescape/workhistory` and
+   `@nimblescape/workhistoryevaluation` ([R-ARCH-003](#r-arch-003),
+   proposal)?
 
 The documents of the parts list their own open questions: the
 [editor](editor.md#10-open-questions), the

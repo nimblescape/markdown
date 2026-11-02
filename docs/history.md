@@ -107,7 +107,7 @@ over HTTP and stores them, for example in a database.
 ### R-HIST-006
 
 *(proposal)* **The first backends.** The first backend is a JSON Lines file,
-`.history/<path of the file>.jsonl` in the repository of the document
+`.workhistory/<path of the file>.jsonl` in the repository of the document
 ([R-GEN-007](specification.md#r-gen-007)), with one step per line and the
 change of each edit as a text patch. A second backend keeps the history in
 the local store of the platform. When the user goes back and then acts
