@@ -123,8 +123,9 @@ classifies each step as original work or as routine work, gives each part of
 a step a role (direct, produce or judge), shows the result in views, and
 gives feedback on work and learning, also for student assignments and for
 source code. Its methods rest on published scientific work
-([R-EVAL-019](evaluation.md#r-eval-019)). It has a VS Code extension of its
-own ([R-EVAL-017](evaluation.md#r-eval-017)), and its specification is
+([R-EVAL-019](evaluation.md#r-eval-019)). It is one product with the
+history, and the history extension of VS Code holds it
+([R-EVAL-017](evaluation.md#r-eval-017)); its specification is
 [evaluation.md](evaluation.md).
 
 ### R-HIST-008
@@ -150,6 +151,8 @@ Code; every creation, deletion and rename of a file, also by Git or by a
 program outside VS Code; the selections in every text editor; the settings;
 and the commands in the terminal, where the shell integration of VS Code
 reports them. It shows the history for any file and for the whole workspace.
+It also holds the evaluation plugin and shows its views
+([R-EVAL-017](evaluation.md#r-eval-017)).
 
 An AI tool that reports its actions through hooks gives its prompts, answers
 and edits with the origin AI and the name of the tool, for example Claude

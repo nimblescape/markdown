@@ -6,8 +6,8 @@ rendered Markdown, built on ProseMirror), a renderer, and layouts with pages
 and PDF. The file stays plain text. nimblescape Markdown Notes and
 nimblescape Markdown Paper extend the libraries with their functions through
 a plugin API. The history, which records every action on any file, and its
-evaluation are products of their own; their documents stay in this
-repository until they have repositories of their own.
+evaluation are one product of its own; their documents stay in this
+repository until it has a repository of its own.
 
 [docs/specification.md](docs/specification.md) is the normative
 specification: the scope, the architecture, the open questions and the plan

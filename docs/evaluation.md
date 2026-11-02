@@ -6,16 +6,17 @@ Licensed under the MIT License. See LICENSE in the repository root for details.
 
 # Specification of the evaluation plugin
 
-This document defines the evaluation plugin of the history, a product of its
-own beside nimblescape Markdown ([R-ARCH-003](specification.md#r-arch-003)).
-The plugin evaluates the history of a file ([history](history.md)): it
-classifies each step as original work or as routine work, gives each part of
-a step a role, shows the result in views, and gives feedback on work and
-learning. It is normative in the same way as the
-[specification](specification.md): "must" marks a requirement, "should" a
-recommendation, and "may" an option; a requirement marked *(proposal)* is
-not decided yet, and [section 9](#9-open-questions) lists these open
-questions. Each requirement has an ID as its heading.
+This document defines the evaluation plugin of the history. The history and
+its evaluation are one product of its own beside nimblescape Markdown
+([R-ARCH-003](specification.md#r-arch-003)). The plugin evaluates the
+history of a file ([history](history.md)): it classifies each step as
+original work or as routine work, gives each part of a step a role, shows
+the result in views, and gives feedback on work and learning. It is
+normative in the same way as the [specification](specification.md): "must"
+marks a requirement, "should" a recommendation, and "may" an option; a
+requirement marked *(proposal)* is not decided yet, and
+[section 9](#9-open-questions) lists these open questions. Each requirement
+has an ID as its heading.
 
 ## 1. Scope
 
@@ -320,13 +321,12 @@ rules)`, `analyze(evaluation, { from, to, part })` and
 
 ### R-EVAL-017
 
-**Package and extension.** The evaluation plugin must have a VS Code
-extension of its own, the evaluation extension
-([R-ARCH-003](specification.md#r-arch-003)). It depends on the history
-extension ([R-VSC-004](history.md#r-vsc-004)) and shows the views of the
-plugin in VS Code. *(proposal)* The plugin is the npm package
-`@nimblescape/evaluation` in the repository `nimblescape/evaluation-vscode`,
-together with its extension.
+**Package and extension.** The evaluation plugin is one product with the
+history ([R-ARCH-003](specification.md#r-arch-003)): it lives in the
+repository of the history, and the history extension of VS Code holds it and
+shows its views ([R-VSC-004](history.md#r-vsc-004)). It must be a package of
+its own, so that it runs without the recorder, for example on a server.
+*(proposal)* The npm package is `@nimblescape/historyevaluation`.
 
 ## 9. Open questions
 
@@ -353,9 +353,8 @@ together with its extension.
 8. Assignments: may a teacher see an overview of a course that compares
    students? How does a student submit the history with an assignment: the
    file of the history in the repository, or an export?
-9. Repository: does the plugin get the repository
-   `nimblescape/evaluation-vscode` of its own ([R-EVAL-017](#r-eval-017),
-   proposal), or does it share one repository with the history?
+9. Name: is `@nimblescape/historyevaluation` the name of the npm package
+   ([R-EVAL-017](#r-eval-017), proposal)?
 
 ## 10. Scientific basis
 
