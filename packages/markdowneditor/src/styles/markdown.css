@@ -799,3 +799,81 @@ a field below the rendering, or in place of the text. The text of a rendered blo
   max-height: 60vh;
   overflow: auto;
 }
+
+/*
+The proposed changes (docs/ai.md, R-AI-006): the text that a change removes is struck through in red, the new text has
+a green background, and "Accept" and "Reject" stand after it. In read-only mode, the buttons are hidden.
+*/
+
+.nsmd-editor .ProseMirror .nsmd-change-removed {
+  background: color-mix(in srgb, var(--nsmd-color-red) 14%, transparent);
+  text-decoration: line-through;
+  text-decoration-color: var(--nsmd-color-red);
+}
+
+.nsmd-editor .ProseMirror .nsmd-change-added {
+  background: color-mix(in srgb, var(--nsmd-color-green) 18%, transparent);
+  border-radius: 3px;
+}
+
+.nsmd-editor .ProseMirror .nsmd-change-block {
+  margin: 0 0 1em;
+  padding: 0 0 0 8px;
+  border-left: 3px solid var(--nsmd-color-green);
+  white-space: normal;
+}
+
+.nsmd-editor .ProseMirror .nsmd-change-block > .nsmd-change-added {
+  padding: 1px 6px;
+}
+
+.nsmd-editor .ProseMirror .nsmd-change-block > .nsmd-change-added > :first-child {
+  margin-top: 0;
+}
+
+.nsmd-editor .ProseMirror .nsmd-change-block > .nsmd-change-added > :last-child {
+  margin-bottom: 0;
+}
+
+.nsmd-editor .ProseMirror .nsmd-change-actions {
+  display: inline-flex;
+  gap: 4px;
+  margin: 0 0 0 4px;
+  vertical-align: baseline;
+  user-select: none;
+}
+
+.nsmd-editor .ProseMirror .nsmd-change-block > .nsmd-change-actions {
+  display: flex;
+  margin: 4px 0 0;
+}
+
+.nsmd-editor .ProseMirror .nsmd-change-actions button {
+  padding: 0 6px;
+  border: 1px solid var(--nsmd-border);
+  border-radius: 4px;
+  background: var(--nsmd-surface);
+  color: var(--nsmd-foreground);
+  font-family: var(--nsmd-font-family);
+  font-size: 12px;
+  line-height: 1.6;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.nsmd-editor .ProseMirror .nsmd-change-actions button:hover {
+  background: var(--nsmd-hover);
+}
+
+.nsmd-editor .ProseMirror .nsmd-change-actions button:focus-visible {
+  outline: 2px solid var(--nsmd-link);
+  outline-offset: -2px;
+}
+
+.nsmd-editor .ProseMirror .nsmd-change-accept {
+  border-color: var(--nsmd-color-green);
+}
+
+.nsmd-editor .ProseMirror[contenteditable='false'] .nsmd-change-actions {
+  display: none;
+}

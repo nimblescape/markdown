@@ -71,6 +71,16 @@ source.onChange((change) => console.log(change.origin, change.patches));
 source.setText('# New title\n', { kind: 'program', name: 'git' }); // the rendered editor shows it
 ```
 
+The AI, or another program, proposes a change of a range of the text of the
+file; the editor shows it as a tracked change with "Accept" and "Reject"
+([R-AI-006](docs/ai.md#r-ai-006)), and nothing changes the file before the
+user accepts it.
+
+```ts
+const result = await rendered.proposeChange({ id: 'ai-1', from: 2, to: 7, text: 'New title' });
+// 'accepted', 'rejected' or 'outdated'
+```
+
 The options `toolbar`, `readOnlyToggle` and `learnToggle` leave out the
 toolbar or its switches, and `learnMode` starts the editor with the
 Markdown marks shown.

@@ -33,6 +33,34 @@ own.
 tracked change: the removed text struck through, the new text marked, with
 "Accept" and "Reject".
 
+*(proposal)* These are the details.
+
+- A proposed change is `{ id, from, to, text, origin? }`: the range of the
+  text of the file that it replaces, as the source counts the text, the new
+  Markdown text, and who proposes it, the AI when it has no origin. The
+  integrating code gives it to `proposeChange` of the editor, and a plugin
+  to `proposeChange` of the API of the editor for the plugins
+  ([R-PLUGIN-001](plugins.md#r-plugin-001)). The result says how the
+  proposal ended: `accepted`, `rejected` or `outdated`.
+- A change inside the text of one paragraph or heading, with no line break
+  in its new text, shows in the line: the removed text struck through in
+  red, the new text with a green background after it, then the buttons. A
+  place right after the marks that open a mark, for example after `**`, is
+  a place of the text too. Every other change shows the blocks that it
+  touches struck through and their new blocks below them, rendered; a change
+  between two blocks shows only the new blocks.
+- "Accept" applies the change to the text as one step of undo. The change
+  goes to the source with the origin of the proposal
+  ([R-SRC-001](source.md#r-src-001)), and it may change generated parts
+  ([R-EDIT-011](editor.md#r-edit-011)), as a change from outside does.
+  "Reject" removes the proposal and leaves the text.
+- A change of the user or from outside in the blocks of a proposal makes the
+  proposal outdated: it goes away. So does a new text of the editor, a new
+  proposal with the same ID, and the closing of the editor. A change in
+  other blocks keeps the proposal.
+- In read-only mode, the editor shows the proposals without the buttons, and
+  nothing accepts a change.
+
 ## 2. Providers
 
 ### R-AI-002
@@ -62,8 +90,8 @@ the Claude API; a second tool searches the other notes and chats.
 
 ## 4. Open questions
 
-1. Tracked changes: does the editor show proposed changes as tracked changes
-   ([R-AI-006](#r-ai-006), proposal)?
+1. Tracked changes: does the editor show proposed changes as tracked changes,
+   with the details of [R-AI-006](#r-ai-006) (proposal)?
 2. Memory: the memory in the repository of the document (proposal) or for
    each user ([R-AI-003](#r-ai-003))? May the AI write the memory without
    asking (proposal: yes, with a setting that makes it ask)?

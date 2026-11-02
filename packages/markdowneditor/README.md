@@ -40,6 +40,16 @@ editor.setEditable(false); // read-only mode
 editor.setLearnMode(true); // show the Markdown marks
 ```
 
+A proposed change of the AI, or of another program, shows as a tracked
+change with "Accept" and "Reject"; nothing changes the file before the user
+accepts it ([R-AI-006](../../docs/ai.md#r-ai-006)). The range is the range
+of the text of the file, and the result says how the proposal ended.
+
+```ts
+const result = await editor.proposeChange({ id: 'ai-1', from: 2, to: 7, text: 'New title' });
+// 'accepted', 'rejected' or 'outdated'
+```
+
 The editor adds style elements to the page: the base styles of Tiptap and
 the styles of the plugins. A page whose policy allows only style elements
 with a nonce gives this nonce in the option `styleNonce`

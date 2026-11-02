@@ -22,6 +22,7 @@ import type { FormatButton } from '../ui/formatBar';
 import type { FrontMatterInput } from '../ui/frontMatterForm';
 import type { LearnMarks } from '../ui/learnMode';
 import type { MenuItem } from '../ui/menu';
+import type { ProposalResult, ProposedChange } from '../ui/proposals';
 
 // The level "render" of a plugin is a plugin of the renderer of @nimblescape/markdownrender (docs/rendering.md,
 // R-REN-002): its members, the version of the plugin API and the function that shows a token come from there.
@@ -127,6 +128,11 @@ export interface PluginEditor {
   closeThread(): void;
   /** refreshPlugins asks the plugins again for their generated parts, threads and schema of the front matter, after a change of their data. */
   refreshPlugins(): void;
+  /**
+   * proposeChange shows a change of the text of the file as a tracked change with "Accept" and "Reject" (R-AI-006), for
+   * example a change of the AI; the result says how the proposal ended.
+   */
+  proposeChange(change: ProposedChange): Promise<ProposalResult>;
 }
 
 /**

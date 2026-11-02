@@ -223,10 +223,10 @@ describe('the form of the front matter', () => {
   });
 
   it('asks a plugin again for its schema after refreshPlugins', () => {
-    let given: JsonSchema | undefined;
-    const opened = open(text, { plugins: [{ name: 'layouts', apiVersion: 1, frontMatterSchema: () => given }] });
+    const given: { schema?: JsonSchema } = {};
+    const opened = open(text, { plugins: [{ name: 'layouts', apiVersion: 1, frontMatterSchema: () => given.schema }] });
     expect(field(['date'])).toBeNull();
-    given = schema;
+    given.schema = schema;
     opened.refreshPlugins();
     expect(field(['date'])).not.toBeNull();
   });

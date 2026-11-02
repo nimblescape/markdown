@@ -14,7 +14,9 @@
 // with the same plugin, which follows each change. The button "Pages" shows the pages of the text in the built-in
 // layout plain (R-LAYOUT-001 to R-LAYOUT-003): the title page from the front matter, the numbered headings, the
 // footnotes at the foot of their pages, made by Paged.js in a frame, with the same plugin. A double click on a page
-// puts the cursor of the rendered editor at the start of that block.
+// puts the cursor of the rendered editor at the start of that block. The button "Propose changes" proposes two changes,
+// as the AI does (docs/ai.md, R-AI-006): one in the line and one of blocks, as tracked changes with "Accept" and
+// "Reject".
 
 import { MarkdownEditor } from '@nimblescape/markdowneditor';
 import { createLayoutRenderer, type Host, LivePages } from '@nimblescape/markdownlayout';
@@ -100,7 +102,8 @@ const showText = document.querySelector<HTMLButtonElement>('#show-text');
 const showRendering = document.querySelector<HTMLButtonElement>('#show-rendering');
 const pages = document.querySelector<HTMLIFrameElement>('#pages');
 const showPagesButton = document.querySelector<HTMLButtonElement>('#show-pages');
-if (!textArea || !element || !status || !rendering || !showText || !showRendering || !pages || !showPagesButton) {
+const propose = document.querySelector<HTMLButtonElement>('#propose');
+if (!textArea || !element || !status || !rendering || !showText || !showRendering || !pages || !showPagesButton || !propose) {
   throw new Error('The example page misses an element.');
 }
 
@@ -191,5 +194,21 @@ source.onChange(() => {
   if (!rendering.hidden) {
     clearTimeout(renderTimer);
     renderTimer = setTimeout(render, 150);
+  }
+});
+
+// The example proposals: the word "strikethrough" in its mark, and the paragraph on the format bar as two blocks. The
+// status shows the origin "ai" after "Accept".
+propose.addEventListener('click', () => {
+  const { text } = source;
+  const word = text.indexOf('strikethrough');
+  const paragraph = text.indexOf('Select some text');
+  const end = paragraph < 0 ? -1 : text.indexOf('\n', paragraph);
+  if (word >= 0) {
+    void editor.proposeChange({ id: 'example-line', from: word, to: word + 'strikethrough'.length, text: 'struck-out text' });
+  }
+  if (end >= 0) {
+    const blocks = 'Select some text for the format bar, or type `/` for the slash commands.\n\n- Move the mouse left of a block for its handles.';
+    void editor.proposeChange({ id: 'example-blocks', from: paragraph, to: end, text: blocks });
   }
 });

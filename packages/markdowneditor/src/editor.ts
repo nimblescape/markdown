@@ -25,9 +25,10 @@
 
 import { type AnyExtension, Editor, Extension } from '@tiptap/core';
 import type { Node } from '@tiptap/pm/model';
+import { closeHistory } from '@tiptap/pm/history';
 import { EditorState, Plugin, Selection, type Transaction } from '@tiptap/pm/state';
 import { Transform } from '@tiptap/pm/transform';
-import type { TextChange, TextSelection, TextSource } from '@nimblescape/markdowntext';
+import type { Origin, TextChange, TextSelection, TextSource } from '@nimblescape/markdowntext';
 import { coreExtensions } from './extensions/core';
 import { MarkdownCodec } from './markdown/codec';
 import type { MarkdownSource } from './markdown/parse';
@@ -44,10 +45,11 @@ import {
   pluginParts,
 } from './plugins/api';
 import { DocCache } from './plugins/cache';
-import { generatedPlugin, validParts } from './plugins/generated';
+import { generatedPlugin, generatedWrite, validParts } from './plugins/generated';
 import { sourceViews } from './plugins/render';
 import { setOpenThread, threadEntries, threadsKey, threadsPlugin, type ThreadEntry } from './plugins/threads';
 import { Interaction, type InteractionOptions } from './ui/interaction';
+import { type ProposalResult, type ProposedChange, proposalsKey, proposalsOf, proposalsPlugin, type Tracked } from './ui/proposals';
 
 /** textMark is the character that marks a position in the text of a block for textOffset, a character of private use. */
 const textMark = '\uE000';
@@ -131,6 +133,10 @@ export class MarkdownEditor implements PluginEditor {
   private readonly stopListening: (() => void)[] = [];
   private outside = false;
   private shownDoc: Node | undefined;
+  /** proposals ends each open proposed change with its result (R-AI-006). */
+  private readonly proposals = new Map<string, (result: ProposalResult) => void>();
+  /** origin is the origin of the change that the editor gives the source now, when it is no change of the user. */
+  private origin: Origin | undefined;
 
   /**
    * @param element - The element of the page that holds the editor.
@@ -189,6 +195,13 @@ export class MarkdownEditor implements PluginEditor {
       this.stopListening.push(() => this.tiptap.off('transaction', onTransaction));
       this.stopListening.push(() => textSource.removeEditor(this.id));
     }
+    // A proposed change whose blocks changed went out of the state: its proposal ends as outdated.
+    const onProposals = () => {
+      const tracked = proposalsOf(this.tiptap.state);
+      [...this.proposals.keys()].filter((id) => !tracked.has(id)).forEach((id) => this.settle(id, 'outdated'));
+    };
+    this.tiptap.on('transaction', onProposals);
+    this.stopListening.push(() => this.tiptap.off('transaction', onProposals));
     const host = options.host ?? { platform: 'web' };
     for (const plugin of plugins) {
       this.disposables.push(plugin.activate?.(this, host));
@@ -206,6 +219,7 @@ export class MarkdownEditor implements PluginEditor {
       addKeyboardShortcuts: () => Object.fromEntries([...this.parts.keys].map(([key, command]) => [key, () => this.runCommand(command)])),
       addProseMirrorPlugins: () => [
         sourceViews({ renderer: () => this.renderer, commit: (pos, text) => this.editSource(pos, text) }),
+        proposalsPlugin({ render: (text, element, inline) => this.renderProposal(text, element, inline), accept: (id) => this.acceptChange(id), reject: (id) => this.rejectChange(id) }),
         new Plugin({ appendTransaction: (transactions, oldState, newState) => this.unitOfCode(transactions, oldState, newState) }),
         ...(plugins.some((plugin) => plugin.generated) ? [generatedPlugin(this.generated)] : []),
         ...(plugins.some((plugin) => plugin.threads)
@@ -413,6 +427,8 @@ export class MarkdownEditor implements PluginEditor {
     this.tiptap.view.updateState(EditorState.create({ doc, plugins: this.tiptap.state.plugins }));
     this.shownDoc = this.tiptap.state.doc;
     this.interaction.refresh();
+    // A new text ends the proposed changes of the old one.
+    [...this.proposals.keys()].forEach((id) => this.settle(id, 'outdated'));
   }
 
   /**
@@ -427,7 +443,7 @@ export class MarkdownEditor implements PluginEditor {
       // The new source knows the text of each block, so that a change from outside finds the blocks that it changes.
       const { text, source } = this.codec.rebased(this.tiptap.state.doc, this.source);
       this.source = source;
-      this.textSource.setText(text, { kind: 'user', editor: this.id });
+      this.textSource.setText(text, this.origin ?? { kind: 'user', editor: this.id });
     }
     this.textSource.setSelections(this.id, [this.textSelection()]);
   }
@@ -558,8 +574,221 @@ export class MarkdownEditor implements PluginEditor {
     this.interaction.openFind();
   }
 
+  /**
+   * proposeChange shows a change of the text of the file that the AI or another program proposes as a tracked change,
+   * with "Accept" and "Reject" (docs/ai.md, R-AI-006). Nothing changes the file before the user accepts it; an accepted
+   * change is one step of Undo and goes to the source with the origin of the proposal, the AI by default. A change of
+   * the user or from outside in the blocks of the proposal, and a new text, end it as outdated.
+   * @param change - The proposed change: the range of the text of the file, as the source counts it, and the new text.
+   * @returns The result, when the user accepted or rejected the change or it went away.
+   */
+  proposeChange(change: ProposedChange): Promise<ProposalResult> {
+    this.settle(change.id, 'outdated');
+    const tracked = this.tiptap.isDestroyed ? undefined : this.track(change);
+    if (!tracked) {
+      this.removeProposals([change.id]);
+      return Promise.resolve('outdated');
+    }
+    const result = new Promise<ProposalResult>((resolve) => this.proposals.set(change.id, resolve));
+    this.tiptap.view.dispatch(this.tiptap.state.tr.setMeta(proposalsKey, { add: tracked }).setMeta('addToHistory', false));
+    return result;
+  }
+
+  /** proposedChanges returns the open proposed changes, in their order in the document. */
+  proposedChanges(): ProposedChange[] {
+    return [...proposalsOf(this.tiptap.state).values()].sort((a, b) => a.from - b.from).map((tracked) => tracked.change);
+  }
+
+  /**
+   * acceptChange applies a proposed change to the text, as one step of Undo with the origin of the proposal.
+   * @param id - The ID of the proposal.
+   * @returns Whether the text changed; a proposal whose text changed meanwhile ends as outdated.
+   */
+  acceptChange(id: string): boolean {
+    const tracked = proposalsOf(this.tiptap.state).get(id);
+    if (!tracked || !this.isEditable || !this.source || this.tiptap.isDestroyed) {
+      return false;
+    }
+    const { state } = this.tiptap;
+    const { text, source } = this.codec.rebased(state.doc, this.source);
+    const ranges = this.blockRanges();
+    const base = tracked.base === 'file' ? 0 : tracked.base === 'start' ? ranges.find((range) => range.start === tracked.from)?.from : ranges.find((range) => range.end === tracked.from)?.to;
+    const at = base === undefined ? -1 : base + tracked.offset;
+    if (at < 0 || text.slice(at, at + tracked.oldText.length) !== tracked.oldText) {
+      this.settle(id, 'outdated');
+      this.removeProposals([id]);
+      return false;
+    }
+    const file = text.slice(0, at) + tracked.newText + text.slice(at + tracked.oldText.length);
+    const { tr, source: next } = updated(state, source, this.codec.parse(file));
+    this.settle(id, 'accepted');
+    if (!tr) {
+      this.removeProposals([id]);
+      return false;
+    }
+    // The change is a change of its own in Undo; it may change generated parts, as a change from outside does.
+    closeHistory(tr).setMeta('addToHistory', true).setMeta(outsideChange, false).setMeta(generatedWrite, true).setMeta(proposalsKey, { remove: [id] });
+    const before = this.source;
+    this.source = next;
+    this.origin = { ...(tracked.change.origin ?? { kind: 'ai' }), editor: this.id };
+    try {
+      this.tiptap.view.dispatch(tr.scrollIntoView());
+    } finally {
+      this.origin = undefined;
+    }
+    if (this.tiptap.state.doc === state.doc) {
+      this.source = before;
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * rejectChange removes a proposed change without a change of the text.
+   * @param id - The ID of the proposal.
+   * @returns Whether the editor had the proposal.
+   */
+  rejectChange(id: string): boolean {
+    if (!proposalsOf(this.tiptap.state).has(id)) {
+      return false;
+    }
+    this.settle(id, 'rejected');
+    this.removeProposals([id]);
+    return true;
+  }
+
+  /** settle ends the proposal of an ID with its result. */
+  private settle(id: string, result: ProposalResult): void {
+    const resolve = this.proposals.get(id);
+    this.proposals.delete(id);
+    resolve?.(result);
+  }
+
+  /** removeProposals removes proposals from the state of the editor. */
+  private removeProposals(ids: readonly string[]): void {
+    if (!this.tiptap.isDestroyed && ids.some((id) => proposalsOf(this.tiptap.state).has(id))) {
+      this.tiptap.view.dispatch(this.tiptap.state.tr.setMeta(proposalsKey, { remove: ids }).setMeta('addToHistory', false));
+    }
+  }
+
+  /**
+   * track finds the places of a proposed change: the top-level blocks that it touches, or the place between blocks for
+   * a change in the text between them, the text that it replaces and its new text, and its range in the line for a change
+   * inside the text of one paragraph or heading.
+   * @param change - The proposed change.
+   * @returns The tracked change, or undefined for a range outside the text.
+   */
+  private track(change: ProposedChange): Tracked | undefined {
+    if (!this.source) {
+      return undefined;
+    }
+    const { text } = this.codec.rebased(this.tiptap.state.doc, this.source);
+    if (!(Number.isInteger(change.from) && Number.isInteger(change.to) && change.from >= 0 && change.from <= change.to && change.to <= text.length)) {
+      return undefined;
+    }
+    const ranges = this.blockRanges();
+    const empty = change.from === change.to;
+    const touched = ranges
+      .map((range, index) => ({ ...range, index }))
+      .filter((range) => (empty ? range.from <= change.from && change.from <= range.to && range.from < range.to : range.from < change.to && range.to > change.from));
+    if (touched.length === 0) {
+      // A change in the text between two blocks, for example a new paragraph.
+      const before = ranges.filter((range) => range.to <= change.from).pop();
+      const at = before?.end ?? 0;
+      return {
+        change,
+        from: at,
+        to: at,
+        inline: undefined,
+        base: before ? 'end' : 'file',
+        offset: before ? change.from - before.to : change.from,
+        oldText: text.slice(change.from, change.to),
+        newText: change.text,
+      };
+    }
+    const first = touched[0];
+    const last = touched[touched.length - 1];
+    const start = Math.min(first.from, change.from);
+    const end = Math.max(last.to, change.to);
+    return {
+      change,
+      from: first.start,
+      to: last.end,
+      inline: touched.length === 1 && !/[\r\n]/.test(change.text) ? this.lineRange(text, first, change) : undefined,
+      base: 'start',
+      offset: start - first.from,
+      oldText: text.slice(start, end),
+      newText: text.slice(start, change.from) + change.text + text.slice(change.to, end),
+    };
+  }
+
+  /**
+   * lineRange returns the positions of a range of the text of the file inside the text of a top-level paragraph or
+   * heading, or undefined when the range does not start and end at places of the text. A place right after the opening
+   * marks of a mark, for example after `**`, or right before its closing marks, is the position at the edge of the mark.
+   * @param text - The text of the file.
+   * @param block - The block, with its positions and its range in the text.
+   * @param change - The range in the text.
+   */
+  private lineRange(text: string, block: { start: number; end: number; from: number; to: number; index: number }, change: ProposedChange): { from: number; to: number } | undefined {
+    const { doc } = this.tiptap.state;
+    const node = doc.child(block.index);
+    if (!node.isTextblock || change.from < block.from || change.to > block.to) {
+      return undefined;
+    }
+    // The places in the text grow with the positions inside the text of a block: a search finds the first position at
+    // or after a place.
+    const search = (offset: number): number => {
+      let low = block.start + 1;
+      let high = block.end - 1;
+      while (low < high) {
+        const middle = Math.floor((low + high) / 2);
+        if (this.textOffset(middle) < offset) {
+          low = middle + 1;
+        } else {
+          high = middle;
+        }
+      }
+      return low;
+    };
+    // A place between marks and a character: the character in the text equals the character of the document.
+    const start = (offset: number): number | undefined => {
+      const pos = search(offset);
+      if (this.textOffset(pos) === offset) {
+        return pos;
+      }
+      return pos > block.start + 1 && text.slice(offset, this.textOffset(pos)) === doc.textBetween(pos - 1, pos) ? pos - 1 : undefined;
+    };
+    const end = (offset: number): number | undefined => {
+      const pos = search(offset);
+      if (this.textOffset(pos) === offset) {
+        return pos;
+      }
+      return pos > block.start + 1 && text.slice(this.textOffset(pos - 1), offset) === doc.textBetween(pos - 1, pos) ? pos : undefined;
+    };
+    const from = start(change.from);
+    const to = from === undefined ? undefined : change.to === change.from ? from : end(change.to);
+    return from === undefined || to === undefined || to < from ? undefined : { from, to };
+  }
+
+  /**
+   * renderProposal shows the new text of a proposed change: blocks, or the content of one paragraph in the line.
+   * @param text - The new text, Markdown.
+   * @param element - The element.
+   * @param inline - true for the new text of a change in the line.
+   */
+  private renderProposal(text: string, element: HTMLElement, inline: boolean): void {
+    this.renderer.render(text, element);
+    const only = element.childElementCount === 1 ? element.firstElementChild : null;
+    if (inline && only?.tagName === 'P') {
+      // In the line, the content of the paragraph stands without the paragraph and the line breaks around it.
+      element.replaceChildren(...only.childNodes);
+    }
+  }
+
   /** destroy removes the editor and its interaction from its element, the editor from its source, and its plugins. */
   destroy(): void {
+    [...this.proposals.keys()].forEach((id) => this.settle(id, 'outdated'));
     this.disposables.splice(0).forEach((disposable) => dispose(disposable));
     this.stopListening.forEach((stop) => stop());
     this.stopListening.length = 0;
