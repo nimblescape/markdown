@@ -169,8 +169,9 @@ history that a student submits with an assignment.
 
 **The history extension.** The history extension of VS Code is an extension
 of its own ([R-ARCH-003](specification.md#r-arch-003)) and the base of all
-editing in VS Code: Markdown Notes and Markdown Paper build on it, as an
-extension dependency, and record their actions through it. It serves every
+editing in VS Code: Markdown Notes, Markdown Paper and the course extension
+([R-COURSE-003](course.md#r-course-003)) build on it, as an extension
+dependency, and record their actions through it. It serves every
 file of the workspace, not only Markdown. It must record every change in the
 workspace through the stable API of VS Code: every edit of any file, in a
 text editor, in a notebook, or on disk by Git or by a program outside VS

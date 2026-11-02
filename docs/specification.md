@@ -73,7 +73,10 @@ its evaluation are one product of its own beside these parts
 ([R-ARCH-003](#r-arch-003)). In VS Code, Markdown Notes and Markdown Paper
 build on the history extension ([R-VSC-004](history.md#r-vsc-004)), which
 records every edit, creation and deletion of any file in the workspace and
-evaluates the history.
+evaluates the history. The course module is a product of its own too
+([R-ARCH-004](#r-arch-004)): its extension builds on the history extension,
+and it gives the evaluation the context of a course through an adapter
+([R-EVAL-021](evaluation.md#r-eval-021)).
 
 ```mermaid
 flowchart TB
@@ -81,8 +84,10 @@ flowchart TB
     notes["Markdown Notes<br/>notes, threads, AI chats"]
     paper["Markdown Paper<br/>layouts, citations, PDF"]
     historyExtension["History extension<br/>records every edit, creation and deletion<br/>of any file, evaluates the history,<br/>the base of all editing in VS Code"]
+    courseExtension["Course extension<br/>structure and checks of a course"]
     notes -- builds on --> historyExtension
     paper -- builds on --> historyExtension
+    courseExtension -- builds on --> historyExtension
   end
   web["Web page<br/>editor, views in a page"]
   cli["Command line<br/>mp build: PDF, no view"]
@@ -104,6 +109,13 @@ flowchart TB
     evaluation["Evaluation plugin<br/>classes, views, feedback, API"]
     evaluation -- reads --> history
   end
+  subgraph courseProduct["Course module: a product of its own"]
+    course["Course module<br/>forms of README and FEEDBACK.md,<br/>instructions, reader, checks"]
+  end
+  feedback["Feedback program<br/>writes FEEDBACK.md"]
+  course -- context through an adapter --> evaluation
+  feedback -- reads with --> course
+  courseExtension -- adapter --> courseProduct
   source -- every change with its origin --> history
   historyExtension -- adapter --> own
   vscode -- adapter --> libraries
@@ -179,6 +191,20 @@ way as the names of the packages of nimblescape Markdown start with
 `markdown`. Until the repository exists, the documents of the history and
 of the evaluation plugin stay in this repository.
 
+### R-ARCH-004
+
+**The course module is a product of its own.** The course module defines
+the form of the files of a course in a repository, its README files and its
+feedback files, with a comment of the format and instructions for AI agents,
+and it reads these files as structured data
+([R-COURSE-001](course.md#r-course-001)). It is a product of its own, not a
+part of nimblescape Markdown or of the history: the repository
+`nimblescape/course-vscode`, the npm package `@nimblescape/course` and the
+folder `.course/` ([R-COURSE-002](course.md#r-course-002)). Its extension
+builds on the history extension, and it is the adapter of a course for the
+evaluation ([R-COURSE-003](course.md#r-course-003)). Until the repository
+exists, its document stays in this repository.
+
 ## 4. Documents
 
 Each part of [section 3](#3-architecture) has a document of its own, except
@@ -186,16 +212,18 @@ the renderer and the layout, which share one document; the plugins of the
 format extensions, the AI and the platforms have documents of their own too.
 The history and its evaluation plugin are one product of its own
 ([R-ARCH-003](#r-arch-003)); their documents stay here until it has a
-repository of its own.
+repository of its own. The same holds for the course module
+([R-ARCH-004](#r-arch-004)).
 
 | Document | Content | Requirements |
 | --- | --- | --- |
-| [Specification](specification.md), this document | Scope, terms, architecture, libraries, licenses and release, plan | [R-GEN-001](#r-gen-001), [R-GEN-015](#r-gen-015), [R-ARCH-001](#r-arch-001), [R-GEN-010](#r-gen-010), [R-ARCH-002](#r-arch-002), [R-ARCH-003](#r-arch-003), [R-GEN-011](#r-gen-011), [R-GEN-007](#r-gen-007) |
+| [Specification](specification.md), this document | Scope, terms, architecture, libraries, licenses and release, plan | [R-GEN-001](#r-gen-001), [R-GEN-015](#r-gen-015), [R-ARCH-001](#r-arch-001), [R-GEN-010](#r-gen-010), [R-ARCH-002](#r-arch-002), [R-ARCH-003](#r-arch-003), [R-ARCH-004](#r-arch-004), [R-GEN-011](#r-gen-011), [R-GEN-007](#r-gen-007) |
 | [Source](source.md) | The text, the selections and the changes; the formats of the front matter and of the files | [R-SRC-001](source.md#r-src-001) to [R-SRC-003](source.md#r-src-003), [R-GEN-006](source.md#r-gen-006) |
 | [Editor](editor.md) | The editors of a file and the rendered Markdown editor: the round trip, the interaction, tables, the read-only mode and the read-only generated parts, the mode to learn Markdown, the form of the front matter, threads beside the text | [R-GEN-002](editor.md#r-gen-002), [R-EDIT-001](editor.md#r-edit-001) to [R-EDIT-011](editor.md#r-edit-011), [R-GEN-009](editor.md#r-gen-009), [R-GEN-003](editor.md#r-gen-003), [R-GEN-008](editor.md#r-gen-008), [R-GEN-013](editor.md#r-gen-013), [R-FM-001](editor.md#r-fm-001) to [R-FM-006](editor.md#r-fm-006), [R-GEN-014](editor.md#r-gen-014) |
 | [Renderer and layout](rendering.md) | The renderer: content without edit functions, plugins of the renderer. The layout: layouts, pages and PDF | [R-REN-001](rendering.md#r-ren-001) to [R-REN-003](rendering.md#r-ren-003), [R-LAYOUT-001](rendering.md#r-layout-001) to [R-LAYOUT-004](rendering.md#r-layout-004) |
 | [History](history.md) | The recorder of every action on any file, a product of its own: steps, the API for actions, AI agents in cloud sessions, storage backends, back and forward, replay, the use of the history by plugins, the history extension of VS Code | [R-AI-004](history.md#r-ai-004), [R-HIST-001](history.md#r-hist-001) to [R-HIST-008](history.md#r-hist-008), [R-HIST-010](history.md#r-hist-010), [R-HIST-011](history.md#r-hist-011), [R-VSC-004](history.md#r-vsc-004) |
 | [Evaluation plugin](evaluation.md) | The evaluation of a history, one product with the history: classes and roles of the work, evaluation, views, feedback, assignments, API, the package and the extension, scientific basis | [R-EVAL-001](evaluation.md#r-eval-001) to [R-EVAL-021](evaluation.md#r-eval-021) |
+| [Course module](course.md) | The course module, a product of its own: the form of the README files and of the feedback files of a course, the comment of the format, the instructions for AI agents, the structured reading, the checks and the adapter of the evaluation | [R-COURSE-001](course.md#r-course-001) to [R-COURSE-012](course.md#r-course-012), [R-FEED-001](course.md#r-feed-001) to [R-FEED-004](course.md#r-feed-004) |
 | [How the evaluation works](evaluation-guide.md) | The documentation of the evaluation: how it works, step by step, with the scientific basis of each step; the report links to it and cites no literature | Documentation of [R-EVAL-020](evaluation.md#r-eval-020) |
 | [Plugins and format extensions](plugins.md) | The plugin API, the levels of a plugin, the plugins of Markdown Notes and Markdown Paper | [R-GEN-005](plugins.md#r-gen-005), [R-GEN-012](plugins.md#r-gen-012), [R-PLUGIN-001](plugins.md#r-plugin-001), [R-NOTES-001](plugins.md#r-notes-001), [R-PAPER-001](plugins.md#r-paper-001) |
 | [AI](ai.md) | AI chats, tracked changes, pluggable providers, the API key, the memory | [R-AI-001](ai.md#r-ai-001), [R-AI-006](ai.md#r-ai-006), [R-AI-002](ai.md#r-ai-002), [R-AI-005](ai.md#r-ai-005), [R-AI-003](ai.md#r-ai-003) |
@@ -239,8 +267,9 @@ use:
   other nimblescape npm packages.
 - A tool keeps the files that it writes into a repository in a folder with
   the name of the tool and a leading dot, for example `.markdownpaper/` of
-  Markdown Paper, `.markdownnotes/` of Markdown Notes and `.workhistory/` of
-  the history, and not in a shared folder such as `.nimblescape/`. The name
+  Markdown Paper, `.markdownnotes/` of Markdown Notes, `.workhistory/` of
+  the history and `.course/` of the course module, and not in a shared folder
+  such as `.nimblescape/`. The name
   of a tool must give a folder that no other common tool uses.
 
 ## 6. Open questions

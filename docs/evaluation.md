@@ -394,9 +394,10 @@ platform:
   adapter, the evaluation works on the history alone.
 - *An adapter:* a program that knows one kind of work and reads its files,
   and gives their context in this form. The adapter belongs to the product
-  of that kind of work and not to the history. For example, an extension of
-  a course reads the README files of the course and of its assignments, and
-  Markdown Paper gives the chapters of a paper as its parts.
+  of that kind of work and not to the history. For example, the course
+  module reads the README files of a course and of its assignments
+  ([R-COURSE-011](course.md#r-course-011)), and Markdown Paper gives the
+  chapters of a paper as its parts.
 - *Platforms:* in VS Code, an adapter is an extension that registers with
   the API of the history extension ([R-VSC-004](history.md#r-vsc-004)); on
   the command line and on a server, an adapter is an npm package that the
