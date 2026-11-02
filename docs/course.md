@@ -115,6 +115,13 @@ A course keeps only its own rules in its repository: its students, its
 language, its conventions and the topics of its chapters. The `AGENTS.md` of
 a course names the commands of the instructions.
 
+**When a course changes to these forms.** A course gets the comment of the
+format ([R-COURSE-004](#r-course-004)) and gives up its copies of the forms in
+one change, together with the course module `nimblescape/course-vscode`, and
+not before: the comment tells an AI agent to run
+`npx -y @nimblescape/course instructions`, and this command exists only with
+the course module.
+
 ## 4. The files of a course
 
 ### R-COURSE-006
