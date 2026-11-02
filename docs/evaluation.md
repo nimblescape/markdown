@@ -320,11 +320,11 @@ rules)`, `analyze(evaluation, { from, to, part })` and
 
 ### R-EVAL-017
 
-*(proposal)* **Package.** The plugin is the npm package
+**Package.** The plugin is the npm package
 `@nimblescape/markdownevaluation`, a workspace of the repository of
 nimblescape Markdown until version 1 of the API of the history
-([R-ARCH-002](specification.md#r-arch-002)), and later a repository of its
-own.
+([R-ARCH-002](specification.md#r-arch-002)). *(proposal)* After that, it
+gets a repository of its own.
 
 ## 9. Open questions
 
@@ -351,7 +351,8 @@ own.
 8. Assignments: may a teacher see an overview of a course that compares
    students? How does a student submit the history with an assignment: the
    file of the history in the repository, or an export?
-9. Package and repository ([R-EVAL-017](#r-eval-017), proposal)?
+9. Repository: does the plugin get a repository of its own after version 1
+   of the API of the history ([R-EVAL-017](#r-eval-017), proposal)?
 
 ## 10. Scientific basis
 

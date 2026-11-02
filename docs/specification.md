@@ -129,25 +129,28 @@ and to the history.
 
 **One rendering.** The rendering code must exist once: the rendered view in
 the editor, the pages and the PDF must use the same views of the same
-plugins. *(proposal)* The editor is built on the renderer: it shows each
-block with the view of the renderer and adds the edit functions; the
-renderer and the layout run without the editor.
+plugins. The editor must be built on the renderer: it shows each block with
+the view of the renderer and adds the edit functions; the renderer and the
+layout run without the editor.
 
 ### R-ARCH-002
 
-**Names of the npm packages.** The name of each npm package of the
-libraries must start with `markdown` in the scope `@nimblescape`, without a
-hyphen, in the same way as `@nimblescape/markdownnotes` and
-`@nimblescape/markdownpaper`. *(proposal)* **One npm package for each
-part:** `@nimblescape/markdowntext` (source), `@nimblescape/markdowneditor`
-(the editor API and the rendered Markdown editor),
-`@nimblescape/markdownrender` (renderer), `@nimblescape/markdownlayout`
-(layout, pages, PDF), `@nimblescape/markdownhistory` (history), and one
-package for each platform, `@nimblescape/markdownvscode` and
-`@nimblescape/markdownweb`; the evaluation plugin is
-`@nimblescape/markdownevaluation` ([R-EVAL-017](evaluation.md#r-eval-017)).
-Until the API between the parts reaches version 1, they live in one
-repository as npm workspaces.
+**Names of the npm packages.** The name of each npm package of the libraries
+must start with `markdown` in the scope `@nimblescape`, without a hyphen, in
+the same way as `@nimblescape/markdownnotes` and
+`@nimblescape/markdownpaper`.
+
+**One npm package for each part.** The libraries must have one npm package
+for each part: `@nimblescape/markdowntext` (source),
+`@nimblescape/markdowneditor` (the editor API and the rendered Markdown
+editor), `@nimblescape/markdownrender` (renderer),
+`@nimblescape/markdownlayout` (layout, pages, PDF),
+`@nimblescape/markdownhistory` (history), and one package for each platform,
+`@nimblescape/markdownvscode` and `@nimblescape/markdownweb`; the evaluation
+plugin is `@nimblescape/markdownevaluation`
+([R-EVAL-017](evaluation.md#r-eval-017)). Until the API between the parts
+reaches version 1, all packages must live in this repository as npm
+workspaces.
 
 ## 4. Documents
 
@@ -161,7 +164,7 @@ platforms have documents of their own too.
 | [Specification](specification.md), this document | Scope, terms, architecture, libraries, licenses and release, plan | [R-GEN-001](#r-gen-001), [R-GEN-015](#r-gen-015), [R-ARCH-001](#r-arch-001), [R-GEN-010](#r-gen-010), [R-ARCH-002](#r-arch-002), [R-GEN-011](#r-gen-011), [R-GEN-007](#r-gen-007) |
 | [Source](source.md) | The text, the selections and the changes; the formats of the front matter and of the files | [R-SRC-001](source.md#r-src-001) to [R-SRC-003](source.md#r-src-003), [R-GEN-006](source.md#r-gen-006) |
 | [Editor](editor.md) | The editors of a file and the rendered Markdown editor: the round trip, the interaction, tables, the read-only mode, the mode to learn Markdown, the form of the front matter, threads beside the text | [R-GEN-002](editor.md#r-gen-002), [R-EDIT-001](editor.md#r-edit-001) to [R-EDIT-010](editor.md#r-edit-010), [R-GEN-009](editor.md#r-gen-009), [R-GEN-003](editor.md#r-gen-003), [R-GEN-008](editor.md#r-gen-008), [R-GEN-013](editor.md#r-gen-013), [R-FM-001](editor.md#r-fm-001) to [R-FM-006](editor.md#r-fm-006), [R-GEN-014](editor.md#r-gen-014) |
-| [Renderer and layout](rendering.md) | The renderer: content without edit functions, plugins of the renderer. The layout: layouts, pages and PDF | [R-REN-001](rendering.md#r-ren-001) to [R-REN-003](rendering.md#r-ren-003), [R-LAYOUT-001](rendering.md#r-layout-001) to [R-LAYOUT-003](rendering.md#r-layout-003) |
+| [Renderer and layout](rendering.md) | The renderer: content without edit functions, plugins of the renderer. The layout: layouts, pages and PDF | [R-REN-001](rendering.md#r-ren-001) to [R-REN-003](rendering.md#r-ren-003), [R-LAYOUT-001](rendering.md#r-layout-001) to [R-LAYOUT-004](rendering.md#r-layout-004) |
 | [History](history.md) | Steps, storage backends, back and forward, replay, the use of the history by plugins, the history extension of VS Code | [R-AI-004](history.md#r-ai-004), [R-HIST-001](history.md#r-hist-001) to [R-HIST-008](history.md#r-hist-008), [R-VSC-004](history.md#r-vsc-004) |
 | [Evaluation plugin](evaluation.md) | Classes and roles of the work in a history, evaluation, views, feedback, assignments, API, scientific basis | [R-EVAL-001](evaluation.md#r-eval-001) to [R-EVAL-019](evaluation.md#r-eval-019) |
 | [Plugins and format extensions](plugins.md) | The plugin API, the levels of a plugin, the plugins of Markdown Notes and Markdown Paper | [R-GEN-005](plugins.md#r-gen-005), [R-GEN-012](plugins.md#r-gen-012), [R-PLUGIN-001](plugins.md#r-plugin-001), [R-NOTES-001](plugins.md#r-notes-001), [R-PAPER-001](plugins.md#r-paper-001) |
@@ -207,16 +210,9 @@ use:
 
 ## 6. Open questions
 
-1. Architecture: are the six parts of [section 3](#3-architecture) the right
-   split?
-2. Packages: one repository with one npm package for each part until version
-   1 of the API ([R-ARCH-002](#r-arch-002), proposal), or one repository for
-   each package from the start?
-3. Rendering: is the editor built on the renderer ([R-GEN-010](#r-gen-010),
-   proposal), instead of "the renderer is the editor in read-only mode"?
-4. Names: the contribution point `nimblescape.markdown.extensions`
+1. Names: the contribution point `nimblescape.markdown.extensions`
    (proposal)?
-5. Licenses: `markdown-it-task-lists` (ISC), `entities` (BSD-2-Clause, used
+2. Licenses: `markdown-it-task-lists` (ISC), `entities` (BSD-2-Clause, used
    by markdown-it) and `argparse` (Python-2.0, only in the command line
    program of markdown-it, in no bundle).
 
@@ -244,11 +240,11 @@ the [platforms](platforms.md#6-open-questions).
 | 10 | The provider API, the Claude provider and the proposed changes in the editor; in Notes, the AI chat as notes and the memory; the events for the history | [R-AI-001](ai.md#r-ai-001) to [R-AI-003](ai.md#r-ai-003), [R-AI-005](ai.md#r-ai-005), [R-AI-006](ai.md#r-ai-006), [R-AI-004](history.md#r-ai-004), [R-EDIT-001](editor.md#r-edit-001) | planned |
 | 11 | The release workflow of the npm packages, the same as for the other nimblescape npm packages | [R-GEN-007](#r-gen-007) | planned |
 
-The parts of [section 3](#3-architecture) that the plan does not name yet,
-the source, the renderer, the layout, the history with its backends and its
-VS Code extension, and the evaluation plugin, get their steps when the open
-questions 1 to 3 of [section 6](#6-open-questions), question 1 of the
-[layout](rendering.md#5-open-questions), the question of the
+The parts of [section 3](#3-architecture) that the plan does not name yet
+get their steps in the plan: the npm workspaces of
+[R-ARCH-002](#r-arch-002), the source, the renderer and the layout before
+step 3 starts; the history with its backends and its VS Code extension, and
+the evaluation plugin, when the question of the
 [history](history.md#6-open-questions) and the questions of the
 [evaluation plugin](evaluation.md#9-open-questions) have answers.
 

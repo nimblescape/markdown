@@ -28,8 +28,8 @@ with footnotes and task lists.
 
 ### R-REN-003
 
-*(proposal)* **The renderer without the editor.** The renderer runs without
-the editor, so that the command line needs no editor code.
+**The renderer without the editor.** The renderer must run without the
+editor, so that the command line needs no editor code.
 
 ## 2. Plugins of the renderer
 
@@ -55,6 +55,12 @@ example the layout `plain` and the layouts of PHT. Each layout has a JSON
 schema of the front matter of its documents
 ([R-FM-004](editor.md#r-fm-004)).
 
+### R-LAYOUT-004
+
+**The layout code of Paper.** The layout part must hold the layout code of
+Markdown Paper: Paper adds only its own parts to the layout, through its
+plugins ([R-PAPER-001](plugins.md#r-paper-001)).
+
 ## 4. Pages and PDF
 
 ### R-LAYOUT-002
@@ -72,10 +78,9 @@ and "Add Note" work, and a double click on a page goes to that place in
 
 ## 5. Open questions
 
-1. Layout code: does the layout code of Paper move into the layout part?
-2. Pages: the switch between "Edit" and "Pages"
+1. Pages: the switch between "Edit" and "Pages"
    ([R-LAYOUT-003](#r-layout-003), proposal)?
-3. Schema of a layout: the file `frontmatter.schema.json` in the layout
+2. Schema of a layout: the file `frontmatter.schema.json` in the layout
    folder, named in `layout.json`, replaces the field `fields` (proposal)?
 
 ---
