@@ -7,11 +7,13 @@ Licensed under the MIT License. See LICENSE in the repository root for details.
 
 # Specification of the history
 
-This document defines the history: a product of its own beside nimblescape
-Markdown ([R-ARCH-003](specification.md#r-arch-003)) that records every
-action on any file, saves it through a pluggable backend and replays it, and
-the history extension of VS Code, the base of all editing in VS Code. The
-evaluation plugin of the history has a document of its own,
+This document defines the history: a product of nimblescape of its own
+beside nimblescape Markdown ([R-ARCH-003](specification.md#r-arch-003)) that
+records every action on any file, saves it through a pluggable backend and
+replays it, and the history extension of VS Code, which records every file
+of the workspace in the same way. The history is general infrastructure: it
+knows no evaluation, no paper and no course. The evaluation is a product of
+majikmate that builds on the history and has a document of its own,
 [evaluation.md](evaluation.md). Until the history has a repository of its
 own, this document stays with the [specification](specification.md) of
 nimblescape Markdown and is normative in the same way.
@@ -24,8 +26,10 @@ nimblescape Markdown and is normative in the same way.
 **A history of every action.** The history must record every action on a
 file, in its order, as a saved history of undo and redo. It must work for
 every file, not only for Markdown: text documents, source code, notebooks
-and other files. It must not depend on nimblescape Markdown. The history
-must stay after the file is closed.
+and other files. It must not depend on nimblescape Markdown. No editor needs
+to report a change of a file to the history: it records a Markdown file of
+Markdown Notes in the same way as a source file, for example `main.ts`. The
+history must stay after the file is closed.
 
 ### R-HIST-001
 
@@ -45,20 +49,22 @@ must stay after the file is closed.
 
 Each step must record its time, its author and its origin: user, AI or other
 program. A change of the user to text that the AI wrote is an edit of the
-user. An editor or an AI tool that uses the history reports its own edits
-through the API of the history ([R-HIST-010](#r-hist-010)); a change by
-another program gets the origin "other program", and the user may mark it as
-an edit of the AI.
+user. An AI tool reports its own actions and edits through the API of the
+history ([R-HIST-010](#r-hist-010)); a change by another program gets the
+origin "other program", and the user may mark it as an edit of the AI.
 
 ### R-HIST-010
 
-**The API for actions.** The history must have an API through which an
-editor, an extension or a tool reports its actions with their origin, for
-example the source of nimblescape Markdown, Markdown Notes, Markdown Paper,
-or an AI tool through its hooks. The history must record by itself every
-action that the platform shows and that no one reports, for example a
-change of a file on disk ([R-VSC-004](#r-vsc-004)), so that no change of a
-file is missing from the history.
+**The API for actions.** The history must have an API through which an AI
+tool reports its actions and the origin of its edits, for example through
+its hooks or its OpenTelemetry data ([R-VSC-004](#r-vsc-004)). No editor
+needs this API for a change of a file: the history records by itself every
+action that the platform shows and that no one reports, for example an edit
+in an editor or a change of a file on disk, so that no change of a file is
+missing from the history. *(proposal)* The AI chat of nimblescape Markdown
+reports its prompts, answers and edits as OpenTelemetry data, in the same
+way as other AI tools, so that no product of nimblescape depends on the
+history ([R-ARCH-005](specification.md#r-arch-005)).
 
 ### R-HIST-011
 
@@ -138,22 +144,22 @@ again. "Run again" sends a recorded question to the AI as a new question.
 **The prompt protocol of Paper.** Markdown Paper uses the history for the
 prompt protocol of a paper; `mp build` may add the history, or a list of the
 questions to the AI, with the evaluation and the declaration of the use of
-AI of the evaluation plugin ([R-EVAL-009](evaluation.md#r-eval-009)), as an
+AI of the evaluation ([R-EVAL-009](evaluation.md#r-eval-009)), as an
 appendix of the PDF.
 
 ### R-HIST-007
 
 **Plugins of the history.** Plugins of the history read the steps through
 the API of the history and may add data of their own to a step, for example
-a class and its reason. The evaluation plugin is such a plugin: it
-classifies each step as original work or as routine work, gives each part of
-a step a role (direct, produce or judge), shows the result in views, and
-gives feedback on work and learning, also for student assignments and for
-source code. Its methods rest on published scientific work
-([R-EVAL-019](evaluation.md#r-eval-019)). It is one product with the
-history, and the history extension of VS Code holds it
+a class and its reason. The evaluation is such a plugin: it classifies each
+step as original work or as routine work, gives each part of a step a role
+(direct, produce or judge), shows the result in views, and gives feedback on
+work and learning, also for student assignments and for source code. Its
+methods rest on published scientific work
+([R-EVAL-019](evaluation.md#r-eval-019)). It is a product of majikmate that
+builds on the history, with its own VS Code extension
 ([R-EVAL-017](evaluation.md#r-eval-017)); its specification is
-[evaluation.md](evaluation.md).
+[evaluation.md](evaluation.md). The history depends on no plugin.
 
 ### R-HIST-008
 
@@ -168,22 +174,19 @@ history that a student submits with an assignment.
 ### R-VSC-004
 
 **The history extension.** The history extension of VS Code is an extension
-of its own ([R-ARCH-003](specification.md#r-arch-003)) and the base of all
-editing in VS Code: Markdown Notes, Markdown Paper and the course extension
-([R-COURSE-003](course.md#r-course-003)) build on it, as an extension
-dependency, and record their actions through it. It serves every
-file of the workspace, not only Markdown. It must record every change in the
-workspace through the stable API of VS Code: every edit of any file, in a
-text editor, in a notebook, or on disk by Git or by a program outside VS
-Code; every creation, deletion and rename of a file, also by Git or by a
-program outside VS Code; the selections in every text editor; the settings;
-and the commands in the terminal, where the shell integration of VS Code
-reports them. It shows the history for any file and for the whole workspace.
-It also holds the evaluation plugin and shows its views
-([R-EVAL-017](evaluation.md#r-eval-017)). *(proposal)* Its API lets other
-extensions register adapters that give the evaluation the context of a work,
-for example an extension of a course
-([R-EVAL-021](evaluation.md#r-eval-021)).
+of its own ([R-ARCH-003](specification.md#r-arch-003)). It serves every file
+of the workspace in the same way, not only Markdown, and no other extension
+needs it to record a file: a file of Markdown Notes, a paper of Markdown
+Paper and the file `main.ts` of a course are workspace files like any other.
+It must record every change in the workspace through the stable API of VS
+Code: every edit of any file, in a text editor, in a notebook, or on disk by
+Git or by a program outside VS Code; every creation, deletion and rename of
+a file, also by Git or by a program outside VS Code; the selections in every
+text editor; the settings; and the commands in the terminal, where the shell
+integration of VS Code reports them. It shows the history for any file and
+for the whole workspace. It knows no plugin of the history: the evaluation
+has its own extension, which reads the history through its API
+([R-EVAL-017](evaluation.md#r-eval-017)).
 
 An AI tool that reports its actions through hooks gives its prompts, answers
 and edits with the origin AI and the name of the tool, for example Claude
@@ -194,10 +197,11 @@ gets the origin "other program", unless a commit shows its AI agent
 ([R-HIST-011](#r-hist-011)), and the user may mark it as an edit of the AI.
 *(proposal)* When the user switches it on, the history extension also
 receives the OpenTelemetry data of AI tools on a local port, for example the
-agent runs of Copilot Chat and the events of Claude Code, with the prompts,
-the answers and the tool calls. It gives a change of a file the origin AI
-and the name of the tool when a tool call of that tool at the same time
-names that file. It marks a change of unknown source as "probably AI" when
+agent runs of Copilot Chat, the events of Claude Code and the events of the
+AI chat of nimblescape Markdown ([R-HIST-010](#r-hist-010)), with the
+prompts, the answers and the tool calls. It gives a change of a file the
+origin AI and the name of the tool when a tool call of that tool at the same
+time names that file. It marks a change of unknown source as "probably AI" when
 its form shows it, for example several lines inserted at once at the cursor,
 and the user confirms it.
 

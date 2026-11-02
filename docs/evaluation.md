@@ -6,9 +6,10 @@ Licensed under the MIT License. See LICENSE in the repository root for details.
 
 # Specification of the evaluation plugin
 
-This document defines the evaluation plugin of the history. The history and
-its evaluation are one product of its own beside nimblescape Markdown
-([R-ARCH-003](specification.md#r-arch-003)). The plugin evaluates the
+This document defines the evaluation plugin of the history. The evaluation is
+a product of majikmate that builds on the history, which is general
+infrastructure of nimblescape ([R-ARCH-003](specification.md#r-arch-003)).
+The plugin evaluates the
 history of a file ([history](history.md)): it classifies each step as
 original work or as routine work, gives each part of a step a role, shows
 the result in views, and gives feedback on work and learning. It is
@@ -369,12 +370,15 @@ rules, context)`, `analyze(evaluation, { from, to, part })` and
 
 ### R-EVAL-017
 
-**Package and extension.** The evaluation plugin is one product with the
-history ([R-ARCH-003](specification.md#r-arch-003)): it lives in the
-repository of the history, and the history extension of VS Code holds it and
-shows its views ([R-VSC-004](history.md#r-vsc-004)). It must be a package of
-its own, so that it runs without the recorder, for example on a server.
-The npm package is `@majikmate/workhistoryevaluation`.
+**Package and extension.** The evaluation is a product of majikmate of its
+own that builds on the history ([R-ARCH-003](specification.md#r-arch-003),
+[R-ARCH-005](specification.md#r-arch-005)). Its VS Code extension depends on
+the history extension ([R-VSC-004](history.md#r-vsc-004)), reads the history
+through its API, and shows the views. Its npm package runs without the
+recorder and without VS Code, for example on a server. The name of the tool
+is `workevaluation`: the repository
+`majikmate/workevaluation-vscode`, the npm package
+`@majikmate/workevaluation` and the folder `.workevaluation/`.
 
 ### R-EVAL-021
 
@@ -399,7 +403,7 @@ platform:
   ([R-COURSE-011](course.md#r-course-011)), and Markdown Paper gives the
   chapters of a paper as its parts.
 - *Platforms:* in VS Code, an adapter is an extension that registers with
-  the API of the history extension ([R-VSC-004](history.md#r-vsc-004)); on
+  the API of the evaluation extension ([R-EVAL-017](#r-eval-017)); on
   the command line and on a server, an adapter is an npm package that the
   run loads. The evaluation passes the context to its functions
   ([R-EVAL-016](#r-eval-016)).

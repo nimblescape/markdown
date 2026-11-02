@@ -46,13 +46,12 @@ its command is `course`, and the comment of the format names the format
 
 ### R-COURSE-003
 
-**The course, the history and the evaluation.** The course extension builds
-on the history extension, as an extension dependency, in the same way as
-Markdown Notes and Markdown Paper ([R-VSC-004](history.md#r-vsc-004)): the
-history records the work of the student in every file of an assignment. The
-course module is the adapter of a course for the evaluation
-([R-EVAL-021](evaluation.md#r-eval-021)): it gives the evaluation the
-context of each assignment from the README files
+**The course, the history and the evaluation.** The history extension
+records the work of the student in every file of an assignment, as in any
+workspace, without a report of the course extension
+([R-VSC-004](history.md#r-vsc-004)). The course module is the adapter of a
+course for the evaluation ([R-EVAL-021](evaluation.md#r-eval-021)): it gives
+the evaluation the context of each assignment from the README files
 ([R-COURSE-011](#r-course-011)). The history and the evaluation know no
 course, and the course module uses no method of the evaluation.
 
@@ -206,8 +205,9 @@ parts; its learning objectives with their levels, and the requirements and
 rules that serve each; and the allowed level of AI use and the goals, when
 the course gives them. The README and the feedback file are not parts of the
 work of the student. In VS Code, the course extension registers the adapter
-with the history extension; on the command line and on a server,
-`@majikmate/course` is the adapter package that the evaluation loads.
+with the evaluation extension ([R-EVAL-017](evaluation.md#r-eval-017)); on
+the command line and on a server, `@majikmate/course` is the adapter package
+that the evaluation loads.
 
 ### R-COURSE-012
 

@@ -5,9 +5,10 @@ web: the source of a file with its changes, editors (first an editor of
 rendered Markdown, built on ProseMirror), a renderer, and layouts with pages
 and PDF. The file stays plain text. nimblescape Markdown Notes and
 nimblescape Markdown Paper extend the libraries with their functions through
-a plugin API. The history, which records every action on any file, and its
-evaluation are one product of its own; their documents stay in this
-repository until it has a repository of its own.
+a plugin API. The history, which records every action on any file, is a
+product of nimblescape of its own, and the evaluation of majikmate builds on
+it; their documents stay in this repository until each has a repository of
+its own.
 
 [docs/specification.md](docs/specification.md) is the normative
 specification: the scope, the architecture, the open questions and the plan
