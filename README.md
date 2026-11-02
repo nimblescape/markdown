@@ -20,9 +20,9 @@ user does not change keeps its text byte for byte; and the interaction of a
 document editor: the toolbar, the format bar over selected text, the insert
 menu "+" and the slash commands, the handles of the blocks, find and
 replace, read-only mode and a mode that shows the Markdown marks beside the
-rendered text; and the tables with handles, markers and a table menu. The
-form of the front matter, VS Code and the plugin API come in the next
-steps.
+rendered text; the tables with handles, markers and a table menu; and the
+form of the front matter, with a JSON schema, for YAML, TOML and JSON.
+VS Code and the plugin API come in the next steps.
 
 ## Use
 
@@ -36,6 +36,7 @@ const editor = new MarkdownEditor(document.querySelector('#editor')!, {
 });
 editor.setEditable(false); // read-only mode
 editor.setLearnMode(true); // show the Markdown marks
+editor.setFrontMatterSchema({ type: 'object', required: ['title'] }); // the schema of the form of the front matter
 ```
 
 The options `toolbar`, `readOnlyToggle` and `learnToggle` leave out the

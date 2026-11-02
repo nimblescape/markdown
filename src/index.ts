@@ -17,3 +17,7 @@ export type { InteractionOptions } from './ui/interaction';
 export type { FormatButton } from './ui/formatBar';
 export type { MenuItem } from './ui/menu';
 export type { LearnMarks, MarkText, NodeText } from './ui/learnMode';
+export { editFrontMatter, readFrontMatter } from './frontMatter/edit';
+export { FrontMatterError, type FrontMatterEdit, type FrontMatterPath } from './frontMatter/types';
+export { checkFrontMatter, schemaAt, type FrontMatterProblem, type JsonSchema, type JsonSchemaObject, type JsonType } from './frontMatter/schema';
+export type { FrontMatterInput, FrontMatterInputContext, FrontMatterMode } from './ui/frontMatterForm';

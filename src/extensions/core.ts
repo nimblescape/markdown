@@ -20,6 +20,10 @@ import Strike from '@tiptap/extension-strike';
 import Underline from '@tiptap/extension-underline';
 import { BulletList, ListItem, ListKeymap, OrderedList, TaskItem, TaskList } from '@tiptap/extension-list';
 import { Table, TableCell, TableHeader, TableRow } from '@tiptap/extension-table';
+import { isHistoryTransaction } from '@tiptap/pm/history';
+import type { Fragment, Node as PmNode } from '@tiptap/pm/model';
+import { Plugin, type EditorState, type Transaction } from '@tiptap/pm/state';
+import { ReplaceAroundStep, ReplaceStep } from '@tiptap/pm/transform';
 import StarterKit from '@tiptap/starter-kit';
 
 /** Alignment is the alignment of a column of a GFM table, from its delimiter row. */
@@ -59,15 +63,72 @@ const rawView = (kind: string, text: string, inline = false): [string, Record<st
   text,
 ];
 
-/** FrontMatter is the front matter at the start of a file, with its fences (R-SRC-003). */
+/** frontMatterRemoval is the meta of a transaction that removes the front matter on purpose. */
+export const frontMatterRemoval = 'nsmdFrontMatterRemoval';
+
+/** isFrontMatter returns true for the node of a front matter. */
+const isFrontMatter = (node: PmNode | null | undefined): boolean => node?.type.name === 'frontMatter';
+
+/** holdsFrontMatter returns true when a fragment holds a front matter. */
+function holdsFrontMatter(fragment: Fragment): boolean {
+  let found = false;
+  fragment.descendants((node) => {
+    found ||= isFrontMatter(node);
+    return !found && !node.isTextblock;
+  });
+  return found;
+}
+
+/** onlyFirst returns true when a document holds a front matter only as its first block. */
+function onlyFirst(doc: PmNode): boolean {
+  let placed = true;
+  doc.descendants((node, pos) => {
+    if (isFrontMatter(node) && pos !== 0) {
+      placed = false;
+    }
+    return placed && !node.isTextblock;
+  });
+  return placed;
+}
+
+/** replacesAll returns true when a transaction replaces the whole document, for a new text or for select all. */
+const replacesAll = (tr: Transaction): boolean =>
+  tr.steps.some((step, index) => step instanceof ReplaceStep && step.from === 0 && step.to === tr.docs[index].content.size);
+
+/**
+ * keepsFrontMatter returns false for a transaction that moves the front matter from the start of the document, puts
+ * one at another place, or removes it by chance, for example with Backspace at the start of the first block. A new
+ * text, select all, undo and a transaction with the meta frontMatterRemoval may remove it.
+ */
+function keepsFrontMatter(tr: Transaction, state: EditorState): boolean {
+  if (!tr.docChanged) {
+    return true;
+  }
+  const inserted = tr.steps.some((step) => (step instanceof ReplaceStep || step instanceof ReplaceAroundStep) && holdsFrontMatter(step.slice.content));
+  if (inserted && !onlyFirst(tr.doc)) {
+    return false;
+  }
+  if (isFrontMatter(state.doc.firstChild) && !isFrontMatter(tr.doc.firstChild)) {
+    let moved = false;
+    tr.doc.forEach((node) => (moved ||= isFrontMatter(node)));
+    return !moved && (isHistoryTransaction(tr) || replacesAll(tr) || tr.getMeta(frontMatterRemoval) === true);
+  }
+  return true;
+}
+
+/**
+ * FrontMatter is the front matter at the start of a file, with its fences (R-SRC-003). It stays the first block of the
+ * document, and the cursor does not select it: the form of the front matter has its own inputs (R-FM-001).
+ */
 export const FrontMatter = Node.create({
   name: 'frontMatter',
   group: 'block',
   atom: true,
-  selectable: true,
+  selectable: false,
   addAttributes: () => ({ format: { default: 'yaml', rendered: false }, text: { default: '', rendered: false } }),
   parseHTML: () => [],
   renderHTML: ({ node }) => rawView('front-matter', node.attrs.text as string),
+  addProseMirrorPlugins: () => [new Plugin({ filterTransaction: keepsFrontMatter })],
 });
 
 /** HtmlBlock is a block of HTML, for example a comment on lines of its own. Plugins show the comments that they know. */

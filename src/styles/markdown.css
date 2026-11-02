@@ -626,3 +626,249 @@ before the table, which hides itself outside the mode to learn Markdown.
 .nsmd-editor th[data-color='purple'] {
   background: rgba(130, 80, 223, 0.14);
 }
+
+/* The form of the front matter (docs/editor.md, R-FM-001 to R-FM-006). */
+
+.nsmd-editor .ProseMirror .nsmd-fm {
+  margin: 0 0 1em;
+  padding: 8px 12px 10px;
+  border: 1px solid var(--nsmd-border);
+  border-radius: 6px;
+  background: var(--nsmd-raw-background);
+  font-size: 14px;
+  line-height: 1.4;
+  white-space: normal;
+  cursor: default;
+}
+
+.nsmd-editor .ProseMirror .nsmd-fm.ProseMirror-selectednode {
+  outline: 2px solid var(--nsmd-selection);
+}
+
+.nsmd-editor .nsmd-fm-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.nsmd-editor .nsmd-fm-title {
+  font-weight: 600;
+}
+
+.nsmd-editor .nsmd-fm-format,
+.nsmd-editor .nsmd-fm-count {
+  padding: 0 6px;
+  border: 1px solid var(--nsmd-border);
+  border-radius: 10px;
+  color: var(--nsmd-muted);
+  font-size: 12px;
+}
+
+.nsmd-editor .nsmd-fm-count {
+  border-color: var(--nsmd-alert-caution);
+  color: var(--nsmd-alert-caution);
+}
+
+.nsmd-editor .nsmd-fm-spacer {
+  flex: 1 1 auto;
+}
+
+.nsmd-editor .nsmd-fm-mode,
+.nsmd-editor .nsmd-fm-add-item,
+.nsmd-editor .nsmd-fm-add-key,
+.nsmd-editor .nsmd-fm-remove {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border: 1px solid var(--nsmd-border);
+  border-radius: 4px;
+  background: var(--nsmd-surface);
+  color: var(--nsmd-foreground);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.nsmd-editor .nsmd-fm-mode:hover,
+.nsmd-editor .nsmd-fm-add-item:hover,
+.nsmd-editor .nsmd-fm-add-key:hover,
+.nsmd-editor .nsmd-fm-remove:hover {
+  background: var(--nsmd-hover);
+}
+
+.nsmd-editor .nsmd-fm-mode[aria-pressed='true'] {
+  border-color: var(--nsmd-link);
+  background: var(--nsmd-active);
+}
+
+.nsmd-editor .nsmd-fm-remove {
+  padding: 2px 4px;
+  border-color: transparent;
+  background: transparent;
+  color: var(--nsmd-muted);
+}
+
+.nsmd-editor .nsmd-fm-fields {
+  display: grid;
+  grid-template-columns: minmax(6rem, max-content) minmax(0, 1fr) auto;
+  gap: 4px 10px;
+  align-items: start;
+}
+
+.nsmd-editor .nsmd-fm-field {
+  display: contents;
+}
+
+.nsmd-editor .nsmd-fm-key {
+  grid-column: 1;
+  padding-top: 4px;
+  color: var(--nsmd-muted);
+  overflow-wrap: anywhere;
+}
+
+.nsmd-editor .nsmd-fm-missing > .nsmd-fm-key {
+  font-style: italic;
+}
+
+.nsmd-editor .nsmd-fm-required {
+  color: var(--nsmd-alert-caution);
+}
+
+.nsmd-editor .nsmd-fm-value {
+  min-width: 0;
+}
+
+.nsmd-editor .nsmd-fm-field > .nsmd-fm-value {
+  grid-column: 2;
+}
+
+.nsmd-editor .nsmd-fm-field > .nsmd-fm-remove {
+  grid-column: 3;
+}
+
+.nsmd-editor .nsmd-fm-field > .nsmd-fm-problem {
+  grid-column: 2 / span 2;
+}
+
+.nsmd-editor .nsmd-fm-fields > .nsmd-fm-add {
+  grid-column: 1 / -1;
+}
+
+.nsmd-editor .nsmd-fm-value > .nsmd-fm-fields {
+  padding-left: 10px;
+  border-left: 2px solid var(--nsmd-border);
+}
+
+.nsmd-editor .nsmd-fm-input,
+.nsmd-editor .nsmd-fm-key-input,
+.nsmd-editor .nsmd-fm-select,
+.nsmd-editor .nsmd-fm-textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding: 3px 6px;
+  border: 1px solid var(--nsmd-border);
+  border-radius: 4px;
+  background: var(--nsmd-background);
+  color: var(--nsmd-foreground);
+  font-family: var(--nsmd-font-family);
+  font-size: 14px;
+}
+
+.nsmd-editor .nsmd-fm-textarea {
+  resize: vertical;
+}
+
+.nsmd-editor .nsmd-fm-text-view .nsmd-fm-textarea {
+  font-family: var(--nsmd-code-font-family);
+  font-size: 13px;
+}
+
+.nsmd-editor .nsmd-fm-key-input {
+  width: 10rem;
+}
+
+.nsmd-editor .nsmd-fm-select {
+  width: auto;
+  max-width: 100%;
+}
+
+.nsmd-editor .nsmd-fm-check {
+  margin: 6px 0 0;
+}
+
+.nsmd-editor [aria-invalid='true'] {
+  border-color: var(--nsmd-alert-caution);
+}
+
+.nsmd-editor .nsmd-fm-static {
+  display: inline-block;
+  padding-top: 4px;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.nsmd-editor .nsmd-fm-empty {
+  color: var(--nsmd-muted);
+  font-style: italic;
+}
+
+.nsmd-editor .nsmd-fm-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.nsmd-editor .nsmd-fm-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px;
+}
+
+.nsmd-editor .nsmd-fm-item > .nsmd-fm-problem {
+  grid-column: 1 / span 2;
+}
+
+.nsmd-editor .nsmd-fm-add-item {
+  align-self: flex-start;
+}
+
+.nsmd-editor .nsmd-fm-add {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.nsmd-editor .nsmd-fm-add .nsmd-fm-new-key {
+  flex: 1 1 8rem;
+  width: auto;
+}
+
+.nsmd-editor .nsmd-fm-add > .nsmd-fm-problem {
+  flex-basis: 100%;
+}
+
+.nsmd-editor .nsmd-fm-problem {
+  color: var(--nsmd-alert-caution);
+  font-size: 13px;
+}
+
+.nsmd-editor .nsmd-fm-text-view {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.nsmd-editor .nsmd-fm-source {
+  margin: 8px 0 0;
+  padding: 6px 8px;
+  border-top: 1px dashed var(--nsmd-border);
+  color: var(--nsmd-raw-foreground);
+  font-family: var(--nsmd-code-font-family);
+  font-size: 13px;
+  white-space: pre-wrap;
+}

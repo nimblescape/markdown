@@ -100,6 +100,15 @@ export class MarkdownEditor {
     this.interaction.setLearnMode(on);
   }
 
+  /**
+   * setFrontMatterSchema gives the front matter a new JSON schema, or none, for example after a change of the layout
+   * of a paper (R-FM-004).
+   * @param schema - The schema, a function that returns it, or undefined for none.
+   */
+  setFrontMatterSchema(schema: MarkdownEditorOptions['frontMatterSchema']): void {
+    this.interaction.setFrontMatterSchema(schema);
+  }
+
   /** openFind opens the bar of find and replace. */
   openFind(): void {
     this.interaction.openFind();

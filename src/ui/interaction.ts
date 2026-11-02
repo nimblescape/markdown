@@ -6,10 +6,14 @@
 // the bar of find and replace, the format bar, the menus and the handles of the blocks around the text, and gives the
 // editor the plugins and the keys of these parts as one Tiptap extension. The keys are those of R-EDIT-007, and also
 // Ctrl+F for find and replace and Alt+Up and Alt+Down to move the block of the cursor (Cmd in place of Ctrl on macOS).
+// The front matter shows as a form (R-FM-001), with the schema and the inputs of plugins that the options give.
 
 import { type Editor, Extension } from '@tiptap/core';
 import { Plugin } from '@tiptap/pm/state';
 import type { EditorView } from '@tiptap/pm/view';
+import { readFrontMatter } from '../frontMatter/edit';
+import type { JsonSchema } from '../frontMatter/schema';
+import type { FrontMatterFormat } from '../markdown/frontMatter';
 import { alertsPlugin } from './alerts';
 import { Asker } from './ask';
 import { BlockHandles, moveCurrentBlock } from './blockHandle';
@@ -17,6 +21,7 @@ import { element } from './dom';
 import { findPlugin } from './find';
 import { FindBar } from './findBar';
 import { FormatBar, type FormatButton } from './formatBar';
+import { type FrontMatterForm, type FrontMatterInput, frontMatterView } from './frontMatterForm';
 import { insertItems } from './items';
 import { isLearning, type LearnMarks, learnPlugin, setLearning } from './learnMode';
 import { Menu, type MenuItem } from './menu';
@@ -46,6 +51,15 @@ export interface InteractionOptions {
    * default is the key `lang` of the front matter, else the language of the page.
    */
   language?: string;
+  /** frontMatterForm false shows the front matter as its text, without the form; the default is true (R-FM-001). */
+  frontMatterForm?: boolean;
+  /**
+   * frontMatterSchema is the JSON schema of the front matter, or returns it, for example the schema of the layout of
+   * a paper (R-FM-004). Without a schema, the form opens in the mode to edit the keys.
+   */
+  frontMatterSchema?: JsonSchema | ((editor: Editor) => JsonSchema | undefined);
+  /** frontMatterInputs are the inputs of plugins for the values of keys of the front matter (R-FM-006). */
+  frontMatterInputs?: FrontMatterInput[];
 }
 
 /** frontMatterLanguage returns the key `lang` or `language` of the front matter of a document. */
@@ -54,7 +68,13 @@ function frontMatterLanguage(editor: Editor): string | undefined {
   if (first?.type.name !== 'frontMatter') {
     return undefined;
   }
-  return /^\s*"?(?:lang|language)"?\s*[:=]\s*["']?([A-Za-z]{2,3}(?:-[A-Za-z0-9]+)*)/m.exec((first.attrs.text as string) ?? '')?.[1];
+  try {
+    const data = readFrontMatter(first.attrs.text as string, first.attrs.format as FrontMatterFormat) as Record<string, unknown>;
+    const language = data.lang ?? data.language;
+    return typeof language === 'string' ? language : undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 /** Interaction holds the parts of the interaction of one editor. */
@@ -72,6 +92,8 @@ export class Interaction {
   private tableHandles: TableHandles | undefined;
   private toolbar: Toolbar | undefined;
   private findBar: FindBar | undefined;
+  private schema: JsonSchema | ((editor: Editor) => JsonSchema | undefined) | undefined;
+  private readonly forms = new Set<FrontMatterForm>();
 
   /**
    * @param root - The element of the editor.
@@ -87,6 +109,7 @@ export class Interaction {
     this.menu = new Menu(this.box, 'Items');
     this.asker = new Asker(this.box);
     this.learning = options.learnMode ?? false;
+    this.schema = options.frontMatterSchema;
     document.addEventListener('mousedown', this.onDocumentDown, true);
     document.addEventListener('mouseup', this.onDocumentUp, true);
   }
@@ -100,6 +123,23 @@ export class Interaction {
       learnPlugin(() => this.learning, this.options.learnMarks),
       alertsPlugin(isLearning),
       tablesPlugin(isLearning),
+      ...(this.options.frontMatterForm === false
+        ? []
+        : [
+            new Plugin({
+              props: {
+                nodeViews: {
+                  frontMatter: frontMatterView({
+                    editor: () => this.editor,
+                    schema: () => this.frontMatterSchema(),
+                    inputs: this.options.frontMatterInputs ?? [],
+                    isLearning: () => this.learning,
+                    forms: this.forms,
+                  }),
+                },
+              },
+            }),
+          ]),
       new Plugin({
         view: () => ({ update: (view) => this.update(view) }),
         props: {
@@ -179,6 +219,22 @@ export class Interaction {
     if (this.editor) {
       setLearning(this.editor.view, on);
     }
+    this.forms.forEach((form) => form.refresh());
+  }
+
+  /**
+   * setFrontMatterSchema gives the front matter a new JSON schema, or none, and shows the form again (R-FM-004).
+   * @param schema - The schema, a function that returns it, or undefined for none.
+   */
+  setFrontMatterSchema(schema: JsonSchema | ((editor: Editor) => JsonSchema | undefined) | undefined): void {
+    this.schema = schema;
+    this.forms.forEach((form) => form.refresh());
+  }
+
+  /** frontMatterSchema returns the JSON schema of the front matter now. */
+  frontMatterSchema(): JsonSchema | undefined {
+    const editor = this.editor;
+    return typeof this.schema === 'function' ? (editor ? this.schema(editor) : undefined) : this.schema;
   }
 
   /** openFind opens the bar of find and replace. */
@@ -197,6 +253,7 @@ export class Interaction {
     this.handles?.hide();
     this.tableHandles?.hide();
     this.findBar?.search();
+    this.forms.forEach((form) => form.refresh());
     this.update(this.editor.view);
   }
 

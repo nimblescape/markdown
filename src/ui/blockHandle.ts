@@ -63,10 +63,14 @@ export function moveBlock(state: EditorState, block: Block, step: -1 | 1, dispat
   if (target < 0 || target >= parent.childCount) {
     return false;
   }
+  const neighbour = parent.child(target);
+  // The front matter stays the first block of the file (R-SRC-003).
+  if (block.node.type.name === 'frontMatter' || neighbour.type.name === 'frontMatter') {
+    return false;
+  }
   if (!dispatch) {
     return true;
   }
-  const neighbour = parent.child(target);
   const { selection } = state;
   const offset = selection.from - block.pos;
   const tr = state.tr.delete(block.pos, block.pos + block.node.nodeSize);
@@ -161,7 +165,8 @@ export class BlockHandles {
     }
     const block = blockAt(this.view.state.doc, found.inside >= 0 ? found.inside : found.pos);
     const dom = block ? (this.view.nodeDOM(block.pos) as HTMLElement | null) : null;
-    if (!block || !dom?.getBoundingClientRect) {
+    // The front matter has no handles: it stays the first block, and its form has its own buttons.
+    if (!block || !dom?.getBoundingClientRect || block.node.type.name === 'frontMatter') {
       this.hide();
       return;
     }

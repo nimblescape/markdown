@@ -210,20 +210,35 @@ full color in the block of the cursor.
 **Structured editor of the front matter.** The editor must show the front
 matter as a form, not as text, for every Markdown file and for every format
 of [R-SRC-003](source.md#r-src-003). Notes and Paper add only their own
-parts.
+parts. *(proposal)* The front matter stays the first block of the file: it
+has no handles of a block, no block moves before it, and Backspace does not
+remove it; a new text, select all and undo may remove it. A front matter
+that does not parse shows its text with the problem, and the user edits the
+text. In the read-only mode of the editor ([R-GEN-008](#r-gen-008)), the
+form shows the values as text; in the mode to learn Markdown
+([R-GEN-013](#r-gen-013)), it also shows the text of the front matter. The
+integrating code may show the text in place of the form.
 
 ### R-FM-002
 
 **Read-only mode of the form.** In the read-only mode, the keys are fixed:
 the user changes only values, and only where the schema allows it. The
 schema defines what the front matter must hold, which keys the user can
-edit, and which values each key allows.
+edit, and which values each key allows. *(proposal)* A file with a schema
+opens in the read-only mode. The form shows the keys of the schema in the
+order of `properties`, then the other keys of the file. A key of the schema
+that the file does not have shows as an empty field; a value in it adds the
+key after the key before it in the order of the schema. The user adds and
+removes the items of a list that the schema defines. A value that the schema
+marks `readOnly` stays read-only in both modes.
 
 ### R-FM-003
 
 **Edit mode of the form.** In the edit mode, the user also adds and removes
 keys and structured values, such as lists and maps, also nested. A button
-switches between the modes.
+switches between the modes. *(proposal)* A file without a schema opens in
+the edit mode. The user also renames keys. A new key gets one of the kinds
+text, number, yes or no, list, or group of keys.
 
 ### R-FM-004
 
@@ -233,20 +248,30 @@ is standard JSON Schema (draft 2020-12) without keywords of its own:
 `required`, `title`, `description`, `readOnly`, `enum`, `type`, `pattern`,
 `format`, `minimum`, `default`, and the order of `properties`. A validator
 without eval checks it, because the page policy of a webview of VS Code
-forbids eval.
+forbids eval. *(proposal)* The validator is the library
+`@cfworker/json-schema`. Each problem shows at its value with a message in
+plain words, and the head of the form counts the problems. The integrating
+code gives the schema and can change it, for example after a change of the
+layout.
 
 ### R-FM-005
 
 **An edit changes only its value.** An edit must change only the edited
 value: comments, order and quotes of the other keys stay, and each edit is
-one step of undo. *(proposal)* The libraries `yaml`,
-`@decimalturn/toml-patch` and `jsonc-parser` do this for YAML, TOML and
-JSON.
+one step of undo. *(proposal)* For YAML, the library `yaml` gives the
+place of each value, and the edit replaces only the lines of that value; a
+value inside a flow collection, for example `[a, b]`, changes the text of
+that collection. For TOML, the library `@decimalturn/toml-patch` changes the
+text. For JSON, the library `jsonc-parser` replaces a value, and the editor
+inserts and removes keys and items line by line. A new text keeps the
+quotes of the text that it replaces.
 
 ### R-FM-006
 
 **Inputs of plugins.** A plugin may give the input of a key, for example
 Paper for `layout` and `repos`: read-only, and Ctrl+click opens the clone.
+*(proposal)* The input of a plugin takes the place of the input of the form
+in both modes.
 
 ## 9. Threads beside the text
 
