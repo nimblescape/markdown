@@ -6,22 +6,32 @@ Licensed under the MIT License. See LICENSE in the repository root for details.
 
 # Specification of the evaluation plugin
 
-This document defines the evaluation plugin of the history. The evaluation is
-a product of majikmate that builds on the history, which is general
+This document defines the evaluation plugin of the history. The evaluation
+is a product of majikmate that builds on the history, which is general
 infrastructure of nimblescape ([R-ARCH-003](specification.md#r-arch-003)).
-The plugin evaluates the
-history of a file ([history](history.md)): it classifies each step as
-original work or as routine work, gives each part of a step a role, shows
-the result in views, and gives feedback on work and learning. It is
-normative in the same way as the [specification](specification.md): "must"
-marks a requirement, "should" a recommendation, and "may" an option; a
-requirement marked *(proposal)* is not decided yet, and
-[section 9](#9-open-questions) lists these open questions. Each requirement
-has an ID as its heading. The documentation
-[How the evaluation works](evaluation-guide.md) describes in detail how the
+The plugin evaluates the history of a file ([history](history.md)): it
+classifies each step as original work or as routine work, gives each part of
+a step a role, shows the result in views, and gives feedback on work and
+learning. It is normative in the same way as the
+[specification](specification.md): "must" marks a requirement, "should" a
+recommendation, and "may" an option; a requirement marked *(proposal)* is
+not decided yet, and [section 9](#9-open-questions) lists these open
+questions. Each requirement has an ID as its heading. The documentation [How
+the evaluation works](evaluation-guide.md) describes in detail how the
 evaluation works ([R-EVAL-020](#r-eval-020)).
 
 ## 1. Scope
+
+### R-EVAL-022
+
+**A supportive tool for learners.** The evaluation must be a tool that
+supports learners: it shows learners how their use of AI affects their work
+and their learning, so that they understand this impact and decide how they
+use AI. It must not judge a person: it gives no grade, no score and no
+ranking, and its words describe the work and do not rate the person. It must
+not capture data about a person for others: the history and the results stay
+with the learner, and only the learner decides what to share
+([R-EVAL-015](#r-eval-015)).
 
 ### R-EVAL-001
 
@@ -242,10 +252,14 @@ did, and the roles in the terms of CRediT (Brand et al., 2015) and GAIDeT
 declaration also states which work of the AI the user directed and checked.
 The declaration comes from the history and not from memory, because people
 who write with AI declare themselves as authors even when they do not feel
-ownership of the text of the AI (Draxler et al., 2024). Paper adds the
-declaration and the views to the appendix of the PDF
-([R-HIST-005](history.md#r-hist-005)). The declaration cites no literature
-and links to the documentation ([R-EVAL-020](#r-eval-020)).
+ownership of the text of the AI (Draxler et al., 2024). *(proposal)* For a
+paper of Markdown Paper, the evaluation writes the declaration and its views
+as a Markdown file with images into the repository of the paper, and the
+paper includes this file as an appendix like any other file, so that
+Markdown Paper, a product of nimblescape, knows no evaluation
+([R-HIST-005](history.md#r-hist-005),
+[R-ARCH-005](specification.md#r-arch-005)). The declaration cites no
+literature and links to the documentation ([R-EVAL-020](#r-eval-020)).
 
 ## 5. Views
 
@@ -398,10 +412,14 @@ platform:
   adapter, the evaluation works on the history alone.
 - *An adapter:* a program that knows one kind of work and reads its files,
   and gives their context in this form. The adapter belongs to the product
-  of that kind of work and not to the history. For example, the course
-  module reads the README files of a course and of its assignments
-  ([R-COURSE-011](course.md#r-course-011)), and Markdown Paper gives the
-  chapters of a paper as its parts.
+  of that kind of work, and never to the history; when that product is
+  general infrastructure of nimblescape, the adapter belongs to the
+  evaluation, because a product of nimblescape does not depend on a product
+  of majikmate ([R-ARCH-005](specification.md#r-arch-005)). For example, the
+  course module reads the README files of a course and of its assignments
+  ([R-COURSE-011](course.md#r-course-011)), and *(proposal)* the adapter of
+  the evaluation for Markdown Paper reads the chapters of a paper as its
+  parts.
 - *Platforms:* in VS Code, an adapter is an extension that registers with
   the API of the evaluation extension ([R-EVAL-017](#r-eval-017)); on
   the command line and on a server, an adapter is an npm package that the

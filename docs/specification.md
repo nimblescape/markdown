@@ -215,19 +215,19 @@ document stays in this repository.
 **Owners of the products.** nimblescape provides general infrastructure;
 majikmate provides the academic context and builds on the infrastructure of
 nimblescape. So nimblescape owns the libraries of nimblescape Markdown,
-Markdown Notes and the history, and majikmate owns Markdown Paper, the
+Markdown Notes, Markdown Paper and the history, and majikmate owns the
 evaluation and the course module: their repositories are
-`majikmate/markdownpaper-vscode`, `majikmate/workevaluation-vscode`
-([R-EVAL-017](evaluation.md#r-eval-017)) and `majikmate/course-vscode`. A
-product of majikmate may depend on a product of nimblescape, and a product
-of nimblescape does not depend on a product of majikmate: the history
-records the files of Markdown Notes like any other file
-([R-VSC-004](history.md#r-vsc-004)), and it knows no evaluation.
-*(proposal)* The scope of the npm packages and the publisher of the VS Code
-extensions follow the owner, for example `@majikmate/markdownpaper`. Until
-the repository of Markdown Paper moves to majikmate, its address stays
-`nimblescape/markdownpaper-vscode`, and GitHub forwards the old address
-after the move.
+`majikmate/workevaluation-vscode` ([R-EVAL-017](evaluation.md#r-eval-017))
+and `majikmate/course-vscode`. Markdown Paper stays with nimblescape for
+now, in `nimblescape/markdownpaper-vscode`. A product of majikmate may
+depend on a product of nimblescape, and a product of nimblescape does not
+depend on a product of majikmate: the history records the files of Markdown
+Notes like any other file ([R-VSC-004](history.md#r-vsc-004)) and knows no
+evaluation, and Markdown Paper knows no evaluation either
+([R-EVAL-009](evaluation.md#r-eval-009),
+[R-EVAL-021](evaluation.md#r-eval-021)). *(proposal)* The scope of the npm
+packages and the publisher of the VS Code extensions follow the owner, for
+example `@majikmate/course` and `@nimblescape/markdownpaper`.
 
 ## 4. Documents
 
@@ -292,9 +292,9 @@ use:
 - A tool keeps the files that it writes into a repository in a folder with
   the name of the tool and a leading dot, for example `.markdownpaper/` of
   Markdown Paper, `.markdownnotes/` of Markdown Notes, `.workhistory/` of
-  the history and `.course/` of the course module, and not in a shared folder
-  such as `.nimblescape/`. The name
-  of a tool must give a folder that no other common tool uses.
+  the history, `.workevaluation/` of the evaluation and `.course/` of the
+  course module, and not in a shared folder such as `.nimblescape/`. The
+  name of a tool must give a folder that no other common tool uses.
 
 ## 6. Open questions
 
