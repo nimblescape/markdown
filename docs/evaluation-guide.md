@@ -417,6 +417,17 @@ on the command line or on a server. The rules of a course may state:
 - whether the teacher may see an overview of the course that compares
   students.
 
+**How a course connects.** *(proposal)* The course keeps its objectives,
+their levels and its requirements in the README files. A step of the
+workflow of the course writes them into the rules file
+`.workhistory/rules.yml`, which the evaluation reads. In an assignment, the
+classifier also gives each episode the requirements that it works on, so
+that each part of the work belongs to an objective. The history extension
+records the work in the development environment of the course, and each push
+submits the history. The workflow that writes the feedback on the
+requirements after each push runs the evaluation too, and the feedback links
+to it ([R-EVAL-021](evaluation.md#r-eval-021)).
+
 **Basis.** The levels of AI use come from the AI Assessment Scale (Perkins
 et al., 2024). The levels of the learning objectives use the revised
 taxonomy of Bloom (Krathwohl, 2002).

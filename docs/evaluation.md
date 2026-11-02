@@ -349,6 +349,34 @@ consent, transparency, privacy and the management of the data (Slade &
 Prinsloo, 2013), and the DELICATE checklist for trusted learning analytics
 (Drachsler & Greller, 2016).
 
+### R-EVAL-021
+
+*(proposal)* **A course.** A course connects to the evaluation in four ways:
+
+- *Course data:* the rules of a course are the file `.workhistory/rules.yml`
+  in the repository of the course ([R-GEN-007](specification.md#r-gen-007)).
+  For each assignment, it holds the learning objectives with their levels
+  ([R-EVAL-003](#r-eval-003)), the requirements with the objectives that
+  each serves, the level of AI use that the assignment allows, and the goals
+  ([R-EVAL-014](#r-eval-014)). A step of the workflow of the course writes
+  the file from the README files of the course, so that these stay the only
+  source; the evaluation reads only the file.
+- *Episodes and requirements:* in an assignment, the classifier also gives
+  each episode the requirements that it works on, each with a reason
+  ([R-EVAL-004](#r-eval-004)). The student may correct it
+  ([R-EVAL-005](#r-eval-005)), and the check of the rules covers it
+  ([R-EVAL-006](#r-eval-006)). The rules may take the examples of the six
+  levels from the descriptions of the levels in the course.
+- *Recording and running:* the history extension records the work in the
+  development environment of the course, and each push submits the history
+  with the work ([R-HIST-006](history.md#r-hist-006)). The workflow that
+  gives feedback on the requirements after each push runs the evaluation
+  too, and a teacher runs it for all repositories of the students of a
+  course on the command line ([R-EVAL-014](#r-eval-014),
+  [R-EVAL-016](#r-eval-016)).
+- *Report:* the feedback on the requirements links to the evaluation, and
+  the views open in the editor of the course.
+
 ## 8. API and platforms
 
 ### R-EVAL-016
@@ -404,6 +432,10 @@ The npm package is `@nimblescape/workhistoryevaluation`.
    for example the limits of an episode, the time of an episode, the share
    of intellectual work and the trend of an indicator
    ([R-EVAL-020](#r-eval-020))?
+10. Course: where does the evaluation get the objectives, levels and
+    requirements of a course: a rules file that the workflow of the course
+    writes from the README files (proposal), the README files directly, or a
+    rules file written by hand ([R-EVAL-021](#r-eval-021))?
 
 ## 10. Scientific basis
 
@@ -429,6 +461,7 @@ result; *new* combines established work in a new way and needs the check of
 | [R-EVAL-013](#r-eval-013) Limits of the indicators | Gašević et al. (2015) | Established position |
 | [R-EVAL-014](#r-eval-014) Assignments | Perkins et al. (2024); Draxler et al. (2024); Krathwohl (2002) | Established framework and taxonomy, and a finding |
 | [R-EVAL-015](#r-eval-015) Data of the students | Slade & Prinsloo (2013); Drachsler & Greller (2016) | Established frameworks |
+| [R-EVAL-021](#r-eval-021) A course | None: technical decisions that connect the requirements above | Not applicable |
 | [R-EVAL-016](#r-eval-016), [R-EVAL-017](#r-eval-017) API and package | None: technical decisions | Not applicable |
 | [R-EVAL-020](#r-eval-020) Documentation | None: the documentation holds the basis of the other requirements | Not applicable |
 
