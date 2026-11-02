@@ -64,8 +64,8 @@ in an editor or a change of a file on disk, so that no change of a file is
 missing from the history. *(proposal)* The AI chat of nimblescape Markdown
 reports its prompts, answers and edits, and the decision of the user to
 accept or reject a proposed change, as OpenTelemetry data, in the same way
-as other AI tools, so that no product of nimblescape depends on the history
-([R-ARCH-005](specification.md#r-arch-005)). It sends this data to the
+as other AI tools, so that nimblescape Markdown does not depend on the
+history ([R-ARCH-003](specification.md#r-arch-003)). It sends this data to the
 address of a setting, whether or not a history receives it. The event of
 each edit names the file, the changed range and a hash of the new text. The
 history gives a change of a file the origin AI when an event names the same

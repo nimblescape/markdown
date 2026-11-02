@@ -76,8 +76,8 @@ step with the scientific work that it rests on, its status ([section
 10](#10-scientific-basis)) and its sources. The report of the reflection
 tool, with its views and its declaration, cites no literature: each view and
 the declaration link to the section of the documentation that explains them.
-Until the repository of the history exists, the documentation is [How the
-reflection tool works](reflection-guide.md).
+Until the repository of the reflection tool exists, the documentation is
+[How the reflection tool works](reflection-guide.md).
 
 ## 2. Terms
 
