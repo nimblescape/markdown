@@ -225,10 +225,7 @@ context: it owns the courses, for example `majikmate/module-ts-2`, and the
 feedback program `majikmate/course-feedback`
 ([R-FEED-004](course.md#r-feed-004)), which use these products. A product
 of majikmate may depend on a product of nimblescape, and a product of
-nimblescape does not depend on a product or a course of majikmate. Until
-the repository of the course module moves to nimblescape, its address stays
-`majikmate/course-vscode`, and GitHub forwards the old address after the
-move.
+nimblescape does not depend on a product or a course of majikmate.
 
 ## 4. Documents
 

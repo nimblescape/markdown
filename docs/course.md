@@ -17,7 +17,9 @@ recommendation, and "may" an option; a requirement marked *(proposal)* is
 not decided yet, and [section 7](#7-open-questions) lists these open
 questions. Each requirement has an ID as its heading. Until it moves to
 the repository `nimblescape/course-vscode`, this document stays in this
-repository.
+repository. The normative form of the files is `docs/format.md` of that
+repository, the format `nimblescape-course` version 1.0.0; this document
+holds the requirements of the module.
 
 ## 1. Scope
 
@@ -130,8 +132,12 @@ the course module.
 name of a section is in the language of the course, and the module keeps the
 names of each role for each language, for example "Anforderungen" in German
 and "Requirements" in English for the role "requirements". *(proposal)* The
-file `.course/course.yml` names the course and its language, for example
-`course: ts-2` and `language: de`.
+file `.course/course.yml` holds the settings of a course: `course`, the name
+of the course, for example `ts-2`; `language`, `de` or `en`; and `readme`,
+`chapters` and `assignments`, the patterns of the paths of the README files,
+with `*` and `**`, each a pattern or a list of patterns. The kind in the
+comment of the format of a file wins over the patterns; the patterns find
+the files that have no comment yet.
 
 ### R-COURSE-007
 
@@ -191,7 +197,11 @@ files of its workspace; and the feedback of each assignment
 reflection tool and the course extension read the files of a course only
 through this reader, so that no program reads a README by rules of its own.
 *(proposal)* The functions are `readCourse(folder)`,
-`readAssignment(folder)` and `readFeedback(file)`.
+`readAssignment(folder)`, `readFeedback(file)`, `checkCourse(folder)` and
+`topicText(topic)`; the package has no dependencies, and its types are
+written by hand. `course read [path]` prints a course, a chapter, an
+assignment or a feedback file as JSON, for programs in other languages, for
+example a feedback program in Python.
 
 ### R-COURSE-010
 
@@ -200,7 +210,12 @@ course differs from its form: a missing section, a requirement that is no
 item of the checklist, an objective of an assignment that no chapter table
 has, a level outside K1 to K6, or a missing comment of the format. The
 course extension shows the same checks as warnings in the text editor, after
-a pause in typing. *(proposal)* A workflow of the course runs
+a pause in typing. *(proposal)* `course check` prints one line for each
+problem, `file:line: message [code]`, and ends with the exit code 1 when it
+finds a problem. `course format [--check] [folder]` writes the comment of
+the format into each README that has none or an older version of it, never
+into a feedback file and never into a file with a higher major version;
+with `--check`, it only reports these files. A workflow of the course runs
 `course check` on each pull request.
 
 ### R-COURSE-011
@@ -220,11 +235,15 @@ package that the reflection tool loads.
 ### R-COURSE-012
 
 **The course extension.** *(proposal)* The course extension of VS Code shows
-the structure of a course: its chapters, learning objectives, assignments
-and requirements, each with a link to its place in the README. For an
-assignment, it opens the feedback and the analysis. It writes the comment
-of the format with the save of a README of a course, in the same way as
-Markdown Notes writes its comment.
+the structure of a course in the view "Course" of the explorer: its
+chapters, learning objectives, assignments and requirements, each with a
+link to its place in the README. For an assignment, it opens the feedback
+and the analysis. It shows the checks as warnings after a pause in typing
+(setting `checkDelay`). It writes the comment of the format with the save of
+a README of a course, in the same way as Markdown Notes writes its comment
+(setting `addFormatComment`), but not with an automatic save after a delay;
+the command "Add Format Comments" writes it into all README files of the
+course.
 
 ## 6. Feedback
 
@@ -273,7 +292,10 @@ feedback program is `majikmate/course-feedback`
 ([R-ARCH-005](specification.md#r-arch-005)): it installs
 `@nimblescape/course` from GitHub at a fixed commit, and it keeps its checks,
 skills, engines and prompts, its own rules of the feedback and the rules of
-each course for the feedback.
+each course for the feedback. It must write the comment of the format into
+each feedback file and read the course and its language from
+`.course/course.yml`; until it does, `course check` reports each
+`FEEDBACK.md` without the comment.
 
 ## 7. Open questions
 
