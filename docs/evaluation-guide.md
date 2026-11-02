@@ -209,10 +209,10 @@ The cognitive process "apply" points to neither class. A student who writes
 a loop that the course has just taught applies what was learned and does
 original work, because the code is new. A formatter applies a given rule and
 does routine work, because the rule fixes the result. The cognitive process
-is always the process of the party that did the work. It is a code of the
-evaluation and not the level of a learning objective of a course: the report
-does not take over the levels of the learning objectives of a course and
-does not compare its codes with them.
+is always the process that the party carried out. *(proposal)* In an
+assignment, the rules of the course give the levels of its learning
+objectives on the same scale, and the report compares the processes with
+these levels ([section 12](#12-assignments)).
 
 When the codes point to both classes, the classifier splits the episode into
 its parts and classifies each part. The work of an answer of the AI has the
@@ -275,6 +275,7 @@ measure learning; each one is a hypothesis, and the report labels it so:
 | --- | --- | --- |
 | The share of own intellectual work, and its trend | Learning effect: the author does more of the intellectual work over time | Offloading of work to AI can harm learning (Bastani et al., 2025) and goes with less critical thinking (Gerlich, 2025) |
 | The cognitive processes of the own episodes, and their trend | Learning effect: the author moves from remember and apply to analyze, evaluate and create | The revised taxonomy of Bloom (Krathwohl, 2002) |
+| *(proposal)* In an assignment, for each learning objective, the share of its work at its level that the student did | Learning effect: the student does the thinking that the objective aims at | Learning objectives on the levels of the revised taxonomy of Bloom (Krathwohl, 2002); offloading of work to AI can harm learning (Bastani et al., 2025) |
 | The share of AI answers that the author rejects or changes in their meaning | Critical evaluation of the output of the AI | Checking and integrating AI answers as critical thinking (Lee et al., 2025) |
 | The share of AI answers that the author accepts without a check | Reliance on the AI without critical evaluation | Automation bias (Parasuraman & Manzey, 2010) and overreliance on AI (Buçinca et al., 2021) |
 | The share of the time on intellectual work, and the time of routine work that the AI took over | Learning efficiency: time free for intellectual work | Offloading reduces the cognitive demand of a task (Risko & Gilbert, 2016), but it can also harm learning (Bastani et al., 2025) |
@@ -326,7 +327,8 @@ The feedback answers three questions:
 3. *Where to next?* *(proposal)* The three sections, files or groups of
    episodes with the highest share of intellectual work of the AI, and the
    answers of the AI that the author accepted without a check, each with a
-   link to its episodes.
+   link to its episodes. In an assignment, also the learning objectives
+   whose level the AI reached in place of the student.
 
 **Basis.** The three questions come from the model of feedback of Hattie and
 Timperley (2007). The feedback supports the self-reflection of
@@ -406,15 +408,18 @@ on the command line or on a server. The rules of a course may state:
 - the level of AI use that the assignment allows, and the report shows the
   work beside this level;
 - goals, for example a minimum share of own intellectual work;
-- *(proposal)* the learning objectives of the assignment and the parts of
-  the work that belong to each, for example the requirements of its README;
-  the report then groups the measures by these objectives, without their
-  levels;
+- *(proposal)* the learning objectives of the assignment, each with the
+  level that it aims at on the scale of the cognitive process (section 4),
+  and the parts of the work that serve each objective, for example the
+  requirements of its README; the report then shows for each objective its
+  level next to the cognitive processes that the student and the AI carried
+  out on its work;
 - whether the teacher may see an overview of the course that compares
   students.
 
 **Basis.** The levels of AI use come from the AI Assessment Scale (Perkins
-et al., 2024).
+et al., 2024). The levels of the learning objectives use the revised
+taxonomy of Bloom (Krathwohl, 2002).
 
 *Status:* established framework.
 

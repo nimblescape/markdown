@@ -138,10 +138,11 @@ rule and a surface change point to routine work. Apply points to neither
 class: a student who writes a loop that the course has just taught applies
 what was learned and does original work, because the code is new; a
 formatter applies a given rule and does routine work, because the rule fixes
-the result. The cognitive process is always the process of the party that
-did the work. It is a code of the evaluation and not the level of a learning
-objective of a course: the evaluation does not take over the levels of the
-learning objectives of a course and does not compare its codes with them.
+the result. The cognitive process is always the process that the party
+carried out, on the six levels of the revised taxonomy. *(proposal)* The
+rules of a course give the levels of its learning objectives on the same
+scale, or with a mapping to it, and the evaluation compares the processes of
+the student and of the AI with these levels ([R-EVAL-014](#r-eval-014)).
 
 ### R-EVAL-004
 
@@ -276,7 +277,9 @@ documentation that explains it ([R-EVAL-020](#r-eval-020)).
 learning of the author, along the three questions of feedback (Hattie &
 Timperley, 2007): where am I going (the goals), how am I going (the shares
 and their trend), and where to next (the sections, files and episodes that
-hold intellectual work of the AI). They support the self-reflection of
+hold intellectual work of the AI, and in an assignment the learning
+objectives whose level the AI reached in place of the student,
+[R-EVAL-014](#r-eval-014)). They support the self-reflection of
 self-regulated learning (Zimmerman, 2002), and they should lead from
 awareness to reflection, sensemaking and a change of behavior (Verbert et
 al., 2013). Dashboards of learning analytics are rarely grounded in learning
@@ -295,6 +298,7 @@ the views must label it as a hypothesis ([R-EVAL-019](#r-eval-019)):
 | --- | --- | --- |
 | The share of own intellectual work, and its trend | Learning effect: the author does more of the intellectual work over time | Offloading of work to AI can harm learning (Bastani et al., 2025) and goes with less critical thinking (Gerlich, 2025) |
 | The cognitive processes of the own episodes, and their trend | Learning effect: the author moves from remember and apply to analyze, evaluate and create | The revised taxonomy of Bloom (Krathwohl, 2002) |
+| *(proposal)* In an assignment, for each learning objective, the share of its work at its level that the student did ([R-EVAL-014](#r-eval-014)) | Learning effect: the student does the thinking that the objective aims at | Learning objectives on the levels of the revised taxonomy of Bloom (Krathwohl, 2002); offloading of work to AI can harm learning (Bastani et al., 2025) |
 | The share of AI answers that the author rejects or changes in their meaning | Critical evaluation of the output of the AI | Checking and integrating AI answers as critical thinking (Lee et al., 2025) |
 | *(proposal)* The share of AI answers that the author accepts without a check ([R-EVAL-018](#r-eval-018)) | Reliance on the AI without critical evaluation | Automation bias (Parasuraman & Manzey, 2010) and overreliance on AI (Buçinca et al., 2021) |
 | The share of the time on intellectual work, and the time of routine work that the AI took over | Learning efficiency: time free for intellectual work | Offloading reduces the cognitive demand of a task (Risko & Gilbert, 2016), but it can also harm learning (Bastani et al., 2025) |
@@ -323,10 +327,16 @@ evaluates all assignments of a course in one run, on the command line or on
 a server. The rules of a course may state the level of AI use that the
 assignment allows, after the AI Assessment Scale (Perkins et al., 2024), and
 the evaluation shows the work beside this level. *(proposal)* The rules of a
-course may name the learning objectives of an assignment and the parts of
-the work that belong to each, for example the requirements of its README;
-the evaluation then groups its measures by these objectives, without their
-levels ([R-EVAL-003](#r-eval-003)).
+course may name the learning objectives of an assignment, each with the
+level that it aims at on the scale of the cognitive process
+([R-EVAL-003](#r-eval-003)), and the parts of the work that serve each
+objective, for example the requirements of its README. The evaluation then
+shows for each objective its level next to the cognitive processes that the
+student and the AI carried out on its work, and the feedback names the
+objectives whose level the AI reached in place of the student
+([R-EVAL-011](#r-eval-011)). The level of an objective is the aim of the
+task; a process below or above it is no error and no grade
+([R-EVAL-013](#r-eval-013)).
 
 ### R-EVAL-015
 
@@ -417,7 +427,7 @@ result; *new* combines established work in a new way and needs the check of
 | [R-EVAL-011](#r-eval-011) Formative feedback | Hattie & Timperley (2007); Zimmerman (2002); Verbert et al. (2013); Matcha et al. (2020) | Established theories; the effect of the views is a hypothesis |
 | [R-EVAL-012](#r-eval-012) Indicators | The column "Basis" of its table | Hypothesis |
 | [R-EVAL-013](#r-eval-013) Limits of the indicators | Gašević et al. (2015) | Established position |
-| [R-EVAL-014](#r-eval-014) Assignments | Perkins et al. (2024); Draxler et al. (2024) | Established framework and a finding |
+| [R-EVAL-014](#r-eval-014) Assignments | Perkins et al. (2024); Draxler et al. (2024); Krathwohl (2002) | Established framework and taxonomy, and a finding |
 | [R-EVAL-015](#r-eval-015) Data of the students | Slade & Prinsloo (2013); Drachsler & Greller (2016) | Established frameworks |
 | [R-EVAL-016](#r-eval-016), [R-EVAL-017](#r-eval-017) API and package | None: technical decisions | Not applicable |
 | [R-EVAL-020](#r-eval-020) Documentation | None: the documentation holds the basis of the other requirements | Not applicable |
