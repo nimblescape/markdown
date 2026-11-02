@@ -60,6 +60,29 @@ action that the platform shows and that no one reports, for example a
 change of a file on disk ([R-VSC-004](#r-vsc-004)), so that no change of a
 file is missing from the history.
 
+### R-HIST-011
+
+**AI agents in cloud sessions.** The history should also record the changes
+of AI agents that work in cloud sessions, for example Claude Code on the
+web, the cloud agent of GitHub Copilot and OpenAI Codex, and this should
+need only configuration in the repository. *(proposal)* Each such agent
+delivers its changes through Git, so the history records each commit that
+reaches the repository as a step, with the origin AI and the name of the
+agent when the commit or its pull request shows them: by its author, by its
+trailers, for example `Co-Authored-By` and a link to the session, or by its
+branch. This needs no configuration. For the details, hooks in the
+repository record the prompts, answers and tool calls of the session into
+the history file of the repository ([R-HIST-006](#r-hist-006)), and a hook
+at the end of each turn adds this file to the next commit, so that the
+details travel with the commits of the agent. The repository holds these
+hooks and the script that they run: `.claude/settings.json` for Claude Code,
+which the Copilot CLI also reads, `.github/hooks/*.json` for Copilot, and
+`.codex/hooks.json` for Codex where it runs hooks. The other way is an HTTP
+hook that sends each step to a server backend of the history
+([R-HIST-002](#r-hist-002)). It stays an option, because it needs settings
+outside the repository: an allowed host in the network settings of the cloud
+environment and a token as a secret of that environment.
+
 ## 2. Storage
 
 ### R-HIST-002
@@ -75,7 +98,8 @@ backend uses the platform adapter for files and storage, and no platform API
 directly. Examples: a file in the repository of the document, which Git
 keeps and shares, for example with a supervisor; a local store on the
 computer of the user (in VS Code the storage of the extension, on the web
-IndexedDB); a server or a database.
+IndexedDB); a server backend: a program on a server that receives the steps
+over HTTP and stores them, for example in a database.
 
 ### R-HIST-006
 
@@ -159,8 +183,9 @@ and edits with the origin AI and the name of the tool, for example Claude
 Code, the agent of GitHub Copilot in VS Code and the Copilot CLI, which
 share one format of hooks. A change whose source VS Code does not report,
 for example an accepted inline completion of Copilot or a change by Git,
-gets the origin "other program", and the user may mark it as an edit of the
-AI. *(proposal)* When the user switches it on, the history extension also
+gets the origin "other program", unless a commit shows its AI agent
+([R-HIST-011](#r-hist-011)), and the user may mark it as an edit of the AI.
+*(proposal)* When the user switches it on, the history extension also
 receives the OpenTelemetry data of AI tools on a local port, for example the
 agent runs of Copilot Chat and the events of Claude Code, with the prompts,
 the answers and the tool calls. It gives a change of a file the origin AI
@@ -181,6 +206,11 @@ and the user confirms it.
 3. AI tools: the OpenTelemetry data of AI tools, the match of tool calls
    with the changes of files, and the mark "probably AI"
    ([R-VSC-004](#r-vsc-004), proposal)?
+4. Cloud sessions: commits as steps with the origin from the commit, and
+   hooks in the repository that write the details into the history file of
+   the repository, which goes with the next commit
+   ([R-HIST-011](#r-hist-011), proposal)? Does each agent commit this file
+   reliably? This needs a test with each agent.
 
 ---
 
