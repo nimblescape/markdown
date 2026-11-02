@@ -203,7 +203,11 @@ target.
 part. The user cannot change the format of a piece of a part. Backspace and
 Delete next to a part delete the whole part. Text that the user types at the
 edge of a part does not become a piece of the part. Replace leaves a match
-that holds a piece of a part. A double click on a part opens its form.
+that holds a piece of a part. A double click on a part opens its form. A
+part can hold whole blocks, for example the code block of a listing: the
+cursor then stays in the text before or after it, and Backspace at the start
+of the text after it and Delete at the end of the text before it delete the
+whole part.
 
 ## 7. Mode to learn Markdown
 

@@ -488,6 +488,50 @@ describe('the generated parts', () => {
     expect(editor.getMarkdown()).toBe('Seen [Levitt, 1972](#levitt-1972) in 2000.\n');
   });
 
+  it('can hold a whole block: the cursor stays in the text around it, and Backspace and Delete next to it delete it', () => {
+    // The code block is a generated part, as the code of a listing from its source file.
+    const blocks: MarkdownPlugin = {
+      name: 'listings',
+      apiVersion: 1,
+      generated: (doc) => {
+        const parts: GeneratedPart[] = [];
+        doc.forEach((node, offset) => {
+          if (node.type.name === 'codeBlock') {
+            parts.push({ from: offset, to: offset + node.nodeSize });
+          }
+        });
+        return parts;
+      },
+    };
+    const code = 'Before\n\n```ts\nconst a = 1;\n```\n\nAfter\n';
+    const editor = open(code, [blocks]);
+    const view = viewOf(editor);
+    const block = view.state.doc.child(1);
+    const start = view.state.doc.child(0).nodeSize;
+    const end = start + block.nodeSize;
+    expect(element.querySelector('.nsmd-generated-block')?.textContent).toBe('const a = 1;');
+    // A move into the code goes over it in its direction; a click goes to the nearer side.
+    select(editor, start - 1);
+    select(editor, start + 2);
+    expect(view.state.selection.head).toBe(end + 1);
+    select(editor, end + 1);
+    select(editor, end - 2);
+    expect(view.state.selection.head).toBe(start - 1);
+    view.dispatch(view.state.tr.setSelection(TextSelection.create(view.state.doc, end - 2)).setMeta('pointer', true));
+    expect(view.state.selection.head).toBe(end + 1);
+    type(editor, 'x');
+    expect(editor.getMarkdown()).toBe(code.replace('After', 'xAfter'));
+    // Backspace at the start of the text after the code deletes the whole code block, and Undo brings it back.
+    select(editor, end + 1);
+    expect(key(editor, 'Backspace')).toBe(true);
+    expect(editor.getMarkdown()).toBe('Before\n\nxAfter\n');
+    editor.tiptap.commands.undo();
+    expect(editor.getMarkdown()).toBe(code.replace('After', 'xAfter'));
+    select(editor, start - 1);
+    expect(key(editor, 'Delete')).toBe(true);
+    expect(editor.getMarkdown()).toBe('Before\n\nxAfter\n');
+  });
+
   it('come again after refreshPlugins, when the data of the plugin changed', () => {
     let active = false;
     const plugin: MarkdownPlugin = { name: 'switch', apiVersion: 1, generated: (doc) => (active ? [{ from: 1, to: doc.child(0).nodeSize - 1 }] : []) };

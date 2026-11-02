@@ -6,13 +6,14 @@
 // generates, for example the text of a citation. The user cannot type in a part, delete a piece of it, paste into it or
 // format a piece of it: the editor drops such a change. The cursor jumps over a part, a selection that touches a part
 // holds the whole part, and Backspace and Delete next to a part delete the whole part in one step of Undo. Text typed at
-// the edge of a part does not take the marks of the part. Ctrl+click (Cmd+click on macOS) on a part goes to its target,
-// and a double click opens its form, when the plugin gives them. Changes from outside, Undo and Redo, and the writes of
-// the plugins, with the meta `generatedWrite`, may change a part.
+// the edge of a part does not take the marks of the part. A part can hold whole blocks, for example the code block of a
+// listing: the cursor then stays in the text before or after it. Ctrl+click (Cmd+click on macOS) on a part goes to its
+// target, and a double click opens its form, when the plugin gives them. Changes from outside, Undo and Redo, and the
+// writes of the plugins, with the meta `generatedWrite`, may change a part.
 
 import { isHistoryTransaction } from '@tiptap/pm/history';
 import type { Node } from '@tiptap/pm/model';
-import { type EditorState, Plugin, PluginKey, TextSelection, type Transaction } from '@tiptap/pm/state';
+import { type EditorState, Plugin, PluginKey, Selection, TextSelection, type Transaction } from '@tiptap/pm/state';
 import { AddMarkStep, type Mapping, RemoveMarkStep, ReplaceAroundStep, ReplaceStep, type StepMap } from '@tiptap/pm/transform';
 import { Decoration, DecorationSet, type EditorView } from '@tiptap/pm/view';
 import { outsideChange } from '../markdown/update';
@@ -98,15 +99,38 @@ export function keepsParts(tr: Transaction, parts: readonly Range[]): boolean {
 /** partAround returns the part that holds a position inside, not at its edges. */
 const partAround = (parts: readonly GeneratedPart[], pos: number): GeneratedPart | undefined => parts.find((part) => part.from < pos && pos < part.to);
 
+/** holdsBlocks returns true for a part that holds whole blocks, for example the code block of a listing. */
+const holdsBlocks = (doc: Node, part: GeneratedPart): boolean => !doc.resolve(part.from).parent.inlineContent;
+
+/**
+ * besidePart returns the cursor at an edge of a part: at the edge itself for a part in a line of text, and in the text
+ * next to the edge for a part that holds whole blocks, or undefined when no text is next to it.
+ * @param doc - The document.
+ * @param parts - The parts of the document.
+ * @param part - The part.
+ * @param toEnd - true for the end of the part, false for its start.
+ */
+function besidePart(doc: Node, parts: readonly GeneratedPart[], part: GeneratedPart, toEnd: boolean): TextSelection | undefined {
+  const edge = toEnd ? part.to : part.from;
+  if (!holdsBlocks(doc, part)) {
+    return TextSelection.create(doc, edge);
+  }
+  const found = Selection.findFrom(doc.resolve(edge), toEnd ? 1 : -1, true) ?? Selection.findFrom(doc.resolve(toEnd ? part.from : part.to), toEnd ? -1 : 1, true);
+  return found instanceof TextSelection && !partAround(parts, found.head) ? found : undefined;
+}
+
 /**
  * outsideParts returns the selection of a state outside the generated parts: a cursor inside a part jumps to the edge in
  * the direction of its move, or to the nearer edge, and a selection that touches a part grows to hold the whole part.
+ * For a part that holds whole blocks, the cursor goes to the text before or after it: in the direction of a move by the
+ * keyboard, and to the nearer edge after a click.
  * @param state - The state after the transactions.
  * @param before - The position of the cursor before the transactions, in the document after them.
  * @param parts - The parts of the document.
+ * @param pointer - true when the mouse set the selection.
  * @returns The new selection, or undefined when the selection stays.
  */
-function outsideParts(state: EditorState, before: number, parts: readonly GeneratedPart[]): TextSelection | undefined {
+function outsideParts(state: EditorState, before: number, parts: readonly GeneratedPart[], pointer: boolean): TextSelection | undefined {
   const selection = state.selection;
   if (!(selection instanceof TextSelection)) {
     return undefined;
@@ -117,13 +141,11 @@ function outsideParts(state: EditorState, before: number, parts: readonly Genera
     if (!part) {
       return undefined;
     }
-    let target: number;
-    if (Math.abs(head - before) === 1) {
-      target = head > before ? part.to : part.from;
-    } else {
-      target = head - part.from <= part.to - head ? part.from : part.to;
+    const nearer = head - part.from > part.to - head;
+    if (holdsBlocks(state.doc, part)) {
+      return besidePart(state.doc, parts, part, pointer || (before > part.from && before < part.to) ? nearer : head > before);
     }
-    return TextSelection.create(state.doc, target);
+    return besidePart(state.doc, parts, part, Math.abs(head - before) === 1 ? head > before : nearer);
   }
   const forward = head > anchor;
   const anchorPart = partAround(parts, anchor);
@@ -137,7 +159,9 @@ function outsideParts(state: EditorState, before: number, parts: readonly Genera
 }
 
 /**
- * deleteNext deletes the whole part next to the cursor, for Backspace before the cursor and for Delete after it.
+ * deleteNext deletes the whole part next to the cursor, for Backspace before the cursor and for Delete after it. A part
+ * that holds whole blocks is next to the cursor at the start of the textblock after it and at the end of the textblock
+ * before it.
  * @returns true when it deleted a part.
  */
 function deleteNext(view: EditorView, parts: readonly GeneratedPart[], backward: boolean): boolean {
@@ -145,7 +169,10 @@ function deleteNext(view: EditorView, parts: readonly GeneratedPart[], backward:
   if (!selection.empty) {
     return false;
   }
-  const part = parts.find((each) => (backward ? each.to === selection.head : each.from === selection.head));
+  const { $head, head } = selection;
+  const atEdge = $head.parent.isTextblock && $head.depth > 0 && (backward ? $head.parentOffset === 0 : $head.parentOffset === $head.parent.content.size);
+  const block = atEdge ? (backward ? $head.before() : $head.after()) : undefined;
+  const part = parts.find((each) => (backward ? each.to === head || each.to === block : each.from === head || each.from === block));
   if (!part) {
     return false;
   }
@@ -211,7 +238,8 @@ export function generatedPlugin(parts: DocCache<GeneratedPart[]>): Plugin {
       for (const tr of transactions) {
         before = tr.mapping.map(before);
       }
-      const selection = outsideParts(newState, before, parts.get(newState.doc));
+      const pointer = transactions.some((tr) => tr.getMeta('pointer') === true);
+      const selection = outsideParts(newState, before, parts.get(newState.doc), pointer);
       return selection ? newState.tr.setSelection(selection) : null;
     },
     props: {
