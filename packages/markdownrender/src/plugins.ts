@@ -109,14 +109,18 @@ export function renderOf(renders: ReadonlyMap<string, RenderFunction>, token: To
  * finds the element of the styles of a plugin by its name.
  * @param plugins - The plugins.
  * @param page - The document of the page.
+ * @param nonce - The nonce of the style elements, for a page whose policy allows only style elements with a nonce.
  */
-export function addStyles(plugins: readonly RenderPlugin[], page: Document): void {
+export function addStyles(plugins: readonly RenderPlugin[], page: Document, nonce?: string): void {
   for (const plugin of plugins) {
     if (!plugin.styles || page.head.querySelector(`style[data-nsmd-plugin="${plugin.name}"]`)) {
       continue;
     }
     const style = page.createElement('style');
     style.dataset.nsmdPlugin = plugin.name;
+    if (nonce) {
+      style.setAttribute('nonce', nonce);
+    }
     style.textContent = plugin.styles;
     page.head.append(style);
   }

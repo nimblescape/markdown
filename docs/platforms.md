@@ -23,6 +23,12 @@ on the computer of the user, the views, the theme, the signed-in GitHub
 user, secrets such as the AI key, commands and settings, opening a link, and
 a message channel from a plugin to its extension.
 
+*(proposal)* **A strict policy of styles.** The editor adds style elements
+to the page: the base styles of Tiptap and the styles of the plugins. A page
+whose policy allows only style elements with a nonce gives this nonce to the
+editor (`styleNonce`), so that its policy needs no `'unsafe-inline'` for
+these styles, for example the side view of Notes.
+
 ## 2. VS Code
 
 The history extension of VS Code, an extension of its own that records every

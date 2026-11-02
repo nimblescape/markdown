@@ -40,6 +40,11 @@ editor.setEditable(false); // read-only mode
 editor.setLearnMode(true); // show the Markdown marks
 ```
 
+The editor adds style elements to the page: the base styles of Tiptap and
+the styles of the plugins. A page whose policy allows only style elements
+with a nonce gives this nonce in the option `styleNonce`
+([R-PLAT-001](../../docs/platforms.md#r-plat-001)).
+
 ## Plugins
 
 Plugins extend the editor through the plugin API, version 1

@@ -74,6 +74,12 @@ export interface MarkdownEditorOptions extends InteractionOptions {
    * in a view of its own (R-GEN-014); the default is true.
    */
   threadIcons?: boolean;
+  /**
+   * styleNonce is the nonce of the style elements that the editor adds to the page: the base styles of Tiptap and the
+   * styles of the plugins. A page whose policy allows only style elements with a nonce gives it, so that its policy
+   * needs no `'unsafe-inline'` (docs/platforms.md, R-PLAT-001).
+   */
+  styleNonce?: string;
 }
 
 /**
@@ -133,7 +139,7 @@ export class MarkdownEditor implements PluginEditor {
     this.textSource = options.source;
     const plugins = options.plugins ?? [];
     this.parts = pluginParts(plugins);
-    addStyles(plugins, element.ownerDocument);
+    addStyles(plugins, element.ownerDocument, options.styleNonce);
     this.generated = new DocCache((doc) => validParts(doc, plugins.flatMap((plugin) => plugin.generated?.(doc) ?? [])));
     this.threads = new DocCache((doc) => threadEntries(plugins, doc));
     this.interaction = new Interaction(element, withPlugins(options, plugins, this.parts));
@@ -141,6 +147,7 @@ export class MarkdownEditor implements PluginEditor {
       element: this.interaction.box,
       extensions: [...(options.extensions ?? coreExtensions()), ...this.parts.extensions, this.pluginExtension(options), this.interaction.extension()],
       editable: options.editable ?? true,
+      ...(options.styleNonce ? { injectNonce: options.styleNonce } : {}),
       // The text has the styles of rendered content of the renderer (content.css).
       editorProps: { attributes: { class: 'nsmd-content' } },
       onUpdate: ({ transaction }) => {
