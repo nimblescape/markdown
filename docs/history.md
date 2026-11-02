@@ -7,30 +7,33 @@ Licensed under the MIT License. See LICENSE in the repository root for details.
 
 # Specification of the history
 
-This document defines the history: the part that records every action on a
-text document, saves it through a pluggable backend and replays it
-([section 3](specification.md#3-architecture) of the specification), and the
-history extension of VS Code, the base of all editing in VS Code. The
+This document defines the history: a product of its own beside nimblescape
+Markdown ([R-ARCH-003](specification.md#r-arch-003)) that records every
+action on any file, saves it through a pluggable backend and replays it, and
+the history extension of VS Code, the base of all editing in VS Code. The
 evaluation plugin of the history has a document of its own,
-[evaluation.md](evaluation.md). It is part of the
-[specification](specification.md) of nimblescape Markdown and normative in
-the same way. [Section 6](#6-open-questions) lists its open questions.
+[evaluation.md](evaluation.md). Until the history has a repository of its
+own, this document stays with the [specification](specification.md) of
+nimblescape Markdown and is normative in the same way.
+[Section 6](#6-open-questions) lists its open questions.
 
 ## 1. Steps
 
 ### R-AI-004
 
 **A history of every action.** The history must record every action on a
-text document, in its order, as a saved history of undo and redo. It must
-work for every text document, also for source code, and depend only on the
-source. The history must stay after the file is closed.
+file, in its order, as a saved history of undo and redo. It must work for
+every file, not only for Markdown: text documents, source code, notebooks
+and other files. It must not depend on nimblescape Markdown. The history
+must stay after the file is closed.
 
 ### R-HIST-001
 
 **Steps.** Each action is one step:
 
-- an edit: typed text grouped as the undo of an editor groups it, for
-  example a word or a pause; a command, for example a moved row;
+- an edit of a file: typed text grouped as the undo of an editor groups it,
+  for example a word or a pause; a command, for example a moved row; a
+  change of the file by another program;
 - a selection: the selected text; a move of the cursor without selected text
   is no step;
 - a question to the AI: the prompt, the selection and the context that the
@@ -42,9 +45,20 @@ source. The history must stay after the file is closed.
 
 Each step must record its time, its author and its origin: user, AI or other
 program. A change of the user to text that the AI wrote is an edit of the
-user. An editor or an AI tool that uses the history reports its own edits; a
-change by another program gets the origin "other program", and the user may
-mark it as an edit of the AI.
+user. An editor or an AI tool that uses the history reports its own edits
+through the API of the history ([R-HIST-010](#r-hist-010)); a change by
+another program gets the origin "other program", and the user may mark it as
+an edit of the AI.
+
+### R-HIST-010
+
+**The API for actions.** The history must have an API through which an
+editor, an extension or a tool reports its actions with their origin, for
+example the source of nimblescape Markdown, Markdown Notes, Markdown Paper,
+or an AI tool through its hooks. The history must record by itself every
+action that the platform shows and that no one reports, for example a
+change of a file on disk ([R-VSC-004](#r-vsc-004)), so that no change of a
+file is missing from the history.
 
 ## 2. Storage
 
@@ -109,7 +123,8 @@ classifies each step as original work or as routine work, gives each part of
 a step a role (direct, produce or judge), shows the result in views, and
 gives feedback on work and learning, also for student assignments and for
 source code. Its methods rest on published scientific work
-([R-EVAL-019](evaluation.md#r-eval-019)). Its specification is
+([R-EVAL-019](evaluation.md#r-eval-019)). It has a VS Code extension of its
+own ([R-EVAL-017](evaluation.md#r-eval-017)), and its specification is
 [evaluation.md](evaluation.md).
 
 ### R-HIST-008
@@ -124,24 +139,32 @@ history that a student submits with an assignment.
 
 ### R-VSC-004
 
-**The history extension.** The history extension of VS Code is the base of
-all editing in VS Code: Markdown Notes and Markdown Paper build on it, as an
-extension dependency, and record their actions through it. It must record
-every change in the workspace through the stable API of VS Code, not only
-the edits of a file: the edits and selections in every text editor and
-notebook; files that are created, deleted or renamed, also by Git or by
-programs outside VS Code; the settings; and the commands in the terminal,
-where the shell integration of VS Code reports them. It shows the history
-for any file and for the whole workspace.
+**The history extension.** The history extension of VS Code is an extension
+of its own ([R-ARCH-003](specification.md#r-arch-003)) and the base of all
+editing in VS Code: Markdown Notes and Markdown Paper build on it, as an
+extension dependency, and record their actions through it. It serves every
+file of the workspace, not only Markdown. It must record every change in the
+workspace through the stable API of VS Code: every edit of any file, in a
+text editor, in a notebook, or on disk by Git or by a program outside VS
+Code; every creation, deletion and rename of a file, also by Git or by a
+program outside VS Code; the selections in every text editor; the settings;
+and the commands in the terminal, where the shell integration of VS Code
+reports them. It shows the history for any file and for the whole workspace.
 
-An AI tool that reports its actions through hooks, for example Claude Code
-or the agent of GitHub Copilot, gives its prompts, answers and edits with
-the origin AI and the name of the tool. A change whose source VS Code does
-not report, for example an accepted inline completion of Copilot or a change
-by Git, gets the origin "other program", and the user may mark it as an
-edit of the AI. *(proposal)* The history marks a change of unknown source as
-"probably AI" when its form shows it, for example several lines inserted at
-once at the cursor, and the user confirms it.
+An AI tool that reports its actions through hooks gives its prompts, answers
+and edits with the origin AI and the name of the tool, for example Claude
+Code, the agent of GitHub Copilot in VS Code and the Copilot CLI, which
+share one format of hooks. A change whose source VS Code does not report,
+for example an accepted inline completion of Copilot or a change by Git,
+gets the origin "other program", and the user may mark it as an edit of the
+AI. *(proposal)* When the user switches it on, the history extension also
+receives the OpenTelemetry data of AI tools on a local port, for example the
+agent runs of Copilot Chat and the events of Claude Code, with the prompts,
+the answers and the tool calls. It gives a change of a file the origin AI
+and the name of the tool when a tool call of that tool at the same time
+names that file. It marks a change of unknown source as "probably AI" when
+its form shows it, for example several lines inserted at once at the cursor,
+and the user confirms it.
 
 ## 6. Open questions
 
@@ -150,6 +173,11 @@ once at the cursor, and the user confirms it.
    supervisors see it through Git (proposal), or the local store on the
    computer of the author? Later steps kept as a branch (proposal) or
    dropped? The form of the file of [R-HIST-006](#r-hist-006) (proposal)?
+2. Files that are not text: does the history keep the content of each
+   version, or only its hash and its size (proposal)?
+3. AI tools: the OpenTelemetry data of AI tools, the match of tool calls
+   with the changes of files, and the mark "probably AI"
+   ([R-VSC-004](#r-vsc-004), proposal)?
 
 ---
 

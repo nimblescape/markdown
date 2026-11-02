@@ -25,8 +25,9 @@ a message channel from a plugin to its extension.
 
 ## 2. VS Code
 
-The history extension of VS Code, the base of Markdown Notes and Markdown
-Paper, is defined with the history ([R-VSC-004](history.md#r-vsc-004)).
+The history extension of VS Code, an extension of its own and the base of
+Markdown Notes and Markdown Paper, is defined with the history
+([R-VSC-004](history.md#r-vsc-004)).
 
 ### R-GEN-004
 

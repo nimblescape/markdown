@@ -6,10 +6,11 @@ Licensed under the MIT License. See LICENSE in the repository root for details.
 
 # Specification of the evaluation plugin
 
-This document defines the evaluation plugin of nimblescape Markdown.
-The plugin evaluates the history of a text document ([history](history.md)):
-it classifies each step as original work or as routine work, gives each part
-of a step a role, shows the result in views, and gives feedback on work and
+This document defines the evaluation plugin of the history, a product of its
+own beside nimblescape Markdown ([R-ARCH-003](specification.md#r-arch-003)).
+The plugin evaluates the history of a file ([history](history.md)): it
+classifies each step as original work or as routine work, gives each part of
+a step a role, shows the result in views, and gives feedback on work and
 learning. It is normative in the same way as the
 [specification](specification.md): "must" marks a requirement, "should" a
 recommendation, and "may" an option; a requirement marked *(proposal)* is
@@ -21,16 +22,15 @@ questions. Each requirement has an ID as its heading.
 ### R-EVAL-001
 
 **An evaluation of a history.** The evaluation plugin evaluates the history
-of any text document: a Markdown document, a paper of Markdown Paper, or
-source code of any language, which the history records in every text editor
-of VS Code ([R-VSC-004](history.md#r-vsc-004)). It serves two uses:
-the author gets feedback on their own work and learning, and a teacher
-evaluates student assignments, written texts as well as programming
-assignments, with their histories. The plugin reads a history only through
-the API and the file form of the history
-([R-HIST-007](history.md#r-hist-007),
-[R-HIST-008](history.md#r-hist-008)), so it runs without the editor:
-in VS Code, on a web page, on the command line and on a server.
+of any file: a Markdown document, a paper of Markdown Paper, source code of
+any language, or another file of the workspace, which the history records in
+VS Code ([R-VSC-004](history.md#r-vsc-004)). It serves two uses: the author
+gets feedback on their own work and learning, and a teacher evaluates
+student assignments, written texts as well as programming assignments, with
+their histories. The plugin reads a history only through the API and the
+file form of the history ([R-HIST-007](history.md#r-hist-007),
+[R-HIST-008](history.md#r-hist-008)), so it runs without the editor: in VS
+Code, on a web page, on the command line and on a server.
 
 ### R-EVAL-019
 
@@ -46,8 +46,8 @@ learning, because counts of activity alone are no valid measure of learning
 
 [Section 10](#10-scientific-basis) lists the basis and its status for each
 requirement. The requirements on the software ([R-EVAL-016](#r-eval-016),
-[R-EVAL-017](#r-eval-017)) are technical decisions and follow the
-specification of the libraries.
+[R-EVAL-017](#r-eval-017)) are technical decisions and follow the rules of
+all nimblescape repositories ([R-GEN-007](specification.md#r-gen-007)).
 
 ## 2. Terms
 
@@ -320,11 +320,13 @@ rules)`, `analyze(evaluation, { from, to, part })` and
 
 ### R-EVAL-017
 
-**Package.** The plugin is the npm package
-`@nimblescape/markdownevaluation`, a workspace of the repository of
-nimblescape Markdown until version 1 of the API of the history
-([R-ARCH-002](specification.md#r-arch-002)). *(proposal)* After that, it
-gets a repository of its own.
+**Package and extension.** The evaluation plugin must have a VS Code
+extension of its own, the evaluation extension
+([R-ARCH-003](specification.md#r-arch-003)). It depends on the history
+extension ([R-VSC-004](history.md#r-vsc-004)) and shows the views of the
+plugin in VS Code. *(proposal)* The plugin is the npm package
+`@nimblescape/evaluation` in the repository `nimblescape/evaluation-vscode`,
+together with its extension.
 
 ## 9. Open questions
 
@@ -351,8 +353,9 @@ gets a repository of its own.
 8. Assignments: may a teacher see an overview of a course that compares
    students? How does a student submit the history with an assignment: the
    file of the history in the repository, or an export?
-9. Repository: does the plugin get a repository of its own after version 1
-   of the API of the history ([R-EVAL-017](#r-eval-017), proposal)?
+9. Repository: does the plugin get the repository
+   `nimblescape/evaluation-vscode` of its own ([R-EVAL-017](#r-eval-017),
+   proposal), or does it share one repository with the history?
 
 ## 10. Scientific basis
 

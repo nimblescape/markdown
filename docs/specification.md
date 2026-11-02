@@ -8,10 +8,10 @@ Licensed under the MIT License. See LICENSE in the repository root for details.
 # Specification
 
 This specification defines nimblescape Markdown: general libraries that
-keep, edit, render, lay out and record text documents, Markdown first, on
-several platforms, and the plugins that build on them. This document gives
-the scope, the terms, the architecture, the rules for libraries, licenses
-and release, and the plan; each part has a document of its own
+keep, edit, render and lay out text documents, Markdown first, on several
+platforms, and the plugins that build on them. This document gives the
+scope, the terms, the architecture, the rules for libraries, licenses and
+release, and the plan; each part has a document of its own
 ([section 4](#4-documents)). The specification is normative. "Must" marks a
 requirement, "should" a recommendation, and "may" an option. A requirement
 marked *(proposal)* is not decided yet; each document that has such
@@ -29,15 +29,17 @@ of [section 4](#4-documents) shows the document of each ID. The
 
 **General libraries for text documents.** nimblescape Markdown is a set of
 general libraries for text documents. Markdown is the first format. The
-source, the history and the platforms also work for any other text, for
-example source code. The target platforms are VS Code and the web, with the
-same code; the command line is a platform for output without a view, for
-example `mp build` of nimblescape Markdown Paper. Today the libraries are
-one npm package, `@nimblescape/markdown` ([R-ARCH-002](#r-arch-002)).
-nimblescape Markdown Notes and nimblescape Markdown Paper are format
-extensions: they add their parts through plugins
-([plugins and format extensions](plugins.md)), and they decide where they
-use the libraries ([R-GEN-004](platforms.md#r-gen-004)).
+source and the platforms also work for any other text, for example source
+code. The history and its evaluation are products of their own that serve
+every file, not only Markdown ([R-ARCH-003](#r-arch-003)). The target
+platforms are VS Code and the web, with the same code; the command line is a
+platform for output without a view, for example `mp build` of nimblescape
+Markdown Paper. Today the libraries are one npm package,
+`@nimblescape/markdown` ([R-ARCH-002](#r-arch-002)). nimblescape Markdown
+Notes and nimblescape Markdown Paper are format extensions: they add their
+parts through plugins ([plugins and format extensions](plugins.md)), and
+they decide where they use the libraries
+([R-GEN-004](platforms.md#r-gen-004)).
 
 ## 2. Terms
 
@@ -47,7 +49,7 @@ use the libraries ([R-GEN-004](platforms.md#r-gen-004)).
 | Editor | A part that shows the text in a form that the user changes |
 | Renderer | A part that turns the text into content without edit functions |
 | Layout | A part that puts rendered content into a layout: styles, templates, pages, PDF |
-| History | A part that records every action on a text, saves it and replays it |
+| History | The recorder of every action on any file, a product of its own ([R-ARCH-003](#r-arch-003)): it saves the actions and replays them |
 | Backend | A plugin of the history that stores the steps of a history and reads them back |
 | Platform adapter | The code that connects the libraries to one platform, for example VS Code |
 | Plugin | An object that adds functions to one part |
@@ -63,43 +65,49 @@ use the libraries ([R-GEN-004](platforms.md#r-gen-004)).
 | Editor | Shows the text in a form that the user edits, and turns each edit into a change of the text. |
 | Renderer | Turns the text into content without edit functions: HTML, with a view for each kind of token. |
 | Layout | Puts the content of the renderer into a layout: styles, title page and templates, numbers, generated lists, pages, PDF. |
-| History | Records every action with its origin, saves it through a pluggable backend, and replays it, back and forward. Its plugins evaluate it. |
 | Platform | Connects the libraries to one platform, and decides how each function is shown and used there. |
 
 Every edit, in any editor and by the AI, becomes a change of the text in the
-source, which sends it to the renderer and to the history. In VS Code,
-Markdown Notes and Markdown Paper build on the history extension
-([R-VSC-004](history.md#r-vsc-004)), which records every change in the
-workspace.
+source, which sends it to the renderer and to the history. The history and
+its evaluation are products of their own beside these parts
+([R-ARCH-003](#r-arch-003)). In VS Code, Markdown Notes and Markdown Paper
+build on the history extension ([R-VSC-004](history.md#r-vsc-004)), which
+records every edit, creation and deletion of any file in the workspace.
 
 ```mermaid
 flowchart TB
   subgraph vscode["VS Code"]
     notes["Markdown Notes<br/>notes, threads, AI chats"]
     paper["Markdown Paper<br/>layouts, citations, PDF"]
-    historyExtension["History extension<br/>records every change in the workspace,<br/>the base of all editing in VS Code"]
+    historyExtension["History extension<br/>records every edit, creation and deletion<br/>of any file, the base of all editing in VS Code"]
+    evaluationExtension["Evaluation extension<br/>classes, views, feedback"]
     notes -- builds on --> historyExtension
     paper -- builds on --> historyExtension
+    evaluationExtension -- builds on --> historyExtension
   end
   web["Web page<br/>editor, views in a page"]
   cli["Command line<br/>mp build: PDF, no view"]
-  subgraph libraries["Libraries: the same on every platform; each part takes plugins"]
+  subgraph libraries["nimblescape Markdown: the same on every platform; each part takes plugins"]
     source["Source<br/>the text: the only truth"]
     editor["Editor<br/>rendered Markdown, text, code, form"]
     renderer["Renderer<br/>markdown-it, a view per token"]
     layout["Layout<br/>styles, pages, numbers, lists, PDF"]
-    history["History<br/>every action, replay, pluggable backends"]
     plugins["Plugins of Notes and Paper<br/>in every part: format, views, commands, schema"]
-    evaluation["Evaluation plugin<br/>classes, views, feedback, API"]
     editor <-->|edits and changes| source
     source -- every change --> renderer
-    source -- every change --> history
     renderer --> layout
     plugins -. plug in .-> editor
     plugins -. plug in .-> renderer
     plugins -. plug in .-> layout
+  end
+  subgraph own["Products of their own, for every file"]
+    history["History<br/>every action, replay, pluggable backends"]
+    evaluation["Evaluation plugin<br/>classes, views, feedback, API"]
     evaluation -- reads --> history
   end
+  source -- every change with its origin --> history
+  historyExtension --> history
+  evaluationExtension --> evaluation
   vscode -- adapter --> libraries
   web -- adapter --> libraries
   cli -- adapter --> libraries
@@ -107,14 +115,14 @@ flowchart TB
 
 ### R-GEN-015
 
-**Six pluggable parts.** The system must consist of the six parts of the
-table above, and each part must take plugins. The functions and their state
-must be in the libraries, the same on every platform; no part except the
-platform adapter may use an API of a platform directly. The platform adapter
-must stay thin: it connects the libraries to the views, commands, settings
-and storage of its platform, and it decides how a function is shown and
-used. For example, the threads of notes show in the side view of Notes in VS
-Code and as icons beside the text on a web page
+**Five pluggable parts.** nimblescape Markdown must consist of the five
+parts of the table above, and each part must take plugins. The functions and
+their state must be in the libraries, the same on every platform; no part
+except the platform adapter may use an API of a platform directly. The
+platform adapter must stay thin: it connects the libraries to the views,
+commands, settings and storage of its platform, and it decides how a
+function is shown and used. For example, the threads of notes show in the
+side view of Notes in VS Code and as icons beside the text on a web page
 ([R-GEN-014](editor.md#r-gen-014)).
 
 ### R-ARCH-001
@@ -144,29 +152,46 @@ the same way as `@nimblescape/markdownnotes` and
 for each part: `@nimblescape/markdowntext` (source),
 `@nimblescape/markdowneditor` (the editor API and the rendered Markdown
 editor), `@nimblescape/markdownrender` (renderer),
-`@nimblescape/markdownlayout` (layout, pages, PDF),
-`@nimblescape/markdownhistory` (history), and one package for each platform,
-`@nimblescape/markdownvscode` and `@nimblescape/markdownweb`; the evaluation
-plugin is `@nimblescape/markdownevaluation`
-([R-EVAL-017](evaluation.md#r-eval-017)). Until the API between the parts
-reaches version 1, all packages must live in this repository as npm
-workspaces.
+`@nimblescape/markdownlayout` (layout, pages, PDF), and one package for each
+platform, `@nimblescape/markdownvscode` and `@nimblescape/markdownweb`.
+Until the API between the parts reaches version 1, all packages must live in
+this repository as npm workspaces.
+
+### R-ARCH-003
+
+**The history and its evaluation are products of their own.** The history
+recorder and its evaluation must be functions of their own, not parts of
+nimblescape Markdown, because they serve every file, not only Markdown.
+Each has a VS Code extension of its own: the history extension records
+every edit of any file in the workspace and every creation and deletion of
+a file ([R-VSC-004](history.md#r-vsc-004)), and the evaluation extension
+evaluates the history ([R-EVAL-017](evaluation.md#r-eval-017)). The source
+of nimblescape Markdown gives every change, with its origin, to the history
+through the API of the history ([R-HIST-010](history.md#r-hist-010)).
+*(proposal)* Each has a repository of its own, in the form of the other
+nimblescape extensions with an npm package: `nimblescape/history-vscode`
+with the npm package `@nimblescape/history`, and
+`nimblescape/evaluation-vscode` with the npm package
+`@nimblescape/evaluation`. Until these repositories exist, the documents of
+the history and of the evaluation plugin stay in this repository.
 
 ## 4. Documents
 
 Each part of [section 3](#3-architecture) has a document of its own, except
-the renderer and the layout, which share one document; the evaluation plugin
-of the history, the plugins of the format extensions, the AI and the
-platforms have documents of their own too.
+the renderer and the layout, which share one document; the plugins of the
+format extensions, the AI and the platforms have documents of their own too.
+The history and its evaluation plugin are products of their own
+([R-ARCH-003](#r-arch-003)); their documents stay here until they have
+repositories of their own.
 
 | Document | Content | Requirements |
 | --- | --- | --- |
-| [Specification](specification.md), this document | Scope, terms, architecture, libraries, licenses and release, plan | [R-GEN-001](#r-gen-001), [R-GEN-015](#r-gen-015), [R-ARCH-001](#r-arch-001), [R-GEN-010](#r-gen-010), [R-ARCH-002](#r-arch-002), [R-GEN-011](#r-gen-011), [R-GEN-007](#r-gen-007) |
+| [Specification](specification.md), this document | Scope, terms, architecture, libraries, licenses and release, plan | [R-GEN-001](#r-gen-001), [R-GEN-015](#r-gen-015), [R-ARCH-001](#r-arch-001), [R-GEN-010](#r-gen-010), [R-ARCH-002](#r-arch-002), [R-ARCH-003](#r-arch-003), [R-GEN-011](#r-gen-011), [R-GEN-007](#r-gen-007) |
 | [Source](source.md) | The text, the selections and the changes; the formats of the front matter and of the files | [R-SRC-001](source.md#r-src-001) to [R-SRC-003](source.md#r-src-003), [R-GEN-006](source.md#r-gen-006) |
 | [Editor](editor.md) | The editors of a file and the rendered Markdown editor: the round trip, the interaction, tables, the read-only mode and the read-only generated parts, the mode to learn Markdown, the form of the front matter, threads beside the text | [R-GEN-002](editor.md#r-gen-002), [R-EDIT-001](editor.md#r-edit-001) to [R-EDIT-011](editor.md#r-edit-011), [R-GEN-009](editor.md#r-gen-009), [R-GEN-003](editor.md#r-gen-003), [R-GEN-008](editor.md#r-gen-008), [R-GEN-013](editor.md#r-gen-013), [R-FM-001](editor.md#r-fm-001) to [R-FM-006](editor.md#r-fm-006), [R-GEN-014](editor.md#r-gen-014) |
 | [Renderer and layout](rendering.md) | The renderer: content without edit functions, plugins of the renderer. The layout: layouts, pages and PDF | [R-REN-001](rendering.md#r-ren-001) to [R-REN-003](rendering.md#r-ren-003), [R-LAYOUT-001](rendering.md#r-layout-001) to [R-LAYOUT-004](rendering.md#r-layout-004) |
-| [History](history.md) | Steps, storage backends, back and forward, replay, the use of the history by plugins, the history extension of VS Code | [R-AI-004](history.md#r-ai-004), [R-HIST-001](history.md#r-hist-001) to [R-HIST-008](history.md#r-hist-008), [R-VSC-004](history.md#r-vsc-004) |
-| [Evaluation plugin](evaluation.md) | Classes and roles of the work in a history, evaluation, views, feedback, assignments, API, scientific basis | [R-EVAL-001](evaluation.md#r-eval-001) to [R-EVAL-019](evaluation.md#r-eval-019) |
+| [History](history.md) | The recorder of every action on any file, a product of its own: steps, the API for actions, storage backends, back and forward, replay, the use of the history by plugins, the history extension of VS Code | [R-AI-004](history.md#r-ai-004), [R-HIST-001](history.md#r-hist-001) to [R-HIST-008](history.md#r-hist-008), [R-HIST-010](history.md#r-hist-010), [R-VSC-004](history.md#r-vsc-004) |
+| [Evaluation plugin](evaluation.md) | The evaluation of a history, a product of its own: classes and roles of the work, evaluation, views, feedback, assignments, API and VS Code extension, scientific basis | [R-EVAL-001](evaluation.md#r-eval-001) to [R-EVAL-019](evaluation.md#r-eval-019) |
 | [Plugins and format extensions](plugins.md) | The plugin API, the levels of a plugin, the plugins of Markdown Notes and Markdown Paper | [R-GEN-005](plugins.md#r-gen-005), [R-GEN-012](plugins.md#r-gen-012), [R-PLUGIN-001](plugins.md#r-plugin-001), [R-NOTES-001](plugins.md#r-notes-001), [R-PAPER-001](plugins.md#r-paper-001) |
 | [AI](ai.md) | AI chats, tracked changes, pluggable providers, the API key, the memory | [R-AI-001](ai.md#r-ai-001), [R-AI-006](ai.md#r-ai-006), [R-AI-002](ai.md#r-ai-002), [R-AI-005](ai.md#r-ai-005), [R-AI-003](ai.md#r-ai-003) |
 | [Platforms](platforms.md) | The adapters of VS Code, of the web and of the command line; the theme | [R-PLAT-001](platforms.md#r-plat-001), [R-GEN-004](platforms.md#r-gen-004), [R-VSC-001](platforms.md#r-vsc-001) to [R-VSC-003](platforms.md#r-vsc-003), [R-WEB-001](platforms.md#r-web-001), [R-CLI-001](platforms.md#r-cli-001), [R-THEME-001](platforms.md#r-theme-001) to [R-THEME-003](platforms.md#r-theme-003) |
@@ -215,6 +240,9 @@ use:
 2. Licenses: `markdown-it-task-lists` (ISC), `entities` (BSD-2-Clause, used
    by markdown-it) and `argparse` (Python-2.0, only in the command line
    program of markdown-it, in no bundle).
+3. Repositories: a repository of its own for the history and one for the
+   evaluation plugin (proposal), one repository for both, or workspaces in
+   this repository until version 1 ([R-ARCH-003](#r-arch-003))?
 
 The documents of the parts list their own open questions: the
 [editor](editor.md#10-open-questions), the
@@ -243,10 +271,9 @@ the [platforms](platforms.md#6-open-questions).
 The parts of [section 3](#3-architecture) that the plan does not name yet
 get their steps in the plan: the npm workspaces of
 [R-ARCH-002](#r-arch-002), the source, the renderer and the layout before
-step 3 starts; the history with its backends and its VS Code extension, and
-the evaluation plugin, when the question of the
-[history](history.md#6-open-questions) and the questions of the
-[evaluation plugin](evaluation.md#9-open-questions) have answers.
+step 3 starts. The history and the evaluation plugin get their plans in
+their own repositories ([R-ARCH-003](#r-arch-003)); this plan holds only the
+events that nimblescape Markdown gives to the history (step 10).
 
 ---
 
