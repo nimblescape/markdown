@@ -342,6 +342,10 @@ use:
   the history, `.workreflection/` of the reflection tool and `.course/` of the
   course module, and not in a shared folder such as `.nimblescape/`. The
   name of a tool must give a folder that no other common tool uses.
+- Every repository with TypeScript code uses exactly TypeScript 6.0.3, and
+  its Dependabot proposes no other version of TypeScript: typescript-eslint
+  supports TypeScript only up to 6.0. A move to another version of
+  TypeScript is one decision for all repositories together.
 
 ## 6. Open questions
 

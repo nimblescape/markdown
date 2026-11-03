@@ -100,7 +100,7 @@ same pull request.
 | `scripts/third-party-notices.mjs` | Writes the notices of the packages of a bundle from the installed packages, for the example page and the example extension. |
 | `esbuild.mjs` | In the folder of a package, builds a `dist/<name>.js` for each entry point of its exports, for Node.js when its export has the condition `node`, and a `dist/<name>.css` for each file of `src/styles/`, with the texts of the imports with the suffix `?raw`, and copies the script of Paged.js for a package that exports it; in the root, with `--demo` or `--serve`, builds the example page in `demo/dist/`, and with `--vscode` the example extension in `demo/vscode/dist/`, with the script of Paged.js for its pages, from the sources of the packages. |
 | `tsconfig.json`, `packages/*/tsconfig.build.json` | The settings of the type check of all packages, and of the declarations of each package in its `dist/`. |
-| `eslint.config.mjs`, `vitest.config.mts` | The settings of the check of the code style and of the unit tests. |
+| `eslint.config.mjs`, `vitest.config.mts` | The settings of the check of the code with ESLint and of the unit tests. `eslint.config.mjs` is the same as in every nimblescape extension, except its lists of the ignored files and of the scripts of pages. |
 | `package.json` | The manifest of the root of the workspaces: private, never published, with the development tools and the commands below. Each package has its own manifest with its libraries. |
 | `package-lock.json` | The locked libraries and development tools. npm writes this file, and nobody edits it by hand. |
 | `.node-version` | The Node release of the development tools. `actions/setup-node` in the workflows and local Node version managers read it. |
@@ -110,19 +110,19 @@ same pull request.
 | `scripts/release-checks.mjs`, `scripts/release-checks.test.mjs` | The check of rule 4 of the [release rules](#release-rules), which `release.yml` and `release-dry-run.yml` run, and its test. |
 | `scripts/npm-setup.sh` | Sets up the publishing to npmjs.com: the environment `npm`, the first version of each package and its trusted publisher ([npmjs.com setup](#npmjscom-setup)). |
 | `CHANGELOG.md` | The changes of each released version; the release takes the section of its version as the notes of its GitHub release. |
-| `.github/dependabot.yml` | Proposes weekly updates of the libraries, of the development tools and of the pinned actions. |
+| `.github/dependabot.yml` | Proposes weekly updates of the libraries, of the development tools and of the pinned actions. TypeScript stays at 6.0.3, as in every nimblescape repository ([R-GEN-007](docs/specification.md#r-gen-007)). |
 | `packages/*/dist/`, `demo/dist/`, `demo/vscode/dist/` | The built packages, the built example page and the built example extension, kept out of Git. |
 
 ## Development
 
-The development tools are TypeScript, esbuild, ESLint and vitest, on the
-Node.js release in `.node-version`.
+The development tools are TypeScript 6.0.3, esbuild, ESLint with
+typescript-eslint and vitest, on the Node.js release in `.node-version`.
 
 | Command | Effect |
 | --- | --- |
 | `npm ci --ignore-scripts` | Installs the locked libraries and development tools and runs no install script of a dependency. |
 | `npm run typecheck` | Checks the types with `tsc`. esbuild does not check them. |
-| `npm run lint` | Checks the code style with ESLint. |
+| `npm run lint` | Checks the code with ESLint: the recommended rules of ESLint and of typescript-eslint, and the rules that find promises that nobody waits for, with the types of `tsconfig.json`. `npm run lint -- --fix` corrects what ESLint can correct itself. |
 | `npm run licenses` | Checks the license of each package that the packages of the workspaces need at run time against `licenses.json`. `npm run licenses -- --write` adds a new package with its license to `licenses.json`; the pull request then shows the new decision. |
 | `npm test` | Runs the unit tests with vitest. |
 | `npm run build` | Builds each package in the order of the workspaces in `package.json`, `@nimblescape/markdowntext` first: its JavaScript in `dist/`, its styles and its declarations `dist/**/*.d.ts`. `npm run build -w packages/markdowntext` builds one package. |
