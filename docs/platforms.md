@@ -152,6 +152,81 @@ Notes for Paper. Until then, the panel keeps at most 100 messages of the
 page for the plugins without a listener, and gives them to the first
 listener of the plugin.
 
+### R-VSC-009
+
+**Rendered changes.** The changes of a file that opens in the editor, for
+example its changes in Git, must show rendered in the editor, in a split
+window: the older version on the left, the newer version on the right.
+
+*(proposal)* The diff of VS Code shows the editor on both sides, for
+example for a changed file in the view "Source Control", in the timeline
+and with "Compare with Saved", because the editor is a custom text editor
+([R-VSC-001](#r-vsc-001)). Each side is a panel of its own. The left side
+is read-only; the right side is editable when its file system can write.
+The adapter connects the two panels that VS Code opens together for one
+tab of a diff, and the editor of each side gets the text of the other side.
+
+- Each side marks its changes: the left side the removed blocks with a red
+  background, the right side the new blocks with a green background, and
+  in a changed block the removed or the new words. The editor compares the
+  blocks with the line diff of the library `diff`
+  ([R-SRC-002](source.md#r-src-002)), and the words of a changed block with
+  its word diff.
+- The blocks of both sides line up: where one side has blocks that the
+  other side does not have, the other side shows an empty space of the same
+  height. Both sides scroll together.
+- Each change of the right side updates the marks of both sides.
+- Buttons in the title of the editor go to the previous and to the next
+  change.
+- On the web, a page shows two editors side by side with the same
+  functions of the editor.
+
+VS Code has an API for the diffs of custom editors that gives both
+documents and both panels at once (`customEditorDiffs`). It is a proposed
+API, so the adapter does not use it ([R-VSC-003](#r-vsc-003)); when it is
+stable, the adapter uses it in place of the connection of the two panels.
+
+### R-VSC-010
+
+*(proposal)* **The extensions of the Markdown preview.** The editor shows
+the syntax that other extensions add to the Markdown preview of VS Code,
+without a change of these extensions. Such an extension declares its parts
+in its package.json: `markdown.markdownItPlugins`, with a function
+`extendMarkdownIt(md)` that its `activate` returns, `markdown.previewStyles`
+and `markdown.previewScripts`.
+
+- The adapter finds them in the same way as the Markdown preview of VS
+  Code: it reads these declarations of all enabled extensions, activates
+  each extension with `markdown.markdownItPlugins`, and calls its
+  `extendMarkdownIt` on a markdown-it with the options of the renderer
+  ([R-REN-001](rendering.md#r-ren-001)). It leaves out the extensions that
+  contribute plugins of the editor ([R-VSC-008](#r-vsc-008)), for example
+  Notes and Paper, because their plugins of the editor show their syntax.
+- These functions run in the extension host, not in the page. So the
+  adapter parses the text of the file with them in the extension host. Each
+  top-level block whose tokens differ from the tokens of the renderer
+  without these plugins becomes a block of the level "render"
+  ([R-GEN-012](plugins.md#r-gen-012)), for example a code block `mermaid`,
+  math between `$$` or a container `:::`. Its rendering is the HTML of
+  markdown-it with these plugins, and its source opens below it. The policy
+  of the page stays the same, so a script inside this HTML does not run.
+- The page loads the style sheets of `markdown.previewStyles` and the
+  scripts of `markdown.previewScripts` from the folders of their
+  extensions, in the same way as the plugins of other extensions; the
+  scripts run with the rights that their extension already has in VS Code.
+  After each change of the rendering, the page sends the event
+  `vscode.markdown.updateContent` on `window`, as the Markdown preview
+  does, because the scripts of these extensions, for example of diagrams,
+  wait for it.
+- A plugin that changes the text inside a paragraph, for example the codes
+  of emoji, makes the whole paragraph such a block. A script that needs
+  other parts of the Markdown preview may not work. A setting of the
+  extension turns these extensions off in the editor.
+- On the web, a page gives a markdown-it plugin to the editor as a plugin
+  of the level "render" with `extendMarkdownIt`
+  ([R-PLUGIN-001](plugins.md#r-plugin-001)), also without a change of the
+  markdown-it plugin.
+
 ## 3. Web
 
 ### R-WEB-001
@@ -215,6 +290,12 @@ uses the font of the editor. A change of these settings shows at once.
    ([R-VSC-006](#r-vsc-006)), the views "Edit" and "Pages"
    ([R-VSC-007](#r-vsc-007)), and the plugins of other extensions
    ([R-VSC-008](#r-vsc-008)), all proposals?
+4. VS Code: the details of the rendered changes, which come from the diff of
+   VS Code with the editor on both sides ([R-VSC-009](#r-vsc-009),
+   proposal)?
+5. VS Code: does the editor show the syntax of the extensions of the
+   Markdown preview, as blocks of the level "render"
+   ([R-VSC-010](#r-vsc-010), proposal)?
 
 ---
 
