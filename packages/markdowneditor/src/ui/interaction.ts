@@ -240,6 +240,11 @@ export class Interaction {
     this.forms.forEach((form) => form.refresh());
   }
 
+  /** refreshFrontMatter shows the forms of the front matter again, for example after a plugin received a new schema. */
+  refreshFrontMatter(): void {
+    this.forms.forEach((form) => form.refresh());
+  }
+
   /** frontMatterSchema returns the JSON schema of the front matter now. */
   frontMatterSchema(): JsonSchema | undefined {
     const editor = this.editor;

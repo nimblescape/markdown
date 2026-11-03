@@ -7,7 +7,8 @@
 // layout: the style sheets of the layout, the templates of its fixed pages filled with the fields of the front matter,
 // the text with the numbers of its headings, figures, tables and listings, its footnotes and its generated lists, and
 // the script that starts Paged.js, which makes the pages. The view of the pages and the PDF use the same page. The
-// modules use no API of a platform; the integrating code reads the files.
+// modules use no API of a platform; the integrating code reads the files. The entry point ./pdf (src/pdf/index.ts)
+// prints the page to a PDF in Node.js.
 
 export { builtinFile, builtinFolder, builtinLayouts } from './builtin';
 export {
@@ -56,7 +57,9 @@ export {
   type Reader,
   type Script,
 } from './page';
-export { showPages, type PagesView } from './pages';
+export { lineAt, LivePages, offsetOfLine, type LivePagesOptions, type PagePlace } from './livePages';
+export { registerRenders, slotsHtml, slotsId, tokenData, type TokenData } from './pageRenders';
+export { showPages, type PagesView, type ShowPagesOptions } from './pages';
 export { escapeHtml, fileName, fill, pdfNameOf } from './template';
 export {
   createLayoutRenderer,

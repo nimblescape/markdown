@@ -21,6 +21,11 @@
 //   handler gives the last line of each such paragraph that ends on the page its natural spaces again, or narrows them
 //   only as far as the line needs to fit, and leaves the paragraph as it was when the change would add a line.
 //
+// - The functions of the plugins in the page (src/pageRenders.ts). A page without `hold` fills each placeholder of the
+//   text whose kind has a function of `addRender` after the page has loaded, with the data of its slot from the element
+//   `script#nsmd-render-slots`, as the renderer does: the placeholder becomes empty and the function shows the token in
+//   it; when the function fails, the placeholder shows the source of the token, marked as an error.
+//
 // When Paged.js has made the pages, `window.paperRendered` is true and the document gets the event `paper-rendered`.
 (function () {
   'use strict';
@@ -118,6 +123,56 @@
     }
   }
 
+  /** The methods of the data of a token in the page, as markdown-it has them. */
+  const tokenMethods = {
+    attrIndex(name) {
+      return (this.attrs || []).findIndex((attribute) => attribute[0] === name);
+    },
+    attrGet(name) {
+      const index = this.attrIndex(name);
+      return index >= 0 ? this.attrs[index][1] : null;
+    },
+  };
+
+  /** The data of a token with the methods of a token, with its children. */
+  function tokenOf(data) {
+    const token = Object.assign(Object.create(tokenMethods), data);
+    token.children = data.children ? data.children.map(tokenOf) : null;
+    return token;
+  }
+
+  /** Fills the placeholders of the plugins in an element with the functions of `renders`. */
+  function fill(root, renders) {
+    const element = document.getElementById('nsmd-render-slots');
+    if (!element || Object.keys(renders).length === 0) {
+      return;
+    }
+    let slots;
+    try {
+      slots = JSON.parse(element.textContent || '[]');
+    } catch (error) {
+      console.error('The slots of the placeholders of the plugins are no JSON.', error);
+      return;
+    }
+    for (const placeholder of root.querySelectorAll('[data-nsmd-render]')) {
+      const slot = slots[Number(placeholder.dataset.nsmdRender)];
+      const render = slot ? renders[slot.kind] : undefined;
+      if (typeof render !== 'function') {
+        continue;
+      }
+      placeholder.replaceChildren();
+      try {
+        render(slot.source, placeholder, tokenOf(slot.token));
+      } catch (error) {
+        const code = document.createElement('code');
+        code.className = 'nsmd-render-error';
+        code.title = String(error);
+        code.textContent = slot.source;
+        placeholder.replaceChildren(code);
+      }
+    }
+  }
+
   /** The value of the counter `page` in a computed value of counter-reset or counter-increment, or undefined. */
   function pageValue(value) {
     const found = /(?:^|\s)page\s+(-?\d+)/.exec(value || '');
@@ -131,8 +186,18 @@
     released = resolve;
   });
 
+  const renders = Object.create(null);
+
   window.paperHandlers = {
     naturalLastLines,
+    /** addRender registers the function of a plugin for a kind of token: the type of the token, or `fence:<language>`. */
+    addRender(kind, render) {
+      renders[kind] = render;
+    },
+    /** fill fills the placeholders of the plugins in an element with the registered functions. */
+    fill(root) {
+      fill(root, renders);
+    },
     /** pending are functions of the integrating code that return true while a drawing of the page waits. */
     pending: [],
     /** beforePages are functions of the integrating code that run right before Paged.js makes the pages. */
@@ -184,7 +249,7 @@
         }
       });
       return loaded
-        .then(() => (held ? release : undefined))
+        .then(() => (held ? release : handlers.fill(document.body)))
         .then(
           () =>
             new Promise((resolve) => {

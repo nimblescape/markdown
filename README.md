@@ -38,6 +38,7 @@ packages with their steps of the plan.
 | Package | Part |
 | --- | --- |
 | [`@nimblescape/markdowntext`](packages/markdowntext) | The source: the text of a file with its changes, their origin and the selections of the editors; the front matter in YAML, TOML and JSON, its edits and the check against a JSON schema; without a view |
+| [`@nimblescape/markdownai`](packages/markdownai) | The AI without a view: the provider API that makes any AI pluggable, the context of the document, the tool with which the AI proposes a change, the loop of a chat, and the provider in another process, so that the API key never reaches the page |
 | [`@nimblescape/markdownrender`](packages/markdownrender) | The renderer: the text of a file as HTML without edit functions, from markdown-it 14, with the plugins of the renderer; without the editor and without a page |
 | [`@nimblescape/markdownlayout`](packages/markdownlayout) | The layout: the text of a file in its layout as pages, with the layout code of Markdown Paper, the built-in layout `plain` and Paged.js |
 | [`@nimblescape/markdowneditor`](packages/markdowneditor) | The editor of rendered Markdown for the web and for the webviews of VS Code, built on the renderer |
@@ -71,6 +72,16 @@ source.onChange((change) => console.log(change.origin, change.patches));
 source.setText('# New title\n', { kind: 'program', name: 'git' }); // the rendered editor shows it
 ```
 
+The AI, or another program, proposes a change of a range of the text of the
+file; the editor shows it as a tracked change with "Accept" and "Reject"
+([R-AI-006](docs/ai.md#r-ai-006)), and nothing changes the file before the
+user accepts it.
+
+```ts
+const result = await rendered.proposeChange({ id: 'ai-1', from: 2, to: 7, text: 'New title' });
+// 'accepted', 'rejected' or 'outdated'
+```
+
 The options `toolbar`, `readOnlyToggle` and `learnToggle` leave out the
 toolbar or its switches, and `learnMode` starts the editor with the
 Markdown marks shown.
@@ -98,7 +109,8 @@ showPages(document.querySelector('iframe')!, page, layoutRenderer); // Paged.js 
 ```
 
 The [README of the package](packages/markdownlayout/README.md) explains the
-host, which reads the files of the layouts.
+host, which reads the files of the layouts, and the PDF in Node.js with the
+entry point `@nimblescape/markdownlayout/pdf`.
 
 In VS Code, an extension registers the editor as a custom text editor with
 `registerMarkdownEditor` of `@nimblescape/markdownvscode`; the

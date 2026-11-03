@@ -3,15 +3,15 @@
 // © 2026 Hannes Stauss (scalarion@nimblescape.com)
 // Licensed under the MIT License. See LICENSE in the repository root for details.
 
-// The tests of the adapter for VS Code (docs/platforms.md, R-GEN-004, R-VSC-001 to R-VSC-003, R-THEME-003): the custom
+// The tests of the adapter for VS Code (docs/platforms.md, R-GEN-004, R-VSC-001 to R-VSC-008, R-THEME-003): the custom
 // text editor with its page, the text and the changes between the page and the document, also when both change at the
 // same time, the read-only mode, the fonts, the text editor to the side, and a MarkdownEditor in the page.
 
 import { MarkdownEditor } from '@nimblescape/markdowneditor';
 import type { TextChange } from '@nimblescape/markdowntext';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { registerMarkdownEditor, type MarkdownEditorRegistration, type PluginPanelChannel } from './extension/editor';
-import { editorElementId, pageMessage } from './messages';
+import { registerMarkdownEditor, type MarkdownEditorHandle, type MarkdownEditorRegistration, type PluginPanelChannel } from './extension/editor';
+import { editorElementId, pageMessage, pagesElementId } from './messages';
 import { FakeRange, FakeUri, fakeVsCode, openPanel, type FakeDocument, type FakePanel, type FakeVsCode } from './test/fakeVscode';
 import { connectVsCode, vscodeOrigin, type VsCodeConnection } from './webview/connection';
 
@@ -19,13 +19,13 @@ const text = '# Title\n\nFirst paragraph.\n\nSecond paragraph.\n';
 const viewType = 'nimblescape.test.editor';
 
 let fake: FakeVsCode;
-let stop: { dispose(): void } | undefined;
+let stop: MarkdownEditorHandle | undefined;
 const connections: VsCodeConnection[] = [];
 
 beforeEach(() => {
   fake = fakeVsCode();
   document.documentElement.removeAttribute('style');
-  document.body.innerHTML = `<div id="${editorElementId}"></div>`;
+  document.body.innerHTML = `<div id="${editorElementId}"></div><iframe id="${pagesElementId}" srcdoc="" hidden></iframe><script nonce="abc"></script>`;
 });
 
 afterEach(() => {
@@ -89,6 +89,8 @@ describe('the custom text editor', () => {
     expect(html).toContain('<html lang="de">');
     expect(html).toContain('<title>file.md</title>');
     expect(html).toContain(`<div id="${editorElementId}"></div>`);
+    expect(html).toContain(`<iframe id="${pagesElementId}" title="Pages" hidden></iframe>`);
+    expect(html).toContain('font-src https://webview.test data: blob:');
     expect(html.match(/<script/g)).toHaveLength(1);
     expect(panel.webview.options.enableScripts).toBe(true);
     expect(panel.webview.options.localResourceRoots?.map(String)).toEqual(['file:///extension/dist', 'file:///extension/dist', 'file:///extension/dist', 'file:///work']);
@@ -221,6 +223,63 @@ describe('the text between the page and the document', () => {
   });
 });
 
+describe('the pages', () => {
+  const pages = { showPagesCommand: 'test.showPages', showEditCommand: 'test.showEdit', pagesScripts: [FakeUri.file('/extension/dist/paged.polyfill.js') as never] };
+
+  it('switches the page between "Edit" and "Pages" from the commands and from the page, with the context key of the view', async () => {
+    const { panel, connection } = await start(text, pages);
+    const views: string[] = [];
+    connection.onView((view) => views.push(view));
+    expect(connection.view).toBe('edit');
+    expect(connection.pagesFrame.hidden).toBe(true);
+    await fake.commands.get('test.showPages')?.();
+    await panel.settle();
+    expect(connection.view).toBe('pages');
+    expect(connection.element.hidden).toBe(true);
+    expect(connection.pagesFrame.hidden).toBe(false);
+    expect(fake.executed).toContainEqual(['setContext', `${viewType}.pages`, true]);
+    // A double click on a page switches back in the page, and the extension follows.
+    connection.setView('edit');
+    expect(connection.element.hidden).toBe(false);
+    expect(connection.pagesFrame.hidden).toBe(true);
+    await panel.settle();
+    expect(fake.executed.at(-1)).toEqual(['setContext', `${viewType}.pages`, false]);
+    expect(views).toEqual(['pages', 'edit']);
+    // A page that starts again keeps the view of the panel.
+    await fake.commands.get('test.showPages')?.();
+    await panel.settle();
+    panel.toHost.push({ type: 'ready' });
+    await panel.settle();
+    expect(connection.view).toBe('pages');
+  });
+
+  it('gives the page the host of the pages: the file, the top folder, the scripts and the addresses in the webview', async () => {
+    const { connection } = await start(text, pages);
+    const host = connection.pages;
+    expect(host.document).toBe('file:///work/docs/file.md');
+    expect(host.top).toBe('file:///work/');
+    expect(host.sources).toBe('https://webview.test');
+    expect(host.scripts).toEqual([{ src: 'https://webview.test/extension/dist/paged.polyfill.js' }]);
+    expect(host.nonce).toBe('abc');
+    expect(host.resource('file:///work/layouts/thesis/logo.png')).toBe('https://webview.test/work/layouts/thesis/logo.png');
+    expect(host.resource('file:///elsewhere/logo.png')).toBe('file:///elsewhere/logo.png');
+  });
+
+  it('reads the files of the layouts through the extension, only from the folders that the page may load', async () => {
+    const { panel, connection } = await start(text, pages);
+    fake.files.set('file:///work/layouts/thesis/layout.json', new TextEncoder().encode('{}'));
+    fake.files.set('file:///secret/key.txt', new TextEncoder().encode('secret'));
+    const read = (url: string) => {
+      const reading = connection.pages.reader.read(url);
+      return panel.settle().then(() => reading);
+    };
+    expect(new TextDecoder().decode(await read('file:///work/layouts/thesis/layout.json'))).toBe('{}');
+    expect(await read('file:///work/layouts/thesis/missing.css')).toBeUndefined();
+    expect(await read('file:///secret/key.txt')).toBeUndefined();
+    expect(await read('file:///work-other/key.txt')).toBeUndefined();
+  });
+});
+
 describe('the text editor to the side', () => {
   it('opens the text editor of the file to the side with the selection of the page, from the button and from the page', async () => {
     const { document, panel, connection } = await start();
@@ -341,6 +400,79 @@ describe('the plugins of the editor', () => {
     expect(onPage).toEqual([{ login: 'scalarion' }]);
     panel.dispose();
     expect(disposed).toEqual(['notes']);
+  });
+
+  it('give the page the scripts that other extensions contribute, only with the option and only from the folders of the extensions', async () => {
+    const contributes = (editorScripts: unknown) => ({ contributes: { 'nimblescape.markdown.extensions': { editorScripts } } });
+    fake.extensions.push(
+      { id: 'nimblescape.nimblescape-markdownpaper', extensionUri: FakeUri.file('/ext/paper'), packageJSON: contributes(['dist/editorPlugins.js', '../notes/dist/webview.js', 'dist/paper.css', 7]) },
+      { id: 'other.plain', extensionUri: FakeUri.file('/ext/plain'), packageJSON: {} },
+      { id: 'a.first', extensionUri: FakeUri.file('/ext/first'), packageJSON: contributes(['main.js']) },
+      { id: 'b.broken', extensionUri: FakeUri.file('/ext/broken'), packageJSON: contributes('main.js') },
+    );
+    const { panel, connection } = await start(text, { contributedPlugins: true });
+    expect(connection.pluginScripts).toEqual(['https://webview.test/ext/first/main.js', 'https://webview.test/ext/paper/dist/editorPlugins.js']);
+    expect(connection.nonce).toBe('abc');
+    const roots = panel.webview.options.localResourceRoots?.map((root) => root.toString());
+    expect(roots).toContain('file:///ext/paper/dist');
+    expect(roots).not.toContain('file:///ext/notes/dist');
+    // The page reads no file of the folders of the plugins through the extension.
+    expect(connection.pages.embed).not.toContain('https://webview.test/ext/paper/dist/');
+    stop?.dispose();
+    connections.forEach((each) => each.dispose());
+    connections.length = 0;
+    const without = await start(text);
+    expect(without.connection.pluginScripts).toEqual([]);
+  });
+
+  it('connect the part of a plugin of another extension later, and give it the messages that the page sent before', async () => {
+    const { document, panel, connection } = await start(text);
+    const pageChannel = connection.host.channel('paper');
+    const onPage: unknown[] = [];
+    pageChannel.onMessage((message) => onPage.push(message));
+    pageChannel.post('first');
+    pageChannel.post('second');
+    await panel.settle();
+    const received: unknown[] = [];
+    const documents: string[] = [];
+    const disposed: string[] = [];
+    const added = stop!.addPlugin('paper', (channel) => {
+      documents.push(channel.document.uri.toString());
+      channel.onMessage((message) => received.push(message));
+      void channel.post('hello');
+      return { dispose: () => disposed.push(channel.document.uri.toString()) };
+    });
+    await panel.settle();
+    expect(received).toEqual(['first', 'second']);
+    expect(onPage).toEqual(['hello']);
+    pageChannel.post('third');
+    await panel.settle();
+    expect(received).toEqual(['first', 'second', 'third']);
+    // A panel that opens later connects the plugin as well.
+    const other = fake.open(text, FakeUri.file('/work/docs/other.md'));
+    await openPanel(fake, other);
+    expect(documents).toEqual([document.uri.toString(), other.uri.toString()]);
+    added.dispose();
+    expect(disposed).toEqual([document.uri.toString(), other.uri.toString()]);
+    pageChannel.post('after');
+    await panel.settle();
+    expect(received).toEqual(['first', 'second', 'third']);
+    expect(() => stop!.addPlugin('no name', () => undefined)).toThrow();
+  });
+
+  it('keep at most 100 messages of the page for plugins without a listener', async () => {
+    const { panel, connection } = await start(text);
+    const pageChannel = connection.host.channel('late');
+    for (let index = 0; index < 120; index++) {
+      pageChannel.post(index);
+    }
+    await panel.settle();
+    const received: unknown[] = [];
+    stop!.addPlugin('late', (channel) => {
+      channel.onMessage((message) => received.push(message));
+    });
+    await Promise.resolve();
+    expect(received).toEqual(Array.from({ length: 100 }, (_, index) => index));
   });
 });
 

@@ -154,6 +154,30 @@ Paper, which writes the cite after the caption.
 view, so that the view and the PDF never differ
 ([R-GEN-010](specification.md#r-gen-010)).
 
+*(proposal)* **The PDF.** The entry point `@nimblescape/markdownlayout/pdf`
+makes the PDF in Node.js, for example on the command line and in the
+extension host of VS Code on the desktop. The page of the PDF is the page of
+the view of the pages, with the files of the disk: an installed browser
+without a window (Google Chrome, Chromium, Microsoft Edge or Brave) loads
+it, Paged.js makes the pages, and the browser prints them in the size of the
+pages of the layout. The integrating code can name the program of the
+browser, else the environment variable `NIMBLESCAPE_BROWSER` names it;
+without a browser, the error says where to get Google Chrome. The layout
+part downloads no browser. The PDF then loses the marks of the soft hyphens,
+so that search and copy find whole words, and gets the title, the author,
+the subtitle as its subject and the language of the layout in its metadata.
+The code is the PDF code of nimblescape Markdown Paper.
+
+*(proposal)* **The functions of the plugins in the PDF.** In the page of the
+PDF, no integrating code fills the placeholders of the plugins, as the view
+of the pages does. So the page holds the data of its placeholders as JSON,
+and a script of the page registers the functions of the plugins
+(`registerRenders`); the integrating code bundles this script with the same
+plugins as its renderer. After the page has loaded, the script of the layout
+fills the placeholders as the renderer does, and then Paged.js makes the
+pages. In the page, a function of a plugin gets a copy of the data of its
+token, with the methods `attrIndex` and `attrGet`.
+
 ### R-LAYOUT-003
 
 *(proposal)* **Pages.** The page engine is Paged.js. A button switches the
@@ -169,6 +193,18 @@ tokens in the frame; Paged.js then starts when the page has not changed for
 stand on a grey background with a gap between them; the PDF has no screen
 styles.
 
+*(proposal)* **The pages follow the text.** While "Pages" shows, the pages
+show again 600 ms after the last change of the text, at the same place of
+the frame; hidden pages make no new pages until they show again. A double
+click on a block of the pages switches to "Edit" and puts the cursor at the
+start of that block. Each block of the pages has the line of its text in
+the attribute `data-line`, which also gives this place. In a webview of VS
+Code, the page in the frame cannot load the files of the webview itself, so
+the view loads the scripts, images, style sheets and fonts of the page and
+gives them to the frame as `blob:` URLs; the files of the layout come
+through the extension, only from the workspace folder of the file and the
+folders of the extension ([R-VSC-007](platforms.md#r-vsc-007)).
+
 ## 5. Open questions
 
 1. Pages: the switch between "Edit" and "Pages"
@@ -180,6 +216,10 @@ styles.
 3. Raw HTML in a rendering: the safe way with a fixed list of elements by
    default ([R-REN-001](#r-ren-001), proposal), or a sanitizer library, whose
    license needs a decision ([R-GEN-011](specification.md#r-gen-011))?
+4. The functions of the plugins in the PDF: a script of the page that the
+   integrating code bundles with the same plugins as its renderer, whose
+   functions get a copy of the data of their tokens
+   ([R-LAYOUT-002](#r-layout-002), proposal)?
 
 ---
 

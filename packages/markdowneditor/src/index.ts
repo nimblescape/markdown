@@ -13,10 +13,11 @@ export { MarkdownCodec, type CodecOptions } from './markdown/codec';
 export { createMarkdownIt, type MarkdownItExtension } from '@nimblescape/markdownrender';
 export type { BlockSource, MarkdownSource, ParsedMarkdown } from './markdown/parse';
 export type { Writers } from './markdown/serialize';
-export { MarkdownEditor, type MarkdownEditorOptions } from './editor';
+export { MarkdownEditor, type AiContext, type MarkdownEditorOptions } from './editor';
 export type { SerializeOptions } from './markdown/serialize';
 export type { InteractionOptions } from './ui/interaction';
 export type { FormatButton } from './ui/formatBar';
+export type { ProposalResult, ProposedChange } from './ui/proposals';
 export type { MenuItem } from './ui/menu';
 export type { LearnMarks, MarkText, NodeText } from './ui/learnMode';
 export type { FrontMatterInput, FrontMatterInputContext, FrontMatterMode } from './ui/frontMatterForm';
@@ -36,3 +37,5 @@ export {
   type ThreadMarker,
 } from './plugins/api';
 export { generatedWrite } from './plugins/generated';
+export { outsideChange } from './markdown/update';
+export { loadPlugins, sharedModules, type LoadOptions } from './plugins/shared';

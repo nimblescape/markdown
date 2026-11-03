@@ -114,6 +114,60 @@ document that the page did not make reaches the editor with the origin
 of the editor; a key that the editor handles starts no key binding of VS
 Code ([R-VSC-006](../../docs/platforms.md#r-vsc-006)).
 
+## The pages
+
+The page of the webview also has a frame for the pages of the file in its
+layout ([R-VSC-007](../../docs/platforms.md#r-vsc-007)). The registration
+names two commands, one for each view, and the scripts of the pages, for
+example the script of Paged.js of `@nimblescape/markdownlayout`, which the
+extension copies to its folder `dist/`:
+
+```ts
+registerMarkdownEditor(vscode, {
+  // …
+  showPagesCommand: 'publisher.extension.showPages',
+  showEditCommand: 'publisher.extension.showEdit',
+  pagesScripts: [vscode.Uri.joinPath(dist, 'paged.polyfill.js')],
+});
+```
+
+The context key `publisher.extension.editor.pages`, the view type with
+`.pages`, is true while the active editor shows the pages, so that the title
+of the editor shows the button of the other view:
+
+```json
+{
+  "command": "publisher.extension.showPages",
+  "when": "activeCustomEditorId == publisher.extension.editor && !publisher.extension.editor.pages",
+  "group": "navigation"
+}
+```
+
+On the page, `connection.pages` is the host of the pages, which reads the
+files of the layouts through the extension, and `connection.pagesFrame` is
+the frame. `connection.view` is the view, `connection.onView` tells each
+change of it, and `connection.setView` changes it:
+
+```ts
+import { createLayoutRenderer, LivePages } from '@nimblescape/markdownlayout';
+
+const host = connection.pages;
+const pages = new LivePages(connection.pagesFrame, {
+  host,
+  renderer: createLayoutRenderer({ plugins }),
+  document: host.document,
+  embed: host.embed,
+  source: connection.source,
+  onDoubleClick: ({ offset }) => {
+    connection.setView('edit');
+    editor.goToText(offset);
+  },
+});
+const follow = (view: string) => (view === 'pages' ? pages.show() : pages.hide());
+connection.onView(follow);
+follow(connection.view);
+```
+
 ## The plugins
 
 `connection.host` is the API of the platform for the plugins of the editor
@@ -134,6 +188,35 @@ registerMarkdownEditor(vscode, {
     }),
   },
 });
+```
+
+### The plugins of other extensions
+
+Another extension can contribute plugins of the editor
+([R-VSC-008](../../docs/platforms.md#r-vsc-008),
+[R-PLUGIN-002](../../docs/plugins.md#r-plugin-002)): its package.json names
+their scripts, and the extension that registers the editor asks for them
+with `contributedPlugins`. The page loads them before it creates the
+editor. The part of such a plugin in the other extension connects with
+`addPlugin` of the handle of the registration, also after panels opened;
+the messages that the page sent before wait for it.
+
+```jsonc
+// The package.json of the other extension, for example Paper.
+"contributes": {
+  "nimblescape.markdown.extensions": { "editorScripts": ["dist/editorPlugins.js"] }
+}
+```
+
+```ts
+// The extension that registers the editor, for example Notes.
+const editor = registerMarkdownEditor(vscode, { /* … */ contributedPlugins: true });
+// Its API gives the other extensions `editor.addPlugin(name, connect)`.
+
+// The page of the editor.
+const connection = await connectVsCode();
+const extra = await loadPlugins(connection.pluginScripts, { nonce: connection.nonce });
+const markdownEditor = new MarkdownEditor(connection.element, { source: connection.source, host: connection.host, plugins: [...ownPlugins, ...extra] });
 ```
 
 ## The theme

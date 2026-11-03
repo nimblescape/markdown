@@ -8,13 +8,18 @@
 // the origin `program` and the name `vscode` (src/messages.ts). The page sends one change at a time: a change that the
 // user makes while the extension has not yet answered waits, and goes with the next message.
 //
+// The page shows the editor ("Edit") or the frame of the pages ("Pages", docs/rendering.md, R-LAYOUT-003): the
+// connection shows one of the two elements and tells the script of the page each switch. For the pages, the connection
+// gives the host of the layout part: it reads the files of the layouts through the extension, and maps the URI of a
+// file to its address in the webview.
+//
 // VS Code gives each key of a webview to its own key bindings as well, and Undo and Redo of a custom text editor work
 // on the document of VS Code, step by step as the page sent the changes. A key that the page handled, and Undo and Redo
 // in a field of text, stay in the page, so that Undo of the editor undoes the steps of the user and a key of the
 // editor, for example Ctrl+K for a link, starts no key binding of VS Code.
 
 import { applyPatches, mergeTexts, patchesBetween, TextSource, type Origin, type TextPatch } from '@nimblescape/markdowntext';
-import { editorElementId, type HostMessage, type PageFonts, type PageMessage } from '../messages';
+import { editorElementId, fromBase64, type HostMessage, type PageFiles, type PageFonts, type PageMessage, pagesElementId, type PageView } from '../messages';
 
 /** VsCodeWebviewApi is the part of the API of the webview that the page needs, from `acquireVsCodeApi()`. */
 export interface VsCodeWebviewApi {
@@ -44,6 +49,32 @@ export interface VsCodePluginHost {
   channel(plugin: string): VsCodePluginChannel;
 }
 
+/**
+ * VsCodePagesHost is the host of the pages of the file for the layout part, the `Host` of @nimblescape/markdownlayout
+ * (docs/rendering.md, R-LAYOUT-003), with the URI of the file.
+ */
+export interface VsCodePagesHost {
+  /** document is the URI of the file. */
+  readonly document: string;
+  /** reader reads the files of the layouts through the extension. */
+  readonly reader: { read(url: string): Promise<Uint8Array | undefined> };
+  /** top is the URI of the top folder of the search for a layout. */
+  readonly top?: string;
+  /** resource maps the URI of a file to its address in the webview. */
+  resource(url: string): string;
+  /** sources is the source of the webview for the policy of the page. */
+  readonly sources: string;
+  /** scripts are the scripts of the pages, Paged.js last. */
+  readonly scripts: { readonly src: string }[];
+  /** nonce is the nonce of the scripts of the page of the webview, which the page in the frame must use as well. */
+  readonly nonce: string;
+  /**
+   * embed are the addresses of the folders in the webview: the webview gives its files only to its own page, so the
+   * view of the pages loads them for the page in the frame (`embed` of showPages).
+   */
+  readonly embed: readonly string[];
+}
+
 /** VsCodeConnection is the connection of the page to the document of VS Code. */
 export interface VsCodeConnection {
   /** source holds the text of the document: the editors of the page take it as their source. */
@@ -54,6 +85,25 @@ export interface VsCodeConnection {
   readonly element: HTMLElement;
   /** host is the API of the platform for the plugins of the editor. */
   readonly host: VsCodePluginHost;
+  /** view is the view that the page shows: the editor ("edit") or the pages ("pages"). */
+  readonly view: PageView;
+  /** pagesFrame is the frame of the page for the pages. */
+  readonly pagesFrame: HTMLIFrameElement;
+  /** pages is the host of the pages for the layout part. */
+  readonly pages: VsCodePagesHost;
+  /**
+   * pluginScripts are the addresses of the scripts of the plugins of the editor that other extensions contribute
+   * (docs/plugins.md, R-PLUGIN-002), when the registration of the editor asks for them: the page loads them with
+   * `loadPlugins(connection.pluginScripts, { nonce: connection.nonce })` of @nimblescape/markdowneditor, and gives
+   * the plugins to its editor.
+   */
+  readonly pluginScripts: readonly string[];
+  /** nonce is the nonce of the scripts of the page, which the policy of its content asks for. */
+  readonly nonce: string;
+  /** onView calls a listener after each switch of the view, and returns a function that stops it. */
+  onView(listener: (view: PageView) => void): () => void;
+  /** setView switches the view of the page, for example to "edit" after a double click on a page. */
+  setView(view: PageView): void;
   /** openText opens the text editor of the file to the side, with the last selection of the page (R-VSC-002). */
   openText(): void;
   /** dispose ends the connection. */
@@ -133,6 +183,13 @@ class Connection implements VsCodeConnection {
   private count = 0;
   private resyncing = false;
   private canEdit = true;
+  private shownView: PageView = 'edit';
+  private files: PageFiles | undefined;
+  private scripts: readonly string[] = [];
+  private reads = 0;
+  /** waiting holds the reads of files that wait for the answer of the extension, by their IDs. */
+  private readonly waiting = new Map<number, (data: Uint8Array | undefined) => void>();
+  private readonly viewListeners = new Set<(view: PageView) => void>();
   private readonly stop: (() => void)[] = [];
   /** listeners holds the listeners of the messages of the plugins, by the name of the plugin. */
   private readonly listeners = new Map<string, Set<(message: unknown) => void>>();
@@ -183,6 +240,70 @@ class Connection implements VsCodeConnection {
     return element;
   }
 
+  get view(): PageView {
+    return this.shownView;
+  }
+
+  get pagesFrame(): HTMLIFrameElement {
+    const element = document.getElementById(pagesElementId);
+    if (!(element instanceof HTMLIFrameElement)) {
+      throw new Error(`The page has no frame ${pagesElementId}.`);
+    }
+    return element;
+  }
+
+  get pages(): VsCodePagesHost {
+    const files = this.files;
+    if (!files) {
+      throw new Error('The connection has no files yet.');
+    }
+    // A URI and the folders compare in the form of the URL of the browser, which the layout part writes.
+    const normal = (address: string) => {
+      try {
+        return new URL(address).href;
+      } catch {
+        return address;
+      }
+    };
+    const folders = files.folders.map((folder) => ({ folder: normal(folder.folder), webview: normal(folder.webview) }));
+    return {
+      document: normal(files.document),
+      reader: { read: (url) => this.read(url) },
+      ...(files.top ? { top: normal(files.top) } : {}),
+      resource: (url) => {
+        const address = normal(url);
+        const folder = folders.find((each) => address.startsWith(each.folder));
+        return folder ? folder.webview + address.slice(folder.folder.length) : url;
+      },
+      sources: files.sources,
+      scripts: files.scripts.map((src) => ({ src: normal(src) })),
+      nonce: this.nonce,
+      embed: folders.map((folder) => folder.webview),
+    };
+  }
+
+  get pluginScripts(): readonly string[] {
+    return this.scripts;
+  }
+
+  get nonce(): string {
+    // The browser hides the attribute of the nonce after the script ran, and keeps it in the property.
+    const script = document.querySelector<HTMLScriptElement>('script[nonce]');
+    return script?.nonce || script?.getAttribute('nonce') || '';
+  }
+
+  onView(listener: (view: PageView) => void): () => void {
+    this.viewListeners.add(listener);
+    return () => this.viewListeners.delete(listener);
+  }
+
+  setView(view: PageView): void {
+    if (view !== this.shownView) {
+      this.showView(view);
+      this.post({ type: 'view', view });
+    }
+  }
+
   openText(): void {
     this.post({ type: 'openText' });
   }
@@ -191,6 +312,32 @@ class Connection implements VsCodeConnection {
     this.stop.forEach((stop) => stop());
     this.stop.length = 0;
     this.listeners.clear();
+    this.viewListeners.clear();
+    this.waiting.forEach((resolve) => resolve(undefined));
+    this.waiting.clear();
+  }
+
+  /** read asks the extension for the bytes of a file. */
+  private read(url: string): Promise<Uint8Array | undefined> {
+    const id = ++this.reads;
+    return new Promise((resolve) => {
+      this.waiting.set(id, resolve);
+      this.post({ type: 'read', id, url });
+    });
+  }
+
+  /** showView shows the element of a view and tells the listeners. */
+  private showView(view: PageView): void {
+    this.shownView = view;
+    const editor = document.getElementById(editorElementId);
+    const pages = document.getElementById(pagesElementId);
+    if (editor) {
+      editor.hidden = view !== 'edit';
+    }
+    if (pages) {
+      pages.hidden = view !== 'pages';
+    }
+    [...this.viewListeners].forEach((listener) => listener(view));
   }
 
   /** received takes a message of the extension. */
@@ -223,6 +370,17 @@ class Connection implements VsCodeConnection {
       case 'fonts':
         applyFonts(message.fonts);
         break;
+      case 'view':
+        if (message.view !== this.shownView) {
+          this.showView(message.view);
+        }
+        break;
+      case 'file': {
+        const resolve = this.waiting.get(message.id);
+        this.waiting.delete(message.id);
+        resolve?.(typeof message.base64 === 'string' ? fromBase64(message.base64) : undefined);
+        break;
+      }
       case 'plugin':
         [...(this.listeners.get(message.plugin) ?? [])].forEach((listener) => listener(message.message));
         break;
@@ -235,11 +393,17 @@ class Connection implements VsCodeConnection {
     this.inFlight = undefined;
     this.resyncing = false;
     this.canEdit = message.editable;
+    this.files = message.files;
     applyFonts(message.fonts);
+    if (message.view !== this.shownView) {
+      this.showView(message.view);
+    }
     if (this.textSource) {
       this.show(message.text);
       return;
     }
+    // The page loads the scripts of the plugins once, before it creates the editor.
+    this.scripts = Array.isArray(message.plugins) ? message.plugins.filter((script): script is string => typeof script === 'string') : [];
     const source = new TextSource(message.text);
     this.textSource = source;
     this.stop.push(

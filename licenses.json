@@ -13,6 +13,12 @@
     "@decimalturn/toml-patch": {
       "license": "MIT"
     },
+    "@pdf-lib/standard-fonts": {
+      "license": "MIT"
+    },
+    "@pdf-lib/upng": {
+      "license": "MIT"
+    },
     "@tiptap/core": {
       "license": "MIT"
     },
@@ -186,6 +192,12 @@
     "pagedjs": {
       "license": "MIT"
     },
+    "pako": {
+      "license": "(MIT AND Zlib)"
+    },
+    "pdf-lib": {
+      "license": "MIT"
+    },
     "prosemirror-changeset": {
       "license": "MIT"
     },
@@ -245,6 +257,9 @@
     },
     "strip-ansi": {
       "license": "MIT"
+    },
+    "tslib": {
+      "license": "0BSD"
     },
     "type": {
       "license": "ISC"

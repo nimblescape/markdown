@@ -10,12 +10,23 @@
 // the page a change of the document (src/messages.ts). VS Code does not say who made a change of the document, so the
 // page gives each such change the origin `program` with the name `vscode`.
 //
+// The page shows the editor ("Edit") or the pages of the file in its layout ("Pages", docs/rendering.md, R-LAYOUT-003).
+// The commands of the extension switch the view of the active panel; the context key `<view type>.pages` is true while
+// the active panel shows the pages, so that the title of the editor shows the button of the other view. For the pages,
+// the page reads the files of the layouts through the extension, only from the folders from which it may load files.
+//
+// The plugins of the editor of other extensions (docs/plugins.md, R-PLUGIN-002; docs/platforms.md, R-VSC-008): with the
+// option `contributedPlugins`, the page loads the scripts that the package.json of another extension names in the
+// contribution point `nimblescape.markdown.extensions`, for example the plugins of Paper in the editor of Notes. The
+// part of such a plugin in the other extension connects later, through `addPlugin` of the registration; the messages
+// that its part on the page sends before wait for it.
+//
 // The code gets the API of VS Code as a parameter and imports no module `vscode`, so that the tests give it an API of
 // their own; it uses no Node.js API, so that it runs in the extension host of the web as well.
 
 import { applyPatches, mergeTexts, patchesBetween, type TextSelection } from '@nimblescape/markdowntext';
 import type * as vscode from 'vscode';
-import { type HostMessage, type PageFonts, pageMessage, type PageMessage } from '../messages';
+import { type HostMessage, type PageFiles, type PageFolder, type PageFonts, pageMessage, type PageMessage, type PageView, pluginName, toBase64 } from '../messages';
 import { newNonce, pageHtml } from './page';
 
 /** VsCode is the API of VS Code, the module `vscode` of the extension. */
@@ -49,6 +60,18 @@ export interface MarkdownEditorRegistration {
    */
   readonly openTextCommand?: string;
   /**
+   * showPagesCommand and showEditCommand are the IDs of the commands that switch the active panel to the view "Pages"
+   * and back to "Edit" (docs/rendering.md, R-LAYOUT-003); the package.json of the extension contributes the commands
+   * and their buttons in the title of the editor, with the context key `<view type>.pages`.
+   */
+  readonly showPagesCommand?: string;
+  readonly showEditCommand?: string;
+  /**
+   * pagesScripts are the scripts of the pages, Paged.js last: the extension copies `paged.polyfill.js` of
+   * @nimblescape/markdownlayout to the folder of its scripts. The page may load them.
+   */
+  readonly pagesScripts?: readonly vscode.Uri[];
+  /**
    * retainContextWhenHidden keeps the page while its tab is in the background, so that the editor keeps its Undo, its
    * scroll position and its selection. The default is true.
    */
@@ -58,7 +81,74 @@ export interface MarkdownEditorRegistration {
    * of the plugin (docs/plugins.md, R-PLUGIN-001): each function gets the channel of its plugin in a panel when the
    * panel opens, and may return what to dispose when the panel closes.
    */
-  readonly plugins?: Readonly<Record<string, (channel: PluginPanelChannel) => void | vscode.Disposable>>;
+  readonly plugins?: Readonly<Record<string, PluginConnect>>;
+  /**
+   * contributedPlugins gives the page the scripts of the plugins of the editor that other extensions contribute
+   * (docs/plugins.md, R-PLUGIN-002; docs/platforms.md, R-VSC-008): the scripts that the package.json of an extension
+   * names in `contributes["nimblescape.markdown.extensions"].editorScripts`. The page may load them, and loads them
+   * with `loadPlugins` of @nimblescape/markdowneditor from `pluginScripts` of its connection. The default is false.
+   */
+  readonly contributedPlugins?: boolean;
+}
+
+/**
+ * PluginConnect connects the part of a plugin of the editor in an extension with its part on the page of a panel: it
+ * gets the channel of the plugin in the panel, and may return what to dispose when the panel closes.
+ */
+export type PluginConnect = (channel: PluginPanelChannel) => void | vscode.Disposable;
+
+/** MarkdownEditorHandle ends the registration of the editor, and connects the plugins of other extensions. */
+export interface MarkdownEditorHandle extends vscode.Disposable {
+  /**
+   * addPlugin connects the part of a plugin of the editor in an extension, as `plugins` of the registration does, in
+   * each open panel and in each panel that opens later, for example the part of a plugin of Paper in the editor of
+   * Notes (R-PLUGIN-002). The messages that the part on the page sent before wait for the first listener of the plugin.
+   * @param name - The name of the plugin.
+   * @param connect - The function that connects the plugin in a panel.
+   * @returns The disposable that disconnects the plugin in every panel.
+   */
+  addPlugin(name: string, connect: PluginConnect): vscode.Disposable;
+}
+
+/** pluginContribution is the contribution point of the package.json of an extension for the plugins of the editor. */
+export const pluginContribution = 'nimblescape.markdown.extensions';
+
+/**
+ * contributedPluginScripts returns the scripts of the plugins of the editor that the extensions contribute, in the
+ * order of the IDs of the extensions (R-VSC-008). A script must be a file `.js` in the folder of its extension.
+ * @param api - The API of VS Code.
+ */
+export function contributedPluginScripts(api: VsCode): vscode.Uri[] {
+  const scripts: vscode.Uri[] = [];
+  const extensions = [...api.extensions.all].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+  for (const extension of extensions) {
+    const contributes: unknown = (extension.packageJSON as { contributes?: unknown } | undefined)?.contributes;
+    const contribution = isRecord(contributes) ? contributes[pluginContribution] : undefined;
+    const editorScripts = isRecord(contribution) ? contribution.editorScripts : undefined;
+    if (!Array.isArray(editorScripts)) {
+      continue;
+    }
+    const root = slashed(extension.extensionUri.toString());
+    for (const script of editorScripts) {
+      if (typeof script !== 'string' || !script.endsWith('.js')) {
+        continue;
+      }
+      const uri = api.Uri.joinPath(extension.extensionUri, script);
+      if (uri.toString().startsWith(root)) {
+        scripts.push(uri);
+      }
+    }
+  }
+  return scripts;
+}
+
+/** isRecord is true for an object that is no array. */
+const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null && !Array.isArray(value);
+
+/** AddedPlugin is a plugin that `addPlugin` connects. */
+interface AddedPlugin {
+  readonly name: string;
+  readonly connect: PluginConnect;
 }
 
 /**
@@ -81,10 +171,11 @@ export interface PluginPanelChannel {
  * text editor to the side.
  * @param api - The API of VS Code, the module `vscode` of the extension.
  * @param registration - The view type, the page and the options of the editor.
- * @returns The disposable that ends the registration.
+ * @returns The handle that ends the registration and connects the plugins of other extensions.
  */
-export function registerMarkdownEditor(api: VsCode, registration: MarkdownEditorRegistration): vscode.Disposable {
+export function registerMarkdownEditor(api: VsCode, registration: MarkdownEditorRegistration): MarkdownEditorHandle {
   const panels = new Set<EditorPanel>();
+  const added = new Set<AddedPlugin>();
   const provider: vscode.CustomTextEditorProvider = {
     resolveCustomTextEditor: async (document, webviewPanel) => {
       if (registration.opens && !registration.opens(document)) {
@@ -93,7 +184,7 @@ export function registerMarkdownEditor(api: VsCode, registration: MarkdownEditor
         webviewPanel.dispose();
         return;
       }
-      const panel = new EditorPanel(api, registration, document, webviewPanel);
+      const panel = new EditorPanel(api, registration, document, webviewPanel, [...added]);
       panels.add(panel);
       webviewPanel.onDidDispose(() => {
         panels.delete(panel);
@@ -106,13 +197,25 @@ export function registerMarkdownEditor(api: VsCode, registration: MarkdownEditor
       webviewOptions: { retainContextWhenHidden: registration.retainContextWhenHidden ?? true },
     }),
   ];
+  /** panelOf returns the panel of a file, the active one when no file is given, as for the button in the title. */
+  const panelOf = (uri?: vscode.Uri): EditorPanel | undefined => {
+    const key = uri?.toString();
+    const matching = [...panels].filter((panel) => key === undefined || panel.uri.toString() === key);
+    return matching.find((candidate) => candidate.active) ?? matching[0];
+  };
+  for (const [command, view] of [
+    [registration.showPagesCommand, 'pages'],
+    [registration.showEditCommand, 'edit'],
+  ] as const) {
+    if (command) {
+      disposables.push(api.commands.registerCommand(command, (uri?: vscode.Uri) => panelOf(uri)?.setView(view)));
+    }
+  }
   if (registration.openTextCommand) {
     disposables.push(
       api.commands.registerCommand(registration.openTextCommand, async (uri?: vscode.Uri) => {
         // The button in the title of the editor gives the file; without it, the command takes the active editor.
-        const key = uri?.toString();
-        const matching = [...panels].filter((panel) => key === undefined || panel.uri.toString() === key);
-        const panel = matching.find((candidate) => candidate.active) ?? matching[0];
+        const panel = panelOf(uri);
         if (panel) {
           await panel.openText();
         } else if (uri) {
@@ -126,15 +229,36 @@ export function registerMarkdownEditor(api: VsCode, registration: MarkdownEditor
       disposables.forEach((disposable) => disposable.dispose());
       panels.forEach((panel) => panel.dispose());
       panels.clear();
+      added.clear();
+    },
+    addPlugin: (name, connect) => {
+      if (!pluginName.test(name)) {
+        throw new Error(`No name of a plugin: ${name}`);
+      }
+      const plugin: AddedPlugin = { name, connect };
+      added.add(plugin);
+      panels.forEach((panel) => panel.connect(plugin));
+      return {
+        dispose: () => {
+          added.delete(plugin);
+          panels.forEach((panel) => panel.disconnect(plugin));
+        },
+      };
     },
   };
 }
+
+/** slashed returns the address of a folder with a slash at its end. */
+const slashed = (address: string): string => (address.endsWith('/') ? address : `${address}/`);
 
 /** Sent is a version of the document that the extension sent to the page, with its text. */
 interface Sent {
   readonly version: number;
   readonly text: string;
 }
+
+/** pendingLimit is the number of the messages of the page that wait for the plugins without a listener. */
+const pendingLimit = 100;
 
 /** EditorPanel connects one webview panel of the editor to its document. */
 class EditorPanel {
@@ -145,24 +269,51 @@ class EditorPanel {
   private lost = false;
   private disposed = false;
   private selection: TextSelection | undefined;
+  private view: PageView = 'edit';
+  /** folders are the folders from which the page may load and read files, with their addresses in the webview. */
+  private readonly folders: PageFolder[];
+  private readonly pagesScripts: string[];
+  /** top is the top folder of the search for a layout: the workspace folder of the file, else its folder. */
+  private readonly top: vscode.Uri | undefined;
   private readonly subscriptions: vscode.Disposable[] = [];
   /** listeners holds the listeners of the messages of the plugins, by the name of the plugin. */
   private readonly listeners = new Map<string, Set<(message: unknown) => void>>();
+  /** pending holds the messages of the page for the plugins without a listener, by the name of the plugin. */
+  private readonly pending = new Map<string, unknown[]>();
+  private pendingCount = 0;
+  /** connections holds the functions that disconnect the plugins in this panel. */
+  private readonly connections = new Map<object, () => void>();
+  /** pluginScripts are the addresses of the scripts of the plugins of other extensions in the webview. */
+  private readonly pluginScripts: string[];
 
   constructor(
     private readonly api: VsCode,
-    registration: MarkdownEditorRegistration,
+    private readonly registration: MarkdownEditorRegistration,
     readonly document: vscode.TextDocument,
     private readonly panel: vscode.WebviewPanel,
+    added: readonly AddedPlugin[],
   ) {
     const folder = (uri: vscode.Uri) => api.Uri.joinPath(uri, '..');
     const styles = registration.styles ?? [];
+    const scripts = registration.pagesScripts ?? [];
     const workspaceFolder = api.workspace.getWorkspaceFolder(document.uri)?.uri;
     const fileFolder = document.isUntitled ? undefined : folder(document.uri);
     const documentRoot = workspaceFolder ?? fileFolder;
-    const roots = [...(registration.resourceRoots ?? []), folder(registration.script), ...styles.map(folder), ...(documentRoot ? [documentRoot] : [])];
+    this.top = documentRoot;
+    const roots = [
+      ...(registration.resourceRoots ?? []),
+      folder(registration.script),
+      ...styles.map(folder),
+      ...scripts.map(folder),
+      ...(documentRoot ? [documentRoot] : []),
+    ];
     const webview = panel.webview;
-    webview.options = { enableScripts: true, localResourceRoots: roots };
+    this.folders = roots.map((root) => ({ folder: slashed(root.toString()), webview: slashed(webview.asWebviewUri(root).toString()) }));
+    this.pagesScripts = scripts.map((script) => webview.asWebviewUri(script).toString());
+    // The page may load the scripts of the plugins of other extensions, but reads no other file of their folders.
+    const pluginScripts = registration.contributedPlugins ? contributedPluginScripts(api) : [];
+    this.pluginScripts = pluginScripts.map((script) => webview.asWebviewUri(script).toString());
+    webview.options = { enableScripts: true, localResourceRoots: [...roots, ...pluginScripts.map(folder)] };
     webview.html = pageHtml({
       webview,
       script: registration.script,
@@ -189,18 +340,48 @@ class EditorPanel {
         if (panel.visible && this.lost) {
           this.sendInit();
         }
+        if (panel.active) {
+          this.showView();
+        }
       }),
     );
-    for (const [plugin, connect] of Object.entries(registration.plugins ?? {})) {
-      const disposable = connect(this.channel(plugin));
-      if (disposable) {
-        this.subscriptions.push(disposable);
-      }
+    for (const [name, connect] of Object.entries(registration.plugins ?? {})) {
+      this.connect({ name, connect });
     }
+    added.forEach((plugin) => this.connect(plugin));
   }
 
-  /** channel returns the channel of a plugin in this panel. */
-  private channel(plugin: string): PluginPanelChannel {
+  /**
+   * connect connects a plugin in this panel.
+   * @param plugin - The name of the plugin and the function that connects it.
+   */
+  connect(plugin: AddedPlugin): void {
+    if (this.disposed || this.connections.has(plugin)) {
+      return;
+    }
+    const own = new Set<(message: unknown) => void>();
+    const disposable = plugin.connect(this.channel(plugin.name, own));
+    this.connections.set(plugin, () => {
+      own.forEach((listener) => this.listeners.get(plugin.name)?.delete(listener));
+      disposable?.dispose();
+    });
+  }
+
+  /**
+   * disconnect disconnects a plugin in this panel: its listeners stop, and what its function returned is disposed.
+   * @param plugin - The plugin, as `connect` got it.
+   */
+  disconnect(plugin: AddedPlugin): void {
+    this.connections.get(plugin)?.();
+    this.connections.delete(plugin);
+  }
+
+  /**
+   * channel returns the channel of a plugin in this panel.
+   * @param plugin - The name of the plugin.
+   * @param own - The set of the listeners that the channel adds, so that a disconnect stops them.
+   */
+  private channel(plugin: string, own: Set<(message: unknown) => void>): PluginPanelChannel {
     return {
       document: this.document,
       panel: this.panel,
@@ -208,10 +389,46 @@ class EditorPanel {
       onMessage: (listener) => {
         const listeners = this.listeners.get(plugin) ?? new Set();
         listeners.add(listener);
+        own.add(listener);
         this.listeners.set(plugin, listeners);
-        return { dispose: () => listeners.delete(listener) };
+        this.deliverPending(plugin);
+        return {
+          dispose: () => {
+            listeners.delete(listener);
+            own.delete(listener);
+          },
+        };
       },
     };
+  }
+
+  /**
+   * deliverPending gives the messages of the page that waited for a plugin to its listeners, after the function that
+   * connects the plugin added all of them.
+   */
+  private deliverPending(plugin: string): void {
+    const messages = this.pending.get(plugin);
+    if (!messages) {
+      return;
+    }
+    this.pending.delete(plugin);
+    this.pendingCount -= messages.length;
+    queueMicrotask(() => messages.forEach((message) => this.deliver(plugin, message)));
+  }
+
+  /** deliver gives a message of the page to the listeners of its plugin, or keeps it while the plugin has none. */
+  private deliver(plugin: string, message: unknown): void {
+    const listeners = this.listeners.get(plugin);
+    if (this.disposed) {
+      return;
+    }
+    if (listeners && listeners.size > 0) {
+      [...listeners].forEach((listener) => listener(message));
+    } else if (this.pendingCount < pendingLimit) {
+      // The part of the plugin in another extension may connect later (R-PLUGIN-002).
+      this.pending.set(plugin, [...(this.pending.get(plugin) ?? []), message]);
+      this.pendingCount++;
+    }
   }
 
   /** uri is the URI of the file. */
@@ -222,6 +439,54 @@ class EditorPanel {
   /** active is true while the panel is the active editor. */
   get active(): boolean {
     return this.panel.active;
+  }
+
+  /**
+   * setView switches the page to a view (docs/rendering.md, R-LAYOUT-003).
+   * @param view - The view: "edit" or "pages".
+   */
+  setView(view: PageView): void {
+    this.view = view;
+    this.post({ type: 'view', view });
+    this.showView();
+  }
+
+  /** showView sets the context key of the view of the active panel, for the buttons in the title of the editor. */
+  private showView(): void {
+    if (this.panel.active && (this.registration.showPagesCommand || this.registration.showEditCommand)) {
+      void this.api.commands.executeCommand('setContext', `${this.registration.viewType}.pages`, this.view === 'pages');
+    }
+  }
+
+  /** files returns what the pages of the file need from the extension. */
+  private files(): PageFiles {
+    return {
+      document: this.document.uri.toString(),
+      ...(this.top ? { top: slashed(this.top.toString()) } : {}),
+      folders: this.folders,
+      sources: this.panel.webview.cspSource,
+      scripts: this.pagesScripts,
+    };
+  }
+
+  /**
+   * read answers the question of the page for a file of a layout with its bytes, or with nothing for a file outside
+   * the folders from which the page may load files and for a file that cannot be read.
+   */
+  private async read(message: Extract<PageMessage, { type: 'read' }>): Promise<void> {
+    let data: Uint8Array | undefined;
+    try {
+      const uri = this.api.Uri.parse(message.url, true);
+      const address = uri.toString();
+      if (this.folders.some((folder) => address.startsWith(folder.folder))) {
+        data = await this.api.workspace.fs.readFile(uri);
+      }
+    } catch {
+      data = undefined;
+    }
+    if (!this.disposed) {
+      this.panel.webview.postMessage({ type: 'file', id: message.id, ...(data ? { base64: toBase64(data) } : {}) } satisfies HostMessage).then(undefined, () => undefined);
+    }
   }
 
   /** openText opens the text editor of the file to the side, with the selection of the page (R-VSC-002). */
@@ -242,7 +507,11 @@ class EditorPanel {
     this.disposed = true;
     this.subscriptions.forEach((subscription) => subscription.dispose());
     this.subscriptions.length = 0;
+    this.connections.forEach((disconnect) => disconnect());
+    this.connections.clear();
     this.listeners.clear();
+    this.pending.clear();
+    this.pendingCount = 0;
   }
 
   /** received takes a message of the page. */
@@ -261,8 +530,15 @@ class EditorPanel {
       case 'openText':
         void this.openText();
         break;
+      case 'view':
+        this.view = message.view;
+        this.showView();
+        break;
+      case 'read':
+        void this.read(message);
+        break;
       case 'plugin':
-        [...(this.listeners.get(message.plugin) ?? [])].forEach((listener) => listener(message.message));
+        this.deliver(message.plugin, message.message);
         break;
     }
   }
@@ -298,7 +574,16 @@ class EditorPanel {
     this.texts.clear();
     this.remember(this.document.version, text);
     this.lost = false;
-    this.post({ type: 'init', text, version: this.document.version, editable: this.editable(), fonts: this.fonts() });
+    this.post({
+      type: 'init',
+      text,
+      version: this.document.version,
+      editable: this.editable(),
+      fonts: this.fonts(),
+      view: this.view,
+      files: this.files(),
+      plugins: this.pluginScripts,
+    });
   }
 
   /** sendText sends a change of the document that the page did not make. */

@@ -23,6 +23,12 @@ on the computer of the user, the views, the theme, the signed-in GitHub
 user, secrets such as the AI key, commands and settings, opening a link, and
 a message channel from a plugin to its extension.
 
+*(proposal)* **A strict policy of styles.** The editor adds style elements
+to the page: the base styles of Tiptap and the styles of the plugins. A page
+whose policy allows only style elements with a nonce gives this nonce to the
+editor (`styleNonce`), so that its policy needs no `'unsafe-inline'` for
+these styles, for example the side view of Notes.
+
 ## 2. VS Code
 
 The history extension of VS Code, an extension of its own that records every
@@ -109,6 +115,43 @@ key that the editor handles, for example Ctrl+K for a link or Ctrl+F for
 find, starts no key binding of VS Code; every other key, for example Ctrl+S,
 reaches VS Code.
 
+### R-VSC-007
+
+*(proposal)* **The views "Edit" and "Pages".** A button in the title of the
+editor switches between "Edit" and "Pages"
+([R-LAYOUT-003](rendering.md#r-layout-003)). The extension contributes two
+commands, one for each view, and the adapter registers them; the context
+key `<view type>.pages` is true while the active editor shows the pages, so
+that the title shows the button of the other view. The page of the webview
+holds the editor and a frame for the pages, and shows one of them. The page
+reads the files of the layout through the extension, which reads only files
+in the folders from which the page may load files, that is the workspace
+folder of the file and the folders of the extension, and sends their bytes
+as Base64. The extension names the scripts of the pages, for example
+Paged.js, which it bundles. So that the page in the frame gets these files
+as `blob:` URLs, the page of the webview may also load its own files with
+`fetch` (`connect-src`), and images and fonts may be `blob:` URLs.
+
+### R-VSC-008
+
+*(proposal)* **The plugins of other extensions.** An extension contributes
+plugins of the editor ([R-PLUGIN-002](plugins.md#r-plugin-002)) in its
+package.json, for example Paper:
+`"contributes": { "nimblescape.markdown.extensions": { "editorScripts":
+["dist/editorPlugins.js"] } }`. An extension that registers the editor with
+the option `contributedPlugins`, for example Notes, gives its page these
+scripts of all enabled extensions, in the order of the IDs of the
+extensions; a script must be a file `.js` in the folder of its extension.
+The page may load these scripts, with the nonce of its policy, and reads no
+other file of these folders through the extension. The scripts of an
+extension run with the rights that the extension already has in VS Code.
+The other part of such a plugin runs in its own extension: the handle of
+the registration connects it with `addPlugin(name, connect)` in each open
+panel and in each panel that opens later, for example through the API of
+Notes for Paper. Until then, the panel keeps at most 100 messages of the
+page for the plugins without a listener, and gives them to the first
+listener of the plugin.
+
 ## 3. Web
 
 ### R-WEB-001
@@ -168,8 +211,10 @@ uses the font of the editor. A change of these settings shows at once.
    ([R-THEME-003](#r-theme-003), proposal)?
 3. VS Code: the form of the adapter ([R-VSC-001](#r-vsc-001)), the
    changes between the page and the document
-   ([R-VSC-005](#r-vsc-005)), and Undo and the keys of the editor
-   ([R-VSC-006](#r-vsc-006)), all proposals?
+   ([R-VSC-005](#r-vsc-005)), Undo and the keys of the editor
+   ([R-VSC-006](#r-vsc-006)), the views "Edit" and "Pages"
+   ([R-VSC-007](#r-vsc-007)), and the plugins of other extensions
+   ([R-VSC-008](#r-vsc-008)), all proposals?
 
 ---
 

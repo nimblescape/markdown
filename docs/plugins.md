@@ -91,14 +91,44 @@ works in the renderer and in the editor.
 | `frontMatterSchema`, `frontMatterInputs` | The schema of the front matter and the inputs of keys ([R-FM-004](editor.md#r-fm-004), [R-FM-006](editor.md#r-fm-006)); the schema of the integrating code comes first |
 | `generated` | The generated parts of a document, which are read-only ([R-EDIT-011](editor.md#r-edit-011)) |
 | `threads` | The threads of a document and the function that fills the panel of a thread ([R-GEN-014](editor.md#r-gen-014)) |
+| `formatRules` | *(proposal)* The format rules of the syntax of the plugin for the AI, a text in Markdown ([R-AI-001](ai.md#r-ai-001)) |
 | `activate` | Starts the plugin in an editor |
 
 The API of the editor for the plugins gives the Tiptap editor, the text as
-Markdown, the commands by their full names, the panel of a thread, and a
+Markdown, the place in the text of the file of a position of the document,
+exact inside a block (*(proposal)* at the edge of a mark, outside the mark,
+or with the side 1 inside the marks of the text after the position), the commands by their full names, the panel of a thread, and a
 refresh of the generated parts and threads after a change of the data of a
-plugin. The API of the platform gives the name of the platform and, for each
+plugin. *(proposal)* The refresh also asks the plugins again for the schema
+of the front matter, for example after the part of a plugin on the platform
+sent the schema of the layout of a paper. *(proposal)* The API of the editor
+also takes proposed changes of the text, which the editor shows as tracked
+changes ([R-AI-006](ai.md#r-ai-006)). A transaction that takes a change of the text from outside has the
+meta `outsideChange`, so that a plugin that guards its parts against the
+edits of the user, for example the notes of Notes, lets such a change pass.
+The API of the platform gives the name of the platform and, for each
 plugin, a channel for messages to the other part of the plugin, for example
 in the extension of VS Code ([R-VSC-001](platforms.md#r-vsc-001)).
+
+### R-PLUGIN-002
+
+*(proposal)* **The plugins of other bundles.** A page that uses the editor
+can load plugins that another bundle holds, for example the plugins of Paper
+in the editor of Notes. The bundle of such plugins is a script that holds no
+copy of Tiptap, ProseMirror or the libraries: it uses the modules of the
+page, because the editor compares their classes. The page gives these
+modules and a function to register a plugin on its global
+`nimblescapeMarkdown`; the bundle registers each plugin with
+`registerPlugin` of `@nimblescape/markdowneditor/bundle`. The plugin of
+esbuild `sharedModulesPlugin` of the same entry point builds such a bundle:
+each import of `@tiptap/core`, of a module of `@tiptap/pm` (or of the same
+package of ProseMirror), of `@nimblescape/markdowneditor` and of
+`@nimblescape/markdowntext` reads the module of the page. The page loads the
+scripts with `loadPlugins`, one after the other, before it creates the
+editor, and gives the editor its own plugins and these. A script that does
+not load, and a value that is no plugin of version 1, add no plugin. In VS
+Code, the extensions contribute such scripts
+([R-VSC-008](platforms.md#r-vsc-008)).
 
 ## 3. Markdown Notes
 
@@ -112,7 +142,10 @@ of answers beside a block, "Add Note", and the buttons Comment and Reaction
 and the removal of the notes from the output to the renderer. It marks the
 parts that it generates as read-only ([R-EDIT-011](editor.md#r-edit-011)):
 the numbers in captions, the text of references (`/ref`), and the code and
-the cite of listings. Notes integrates the AI chat as notes
+the cite of listings. It hides the anchors of the captions and the headings
+and the comments of the listings. Until the libraries show the values of
+the front matter in the text (open question 1), Notes hides their markers
+and marks the values as read-only. Notes integrates the AI chat as notes
 ([R-AI-001](ai.md#r-ai-001)).
 
 ## 4. Markdown Paper
@@ -120,7 +153,8 @@ the cite of listings. Notes integrates the AI chat as notes
 ### R-PAPER-001
 
 **The plugins of Paper.** Paper adds the schema of the front matter of the
-layout, and `layout` and `repos` read-only with Ctrl+click to the clone
+layout, and `layout` and `repos` read-only with Ctrl+click (Cmd+click on
+macOS) to the clone
 ([R-FM-006](editor.md#r-fm-006)). It adds citations: `/cite` with Zotero,
 `/research`, the hidden comment of the sources, and the hidden codes of the
 special sections. It adds the generated lists, the layouts, the pages and

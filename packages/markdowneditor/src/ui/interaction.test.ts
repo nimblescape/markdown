@@ -214,6 +214,19 @@ describe('the toolbar and read-only mode', () => {
     expect(element.querySelector('.nsmd-format-bar [data-button="comment"]')).not.toBeNull();
     expect(element.querySelector('.nsmd-format-bar button[aria-label^="Underline"]')).not.toBeNull();
   });
+
+  it('hides a button of an extension that does not apply', () => {
+    let applies = false;
+    const opened = open('Some text\n', { formatButtons: [{ id: 'research', label: 'Research', text: 'Research', isShown: () => applies, run: () => undefined }] });
+    const button = () => element.querySelector<HTMLElement>('.nsmd-format-bar [data-button="research"]')!;
+    viewOf(opened).focus();
+    select(opened, 1, 5);
+    expect(element.querySelector<HTMLElement>('.nsmd-format-bar')?.hidden).toBe(false);
+    expect(button().hidden).toBe(true);
+    applies = true;
+    select(opened, 1, 6);
+    expect(button().hidden).toBe(false);
+  });
 });
 
 describe('the mode to learn Markdown', () => {

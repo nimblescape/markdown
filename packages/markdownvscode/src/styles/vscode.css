@@ -47,3 +47,22 @@ markdown.css, so that these values win over its defaults for the light and the d
   --nsmd-line-height: var(--nsmd-preview-line-height, 1.6);
   --nsmd-code-font-family: var(--vscode-editor-font-family);
 }
+
+/*
+The frame of the pages (docs/rendering.md, R-LAYOUT-003) fills the webview in place of the editor, in the view "Pages".
+The webview of VS Code gives the body a padding, which the frame covers. The pages in the frame keep the colors of the
+layout on the grey background of the pages.
+*/
+
+#nsmd-pages {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+#nsmd-pages[hidden],
+#nsmd-editor[hidden] {
+  display: none;
+}

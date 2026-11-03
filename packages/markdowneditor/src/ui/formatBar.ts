@@ -27,6 +27,8 @@ export interface FormatButton {
   readOnly?: boolean;
   /** isActive returns true when the whole selection has the format of the button. */
   isActive?: (editor: Editor) => boolean;
+  /** isShown returns false when the button does not apply to the document or the selection; the bar then hides it. */
+  isShown?: (editor: Editor) => boolean;
   /** run does what the button does. */
   run: (editor: Editor) => void;
 }
@@ -50,7 +52,7 @@ function markButton(host: FormatBarHost, name: string, label: string, text: stri
 export class FormatBar {
   readonly dom: HTMLElement;
   private readonly style: HTMLButtonElement;
-  private readonly states: { dom: HTMLElement; isActive: () => boolean; readOnly: boolean }[] = [];
+  private readonly states: { dom: HTMLElement; isActive: () => boolean; readOnly: boolean; isShown?: () => boolean }[] = [];
   private pointerDown = false;
 
   /**
@@ -80,7 +82,7 @@ export class FormatBar {
     const extra = host.buttons.map((each) => {
       const dom = button(each.label, each.icon ? icon(each.icon) : (each.text ?? each.label), () => each.run(editor));
       dom.dataset.button = each.id;
-      this.states.push({ dom, isActive: () => each.isActive?.(editor) ?? false, readOnly: each.readOnly ?? false });
+      this.states.push({ dom, isActive: () => each.isActive?.(editor) ?? false, readOnly: each.readOnly ?? false, isShown: () => each.isShown?.(editor) ?? true });
       return dom;
     });
     this.dom = element('div', { class: 'nsmd-format-bar', role: 'toolbar', 'aria-label': 'Format', hidden: true }, ...extra, ...library);
@@ -106,7 +108,8 @@ export class FormatBar {
     const { selection } = view.state;
     const editable = view.editable;
     const hasText = !selection.empty && !(selection instanceof NodeSelection) && view.state.doc.textBetween(selection.from, selection.to, ' ').trim() !== '';
-    const visible = this.states.filter((state) => editable || state.readOnly);
+    const shown = (state: (typeof this.states)[number]): boolean => (editable || state.readOnly) && (state.isShown?.() ?? true);
+    const visible = this.states.filter(shown);
     const focused = view.hasFocus() || this.dom.contains(document.activeElement);
     if (!hasText || this.pointerDown || !focused || visible.length === 0 || this.host.menu.isOpen) {
       if (!this.host.menu.isOpen) {
@@ -115,7 +118,7 @@ export class FormatBar {
       return;
     }
     for (const state of this.states) {
-      state.dom.hidden = !(editable || state.readOnly);
+      state.dom.hidden = !shown(state);
       const active = state.isActive();
       state.dom.classList.toggle('nsmd-button-active', active);
       state.dom.setAttribute('aria-pressed', active ? 'true' : 'false');

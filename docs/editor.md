@@ -131,7 +131,9 @@ buttons:
 
 A button whose function comes from an extension must show only when that
 extension is active. An extension may add buttons, for example "Cite" of
-Paper. A button must show as active when the whole selection has its format.
+Paper. *(proposal)* A button of an extension may also show only where it
+applies, for example "Research" of Paper only in a paper. A button must show
+as active when the whole selection has its format.
 Bold, italic, strikethrough, code and link must have the keys Ctrl+B,
 Ctrl+I, Ctrl+Shift+S, Ctrl+E and Ctrl+K (Cmd on macOS).
 
@@ -196,14 +198,18 @@ example by the formatter, may change a generated part
 ([R-SRC-002](source.md#r-src-002)). *(proposal)* The cursor jumps over a
 generated part, and the user deletes it only as a whole, in one step of
 undo. A plugin may give a form for the data of a generated part, for
-example the page of a citation. Ctrl+click on a reference goes to its
-target.
+example the page of a citation. Ctrl+click (Cmd+click on macOS) on a
+reference goes to its target.
 
 *(proposal)* A selection that touches a generated part holds the whole
 part. The user cannot change the format of a piece of a part. Backspace and
 Delete next to a part delete the whole part. Text that the user types at the
 edge of a part does not become a piece of the part. Replace leaves a match
-that holds a piece of a part. A double click on a part opens its form.
+that holds a piece of a part. A double click on a part opens its form. A
+part can hold whole blocks, for example the code block of a listing: the
+cursor then stays in the text before or after it, and Backspace at the start
+of the text after it and Delete at the end of the text before it delete the
+whole part.
 
 ## 7. Mode to learn Markdown
 
@@ -288,7 +294,8 @@ quotes of the text that it replaces. The edits are code of the source
 ### R-FM-006
 
 **Inputs of plugins.** A plugin may give the input of a key, for example
-Paper for `layout` and `repos`: read-only, and Ctrl+click opens the clone.
+Paper for `layout` and `repos`: read-only, and Ctrl+click (Cmd+click on
+macOS) opens the clone.
 *(proposal)* The input of a plugin takes the place of the input of the form
 in both modes.
 

@@ -6,10 +6,12 @@
 // the script of the extension with a random nonce, the style sheets and fonts of the extension, and images from the
 // folder of the file, from https and as data. Styles in attributes stay allowed, because the editor sets some, for
 // example the alignment of the cells of a table. The base of the page is the folder of the file, so that an image with
-// a relative path shows.
+// a relative path shows. The page has the element of the editor and the frame of the pages (docs/rendering.md,
+// R-LAYOUT-003), which shows instead of the editor in the view "Pages": the page in the frame has the same policy and
+// uses the same nonce, and it gets its files as blob: URLs, so images and fonts may also be blobs and data.
 
 import type * as vscode from 'vscode';
-import { editorElementId } from '../messages';
+import { editorElementId, pagesElementId } from '../messages';
 
 /** PageOptions are the parts of the page of the webview. */
 export interface PageOptions {
@@ -50,11 +52,13 @@ export function pageHtml(options: PageOptions): string {
   const source = webview.cspSource;
   const policy = [
     "default-src 'none'",
-    `img-src ${source} https: data:`,
+    `img-src ${source} https: data: blob:`,
     `media-src ${source} https:`,
     `style-src ${source} 'unsafe-inline'`,
-    `font-src ${source}`,
+    `font-src ${source} data: blob:`,
     `script-src 'nonce-${nonce}'`,
+    // The view of the pages loads the files of the webview for the page in its frame.
+    `connect-src ${source}`,
   ].join('; ');
   const uri = (resource: vscode.Uri) => escaped(webview.asWebviewUri(resource).toString());
   const base = options.base ? `\n    <base href="${uri(options.base)}/">` : '';
@@ -69,6 +73,7 @@ export function pageHtml(options: PageOptions): string {
   </head>
   <body>
     <div id="${editorElementId}"></div>
+    <iframe id="${pagesElementId}" title="Pages" hidden></iframe>
     <script nonce="${nonce}" src="${uri(options.script)}"></script>
   </body>
 </html>

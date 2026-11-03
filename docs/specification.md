@@ -36,10 +36,11 @@ Markdown, and the reflection tool builds on it
 platforms are VS Code and the web, with the same code; the command line is a
 platform for output without a view, for example `mp build` of nimblescape
 Markdown Paper. The libraries are npm packages, one for each part
-([R-ARCH-002](#r-arch-002)); today five exist,
-`@nimblescape/markdowntext`, `@nimblescape/markdownrender`,
-`@nimblescape/markdownlayout`, `@nimblescape/markdowneditor` and
-`@nimblescape/markdownvscode`. nimblescape Markdown
+([R-ARCH-002](#r-arch-002)); today six exist,
+`@nimblescape/markdowntext`, `@nimblescape/markdownai`,
+`@nimblescape/markdownrender`, `@nimblescape/markdownlayout`,
+`@nimblescape/markdowneditor` and `@nimblescape/markdownvscode`.
+nimblescape Markdown
 Notes and nimblescape Markdown Paper are format extensions: they add their
 parts through plugins ([plugins and format extensions](plugins.md)), and
 they decide where they use the libraries
@@ -182,6 +183,13 @@ platform, `@nimblescape/markdownvscode` and `@nimblescape/markdownweb`.
 Until the API between the parts reaches version 1, all packages must live in
 this repository as npm workspaces.
 
+*(proposal)* **The package of the AI.** The provider API, the context of the
+document for the AI, the tool of the proposed changes and the loop of a chat
+([AI](ai.md)) are the package `@nimblescape/markdownai`, without a view, so
+that they run in the page, in the extension host of VS Code and on a
+server. A provider of one AI, for example the Claude API, is a part of that
+package with its own entry point.
+
 *(proposal)* **Form of the workspaces.** Each package must live in the
 folder `packages/<name>/` with its own `package.json`, `src/`, README and
 license file, and its build must write its files to `dist/`. The root
@@ -271,9 +279,9 @@ repositories of their own. The same holds for the course module
 | [Reflection tool](reflection.md) | The reflection tool, a plugin of the history and a product of its own: classes and roles of the work, analysis, views, feedback, assignments, API, the package and the extension, scientific basis | [R-REFL-001](reflection.md#r-refl-001) to [R-REFL-022](reflection.md#r-refl-022) |
 | [Course module](course.md) | The course module, a product of its own: the form of the README files and of the feedback files of a course, the comment of the format, the instructions for AI agents, the structured reading, the checks and the adapter of the reflection tool | [R-COURSE-001](course.md#r-course-001) to [R-COURSE-012](course.md#r-course-012), [R-FEED-001](course.md#r-feed-001) to [R-FEED-004](course.md#r-feed-004) |
 | [How the reflection tool works](reflection-guide.md) | The documentation of the reflection tool: how it works, step by step, with the scientific basis of each step; the report links to it and cites no literature | Documentation of [R-REFL-020](reflection.md#r-refl-020) |
-| [Plugins and format extensions](plugins.md) | The plugin API, the levels of a plugin, the plugins of Markdown Notes and Markdown Paper | [R-GEN-005](plugins.md#r-gen-005), [R-GEN-012](plugins.md#r-gen-012), [R-PLUGIN-001](plugins.md#r-plugin-001), [R-NOTES-001](plugins.md#r-notes-001), [R-PAPER-001](plugins.md#r-paper-001) |
+| [Plugins and format extensions](plugins.md) | The plugin API, the levels of a plugin, the plugins of Markdown Notes and Markdown Paper | [R-GEN-005](plugins.md#r-gen-005), [R-GEN-012](plugins.md#r-gen-012), [R-PLUGIN-001](plugins.md#r-plugin-001), [R-PLUGIN-002](plugins.md#r-plugin-002), [R-NOTES-001](plugins.md#r-notes-001), [R-PAPER-001](plugins.md#r-paper-001) |
 | [AI](ai.md) | AI chats, tracked changes, pluggable providers, the API key, the memory | [R-AI-001](ai.md#r-ai-001), [R-AI-006](ai.md#r-ai-006), [R-AI-002](ai.md#r-ai-002), [R-AI-005](ai.md#r-ai-005), [R-AI-003](ai.md#r-ai-003) |
-| [Platforms](platforms.md) | The adapters of VS Code, of the web and of the command line; the theme | [R-PLAT-001](platforms.md#r-plat-001), [R-GEN-004](platforms.md#r-gen-004), [R-VSC-001](platforms.md#r-vsc-001) to [R-VSC-003](platforms.md#r-vsc-003), [R-WEB-001](platforms.md#r-web-001), [R-CLI-001](platforms.md#r-cli-001), [R-THEME-001](platforms.md#r-theme-001) to [R-THEME-003](platforms.md#r-theme-003) |
+| [Platforms](platforms.md) | The adapters of VS Code, of the web and of the command line; the theme | [R-PLAT-001](platforms.md#r-plat-001), [R-GEN-004](platforms.md#r-gen-004), [R-VSC-001](platforms.md#r-vsc-001) to [R-VSC-003](platforms.md#r-vsc-003), [R-VSC-005](platforms.md#r-vsc-005) to [R-VSC-008](platforms.md#r-vsc-008), [R-WEB-001](platforms.md#r-web-001), [R-CLI-001](platforms.md#r-cli-001), [R-THEME-001](platforms.md#r-theme-001) to [R-THEME-003](platforms.md#r-theme-003) |
 
 ## 5. Libraries, licenses and release
 
@@ -302,6 +310,7 @@ use:
 | `@cfworker/json-schema` *(proposal)* | MIT | The check of the front matter against its JSON schema, without eval ([R-FM-004](editor.md#r-fm-004)) |
 | `diff` *(proposal)* | BSD-3-Clause | The patches between two texts, and the blocks that a change from outside changes ([R-SRC-002](source.md#r-src-002)) |
 | `pagedjs` *(proposal)* | MIT | The pages of a layout ([R-LAYOUT-003](rendering.md#r-layout-003)); the layout package holds its script `paged.polyfill.js`, which holds `event-emitter`, `d`, `es5-ext`, `type` and `es6-symbol` (MIT and ISC), `css-tree` (MIT) with `mdn-data` (CC0-1.0) and `source-map` (BSD-3-Clause), and `clear-cut` (MIT) |
+| `pdf-lib` *(proposal)* | MIT | The finish of the PDF: the removal of the marks of the soft hyphens and the metadata ([R-LAYOUT-002](rendering.md#r-layout-002)); it uses `@pdf-lib/standard-fonts` and `@pdf-lib/upng` (MIT), `pako` (MIT and Zlib) and `tslib` (0BSD) |
 | `hyphen` *(proposal)* | ISC | The soft hyphens of the text of the pages by the language of the layout ([R-LAYOUT-004](rendering.md#r-layout-004)); its patterns come from the hyphenation patterns of TeX (hyph-utf8), each language with its own authors and license |
 
 ### R-GEN-007
@@ -332,6 +341,9 @@ use:
 2. Licenses: `markdown-it-task-lists` (ISC), `entities` (BSD-2-Clause, used
    by markdown-it) and `argparse` (Python-2.0, only in the command line
    program of markdown-it, in no bundle).
+3. The package of the AI: `@nimblescape/markdownai` for the provider API,
+   the context, the tool of the proposed changes and the loop of a chat
+   ([R-ARCH-002](#r-arch-002), proposal)?
 
 The documents of the parts list their own open questions: the
 [editor](editor.md#10-open-questions), the
@@ -352,14 +364,14 @@ the [platforms](platforms.md#6-open-questions).
 | 5 | The form of the front matter with both modes and the JSON schema | [R-FM-001](editor.md#r-fm-001) to [R-FM-006](editor.md#r-fm-006) | built |
 | 6 | The adapter for the webviews of VS Code and the theme of VS Code | [R-GEN-004](platforms.md#r-gen-004), [R-VSC-001](platforms.md#r-vsc-001) to [R-VSC-003](platforms.md#r-vsc-003), [R-VSC-005](platforms.md#r-vsc-005), [R-VSC-006](platforms.md#r-vsc-006), [R-THEME-001](platforms.md#r-theme-001), [R-THEME-003](platforms.md#r-theme-003) | built, with an example extension; the setting of the files that open in the editor comes with Notes (step 8) |
 | 7 | The plugin API, version 1, with both levels of plugins; the read-only generated parts; the icons of threads beside the text | [R-GEN-005](plugins.md#r-gen-005), [R-GEN-012](plugins.md#r-gen-012), [R-PLUGIN-001](plugins.md#r-plugin-001), [R-EDIT-011](editor.md#r-edit-011), [R-GEN-014](editor.md#r-gen-014) | built, with an example plugin in both example pages |
-| 8 | The plugins of nimblescape Markdown Notes, in its repository; the editor in the Notes side view | [R-NOTES-001](plugins.md#r-notes-001), [R-GEN-002](editor.md#r-gen-002), [R-GEN-004](platforms.md#r-gen-004) | planned |
-| 9 | The plugins of nimblescape Markdown Paper, in its repository; the schema of each layout | [R-PAPER-001](plugins.md#r-paper-001), [R-FM-004](editor.md#r-fm-004) | planned |
-| 10 | The provider API, the Claude provider and the proposed changes in the editor; in Notes, the AI chat as notes and the memory; the OpenTelemetry events of the AI chat | [R-AI-001](ai.md#r-ai-001) to [R-AI-003](ai.md#r-ai-003), [R-AI-005](ai.md#r-ai-005), [R-AI-006](ai.md#r-ai-006), [R-AI-004](history.md#r-ai-004), [R-EDIT-001](editor.md#r-edit-001) | planned |
+| 8 | The plugins of nimblescape Markdown Notes, in its repository; the editor in the Notes side view | [R-NOTES-001](plugins.md#r-notes-001), [R-GEN-002](editor.md#r-gen-002), [R-GEN-004](platforms.md#r-gen-004) | 8a built: the editor in the Notes side view for answers, new notes and footnotes, with the packages built from this repository at a fixed commit; 8b built: the plugins of Notes in the editor of a whole file, the custom text editor of VS Code, with the removal of the notes in the renderer; 8c built: the read-only generated parts of Notes and the hidden anchors, markers and comments of listings, and generated parts that hold whole blocks; the formatter of Notes runs on save of the document of the editor |
+| 9 | The plugins of nimblescape Markdown Paper, in its repository; the schema of each layout | [R-PAPER-001](plugins.md#r-paper-001), [R-PLUGIN-002](plugins.md#r-plugin-002), [R-VSC-008](platforms.md#r-vsc-008), [R-FM-004](editor.md#r-fm-004) | 9a built: the plugins of other bundles with the shared modules of the page, and the plugins that other extensions of VS Code contribute, with the late connection of their part in the extension; 9b built: the plugin `paper` in the repository of Paper (its step 44), which hides the database of the sources, the codes of the special sections and the markers of `/research` and marks the citations, the reference list and the generated lists as read-only, with Ctrl+click (Cmd+click on macOS) to their targets; 9c built: in the repository of Paper (its step 45), the schema of the front matter of the layout of a paper, `layout` and `repos` read-only with Ctrl+click (Cmd+click on macOS) to the clone, `/cite` and "Cite" with the list of the sources of the platform, and "Research" in the format bar |
+| 10 | The provider API, the Claude provider and the proposed changes in the editor; in Notes, the AI chat as notes and the memory; the OpenTelemetry events of the AI chat | [R-AI-001](ai.md#r-ai-001) to [R-AI-003](ai.md#r-ai-003), [R-AI-005](ai.md#r-ai-005), [R-AI-006](ai.md#r-ai-006), [R-AI-004](history.md#r-ai-004), [R-EDIT-001](editor.md#r-edit-001) | 10a built: the proposed changes as tracked changes in the editor, with `proposeChange` for the integrating code and the plugins; 10b built: the package `@nimblescape/markdownai` with the provider API, the context of the document, the tool `propose_change`, the loop of a chat and the provider in another process; the rest is skipped for now, because nimblescape Markdown builds no AI chats for now ([AI](ai.md)) |
 | 11 | The release workflow of the npm packages, the same as for the other nimblescape npm packages | [R-GEN-007](#r-gen-007) | planned |
 | 12 | The npm workspaces: the code moves into the packages of the parts, first `@nimblescape/markdowneditor` and `@nimblescape/markdowntext`; each other package starts with its step | [R-ARCH-002](#r-arch-002) | built |
 | 13 | The source: the text, the selections and the changes of a file with their origin, the changes from outside, the front matter and the parts that no plugin knows | [R-SRC-001](source.md#r-src-001) to [R-SRC-003](source.md#r-src-003), [R-GEN-006](source.md#r-gen-006), [R-EDIT-002](editor.md#r-edit-002) | built; each platform adapter gives the files in its own step |
 | 14 | The renderer: content without edit functions from markdown-it 14, without the editor, with the plugins of the renderer | [R-REN-001](rendering.md#r-ren-001) to [R-REN-003](rendering.md#r-ren-003) | built; the editor is built on it, and the example page shows its rendering |
-| 15 | The layout: the layouts with the schemas of their front matter, the layout code of Markdown Paper, pages and PDF from the same rendering as the view | [R-LAYOUT-001](rendering.md#r-layout-001) to [R-LAYOUT-004](rendering.md#r-layout-004) | 15a built: the package `@nimblescape/markdownlayout` with the layouts, the text in pages, the page for Paged.js and the view of the pages, shown in the example page; 15b, the PDF, and 15c, the switch between "Edit" and "Pages" in VS Code, planned |
+| 15 | The layout: the layouts with the schemas of their front matter, the layout code of Markdown Paper, pages and PDF from the same rendering as the view | [R-LAYOUT-001](rendering.md#r-layout-001) to [R-LAYOUT-004](rendering.md#r-layout-004) | 15a built: the package `@nimblescape/markdownlayout` with the layouts, the text in pages, the page for Paged.js and the view of the pages, shown in the example page; 15b built: the PDF in Node.js with the entry point `@nimblescape/markdownlayout/pdf` and the functions of the plugins in the page of the PDF; 15c built: the switch between "Edit" and "Pages" in VS Code and in the example page, with pages that follow the text and a double click that goes to the block in "Edit" |
 
 Steps 12 to 15 give the parts of [section 3](#3-architecture) that the
 first plan did not name their steps, so their numbers do not give their

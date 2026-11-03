@@ -22,6 +22,7 @@ import type { FormatButton } from '../ui/formatBar';
 import type { FrontMatterInput } from '../ui/frontMatterForm';
 import type { LearnMarks } from '../ui/learnMode';
 import type { MenuItem } from '../ui/menu';
+import type { ProposalResult, ProposedChange } from '../ui/proposals';
 
 // The level "render" of a plugin is a plugin of the renderer of @nimblescape/markdownrender (docs/rendering.md,
 // R-REN-002): its members, the version of the plugin API and the function that shows a token come from there.
@@ -118,13 +119,23 @@ export interface PluginEditor {
   readonly isEditable: boolean;
   /** getMarkdown returns the text of the editor as Markdown. */
   getMarkdown(): string;
+  /**
+   * textOffset returns the place in the text of the file of a position of the document, exact inside a block; with the
+   * side 1, the place at the edge of a mark is inside the marks of the text after the position.
+   */
+  textOffset(pos: number, side?: -1 | 1): number;
   /** runCommand runs a command of a plugin by its full name, `plugin.command`. */
   runCommand(name: string, ...args: unknown[]): boolean;
   /** openThread opens the panel of a thread beside the text, and closeThread closes it. */
   openThread(id: string): boolean;
   closeThread(): void;
-  /** refreshPlugins asks the plugins again for their generated parts and threads, after a change of their data. */
+  /** refreshPlugins asks the plugins again for their generated parts, threads and schema of the front matter, after a change of their data. */
   refreshPlugins(): void;
+  /**
+   * proposeChange shows a change of the text of the file as a tracked change with "Accept" and "Reject" (R-AI-006), for
+   * example a change of the AI; the result says how the proposal ended.
+   */
+  proposeChange(change: ProposedChange): Promise<ProposalResult>;
 }
 
 /**
@@ -162,6 +173,11 @@ export interface MarkdownPlugin extends RenderPlugin {
   readonly generated?: (doc: Node) => readonly GeneratedPart[];
   /** threads are the threads of the plugin beside the text (R-GEN-014). */
   readonly threads?: PluginThreads;
+  /**
+   * formatRules are the format rules of the syntax of the plugin for the AI, a text in Markdown, for example how a note
+   * is written (docs/ai.md, R-AI-001).
+   */
+  readonly formatRules?: string;
   /**
    * activate starts the plugin in an editor, after the editor shows its text.
    * @param editor - The API of the editor.
