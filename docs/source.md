@@ -56,7 +56,7 @@ library `diff` finds them. A change of the file from outside has the origin
 
 *(proposal)* **Two changes at the same time.** When two sides change the
 same text at the same time, for example the editor in a webview and the
-text editor of VS Code ([R-VSC-005](platforms.md#r-vsc-005)), the function
+text editor of VS Code ([R-VSC-005](https://github.com/nimblescape/markdownnotes-vscode/blob/main/docs/requirements.md#r-vsc-005) of Markdown Notes), the function
 `mergeTexts` of `@nimblescape/markdowntext` merges the two changes: it keeps
 the patches of both against the text before them. A patch that both make
 counts once, and text that both insert at the same place comes in the order

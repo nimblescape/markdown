@@ -203,7 +203,7 @@ Code, the page in the frame cannot load the files of the webview itself, so
 the view loads the scripts, images, style sheets and fonts of the page and
 gives them to the frame as `blob:` URLs; the files of the layout come
 through the extension, only from the workspace folder of the file and the
-folders of the extension ([R-VSC-007](platforms.md#r-vsc-007)).
+folders of the extension ([R-VSC-007](https://github.com/nimblescape/markdownnotes-vscode/blob/main/docs/requirements.md#r-vsc-007) of Markdown Notes).
 
 ## 5. Open questions
 

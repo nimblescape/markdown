@@ -74,10 +74,6 @@ jobs:
       - name: Build the example page
         run: node esbuild.mjs --demo
 
-      # The example extension bundles the adapter for VS Code; its build checks that the package works in an extension.
-      - name: Build the example extension for VS Code
-        run: npm run demo:vscode
-
       - name: Build the npm packages
         run: npm run pack
 

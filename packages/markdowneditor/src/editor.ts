@@ -27,7 +27,7 @@ import { type AnyExtension, Editor, Extension } from '@tiptap/core';
 import type { Node } from '@tiptap/pm/model';
 import { closeHistory } from '@tiptap/pm/history';
 import { EditorState, Plugin, Selection, type Transaction } from '@tiptap/pm/state';
-import { Transform } from '@tiptap/pm/transform';
+import { ReplaceStep, Transform } from '@tiptap/pm/transform';
 import type { JsonSchema, Origin, TextChange, TextSelection, TextSource } from '@nimblescape/markdowntext';
 import { coreExtensions } from './extensions/core';
 import { MarkdownCodec } from './markdown/codec';
@@ -149,8 +149,13 @@ export class MarkdownEditor implements PluginEditor {
   private readonly proposals = new Map<string, (result: ProposalResult) => void>();
   /** origin is the origin of the change that the editor gives the source now, when it is no change of the user. */
   private origin: Origin | undefined;
-  /** changes shows the rendered changes against the text of the other side of a diff (docs/platforms.md, R-VSC-009). */
+  /** changes shows the rendered changes against the text of the other side of a diff (docs/editor.md, R-EDIT-012). */
   private changes: EditorChanges | undefined;
+  /**
+   * held is the range of the top-level code block that held the cursor when `reparse` would have changed it: the
+   * editor parses the text again when the cursor leaves it.
+   */
+  private held: { from: number; to: number } | undefined;
 
   /**
    * @param element - The element of the page that holds the editor.
@@ -216,6 +221,22 @@ export class MarkdownEditor implements PluginEditor {
     };
     this.tiptap.on('transaction', onProposals);
     this.stopListening.push(() => this.tiptap.off('transaction', onProposals));
+    // A code block that waits for `reparse` moves with the changes, and the editor parses again once the cursor left it.
+    const onHeld = ({ transaction }: { transaction: Transaction }) => {
+      const held = this.held;
+      if (!held) {
+        return;
+      }
+      held.from = transaction.mapping.map(held.from, 1);
+      held.to = transaction.mapping.map(held.to, -1);
+      const { from, to } = this.tiptap.state.selection;
+      if (to <= held.from || from >= held.to) {
+        this.held = undefined;
+        queueMicrotask(() => this.reparse());
+      }
+    };
+    this.tiptap.on('transaction', onHeld);
+    this.stopListening.push(() => this.tiptap.off('transaction', onHeld));
     const host = options.host ?? { platform: 'web' };
     for (const plugin of plugins) {
       this.disposables.push(plugin.activate?.(this, host));
@@ -380,6 +401,40 @@ export class MarkdownEditor implements PluginEditor {
   }
 
   /**
+   * reparse parses the text of the file again after the syntax of a plugin changed, for example the blocks that a plugin
+   * of the level "render" knows (docs/plugins.md, R-PLUGIN-001): only the top-level blocks whose node changes change,
+   * outside Undo, and the text stays the same. A top-level code block that holds the cursor changes only after the
+   * cursor leaves it, as a code block whose language a plugin shows (R-GEN-012).
+   */
+  reparse(): void {
+    this.held = undefined;
+    if (this.tiptap.isDestroyed || !this.source) {
+      return;
+    }
+    const { state } = this.tiptap;
+    const { text, source } = this.codec.rebased(state.doc, this.source);
+    const { tr, source: next } = updated(state, source, this.codec.parse(text));
+    if (!tr) {
+      return;
+    }
+    const { $head } = state.selection;
+    if ($head.depth >= 1 && $head.node(1).type.name === 'codeBlock') {
+      const held = { from: $head.before(1), to: $head.after(1) };
+      if (tr.steps.some((step) => step instanceof ReplaceStep && step.from < held.to && held.from < step.to)) {
+        this.held = held;
+        return;
+      }
+    }
+    this.source = next;
+    this.outside = true;
+    try {
+      this.tiptap.view.dispatch(tr);
+    } finally {
+      this.outside = false;
+    }
+  }
+
+  /**
    * editSource gives a block with a source a new text, from the field "Edit source" (R-GEN-012): a top-level block
    * changes through its text in the text of the file, which the editor parses again, so that the new text may become
    * other blocks; a block of HTML inside another block takes the new text. The change is one step of Undo.
@@ -441,6 +496,7 @@ export class MarkdownEditor implements PluginEditor {
   private show(markdown: string): void {
     const { doc, source } = this.codec.parse(markdown);
     this.source = source;
+    this.held = undefined;
     this.tiptap.view.updateState(EditorState.create({ doc, plugins: this.tiptap.state.plugins }));
     this.shownDoc = this.tiptap.state.doc;
     this.interaction.refresh();
@@ -567,7 +623,7 @@ export class MarkdownEditor implements PluginEditor {
   }
 
   /**
-   * showChanges shows the rendered changes of this editor as one side of a diff (docs/platforms.md, R-VSC-009): the
+   * showChanges shows the rendered changes of this editor as one side of a diff (docs/editor.md, R-EDIT-012): the
    * marks of the changed blocks and words against the text of the other side, the rows that line up with the other
    * side and the scroll together (src/ui/changes.ts). A second call replaces the first one.
    * @param options - The side, the text of the other side and the listeners for the other side.
@@ -603,7 +659,7 @@ export class MarkdownEditor implements PluginEditor {
 
   /**
    * setReadOnlyToggle shows or hides the switch between editing and reading in the toolbar (R-GEN-008), for example
-   * for the older version of a diff, which cannot change (docs/platforms.md, R-VSC-009). The option `readOnlyToggle`
+   * for the older version of a diff, which cannot change (docs/editor.md, R-EDIT-012). The option `readOnlyToggle`
    * false leaves out the switch for good.
    * @param shown - false hides the switch.
    */

@@ -81,7 +81,9 @@ pages.hide(); // the view "Edit": the frame keeps the last pages
 In a webview of VS Code, the page in the frame cannot load the files of the
 webview itself. The option `embed` names the starts of their addresses:
 the view loads these files and gives them to the page in the frame as
-`blob:` URLs. `@nimblescape/markdownvscode` gives these addresses.
+`blob:` URLs. The adapter of VS Code of the extension gives these
+addresses, for example the connection of the page in nimblescape Markdown
+Notes.
 
 ## The PDF
 

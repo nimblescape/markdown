@@ -118,9 +118,14 @@ also takes proposed changes of the text, which the editor shows as tracked
 changes ([R-AI-006](ai.md#r-ai-006)). A transaction that takes a change of the text from outside has the
 meta `outsideChange`, so that a plugin that guards its parts against the
 edits of the user, for example the notes of Notes, lets such a change pass.
-The API of the platform gives the name of the platform and, for each
+A plugin whose syntax changes, for example after new data from its part on
+the platform, asks the editor to parse the text again (`reparse`): only the
+top-level blocks whose node changes change, outside Undo, and the text stays
+the same; a top-level code block that holds the cursor changes only after
+the cursor left it, so that typing in it goes on. The API of the platform gives the name of the platform and, for each
 plugin, a channel for messages to the other part of the plugin, for example
-in the extension of VS Code ([R-VSC-001](platforms.md#r-vsc-001)).
+in the extension of VS Code ([R-VSC-001](https://github.com/nimblescape/markdownnotes-vscode/blob/main/docs/requirements.md#r-vsc-001) of Markdown
+Notes).
 
 ### R-PLUGIN-002
 
@@ -140,7 +145,7 @@ scripts with `loadPlugins`, one after the other, before it creates the
 editor, and gives the editor its own plugins and these. A script that does
 not load, and a value that is no plugin of version 1, add no plugin. In VS
 Code, the extensions contribute such scripts
-([R-VSC-008](platforms.md#r-vsc-008)).
+([R-VSC-008](https://github.com/nimblescape/markdownnotes-vscode/blob/main/docs/requirements.md#r-vsc-008) of Markdown Notes).
 
 ## 3. Markdown Notes
 

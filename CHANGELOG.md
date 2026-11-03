@@ -24,8 +24,6 @@ The first version of the packages.
   changes, and version 1 of the plugin API.
 - `@nimblescape/markdownlayout`: layouts with the schema of their front
   matter, the pages of a document with Paged.js, and the PDF in Node.js.
-- `@nimblescape/markdownvscode`: the adapter for VS Code, a custom text
-  editor with the theme of VS Code and the views "Edit" and "Pages".
 - `@nimblescape/markdownai`: the provider API of an AI, the context of the
   document, the tool of the proposed changes and the loop of a chat, without
   a provider of its own.
