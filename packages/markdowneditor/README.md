@@ -62,7 +62,8 @@ Plugins extend the editor through the plugin API, version 1
 [R-PLUGIN-001](../../docs/plugins.md#r-plugin-001)). A plugin is one object.
 At the level "render", it adds syntax to markdown-it and shows its kinds of
 tokens; the editor keeps such a block byte for byte as one unit, and the
-user changes it through its source ("Edit source" or a double click). At the
+user switches it to its source in its place ("Edit source" or a double
+click) and back ("Show rendering"). At the
 level "render and edit", it adds nodes and marks, how they are read and
 written, commands, keys and items of the menus. A plugin may mark the parts
 that it generates as read-only and show threads beside the text.

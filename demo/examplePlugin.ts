@@ -5,7 +5,7 @@
 // The plugin of the example pages (docs/plugins.md, R-PLUGIN-001), which shows the parts of the plugin API:
 //
 // - Level "render" (R-GEN-012): a fenced code block with the language `csv` shows as a table. A double click or the
-//   button "Edit source" opens its text below the table.
+//   button "Edit source" shows its text in the place of the table, and "Show rendering" shows the table again.
 // - Generated parts (docs/editor.md, R-EDIT-011): a link whose address starts with `#ref-` stands for a citation that a
 //   plugin writes. It is read-only: the cursor jumps over it, and Backspace deletes it as a whole.
 // - Threads beside the text (R-GEN-014): each paragraph with the word TODO has a thread; its icon opens the panel.
