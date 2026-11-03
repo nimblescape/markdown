@@ -28,6 +28,10 @@ updates:
         update-types: ['version-update:semver-major']
       - dependency-name: '@types/markdown-it'
         update-types: ['version-update:semver-major']
+      # @types/vscode stays at the oldest VS Code that the adapter supports (engines.vscode of
+      # packages/markdownvscode), so that the adapter uses no newer API (R-VSC-003).
+      - dependency-name: '@types/vscode'
+        update-types: ['version-update:semver-minor', 'version-update:semver-major']
   - package-ecosystem: github-actions
     directory: /
     schedule:

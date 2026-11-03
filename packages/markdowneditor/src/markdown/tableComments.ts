@@ -6,8 +6,5 @@
 // at the start of the cell, `<!--cell red-->`; the widths of the columns are a comment on the line before the table,
 // `<!-- table: widths=30,70 -->`.
 
-/** cellColorPattern matches the comment of the color of a cell; the group is the name of the color. */
-export const cellColorPattern = /^<!--\s*cell\s+([a-z]+)\s*-->$/;
-
-/** widthsPattern matches the comment of the widths of the columns; the group is the list of the widths in percent. */
-export const widthsPattern = /^<!--\s*table:\s*widths=(\d+(?:\.\d+)?(?:\s*,\s*\d+(?:\.\d+)?)*)\s*-->$/;
+// The patterns come from the renderer, which shows the comments in the same way (docs/specification.md, R-GEN-010).
+export { cellColorPattern, widthsPattern } from '@nimblescape/markdownrender';

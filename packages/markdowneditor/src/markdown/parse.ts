@@ -121,7 +121,7 @@ const specs: Record<string, ParseSpec> = {
   td: { block: 'tableCell', getAttrs: cellAttributes },
   footnote_reference: { block: 'footnoteDefinition', getAttrs: (token) => ({ label: (token.meta as { label: string }).label }) },
   front_matter: { node: 'frontMatter', getAttrs: (token) => token.meta as Record<string, unknown> },
-  raw_block: { node: 'rawBlock', getAttrs: (token) => ({ text: token.content }) },
+  raw_block: { node: 'rawBlock', getAttrs: (token) => ({ text: token.content, rendered: Boolean((token.meta as { rendered?: boolean } | null)?.rendered) }) },
   em: { mark: 'italic', getAttrs: (token) => ({ marker: token.markup }) },
   strong: { mark: 'bold', getAttrs: (token) => ({ marker: token.markup }) },
   s: { mark: 'strike' },
@@ -141,19 +141,29 @@ const specs: Record<string, ParseSpec> = {
   footnote_ref: { node: 'footnoteReference', getAttrs: (token) => ({ label: (token.meta as { label: string }).label }) },
 };
 
-/** handled holds the types of the tokens that the parser turns into the document. */
-const handled = new Set(['text', 'inline', 'softbreak']);
-for (const [type, spec] of Object.entries(specs)) {
-  if (spec.noCloseToken || spec.node || type === 'code_inline' || type === 'fence' || type === 'code_block') {
-    handled.add(type);
-  } else {
-    handled.add(`${type}_open`);
-    handled.add(`${type}_close`);
+/**
+ * handledOf returns the types of the tokens that the parser turns into the document with a set of specs.
+ * @param all - The specs of the editor and of its extensions.
+ */
+function handledOf(all: Record<string, ParseSpec>): Set<string> {
+  const handled = new Set(['text', 'inline', 'softbreak']);
+  for (const [type, spec] of Object.entries(all)) {
+    if (spec.noCloseToken || spec.node || type === 'code_inline' || type === 'fence' || type === 'code_block') {
+      handled.add(type);
+    } else {
+      handled.add(`${type}_open`);
+      handled.add(`${type}_close`);
+    }
   }
+  return handled;
 }
 
 /** knows returns true when the parser turns each token of a group of tokens, with their children, into the document. */
-const knows = (tokens: readonly Token[]): boolean => tokens.every((token) => handled.has(token.type) && knows(token.children ?? []));
+const knows = (handled: ReadonlySet<string>, tokens: readonly Token[]): boolean =>
+  tokens.every((token) => handled.has(token.type) && knows(handled, token.children ?? []));
+
+/** holds returns true when a token of a group of tokens, or of their children, is one that a test finds. */
+const holds = (test: (token: Token) => boolean, tokens: readonly Token[]): boolean => tokens.some((token) => test(token) || holds(test, token.children ?? []));
 
 /** checkboxOf returns the state of the check box that markdown-it-task-lists puts at the start of an inline token. */
 function checkboxOf(inline: Token | undefined): boolean | undefined {
@@ -306,20 +316,25 @@ interface Group extends Range {
 export class MarkdownReader {
   private readonly parser: MarkdownParser;
   private readonly features: Features;
+  private readonly handled: ReadonlySet<string>;
   private tokens: Token[] = [];
 
   /**
    * @param schema - The schema of the document.
    * @param md - The markdown-it of the editor.
    * @param extraSpecs - The specs of the tokens of the extensions of the editor.
+   * @param rendered - Returns true for a token that a plugin of the level "render" shows (docs/plugins.md, R-GEN-012).
    */
   constructor(
     schema: Schema,
     private readonly md: MarkdownIt,
     extraSpecs: Record<string, ParseSpec> = {},
+    private readonly rendered: (token: Token) => boolean = () => false,
   ) {
+    const all = { ...specs, ...extraSpecs };
+    this.handled = handledOf(all);
     // The tokens come from parse, which prepares them; the parser only reads them.
-    this.parser = new MarkdownParser(schema, { parse: () => this.tokens } as unknown as MarkdownIt, { ...specs, ...extraSpecs });
+    this.parser = new MarkdownParser(schema, { parse: () => this.tokens } as unknown as MarkdownIt, all);
     this.features = { underline: Boolean(schema.marks.underline), cellColor: 'background' in (schema.nodes.tableCell?.spec.attrs ?? {}) };
   }
 
@@ -390,10 +405,12 @@ export class MarkdownReader {
         const token = new Token('front_matter', '', 0);
         token.meta = { format: frontMatter.format, text: lineText };
         group.tokens = [token];
-      } else if (group.tokens.length === 0 || !knows(group.tokens)) {
-        // Text that no block holds, or a block with tokens that no extension turns into the document, stays as text.
+      } else if (group.tokens.length === 0 || !knows(this.handled, group.tokens) || holds(this.rendered, group.tokens)) {
+        // Text that no block holds, or a block with tokens that no extension turns into the document or that a plugin of
+        // the level "render" shows, stays as text. Such a block with tokens shows its rendering.
         const token = new Token('raw_block', '', 0);
         token.content = lineText;
+        token.meta = { rendered: group.tokens.length > 0 };
         group.tokens = [token];
       }
       all.push(...group.tokens);

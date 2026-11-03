@@ -4,222 +4,37 @@ SPDX-License-Identifier: MIT
 Licensed under the MIT License. See LICENSE in the repository root for details.
 */
 
+@import '@nimblescape/markdownrender/content.css';
+
 /*
-The styles of the editor (docs/specification.md, R-THEME-001, R-THEME-002). Every color and font comes from a token
---nsmd-*. On the web, a page sets the tokens for its theme; the defaults below follow the light or dark scheme of the
-browser. In VS Code, the adapter of the webview sets the tokens from the variables --vscode-* of the theme (step 6).
+The styles of the editor (docs/platforms.md, R-THEME-001, R-THEME-002). The text of the editor has the styles of
+rendered content of @nimblescape/markdownrender (content.css, imported above), so that the text of the editor and a
+rendering of the renderer look the same (docs/specification.md, R-GEN-010). Every color and font comes from a token
+--nsmd-* of content.css, which the element of the editor sets: on the web, a page sets the tokens for its theme; the
+defaults follow the light or dark scheme of the browser. In VS Code, vscode.css of @nimblescape/markdownvscode sets the
+tokens from the variables --vscode-* of the theme. This file adds the styles that only the editor has.
 */
-
-.nsmd-editor {
-  --nsmd-background: #ffffff;
-  --nsmd-foreground: #1f2328;
-  --nsmd-muted: #59636e;
-  --nsmd-border: #d1d9e0;
-  --nsmd-code-background: #f6f8fa;
-  --nsmd-link: #0969da;
-  --nsmd-selection: #b6d4fe;
-  --nsmd-raw-background: #f6f8fa;
-  --nsmd-raw-foreground: #59636e;
-  --nsmd-surface: #ffffff;
-  --nsmd-hover: rgba(129, 139, 152, 0.15);
-  --nsmd-active: rgba(9, 105, 218, 0.12);
-  --nsmd-shadow: 0 4px 16px rgba(31, 35, 40, 0.15);
-  --nsmd-mark: #953800;
-  --nsmd-find-match: rgba(212, 167, 44, 0.35);
-  --nsmd-find-current: rgba(255, 145, 0, 0.6);
-  --nsmd-alert-note: #0969da;
-  --nsmd-alert-tip: #1a7f37;
-  --nsmd-alert-important: #8250df;
-  --nsmd-alert-warning: #9a6700;
-  --nsmd-alert-caution: #d1242f;
-  --nsmd-font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --nsmd-font-size: 16px;
-  --nsmd-line-height: 1.6;
-  --nsmd-code-font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
-}
-
-@media (prefers-color-scheme: dark) {
-  .nsmd-editor {
-    --nsmd-background: #0d1117;
-    --nsmd-foreground: #e6edf3;
-    --nsmd-muted: #9198a1;
-    --nsmd-border: #3d444d;
-    --nsmd-code-background: #151b23;
-    --nsmd-link: #4493f8;
-    --nsmd-selection: #264f78;
-    --nsmd-raw-background: #151b23;
-    --nsmd-raw-foreground: #9198a1;
-    --nsmd-surface: #151b23;
-    --nsmd-hover: rgba(101, 108, 118, 0.2);
-    --nsmd-active: rgba(68, 147, 248, 0.15);
-    --nsmd-shadow: 0 4px 16px rgba(1, 4, 9, 0.6);
-    --nsmd-mark: #ffa657;
-    --nsmd-find-match: rgba(187, 128, 9, 0.4);
-    --nsmd-find-current: rgba(255, 145, 0, 0.6);
-    --nsmd-alert-note: #4493f8;
-    --nsmd-alert-tip: #3fb950;
-    --nsmd-alert-important: #ab7df8;
-    --nsmd-alert-warning: #d29922;
-    --nsmd-alert-caution: #f85149;
-  }
-}
 
 .nsmd-editor .ProseMirror {
-  background: var(--nsmd-background);
-  color: var(--nsmd-foreground);
-  font-family: var(--nsmd-font-family);
-  font-size: var(--nsmd-font-size);
-  line-height: var(--nsmd-line-height);
   outline: none;
   white-space: pre-wrap;
-  word-wrap: break-word;
 }
 
+/* A theme may give the selected text its own color, for example a theme of high contrast; else the text keeps its color. */
 .nsmd-editor .ProseMirror ::selection {
   background: var(--nsmd-selection);
-}
-
-.nsmd-editor a {
-  color: var(--nsmd-link);
-}
-
-.nsmd-editor code,
-.nsmd-editor pre {
-  font-family: var(--nsmd-code-font-family);
-  font-size: 0.875em;
-  background: var(--nsmd-code-background);
-  border-radius: 6px;
-}
-
-.nsmd-editor code {
-  padding: 0.15em 0.35em;
-}
-
-.nsmd-editor pre {
-  padding: 0.75em 1em;
-  overflow-x: auto;
-}
-
-.nsmd-editor pre code {
-  padding: 0;
-  background: none;
-}
-
-.nsmd-editor blockquote {
-  margin: 0 0 1em;
-  padding: 0 1em;
-  color: var(--nsmd-muted);
-  border-left: 0.25em solid var(--nsmd-border);
-}
-
-.nsmd-editor hr {
-  border: none;
-  border-top: 1px solid var(--nsmd-border);
-  margin: 1.5em 0;
-}
-
-.nsmd-editor table {
-  border-collapse: collapse;
-  margin: 0 0 1em;
-}
-
-.nsmd-editor th,
-.nsmd-editor td {
-  border: 1px solid var(--nsmd-border);
-  padding: 0.35em 0.75em;
-  vertical-align: top;
-}
-
-.nsmd-editor th > p,
-.nsmd-editor td > p {
-  margin: 0;
-}
-
-/* The items of a tight list stand closer, as in the preview of the file. */
-.nsmd-editor ul[data-tight] > li > p,
-.nsmd-editor ol[data-tight] > li > p,
-.nsmd-editor ul[data-tight] > li > div > p {
-  margin: 0;
-}
-
-.nsmd-editor ul[data-type='taskList'] {
-  list-style: none;
-  padding-left: 0.5em;
-}
-
-.nsmd-editor ul[data-type='taskList'] li {
-  display: flex;
-  gap: 0.5em;
-}
-
-.nsmd-editor ul[data-type='taskList'] li > div {
-  flex: 1;
-}
-
-.nsmd-editor img {
-  max-width: 100%;
+  color: var(--nsmd-selection-foreground, inherit);
 }
 
 /*
-Raw text: HTML, the front matter and text that no block of Markdown holds, until a plugin shows it its own way. The
-selector names .ProseMirror, because Tiptap sets `white-space: normal` for the nodes that are not editable.
+Raw text in the editor: the selector names .ProseMirror, because Tiptap sets `white-space: normal` for the nodes that
+are not editable.
 */
 .nsmd-editor .ProseMirror .nsmd-raw {
-  color: var(--nsmd-raw-foreground);
-  background: var(--nsmd-raw-background);
-  font-family: var(--nsmd-code-font-family);
-  font-size: 0.8em;
   white-space: pre-wrap;
 }
 
-.nsmd-editor .ProseMirror span.nsmd-raw {
-  padding: 0 0.25em;
-  border-radius: 4px;
-}
-
-.nsmd-editor .nsmd-footnote {
-  display: flex;
-  gap: 0.5em;
-  font-size: 0.9em;
-  color: var(--nsmd-muted);
-}
-
-.nsmd-editor .nsmd-footnote::before {
-  content: '[^' attr(data-label) ']:';
-  font-family: var(--nsmd-code-font-family);
-}
-
-.nsmd-editor .nsmd-footnote-reference {
-  color: var(--nsmd-link);
-  font-size: 0.75em;
-}
-
-/* GitHub alerts: the color of the kind, and the name of the kind in place of the marker `[!NOTE]` (R-EDIT-003). */
-.nsmd-editor .nsmd-alert-note {
-  --nsmd-alert-color: var(--nsmd-alert-note);
-}
-
-.nsmd-editor .nsmd-alert-tip {
-  --nsmd-alert-color: var(--nsmd-alert-tip);
-}
-
-.nsmd-editor .nsmd-alert-important {
-  --nsmd-alert-color: var(--nsmd-alert-important);
-}
-
-.nsmd-editor .nsmd-alert-warning {
-  --nsmd-alert-color: var(--nsmd-alert-warning);
-}
-
-.nsmd-editor .nsmd-alert-caution {
-  --nsmd-alert-color: var(--nsmd-alert-caution);
-}
-
-.nsmd-editor blockquote.nsmd-alert {
-  color: var(--nsmd-foreground);
-  border-left-color: var(--nsmd-alert-color);
-}
-
+/* The marker of a GitHub alert shows the name of its kind, until the cursor is at the marker (R-EDIT-003). */
 .nsmd-editor .ProseMirror .nsmd-alert-marker {
   color: var(--nsmd-alert-color);
 }
@@ -583,48 +398,8 @@ before the table, which hides itself outside the mode to learn Markdown.
   display: none;
 }
 
-.nsmd-editor .nsmd-table-fixed table {
-  table-layout: fixed;
-  width: 100% !important;
-}
-
 .nsmd-editor .ProseMirror .selectedCell {
   background: var(--nsmd-selection);
-}
-
-.nsmd-editor td[data-color='gray'],
-.nsmd-editor th[data-color='gray'] {
-  background: rgba(129, 139, 152, 0.18);
-}
-
-.nsmd-editor td[data-color='red'],
-.nsmd-editor th[data-color='red'] {
-  background: rgba(209, 36, 47, 0.14);
-}
-
-.nsmd-editor td[data-color='orange'],
-.nsmd-editor th[data-color='orange'] {
-  background: rgba(219, 109, 40, 0.16);
-}
-
-.nsmd-editor td[data-color='yellow'],
-.nsmd-editor th[data-color='yellow'] {
-  background: rgba(212, 167, 44, 0.22);
-}
-
-.nsmd-editor td[data-color='green'],
-.nsmd-editor th[data-color='green'] {
-  background: rgba(26, 127, 55, 0.14);
-}
-
-.nsmd-editor td[data-color='blue'],
-.nsmd-editor th[data-color='blue'] {
-  background: rgba(9, 105, 218, 0.14);
-}
-
-.nsmd-editor td[data-color='purple'],
-.nsmd-editor th[data-color='purple'] {
-  background: rgba(130, 80, 223, 0.14);
 }
 
 /* The form of the front matter (docs/editor.md, R-FM-001 to R-FM-006). */
@@ -871,4 +646,297 @@ before the table, which hides itself outside the mode to learn Markdown.
   font-family: var(--nsmd-code-font-family);
   font-size: 13px;
   white-space: pre-wrap;
+}
+
+/*
+The blocks with a source (docs/plugins.md, R-GEN-012): a raw block shows its rendering or its text, and the user switches it
+to a field with its source in the same place; the two never show at the same time. The text of a rendered block shows below
+its rendering in the mode to learn Markdown.
+*/
+
+.nsmd-editor .ProseMirror .nsmd-unit {
+  position: relative;
+  margin: 0 0 1em;
+}
+
+.nsmd-editor .ProseMirror .nsmd-unit > .nsmd-unit-view.nsmd-raw {
+  margin: 0;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.nsmd-editor .ProseMirror .nsmd-unit.ProseMirror-selectednode {
+  outline: 2px solid var(--nsmd-selection);
+  outline-offset: 2px;
+}
+
+.nsmd-editor .ProseMirror .nsmd-rendered > :last-child {
+  margin-bottom: 0;
+}
+
+.nsmd-editor .ProseMirror .nsmd-unit-source {
+  display: none;
+  margin: 6px 0 0;
+  padding: 6px 8px;
+  border-top: 1px dashed var(--nsmd-border);
+  border-radius: 0;
+}
+
+.nsmd-editor .ProseMirror.nsmd-learn .nsmd-unit-rendered:not(.nsmd-unit-editing) > .nsmd-unit-source {
+  display: block;
+}
+
+.nsmd-editor .ProseMirror .nsmd-unit-edit,
+.nsmd-editor .ProseMirror .nsmd-unit-done {
+  position: absolute;
+  top: 0;
+  right: 0;
+  visibility: hidden;
+  background: var(--nsmd-surface);
+  box-shadow: var(--nsmd-shadow);
+}
+
+.nsmd-editor .ProseMirror[contenteditable='true'] .nsmd-unit:hover > .nsmd-unit-edit,
+.nsmd-editor .ProseMirror[contenteditable='true'] .nsmd-unit.ProseMirror-selectednode > .nsmd-unit-edit {
+  visibility: visible;
+}
+
+.nsmd-editor .ProseMirror .nsmd-unit-editing > .nsmd-unit-done {
+  visibility: visible;
+}
+
+.nsmd-editor .ProseMirror .nsmd-unit-editing > .nsmd-unit-edit,
+.nsmd-editor .ProseMirror .nsmd-unit-editing > .nsmd-unit-view,
+.nsmd-editor .ProseMirror .nsmd-unit-editing > .nsmd-unit-source {
+  display: none;
+}
+
+.nsmd-editor .ProseMirror .nsmd-unit-field {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  /* The button "Show rendering" stands at the top right corner of the field. */
+  padding: 6px 36px 6px 8px;
+  border: 1px solid var(--nsmd-link);
+  border-radius: 4px;
+  background: var(--nsmd-raw-background);
+  color: var(--nsmd-foreground);
+  font-family: var(--nsmd-code-font-family);
+  font-size: 13px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.nsmd-editor .ProseMirror .nsmd-unit-field:focus {
+  outline: 1px solid var(--nsmd-link);
+  outline-offset: 0;
+}
+
+/* The read-only generated parts (docs/editor.md, R-EDIT-011). */
+
+.nsmd-editor .ProseMirror .nsmd-generated {
+  cursor: default;
+  border-radius: 3px;
+}
+
+.nsmd-editor .ProseMirror[contenteditable='true'] .nsmd-generated:hover {
+  background: var(--nsmd-hover);
+}
+
+/* The threads beside the text (docs/editor.md, R-GEN-014): the icons at the right of the text, and the panel. */
+
+.nsmd-editor .nsmd-box.nsmd-has-threads {
+  padding-right: 2.75rem;
+}
+
+.nsmd-editor .nsmd-threads {
+  position: absolute;
+  top: 0;
+  right: 0.25rem;
+  width: 2.25rem;
+}
+
+.nsmd-editor .nsmd-thread-icon {
+  position: absolute;
+  right: 0;
+  gap: 2px;
+  color: var(--nsmd-muted);
+}
+
+.nsmd-editor .nsmd-thread-icon[aria-expanded='true'] {
+  background: var(--nsmd-active);
+  color: var(--nsmd-link);
+}
+
+.nsmd-editor .nsmd-thread-count {
+  font-size: 11px;
+  line-height: 1;
+}
+
+.nsmd-editor .ProseMirror .nsmd-thread-active {
+  background: var(--nsmd-active);
+}
+
+.nsmd-editor .nsmd-thread-panel {
+  position: absolute;
+  z-index: 4;
+  right: 2.75rem;
+  box-sizing: border-box;
+  width: min(22rem, calc(100% - 4rem));
+  border: 1px solid var(--nsmd-border);
+  border-radius: 8px;
+  background: var(--nsmd-surface);
+  box-shadow: var(--nsmd-shadow);
+  font-family: var(--nsmd-font-family);
+  font-size: 14px;
+}
+
+.nsmd-editor .nsmd-thread-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 4px 4px 10px;
+  border-bottom: 1px solid var(--nsmd-border);
+  color: var(--nsmd-muted);
+}
+
+.nsmd-editor .nsmd-thread-body {
+  padding: 8px 10px;
+  max-height: 60vh;
+  overflow: auto;
+}
+
+/*
+The proposed changes (docs/ai.md, R-AI-006): the text that a change removes is struck through in red, the new text has
+a green background, and "Accept" and "Reject" stand after it. In read-only mode, the buttons are hidden.
+*/
+
+.nsmd-editor .ProseMirror .nsmd-change-removed {
+  background: color-mix(in srgb, var(--nsmd-color-red) 14%, transparent);
+  text-decoration: line-through;
+  text-decoration-color: var(--nsmd-color-red);
+}
+
+.nsmd-editor .ProseMirror .nsmd-change-added {
+  background: color-mix(in srgb, var(--nsmd-color-green) 18%, transparent);
+  border-radius: 3px;
+}
+
+.nsmd-editor .ProseMirror .nsmd-change-block {
+  margin: 0 0 1em;
+  padding: 0 0 0 8px;
+  border-left: 3px solid var(--nsmd-color-green);
+  white-space: normal;
+}
+
+.nsmd-editor .ProseMirror .nsmd-change-block > .nsmd-change-added {
+  padding: 1px 6px;
+}
+
+.nsmd-editor .ProseMirror .nsmd-change-block > .nsmd-change-added > :first-child {
+  margin-top: 0;
+}
+
+.nsmd-editor .ProseMirror .nsmd-change-block > .nsmd-change-added > :last-child {
+  margin-bottom: 0;
+}
+
+.nsmd-editor .ProseMirror .nsmd-change-actions {
+  display: inline-flex;
+  gap: 4px;
+  margin: 0 0 0 4px;
+  vertical-align: baseline;
+  user-select: none;
+}
+
+.nsmd-editor .ProseMirror .nsmd-change-block > .nsmd-change-actions {
+  display: flex;
+  margin: 4px 0 0;
+}
+
+.nsmd-editor .ProseMirror .nsmd-change-actions button {
+  padding: 0 6px;
+  border: 1px solid var(--nsmd-border);
+  border-radius: 4px;
+  background: var(--nsmd-surface);
+  color: var(--nsmd-foreground);
+  font-family: var(--nsmd-font-family);
+  font-size: 12px;
+  line-height: 1.6;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.nsmd-editor .ProseMirror .nsmd-change-actions button:hover {
+  background: var(--nsmd-hover);
+}
+
+.nsmd-editor .ProseMirror .nsmd-change-actions button:focus-visible {
+  outline: 2px solid var(--nsmd-link);
+  outline-offset: -2px;
+}
+
+.nsmd-editor .ProseMirror .nsmd-change-accept {
+  border-color: var(--nsmd-color-green);
+}
+
+.nsmd-editor .ProseMirror[contenteditable='false'] .nsmd-change-actions {
+  display: none;
+}
+
+/*
+The rendered changes (docs/platforms.md, R-VSC-009): the side `original` marks the removed blocks and words in red, the
+side `modified` the new blocks and words in green; a changed block has a lighter background and a bar at its left, and
+its changed words a stronger one. A spacer is the empty space where the other side has more, with thin lines as in
+the diff of VS Code.
+*/
+
+.nsmd-editor.nsmd-diff-original {
+  --nsmd-diff-color: var(--nsmd-color-red);
+}
+
+.nsmd-editor.nsmd-diff-modified {
+  --nsmd-diff-color: var(--nsmd-color-green);
+}
+
+.nsmd-editor.nsmd-diff .ProseMirror > .nsmd-diff-block {
+  background: color-mix(in srgb, var(--nsmd-diff-color) 16%, transparent);
+  box-shadow: -6px 0 0 color-mix(in srgb, var(--nsmd-diff-color) 16%, transparent), -9px 0 0 var(--nsmd-diff-color);
+}
+
+.nsmd-editor.nsmd-diff .ProseMirror > .nsmd-diff-changed {
+  background: color-mix(in srgb, var(--nsmd-diff-color) 7%, transparent);
+  box-shadow: -6px 0 0 color-mix(in srgb, var(--nsmd-diff-color) 7%, transparent), -9px 0 0 var(--nsmd-diff-color);
+}
+
+.nsmd-editor.nsmd-diff .ProseMirror .nsmd-diff-word {
+  background: color-mix(in srgb, var(--nsmd-diff-color) 32%, transparent);
+  border-radius: 2px;
+}
+
+/* A spacer ends each row of the diff, also with the height 0: as a block of its own formatting context it never lets
+   the margins of the blocks around it collapse, so that its height adds to the height of its row exactly. The blocks
+   have no top margin, so that the space between two rows stays the bottom margin of the block before. */
+.nsmd-editor.nsmd-diff .ProseMirror > * {
+  margin-top: 0;
+}
+
+.nsmd-editor.nsmd-diff .ProseMirror .nsmd-diff-spacer {
+  display: flow-root;
+  margin: 0;
+  padding: 0;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent 0 6px,
+    color-mix(in srgb, var(--nsmd-color-gray) 22%, transparent) 6px 7px
+  );
+  pointer-events: none;
+  user-select: none;
+}
+
+/* The spacer before the first row lines up the start of the text: it stands for no block, so it has no hatch. */
+.nsmd-editor.nsmd-diff .ProseMirror .nsmd-diff-lead {
+  background-image: none;
 }

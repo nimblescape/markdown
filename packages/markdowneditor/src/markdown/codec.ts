@@ -3,14 +3,16 @@
 // Licensed under the MIT License. See LICENSE in the repository root for details.
 
 // The Markdown of the editor in both directions (docs/editor.md, R-EDIT-004, R-EDIT-005): the reader and the
-// writer for one schema and one markdown-it, with the parts that the extensions of the editor add (R-GEN-012).
+// writer for one schema and one markdown-it, with the parts that the extensions of the editor add (R-GEN-012). The
+// markdown-it is the one of @nimblescape/markdownrender, with the definitions of the footnotes in their places.
 
 import { getSchema, type AnyExtension } from '@tiptap/core';
 import type { Node, Schema } from '@tiptap/pm/model';
 import type MarkdownIt from 'markdown-it';
+import type Token from 'markdown-it/lib/token.mjs';
 import type { ParseSpec } from 'prosemirror-markdown';
+import { createMarkdownIt, type MarkdownItExtension } from '@nimblescape/markdownrender';
 import { coreExtensions } from '../extensions/core';
-import { createMarkdownIt, type MarkdownItExtension } from './markdownIt';
 import { MarkdownReader, type MarkdownSource, type ParsedMarkdown } from './parse';
 import { MarkdownWriter, type SerializeOptions, type Writers } from './serialize';
 
@@ -22,10 +24,20 @@ export interface CodecOptions {
   schema?: Schema;
   /** markdownIt are the functions that add syntax to the markdown-it of the editor. */
   markdownIt?: MarkdownItExtension[];
+  /**
+   * md is the markdown-it of the editor, for example the one of the renderer of the editor; it replaces `markdownIt`.
+   * It keeps the definitions of the footnotes in their places (`createMarkdownIt` with `footnotes: 'inPlace'`).
+   */
+  md?: MarkdownIt;
   /** tokens maps the tokens of that syntax to nodes and marks of the document. */
   tokens?: Record<string, ParseSpec>;
   /** writers are the ways to write those nodes and marks as Markdown. */
   writers?: Writers;
+  /**
+   * rendered returns true for a token that a plugin of the level "render" shows (docs/plugins.md, R-GEN-012): its
+   * top-level block stays one unit, a raw block that keeps its text.
+   */
+  rendered?: (token: Token) => boolean;
 }
 
 /** MarkdownCodec reads Markdown text into the document of the editor and writes the document back as Markdown text. */
@@ -37,8 +49,8 @@ export class MarkdownCodec {
 
   constructor(options: CodecOptions = {}) {
     this.schema = options.schema ?? getSchema(options.extensions ?? coreExtensions());
-    this.md = createMarkdownIt(options.markdownIt);
-    this.reader = new MarkdownReader(this.schema, this.md, options.tokens);
+    this.md = options.md ?? createMarkdownIt(options.markdownIt, { footnotes: 'inPlace' });
+    this.reader = new MarkdownReader(this.schema, this.md, options.tokens, options.rendered);
     this.writer = new MarkdownWriter(this.md.utils.normalizeReference, options.writers);
   }
 

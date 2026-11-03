@@ -22,9 +22,11 @@ interaction of a document editor: the toolbar, the format bar over selected
 text, the insert menu "+" and the slash commands, the handles of the blocks,
 find and replace, read-only mode and a mode that shows the Markdown marks
 beside the rendered text; the tables with handles, markers and a table menu;
-and the form of the front matter, with a JSON schema, for YAML, TOML and
-JSON.
-VS Code and the plugin API come in the next steps.
+the form of the front matter, with a JSON schema, for YAML, TOML and
+JSON; the adapter for VS Code, which opens the editor as a custom text
+editor with the theme of VS Code; the plugin API, version 1; and the
+renderer, which shows the text as HTML without edit functions, without the
+editor, and on which the editor is built. The layout comes in the next step.
 
 ## Packages
 
@@ -36,7 +38,11 @@ packages with their steps of the plan.
 | Package | Part |
 | --- | --- |
 | [`@nimblescape/markdowntext`](packages/markdowntext) | The source: the text of a file with its changes, their origin and the selections of the editors; the front matter in YAML, TOML and JSON, its edits and the check against a JSON schema; without a view |
-| [`@nimblescape/markdowneditor`](packages/markdowneditor) | The editor of rendered Markdown for the web and for the webviews of VS Code |
+| [`@nimblescape/markdownai`](packages/markdownai) | The AI without a view: the provider API that makes any AI pluggable, the context of the document, the tool with which the AI proposes a change, the loop of a chat, and the provider in another process, so that the API key never reaches the page |
+| [`@nimblescape/markdownrender`](packages/markdownrender) | The renderer: the text of a file as HTML without edit functions, from markdown-it 14, with the plugins of the renderer; without the editor and without a page |
+| [`@nimblescape/markdownlayout`](packages/markdownlayout) | The layout: the text of a file in its layout as pages, with the layout code of Markdown Paper, the built-in layout `plain` and Paged.js |
+| [`@nimblescape/markdowneditor`](packages/markdowneditor) | The editor of rendered Markdown for the web and for the webviews of VS Code, built on the renderer |
+| [`@nimblescape/markdownvscode`](packages/markdownvscode) | The adapter for VS Code: the editor as a custom text editor, which keeps the file a text document of VS Code, and the theme of VS Code |
 
 ## Use
 
@@ -66,14 +72,56 @@ source.onChange((change) => console.log(change.origin, change.patches));
 source.setText('# New title\n', { kind: 'program', name: 'git' }); // the rendered editor shows it
 ```
 
+The AI, or another program, proposes a change of a range of the text of the
+file; the editor shows it as a tracked change with "Accept" and "Reject"
+([R-AI-006](docs/ai.md#r-ai-006)), and nothing changes the file before the
+user accepts it.
+
+```ts
+const result = await rendered.proposeChange({ id: 'ai-1', from: 2, to: 7, text: 'New title' });
+// 'accepted', 'rejected' or 'outdated'
+```
+
 The options `toolbar`, `readOnlyToggle` and `learnToggle` leave out the
 toolbar or its switches, and `learnMode` starts the editor with the
 Markdown marks shown.
 
+The renderer shows the same text without edit functions, for example for a
+view or a command line:
+
+```ts
+import { MarkdownRenderer } from '@nimblescape/markdownrender';
+import '@nimblescape/markdownrender/content.css';
+
+const renderer = new MarkdownRenderer();
+const { html } = renderer.toHtml('# Title\n\n> [!NOTE]\n> A note.\n'); // without a page
+renderer.render('# Title\n', document.querySelector('#rendering')!); // in a page, with the plugins
+```
+
+The layout shows the text in its layout as pages, in a frame of the page:
+
+```ts
+import { createLayoutRenderer, renderPage, showPages } from '@nimblescape/markdownlayout';
+
+const layoutRenderer = createLayoutRenderer();
+const page = await renderPage(host, layoutRenderer, 'file:///project/paper.md', text, { hold: true });
+showPages(document.querySelector('iframe')!, page, layoutRenderer); // Paged.js makes the pages
+```
+
+The [README of the package](packages/markdownlayout/README.md) explains the
+host, which reads the files of the layouts, and the PDF in Node.js with the
+entry point `@nimblescape/markdownlayout/pdf`.
+
+In VS Code, an extension registers the editor as a custom text editor with
+`registerMarkdownEditor` of `@nimblescape/markdownvscode`; the
+[README of the package](packages/markdownvscode/README.md) shows the
+extension and its page.
+
 The packages are not on npmjs.com before the release.
 [CONTRIBUTING.md](CONTRIBUTING.md) explains the development, the example
-page (`npm run demo`) and how another repository installs the packages from
-GitHub.
+page (`npm run demo`), the example extension for VS Code
+(`npm run demo:vscode`) and how another repository installs the packages
+from GitHub.
 
 ## License
 

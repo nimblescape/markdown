@@ -13,5 +13,8 @@ export default defineConfig({
     include: ['packages/*/src/**/*.test.ts', 'scripts/**/*.test.mjs'],
     // The tests of the Markdown need no page; a test of the view sets `@vitest-environment happy-dom` in its file.
     environment: 'node',
+    // A style sheet that a module imports as its text with the suffix `?raw` keeps its text in the tests, for example the
+    // style sheet of the built-in layout `plain` (packages/markdownlayout); without this, Vitest gives an empty text.
+    css: { include: [/\.css\?raw$/] },
   },
 });

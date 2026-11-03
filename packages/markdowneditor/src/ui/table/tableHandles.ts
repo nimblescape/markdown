@@ -9,6 +9,7 @@
 
 import { TextSelection } from '@tiptap/pm/state';
 import type { EditorView } from '@tiptap/pm/view';
+import type { Node } from '@tiptap/pm/model';
 import { button, element, icon } from '../dom';
 import type { Menu, MenuItem } from '../menu';
 import {
@@ -46,6 +47,8 @@ export interface TableHandleHost {
   insertItems: () => MenuItem[];
   /** menuOpened is called after the table menu opens, for example to hide the format bar. */
   menuOpened?: () => void;
+  /** tableItems returns the items that plugins add to the table menu of a table. */
+  tableItems?: (table: { node: Node; pos: number }) => MenuItem[];
 }
 
 /** Hover is the cell under the mouse: the table element, its row and its column. */
@@ -157,7 +160,8 @@ export class TableHandles {
     }
     const cell = target?.closest?.('td, th');
     const table = cell?.closest('table');
-    if (!cell || !table || !this.view.dom.contains(table)) {
+    // A table in the rendering of a block of the level "render" is no table of the document (docs/plugins.md, R-GEN-012).
+    if (!cell || !table || !this.view.dom.contains(table) || table.closest('.nsmd-unit')) {
       this.hide();
       return;
     }
@@ -318,7 +322,12 @@ export class TableHandles {
  * @param index - The index of the row or the column.
  * @param host - The helpers of the editor.
  */
-export function tableMenuItems(view: EditorView, axis: Axis, index: number, host: Pick<TableHandleHost, 'ask' | 'language' | 'insertItems' | 'box' | 'menu'>): MenuItem[] {
+export function tableMenuItems(
+  view: EditorView,
+  axis: Axis,
+  index: number,
+  host: Pick<TableHandleHost, 'ask' | 'language' | 'insertItems' | 'box' | 'menu' | 'tableItems'>,
+): MenuItem[] {
   const table = tableAt(view.state.doc, view.state.selection.from);
   if (!table) {
     return [];
@@ -418,6 +427,7 @@ export function tableMenuItems(view: EditorView, axis: Axis, index: number, host
       },
     },
     { id: 'deleteTable', label: 'Delete table', icon: 'close', run: run(deleteTable(pos)) },
+    ...(host.tableItems?.(table) ?? []),
   );
   return items;
 }

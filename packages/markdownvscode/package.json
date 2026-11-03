@@ -1,0 +1,69 @@
+{
+  "name": "@nimblescape/markdownvscode",
+  "version": "0.1.0",
+  "description": "The adapter of nimblescape Markdown for VS Code: the editor of rendered Markdown as a custom text editor, which keeps the file a text document of VS Code, and the theme of VS Code for the editor. An extension, for example nimblescape Markdown Notes, registers it with its own view type.",
+  "license": "MIT",
+  "author": {
+    "name": "nimblescape e.U.",
+    "url": "https://nimblescape.com"
+  },
+  "homepage": "https://github.com/nimblescape/markdown/tree/main/packages/markdownvscode#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nimblescape/markdown.git",
+    "directory": "packages/markdownvscode"
+  },
+  "bugs": {
+    "url": "https://github.com/nimblescape/markdown/issues"
+  },
+  "keywords": [
+    "markdown",
+    "editor",
+    "vscode",
+    "custom editor",
+    "webview"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "nimblescape-source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./webview": {
+      "nimblescape-source": "./src/webview.ts",
+      "types": "./dist/webview.d.ts",
+      "default": "./dist/webview.js"
+    },
+    "./vscode.css": "./dist/vscode.css"
+  },
+  "files": [
+    "dist/*.js",
+    "dist/**/*.d.ts",
+    "dist/vscode.css"
+  ],
+  "sideEffects": [
+    "*.css"
+  ],
+  "scripts": {
+    "build": "node ../../esbuild.mjs --production && tsc -p tsconfig.build.json"
+  },
+  "dependencies": {
+    "@nimblescape/markdowntext": "0.1.0"
+  },
+  "devDependencies": {
+    "@nimblescape/markdowneditor": "0.1.0"
+  },
+  "peerDependencies": {
+    "@types/vscode": ">=1.125.0"
+  },
+  "peerDependenciesMeta": {
+    "@types/vscode": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=22",
+    "vscode": "^1.125.0"
+  }
+}

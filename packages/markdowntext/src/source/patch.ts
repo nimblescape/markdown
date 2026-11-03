@@ -164,3 +164,48 @@ export function patchesBetween(before: string, after: string): TextPatch[] {
   close();
   return patches;
 }
+
+/**
+ * mergeTexts returns the text of two changes of the same text, for example a change in the webview of VS Code and a
+ * change of the document that came at the same time: the patches of both changes against the text before them, in the
+ * order of the text. A patch that both changes make counts once; text that both insert at the same place comes in the
+ * order theirs, then ours. Where the patches of the two changes overlap, the patches of `theirs` stay and the patch of
+ * `ours` is dropped, so that the result never holds a part of both.
+ * @param base - The text before both changes.
+ * @param ours - The text after our change.
+ * @param theirs - The text after their change.
+ */
+export function mergeTexts(base: string, ours: string, theirs: string): string {
+  if (ours === base || ours === theirs) {
+    return theirs;
+  }
+  if (theirs === base) {
+    return ours;
+  }
+  const mine = patchesBetween(base, ours);
+  const other = patchesBetween(base, theirs);
+  const merged: TextPatch[] = [];
+  // before is true when a patch ends where or before another starts, so that both fit after each other.
+  const before = (a: TextPatch, b: TextPatch) => a.to <= b.from;
+  let i = 0;
+  let j = 0;
+  while (i < mine.length || j < other.length) {
+    const a = mine[i];
+    const b = other[j];
+    if (!a || (b && before(b, a))) {
+      // The same patch of both, or a patch of theirs that comes first; at the same place theirs comes first.
+      if (a && a.from === b.from && a.to === b.to && a.insert === b.insert) {
+        i++;
+      }
+      merged.push(b);
+      j++;
+    } else if (!b || before(a, b)) {
+      merged.push(a);
+      i++;
+    } else {
+      // The patches overlap: theirs stays.
+      i++;
+    }
+  }
+  return applyPatches(base, merged);
+}

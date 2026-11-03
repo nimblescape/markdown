@@ -62,6 +62,9 @@ const paths = {
   up: ['M4 10l4-4 4 4'],
   down: ['M4 6l4 4 4-4'],
   chevron: ['M5 6.5l3 3 3-3'],
+  note: ['M3 2.5h10v7.5l-3 3H3z', 'M10 13v-3h3'],
+  chat: ['M2.5 3.5h11v7h-6l-3 2.5v-2.5h-2z'],
+  source: ['M5.5 4.5L2 8l3.5 3.5', 'M10.5 4.5L14 8l-3.5 3.5'],
 } as const;
 
 /** IconName is the name of an icon of the editor. */

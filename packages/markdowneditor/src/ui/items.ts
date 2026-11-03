@@ -9,19 +9,14 @@
 import type { Editor } from '@tiptap/core';
 import type { Node } from '@tiptap/pm/model';
 import { TextSelection } from '@tiptap/pm/state';
+import { alertTitles, type AlertKind } from '@nimblescape/markdownrender';
 import type { MenuItem } from './menu';
 
 /** AlertKind is a kind of GitHub alert, `> [!NOTE]`. */
-export type AlertKind = 'note' | 'tip' | 'important' | 'warning' | 'caution';
+export type { AlertKind };
 
-/** alertKinds are the kinds of GitHub alerts with their names. */
-export const alertKinds: Record<AlertKind, string> = {
-  note: 'Note',
-  tip: 'Tip',
-  important: 'Important',
-  warning: 'Warning',
-  caution: 'Caution',
-};
+/** alertKinds are the kinds of GitHub alerts with their names, as the renderer writes them. */
+export const alertKinds = alertTitles;
 
 /**
  * nextFootnoteLabel returns a label for a new footnote: one more than the highest number among the labels of the

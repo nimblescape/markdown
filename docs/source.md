@@ -54,6 +54,16 @@ and inside them only the characters that differ; the line diff of the
 library `diff` finds them. A change of the file from outside has the origin
 `program` with the name `file`.
 
+*(proposal)* **Two changes at the same time.** When two sides change the
+same text at the same time, for example the editor in a webview and the
+text editor of VS Code ([R-VSC-005](platforms.md#r-vsc-005)), the function
+`mergeTexts` of `@nimblescape/markdowntext` merges the two changes: it keeps
+the patches of both against the text before them. A patch that both make
+counts once, and text that both insert at the same place comes in the order
+"theirs, then ours". Where the patches of the two changes overlap, the
+patches of the other side stay and the overlapping patch of the editor is
+dropped, so that the text never holds a part of both.
+
 ## 2. File formats
 
 ### R-SRC-003

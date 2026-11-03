@@ -6,11 +6,13 @@
 # every pull request, on the pinned Node.js release (.node-version). The job
 # installs the locked development tools without install scripts, checks the
 # types, the code style and the licenses of the libraries (licenses.json,
-# R-GEN-011), runs the unit tests, builds the packages of the workspaces and
-# the example page, and packs each package with npm pack (R-ARCH-002). The
-# packages stay a workflow artifact for inspection. This workflow publishes
-# nothing: nothing is published before the release (CONTRIBUTING.md,
-# "Release").
+# R-GEN-011), runs the unit tests, builds the packages of the workspaces, the
+# example page and the example extension for VS Code, and packs each package
+# with npm pack (R-ARCH-002). The packages stay a workflow artifact for
+# inspection. This workflow publishes nothing: the release workflow calls it
+# for the commit of a version and publishes the npm packages of that call. A
+# change of this file changes the release process: its pull request needs a
+# dry run (rule 4 of the release rules in CONTRIBUTING.md).
 
 name: CI
 
@@ -19,6 +21,15 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+  # The release workflow calls this workflow for the commit of a version,
+  # because its push of that commit starts no workflow.
+  workflow_call:
+    inputs:
+      ref:
+        description: The commit to test and package; empty for the commit of the event.
+        type: string
+        required: false
+        default: ''
 
 permissions:
   # Checkout needs repository reads; the checks get no write scope.
@@ -33,6 +44,7 @@ jobs:
       - name: Check out the source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ inputs.ref }}
           persist-credentials: false
 
       - name: Set up the pinned Node release
@@ -61,6 +73,10 @@ jobs:
       # The example page bundles all libraries; its build checks that the packages work in a page.
       - name: Build the example page
         run: node esbuild.mjs --demo
+
+      # The example extension bundles the adapter for VS Code; its build checks that the package works in an extension.
+      - name: Build the example extension for VS Code
+        run: npm run demo:vscode
 
       - name: Build the npm packages
         run: npm run pack

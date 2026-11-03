@@ -1,10 +1,22 @@
 {
   "about": "The license that was decided for each package that the packages of the workspaces need at run time (docs/specification.md, R-GEN-011). npm run licenses checks package-lock.json against this file.",
   "packages": {
+    "@babel/polyfill": {
+      "license": "MIT"
+    },
+    "@babel/runtime": {
+      "license": "MIT"
+    },
     "@cfworker/json-schema": {
       "license": "MIT"
     },
     "@decimalturn/toml-patch": {
+      "license": "MIT"
+    },
+    "@pdf-lib/standard-fonts": {
+      "license": "MIT"
+    },
+    "@pdf-lib/upng": {
       "license": "MIT"
     },
     "@tiptap/core": {
@@ -23,6 +35,9 @@
       "license": "MIT"
     },
     "@tiptap/extension-code-block": {
+      "license": "MIT"
+    },
+    "@tiptap/extension-code-block-lowlight": {
       "license": "MIT"
     },
     "@tiptap/extension-document": {
@@ -88,6 +103,10 @@
     "@tiptap/starter-kit": {
       "license": "MIT"
     },
+    "@types/hast": {
+      "license": "MIT",
+      "note": "The types of the syntax tree of lowlight; it holds no code of a bundle."
+    },
     "@types/linkify-it": {
       "license": "MIT"
     },
@@ -97,12 +116,34 @@
     "@types/mdurl": {
       "license": "MIT"
     },
+    "@types/unist": {
+      "license": "MIT",
+      "note": "The types of the syntax tree of lowlight; it holds no code of a bundle."
+    },
     "ansi-regex": {
       "license": "MIT"
     },
     "argparse": {
       "license": "Python-2.0",
       "note": "Only the command line program of markdown-it uses it; no bundle of the editor holds it."
+    },
+    "clear-cut": {
+      "license": "MIT"
+    },
+    "core-js": {
+      "license": "MIT"
+    },
+    "css-tree": {
+      "license": "MIT"
+    },
+    "d": {
+      "license": "ISC"
+    },
+    "dequal": {
+      "license": "MIT"
+    },
+    "devlop": {
+      "license": "MIT"
     },
     "diff": {
       "license": "BSD-3-Clause"
@@ -111,8 +152,33 @@
       "license": "BSD-2-Clause",
       "note": "markdown-it decodes character references with it; the notices of a bundle hold its license."
     },
+    "es5-ext": {
+      "license": "ISC"
+    },
+    "es6-iterator": {
+      "license": "MIT"
+    },
+    "es6-symbol": {
+      "license": "ISC"
+    },
+    "esniff": {
+      "license": "ISC"
+    },
+    "event-emitter": {
+      "license": "MIT"
+    },
+    "ext": {
+      "license": "ISC"
+    },
     "get-east-asian-width": {
       "license": "MIT"
+    },
+    "highlight.js": {
+      "license": "BSD-3-Clause",
+      "note": "The syntax colors of code blocks, through lowlight; the notices of a bundle hold its license."
+    },
+    "hyphen": {
+      "license": "ISC"
     },
     "jsonc-parser": {
       "license": "MIT"
@@ -121,6 +187,9 @@
       "license": "MIT"
     },
     "linkifyjs": {
+      "license": "MIT"
+    },
+    "lowlight": {
       "license": "MIT"
     },
     "markdown-it": {
@@ -132,10 +201,25 @@
     "markdown-it-task-lists": {
       "license": "ISC"
     },
+    "mdn-data": {
+      "license": "CC0-1.0"
+    },
     "mdurl": {
       "license": "MIT"
     },
+    "next-tick": {
+      "license": "ISC"
+    },
     "orderedmap": {
+      "license": "MIT"
+    },
+    "pagedjs": {
+      "license": "MIT"
+    },
+    "pako": {
+      "license": "(MIT AND Zlib)"
+    },
+    "pdf-lib": {
       "license": "MIT"
     },
     "prosemirror-changeset": {
@@ -183,14 +267,26 @@
     "punycode.js": {
       "license": "MIT"
     },
+    "regenerator-runtime": {
+      "license": "MIT"
+    },
     "rope-sequence": {
       "license": "MIT"
+    },
+    "source-map": {
+      "license": "BSD-3-Clause"
     },
     "string-width": {
       "license": "MIT"
     },
     "strip-ansi": {
       "license": "MIT"
+    },
+    "tslib": {
+      "license": "0BSD"
+    },
+    "type": {
+      "license": "ISC"
     },
     "uc.micro": {
       "license": "MIT"

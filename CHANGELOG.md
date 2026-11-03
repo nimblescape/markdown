@@ -1,0 +1,36 @@
+# Change log
+
+Each section lists the changes of one released version of the npm packages
+of nimblescape Markdown. All packages have the same version. The release
+workflow takes the section of a version as the notes of its GitHub release.
+
+## 0.1.0
+
+The first version of the packages.
+
+- `@nimblescape/markdowntext`: the text of a file as the only truth, with
+  the changes and their origin, the selections of the editors, the changes
+  from outside, and the reading, the edits and the check of a front matter
+  in YAML, TOML or JSON.
+- `@nimblescape/markdownrender`: the renderer of Markdown with markdown-it,
+  as GitHub shows it, with GitHub alerts, footnotes, task lists, the IDs of
+  the headings and plugins of the renderer.
+- `@nimblescape/markdowneditor`: the editor of rendered Markdown, for the web
+  and for the webviews of VS Code. Each block that the user does not change
+  keeps its text byte for byte. It has a toolbar, a format bar, an insert
+  menu, slash commands, block handles, find and replace, tables, a read-only
+  mode, a mode to learn Markdown, a form of the front matter, syntax colors
+  of code blocks, threads beside the text, proposed changes as tracked
+  changes, and version 1 of the plugin API.
+- `@nimblescape/markdownlayout`: layouts with the schema of their front
+  matter, the pages of a document with Paged.js, and the PDF in Node.js.
+- `@nimblescape/markdownvscode`: the adapter for VS Code, a custom text
+  editor with the theme of VS Code and the views "Edit" and "Pages".
+- `@nimblescape/markdownai`: the provider API of an AI, the context of the
+  document, the tool of the proposed changes and the loop of a chat, without
+  a provider of its own.
+
+---
+
+© 2026 Hannes Stauss (scalarion@nimblescape.com) ·
+[MIT License](https://github.com/nimblescape/markdown/blob/main/LICENSE).

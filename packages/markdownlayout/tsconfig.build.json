@@ -1,0 +1,21 @@
+// SPDX-License-Identifier: MIT
+// © 2026 Hannes Stauss (scalarion@nimblescape.com)
+// Licensed under the MIT License. See LICENSE in the repository root for details.
+
+// The declarations of the npm package in dist/; esbuild writes its JavaScript. Without the condition of the sources, a
+// package of the workspaces resolves to the declarations in dist/ of the other package, which its build writes first.
+// The entry point ./pdf runs in Node.js, so the declarations know the types of Node.js.
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "customConditions": [],
+    "rootDir": "src",
+    "outDir": "dist",
+    "types": ["node"]
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["src/**/*.test.ts"]
+}

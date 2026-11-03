@@ -28,7 +28,9 @@ holds the requirements of the module.
 **A course in a repository.** The course module must define the form of the
 files of a course in a Git repository: the README of the course, the README
 of each chapter with its learning objectives, the README of each assignment
-with its requirements, and the feedback file of each assignment. The README
+with its requirements, the feedback file of each assignment, the tutorial
+pages, the walkthroughs, the plan of the course, the cheat sheet, and the
+overviews, the README of a folder that links each of its files. The README
 files must be readable as structured data ([R-COURSE-009](#r-course-009)),
 and each file must tell an AI agent where its rules are
 ([R-COURSE-004](#r-course-004), [R-COURSE-005](#r-course-005)). The module
@@ -43,9 +45,15 @@ in the same form as the nimblescape extensions with an npm package
 ([R-GEN-007](specification.md#r-gen-007)): the repository
 `nimblescape/course-vscode` ([R-ARCH-005](specification.md#r-arch-005)), a
 VS Code extension, and the folder `.course/` for the files that it keeps in
-the repository of a course. *(proposal)* The npm package is
-`@nimblescape/course`, its command is `course`, and the comment of the
-format names the format `nimblescape-course`.
+the repository of a course. The npm package is `@nimblescape/course`, its
+command is `cs`, and the comment of the format names the format
+`nimblescape-course`. Each release publishes both: the VS Code extension on
+the Visual Studio Marketplace and the npm package on npmjs.com; the first
+release is version 0.1.0. The release workflow `release.yml` of
+`nimblescape/course-vscode` publishes the npm package with trusted
+publishing, through the environment `npm`; only the first version of the
+package is published by hand with `scripts/npm-setup.sh`, which also sets
+the trusted publisher.
 
 ### R-COURSE-003
 
@@ -83,17 +91,23 @@ must hold a comment that names the format, like a DOCTYPE, in the same form
 as the comment of the format of Markdown Notes
 ([R-NOTE-007](https://github.com/nimblescape/markdownnotes-vscode/blob/main/docs/requirements.md#r-note-007)):
 
-- *(proposal)* The first line names the format, its version, the kind of
-  the file and the address of the specification:
+- The first line names the format, its version, the kind of the file and
+  the address of the specification:
   `<!-- nimblescape-course v1.0.0 assignment spec=https://github.com/nimblescape/course-vscode/blob/main/docs/format.md`.
-  The kind is `course`, `chapter`, `assignment` or `feedback`.
+  The kind is `course`, `chapter`, `assignment`, `feedback`, `tutorial`,
+  `walkthrough`, `plan` (the plan of the course), `cheat-sheet` or
+  `overview` (the README of a folder that links each of its files). The
+  sections 4 to 13 of `docs/format.md` of `nimblescape/course-vscode` define
+  the form of each kind.
 - Short lines of words follow, which tell an AI agent to print the rules of
   the kind of the file with `npx -y @nimblescape/course instructions <kind>`
   ([R-COURSE-005](#r-course-005)) before it reads, changes or writes the
   file. The last line is `-->`. GitHub and the Markdown preview do not show
   the comment.
-- The comment is the first block of the file, with a blank line after it.
-  The README files of a course have no front matter, because GitHub shows a
+- The comment stands at the start of the file, with a blank line after it.
+  In a README with notes, the comment of the course and the comment of the
+  format of Markdown Notes both stand at the start of the file, in any
+  order. The README files of a course have no front matter, because GitHub shows a
   front matter as a table.
 - The version is a semantic version, with the rules of the version of the
   comment of Markdown Notes: a program writes a comment anew only when its
@@ -102,27 +116,36 @@ as the comment of the format of Markdown Notes
 
 ### R-COURSE-005
 
-**Instructions for AI agents.** `course instructions [topic]` must print the
+**Instructions for AI agents.** `cs instructions [topic]` must print the
 rules of a topic as Markdown; without a topic, it prints the list of the
 topics, in the same way as `mp instructions` of Markdown Paper
 ([R-CLI-003](https://github.com/nimblescape/markdownpaper-vscode/blob/main/docs/requirements.md#r-cli-003)).
-The topics are `course`, `chapter`, `assignment`, `objectives` (the six
-levels of the revised taxonomy with their verbs) and `feedback`. The
+The topics are the kinds of the files ([R-COURSE-004](#r-course-004)) and
+`objectives` (the six levels of the revised taxonomy with their verbs). The
 documents in `docs/` of the repository are the source of the instructions.
-*(proposal)* These instructions replace the copies of the forms in each
-course, today `.github/instructions/objectives.md`,
-`.github/instructions/assignment-readme.md` and
-`.github/instructions/taxonomiestufen-bloom.md` of `majikmate/module-ts-2`.
-A course keeps only its own rules in its repository: its students, its
-language, its conventions and the topics of its chapters. The `AGENTS.md` of
-a course names the commands of the instructions.
+These instructions replace the copies of the forms in each course. A course
+keeps only its own rules in its repository: its students, its language, its
+conventions and the topics of its chapters. They are in
+`.course/instructions/<topic>.md` and `.course/instructions/all.md`, and
+`cs instructions <topic>` prints them after the rules of the format. A
+course has no `AGENTS.md` and no other file of rules for AI agents, because
+the students get the repository by the sync of a template, and the rules
+stay hidden. AI agents run each command of the course module only with npx,
+`npx -y @nimblescape/course <command>`, and never install the package
+globally; the format, the help of the command and the files of each course
+name it only in this form.
 
 **When a course changes to these forms.** A course gets the comment of the
 format ([R-COURSE-004](#r-course-004)) and gives up its copies of the forms in
 one change, together with the course module `nimblescape/course-vscode`, and
 not before: the comment tells an AI agent to run
 `npx -y @nimblescape/course instructions`, and this command exists only with
-the course module.
+the course module. The courses `majikmate/module-ts-2`,
+`majikmate/module-html-css-2`, `majikmate/module-oop-2` and
+`majikmate/module-react-2` change in this way, each in one change: they get
+`.course/course.yml`, the comment of the format in each file and their own
+rules in `.course/instructions/`, and they lose their copies of the forms
+and their files of rules for AI agents.
 
 ## 4. The files of a course
 
@@ -131,13 +154,19 @@ the course module.
 **Sections by role.** Each kind of file has sections with fixed roles. The
 name of a section is in the language of the course, and the module keeps the
 names of each role for each language, for example "Anforderungen" in German
-and "Requirements" in English for the role "requirements". *(proposal)* The
-file `.course/course.yml` holds the settings of a course: `course`, the name
-of the course, for example `ts-2`; `language`, `de` or `en`; and `readme`,
-`chapters` and `assignments`, the patterns of the paths of the README files,
-with `*` and `**`, each a pattern or a list of patterns. The kind in the
-comment of the format of a file wins over the patterns; the patterns find
-the files that have no comment yet.
+and "Requirements" in English for the role "requirements". The file
+`.course/course.yml` holds the settings of a course: `course`, the name of
+the course, for example `ts-2`; `language`, `de` or `en`; and the patterns
+of the paths of the files of each kind, for example `readme`, `chapters` and
+`assignments`, with `*` and `**`, each a pattern or a list of patterns. The course module
+and the feedback program read the name and the language of a course from
+this file. Each README names its kind in its comment of the format
+([R-COURSE-004](#r-course-004)), and the kind in the comment wins over the
+patterns; with the patterns, `cs check` finds the README files that have
+no comment yet. The defaults of the patterns are the folders of the courses
+of majikmate. Only `.course/course.yml` marks a course: a folder without
+this file is no course, also when it has README files at the default paths
+of the patterns, and no program of the module treats it as a course.
 
 ### R-COURSE-007
 
@@ -199,24 +228,25 @@ through this reader, so that no program reads a README by rules of its own.
 *(proposal)* The functions are `readCourse(folder)`,
 `readAssignment(folder)`, `readFeedback(file)`, `checkCourse(folder)` and
 `topicText(topic)`; the package has no dependencies, and its types are
-written by hand. `course read [path]` prints a course, a chapter, an
+written by hand. `cs read [path]` prints a course, a chapter, an
 assignment or a feedback file as JSON, for programs in other languages, for
 example a feedback program in Python.
 
 ### R-COURSE-010
 
-**Checks.** `course check [folder]` must report each place where a file of a
+**Checks.** `cs check [folder]` must report each place where a file of a
 course differs from its form: a missing section, a requirement that is no
 item of the checklist, an objective of an assignment that no chapter table
 has, a level outside K1 to K6, or a missing comment of the format. The
 course extension shows the same checks as warnings in the text editor, after
-a pause in typing. *(proposal)* `course check` prints one line for each
+a pause in typing, only in a course ([R-COURSE-006](#r-course-006)).
+*(proposal)* `cs check` prints one line for each
 problem, `file:line: message [code]`, and ends with the exit code 1 when it
-finds a problem. `course format [--check] [folder]` writes the comment of
+finds a problem. `cs format [--check] [folder]` writes the comment of
 the format into each README that has none or an older version of it, never
 into a feedback file and never into a file with a higher major version;
 with `--check`, it only reports these files. A workflow of the course runs
-`course check` on each pull request.
+`cs check` on each pull request.
 
 ### R-COURSE-011
 
@@ -234,7 +264,11 @@ package that the reflection tool loads.
 
 ### R-COURSE-012
 
-**The course extension.** *(proposal)* The course extension of VS Code shows
+**The course extension.** The course extension of VS Code starts only in a
+workspace that contains `.course/course.yml` (the activation event
+`workspaceContains:.course/course.yml`), not when a Markdown file opens. In
+a folder without this file it shows no view, no warnings and writes no
+comment on save ([R-COURSE-006](#r-course-006)). *(proposal)* It shows
 the structure of a course in the view "Course" of the explorer: its
 chapters, learning objectives, assignments and requirements, each with a
 link to its place in the README. For an assignment, it opens the feedback
@@ -266,7 +300,12 @@ in every language of a course:
 
 The headings and the fixed texts come from the language of the course
 ([R-COURSE-006](#r-course-006)). Only the feedback program writes the file;
-students cannot change it.
+students cannot change it. The form is section 8 of `docs/format.md` of
+`nimblescape/course-vscode`. `cs feedback --form` prints the form of the
+answer of a feedback program, and `cs feedback` writes the feedback file
+from this answer in the form above, with the comment of the format and the
+score. The older feedback files of the courses of majikmate are migrated to
+this form.
 
 ### R-FEED-002
 
@@ -287,39 +326,32 @@ the feedback links to the analysis of the same state of the work.
 
 **The feedback program.** A feedback program must read the README with the
 reader of the module ([R-COURSE-009](#r-course-009)) and write the feedback
-file in the form of [R-FEED-001](#r-feed-001). *(proposal)* The first
-feedback program is `majikmate/course-feedback`
-([R-ARCH-005](specification.md#r-arch-005)): it installs
-`@nimblescape/course` from GitHub at a fixed commit, and it keeps its checks,
-skills, engines and prompts, its own rules of the feedback and the rules of
-each course for the feedback. It must write the comment of the format into
-each feedback file and read the course and its language from
-`.course/course.yml`; until it does, `course check` reports each
-`FEEDBACK.md` without the comment.
+file in the form of [R-FEED-001](#r-feed-001). The feedback program is
+`nimblescape/course-feedback`, a public program of its own
+([R-ARCH-005](specification.md#r-arch-005)). It uses `cs` of the course
+module: `cs read` reads the course, with its name and language from
+`.course/course.yml`; `cs instructions feedback` prints the rules of the
+feedback, the rules of the format and `.course/instructions/feedback.md` of
+the course; `cs feedback --form` prints the form of the answer; and
+`cs feedback` writes `FEEDBACK.md` with the score. The program runs the
+command of the npm package `@nimblescape/course` with npx and installs
+nothing, in the version that `versions.course` of its `config.yml` names;
+for a version that is not on npm, `versions.course` names a commit of
+`nimblescape/course-vscode`, and the program builds and runs that commit.
+It keeps its checks, skills, engines and prompts. The workflow of a course runs the feedback program at
+the tag that `FEEDBACK_VERSION` names, `v1`. The tag `v1` is the version of
+the program that uses the course module, so only a course in the format of
+the module ([R-COURSE-005](#r-course-005)) may use it; the four -2 courses of
+majikmate are in this format.
 
 ## 7. Open questions
 
-1. Names: is `course` the name of the command
-   ([R-COURSE-002](#r-course-002))?
-2. Level of AI use: where does an assignment state the level of AI use that
+1. Level of AI use: where does an assignment state the level of AI use that
    it allows: a line at the head of its README, its chapter, or
    `.course/course.yml` ([R-COURSE-011](#r-course-011))?
-3. Settings: does the language of a course move from `.github/feedback.yml`
-   to `.course/course.yml`, so that the course module and the feedback
-   program read it from one place ([R-COURSE-006](#r-course-006))?
-4. Notes in a README: the format of Markdown Notes wants its comment on the
-   first line of a file. Does a README with notes hold the comment of the
-   course first and the comment of the notes after it, with a new minor
-   version of the format of Markdown Notes ([R-COURSE-004](#r-course-004))?
-5. Integrity: a student can change the history file in `.workhistory/`. Does
+2. Integrity: a student can change the history file in `.workhistory/`. Does
    the course protect it like `FEEDBACK.md`, or does the reflection tool
    check it against the commits ([R-COURSE-003](#r-course-003))?
-6. Feedback program: does `majikmate/course-feedback` stay a program of its
-   own (proposal), or does it become a part of `course-vscode`
-   ([R-FEED-004](#r-feed-004))?
-7. Other files: does the module also define the form of the tutorial pages,
-   the walkthroughs and the cheat sheet, or only the README files of the
-   course, the chapters and the assignments ([R-COURSE-001](#r-course-001))?
 
 ## Sources
 

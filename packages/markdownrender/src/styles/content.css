@@ -1,0 +1,377 @@
+/*
+SPDX-License-Identifier: MIT
+© 2026 Hannes Stauss (scalarion@nimblescape.com)
+Licensed under the MIT License. See LICENSE in the repository root for details.
+*/
+
+/*
+The styles of rendered content (docs/specification.md, R-GEN-010; docs/platforms.md, R-THEME-001, R-THEME-002): the
+text, code, block quotes, tables, lists, images, footnotes and GitHub alerts, for the rendering of the renderer and for
+the text of the editor, so that both look the same. The element that holds the content has the class nsmd-content: the
+element of a rendering, and the text of the editor. Every color and font comes from a token --nsmd-*, which the element
+of the page around the content sets: the editor (nsmd-editor), or the element of a rendering without an editor
+(nsmd-document). On the web, a page sets the tokens for its theme; the defaults below follow the light or dark scheme
+of the browser. The palette of seven colors, --nsmd-color-*, gives the colors of the alerts, of the plugins and of the
+syntax colors of code, --nsmd-syntax-*. In VS
+Code, vscode.css of @nimblescape/markdownvscode sets the tokens from the variables --vscode-* of the theme.
+*/
+
+.nsmd-editor,
+.nsmd-document {
+  --nsmd-background: #ffffff;
+  --nsmd-foreground: #1f2328;
+  --nsmd-muted: #59636e;
+  --nsmd-border: #d1d9e0;
+  --nsmd-code-background: #f6f8fa;
+  --nsmd-link: #0969da;
+  --nsmd-selection: #b6d4fe;
+  --nsmd-raw-background: #f6f8fa;
+  --nsmd-raw-foreground: #59636e;
+  --nsmd-surface: #ffffff;
+  --nsmd-hover: rgba(129, 139, 152, 0.15);
+  --nsmd-active: rgba(9, 105, 218, 0.12);
+  --nsmd-shadow: 0 4px 16px rgba(31, 35, 40, 0.15);
+  --nsmd-mark: #953800;
+  --nsmd-find-match: rgba(212, 167, 44, 0.35);
+  --nsmd-find-current: rgba(255, 145, 0, 0.6);
+  --nsmd-color-gray: #59636e;
+  --nsmd-color-red: #d1242f;
+  --nsmd-color-orange: #bc4c00;
+  --nsmd-color-yellow: #9a6700;
+  --nsmd-color-green: #1a7f37;
+  --nsmd-color-blue: #0969da;
+  --nsmd-color-purple: #8250df;
+  --nsmd-alert-note: var(--nsmd-color-blue);
+  --nsmd-alert-tip: var(--nsmd-color-green);
+  --nsmd-alert-important: var(--nsmd-color-purple);
+  --nsmd-alert-warning: var(--nsmd-color-yellow);
+  --nsmd-alert-caution: var(--nsmd-color-red);
+  --nsmd-syntax-keyword: var(--nsmd-color-red);
+  --nsmd-syntax-string: var(--nsmd-color-green);
+  --nsmd-syntax-constant: var(--nsmd-color-blue);
+  --nsmd-syntax-title: var(--nsmd-color-purple);
+  --nsmd-syntax-type: var(--nsmd-color-orange);
+  --nsmd-syntax-comment: var(--nsmd-muted);
+  --nsmd-font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --nsmd-font-size: 16px;
+  --nsmd-line-height: 1.6;
+  --nsmd-code-font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  .nsmd-editor,
+  .nsmd-document {
+    --nsmd-background: #0d1117;
+    --nsmd-foreground: #e6edf3;
+    --nsmd-muted: #9198a1;
+    --nsmd-border: #3d444d;
+    --nsmd-code-background: #151b23;
+    --nsmd-link: #4493f8;
+    --nsmd-selection: #264f78;
+    --nsmd-raw-background: #151b23;
+    --nsmd-raw-foreground: #9198a1;
+    --nsmd-surface: #151b23;
+    --nsmd-hover: rgba(101, 108, 118, 0.2);
+    --nsmd-active: rgba(68, 147, 248, 0.15);
+    --nsmd-shadow: 0 4px 16px rgba(1, 4, 9, 0.6);
+    --nsmd-mark: #ffa657;
+    --nsmd-find-match: rgba(187, 128, 9, 0.4);
+    --nsmd-find-current: rgba(255, 145, 0, 0.6);
+    --nsmd-color-gray: #9198a1;
+    --nsmd-color-red: #f85149;
+    --nsmd-color-orange: #db6d28;
+    --nsmd-color-yellow: #d29922;
+    --nsmd-color-green: #3fb950;
+    --nsmd-color-blue: #4493f8;
+    --nsmd-color-purple: #ab7df8;
+  }
+}
+
+.nsmd-content {
+  background: var(--nsmd-background);
+  color: var(--nsmd-foreground);
+  font-family: var(--nsmd-font-family);
+  font-size: var(--nsmd-font-size);
+  line-height: var(--nsmd-line-height);
+  word-wrap: break-word;
+}
+
+.nsmd-content a {
+  color: var(--nsmd-link);
+}
+
+.nsmd-content code,
+.nsmd-content pre {
+  font-family: var(--nsmd-code-font-family);
+  font-size: 0.875em;
+  background: var(--nsmd-code-background);
+  border-radius: 6px;
+}
+
+.nsmd-content code {
+  padding: 0.15em 0.35em;
+}
+
+.nsmd-content pre {
+  padding: 0.75em 1em;
+  overflow-x: auto;
+}
+
+.nsmd-content pre code {
+  padding: 0;
+  background: none;
+}
+
+/*
+The syntax colors of code (docs/editor.md, R-EDIT-003): the classes hljs-* of highlight.js, each on a token of a code
+block with a language, in six roles.
+*/
+.nsmd-content pre :is(.hljs-keyword, .hljs-selector-tag, .hljs-template-tag, .hljs-doctag, .hljs-deletion) {
+  color: var(--nsmd-syntax-keyword);
+}
+
+.nsmd-content pre :is(.hljs-string, .hljs-regexp, .hljs-char, .hljs-addition) {
+  color: var(--nsmd-syntax-string);
+}
+
+.nsmd-content
+  pre
+  :is(
+    .hljs-number,
+    .hljs-literal,
+    .hljs-symbol,
+    .hljs-attr,
+    .hljs-attribute,
+    .hljs-property,
+    .hljs-selector-id,
+    .hljs-selector-class,
+    .hljs-selector-attr,
+    .hljs-selector-pseudo,
+    .hljs-link,
+    .hljs-code
+  ) {
+  color: var(--nsmd-syntax-constant);
+}
+
+.nsmd-content pre :is(.hljs-title, .hljs-section, .hljs-name) {
+  color: var(--nsmd-syntax-title);
+}
+
+.nsmd-content pre :is(.hljs-built_in, .hljs-type, .hljs-variable, .hljs-template-variable, .hljs-bullet) {
+  color: var(--nsmd-syntax-type);
+}
+
+.nsmd-content pre :is(.hljs-comment, .hljs-quote, .hljs-meta) {
+  color: var(--nsmd-syntax-comment);
+}
+
+.nsmd-content pre .hljs-emphasis {
+  font-style: italic;
+}
+
+.nsmd-content pre .hljs-strong {
+  font-weight: 600;
+}
+
+.nsmd-content blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--nsmd-muted);
+  border-left: 0.25em solid var(--nsmd-border);
+}
+
+.nsmd-content hr {
+  border: none;
+  border-top: 1px solid var(--nsmd-border);
+  margin: 1.5em 0;
+}
+
+.nsmd-content table {
+  border-collapse: collapse;
+  margin: 0 0 1em;
+}
+
+.nsmd-content th,
+.nsmd-content td {
+  border: 1px solid var(--nsmd-border);
+  padding: 0.35em 0.75em;
+  vertical-align: top;
+}
+
+.nsmd-content th > p,
+.nsmd-content td > p {
+  margin: 0;
+}
+
+/* The comment of the widths of the columns gives a table the whole width and fixed columns (R-EDIT-010). */
+.nsmd-content table.nsmd-table-fixed,
+.nsmd-content .nsmd-table-fixed table {
+  table-layout: fixed;
+  width: 100% !important;
+}
+
+/* The comment of the color of a cell (R-EDIT-010). */
+.nsmd-content td[data-color='gray'],
+.nsmd-content th[data-color='gray'] {
+  background: rgba(129, 139, 152, 0.18);
+}
+
+.nsmd-content td[data-color='red'],
+.nsmd-content th[data-color='red'] {
+  background: rgba(209, 36, 47, 0.14);
+}
+
+.nsmd-content td[data-color='orange'],
+.nsmd-content th[data-color='orange'] {
+  background: rgba(219, 109, 40, 0.16);
+}
+
+.nsmd-content td[data-color='yellow'],
+.nsmd-content th[data-color='yellow'] {
+  background: rgba(212, 167, 44, 0.22);
+}
+
+.nsmd-content td[data-color='green'],
+.nsmd-content th[data-color='green'] {
+  background: rgba(26, 127, 55, 0.14);
+}
+
+.nsmd-content td[data-color='blue'],
+.nsmd-content th[data-color='blue'] {
+  background: rgba(9, 105, 218, 0.14);
+}
+
+.nsmd-content td[data-color='purple'],
+.nsmd-content th[data-color='purple'] {
+  background: rgba(130, 80, 223, 0.14);
+}
+
+/* The items of a tight list stand closer, as in the preview of the file. */
+.nsmd-content ul[data-tight] > li > p,
+.nsmd-content ol[data-tight] > li > p,
+.nsmd-content ul[data-tight] > li > div > p {
+  margin: 0;
+}
+
+/* Task lists: in the editor, a list of the type taskList; in a rendering, the HTML of markdown-it-task-lists. */
+.nsmd-content ul[data-type='taskList'],
+.nsmd-content ul.contains-task-list {
+  list-style: none;
+  padding-left: 0.5em;
+}
+
+.nsmd-content ul[data-type='taskList'] li {
+  display: flex;
+  gap: 0.5em;
+}
+
+.nsmd-content ul[data-type='taskList'] li > div {
+  flex: 1;
+}
+
+.nsmd-content .task-list-item-checkbox {
+  margin: 0 0.5em 0 0;
+}
+
+.nsmd-content img {
+  max-width: 100%;
+}
+
+/* Raw text: HTML of the file that shows as its text, until a plugin shows it its own way. */
+.nsmd-content .nsmd-raw {
+  color: var(--nsmd-raw-foreground);
+  background: var(--nsmd-raw-background);
+  font-family: var(--nsmd-code-font-family);
+  font-size: 0.8em;
+  white-space: pre-wrap;
+}
+
+.nsmd-content span.nsmd-raw {
+  padding: 0 0.25em;
+  border-radius: 4px;
+}
+
+/* Footnotes: in the editor, each definition in its place; in a rendering, the list of markdown-it-footnote at the end. */
+.nsmd-content .nsmd-footnote {
+  display: flex;
+  gap: 0.5em;
+  font-size: 0.9em;
+  color: var(--nsmd-muted);
+}
+
+.nsmd-content .nsmd-footnote::before {
+  content: '[^' attr(data-label) ']:';
+  font-family: var(--nsmd-code-font-family);
+}
+
+.nsmd-content .nsmd-footnote-reference,
+.nsmd-content .footnote-ref {
+  color: var(--nsmd-link);
+  font-size: 0.75em;
+}
+
+.nsmd-content .footnotes-sep {
+  margin: 2em 0 1em;
+}
+
+.nsmd-content .footnotes {
+  font-size: 0.9em;
+  color: var(--nsmd-muted);
+}
+
+/*
+GitHub alerts (R-EDIT-003): the color of the kind, and its name on a line of its own, as on GitHub. In the editor, the
+block quote of the alert has the class nsmd-alert; in a rendering, the element of the alert is the one that GitHub writes,
+.markdown-alert with its title .markdown-alert-title.
+*/
+.nsmd-content .nsmd-alert-note,
+.nsmd-content .markdown-alert-note {
+  --nsmd-alert-color: var(--nsmd-alert-note);
+}
+
+.nsmd-content .nsmd-alert-tip,
+.nsmd-content .markdown-alert-tip {
+  --nsmd-alert-color: var(--nsmd-alert-tip);
+}
+
+.nsmd-content .nsmd-alert-important,
+.nsmd-content .markdown-alert-important {
+  --nsmd-alert-color: var(--nsmd-alert-important);
+}
+
+.nsmd-content .nsmd-alert-warning,
+.nsmd-content .markdown-alert-warning {
+  --nsmd-alert-color: var(--nsmd-alert-warning);
+}
+
+.nsmd-content .nsmd-alert-caution,
+.nsmd-content .markdown-alert-caution {
+  --nsmd-alert-color: var(--nsmd-alert-caution);
+}
+
+.nsmd-content blockquote.nsmd-alert {
+  color: var(--nsmd-foreground);
+  border-left-color: var(--nsmd-alert-color);
+}
+
+.nsmd-content .markdown-alert {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  border-left: 0.25em solid var(--nsmd-alert-color);
+}
+
+.nsmd-content .markdown-alert-title {
+  margin: 0;
+  color: var(--nsmd-alert-color);
+  font-weight: 600;
+}
+
+/* The text of an alert starts on the line after its title, as in the editor. */
+.nsmd-content .markdown-alert-title + * {
+  margin-top: 0;
+}
+
+/* A token that a plugin could not show shows its text. */
+.nsmd-content .nsmd-render-error {
+  color: var(--nsmd-alert-caution);
+}
