@@ -51,15 +51,20 @@ takes; the editor keeps it as one unit with its text. Its view shows the
 rendering: the HTML of markdown-it with the syntax of the plugins, and the
 function `render` of a plugin for each kind of token that the plugin shows.
 Raw HTML of the file shows as its text in the rendering, as in the rest of
-the editor. The source opens in a field below the rendering, and each
-change of the source shows in the rendering; leaving the field or Ctrl+Enter
-keeps the new text, Escape restores the text. The editor parses the new text
-in its place in the file, so that it may become other blocks, in one step of
-undo. A block without a rendering, for example the definitions of link
-references, and a block of HTML show their text, and the field takes the
-place of the text. A code block that the user writes with a language that a
-plugin shows becomes such a unit when the cursor leaves it. In the mode to
-learn Markdown, the text of a unit shows below its rendering.
+the editor. The editor parses the new text of a block in its place in the
+file, so that it may become other blocks, in one step of undo. A block
+without a rendering, for example the definitions of link references, and a
+block of HTML show their text. A code block that the user writes with a
+language that a plugin shows becomes such a unit when the cursor leaves it.
+In the mode to learn Markdown, the text of a unit shows below its rendering.
+
+The user switches a block of the level "render" between its rendering and
+its source; the two never show at the same time. A double click or the
+button "Edit source" shows the source in a field in the place of the
+rendering. Leaving the field, Ctrl+Enter (Cmd+Enter on macOS) or the button
+"Show rendering" keeps the new text and shows the rendering again; Escape
+restores the text and shows the rendering. A block without a rendering
+switches between its text and the field in the same way.
 
 ### R-PLUGIN-001
 
@@ -171,8 +176,6 @@ the reference list and the generated lists.
    (proposal: yes); the values of the front matter in the text in the
    libraries (proposal: yes); the form of the front matter replaces the view
    "Front Matter" of Paper (proposal: yes).
-2. Level "render": does the source of a block of the level "render" open
-   below its rendering (proposal) or in its place ([R-GEN-012](#r-gen-012))?
 
 ---
 

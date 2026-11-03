@@ -7,11 +7,12 @@
 // its text byte for byte as one unit. The view of such a block shows its rendering by the renderer of the editor, the
 // renderer of @nimblescape/markdownrender with the plugins of the editor (docs/specification.md, R-GEN-010): the HTML of
 // markdown-it, and the function `render` of a plugin for each kind of token that the plugin shows. Raw HTML of the file
-// shows as its text, as in the rest of the editor. The user changes the block through its source: a double
-// click or the button "Edit source" opens a field with the text of the block below the rendering, which shows each
-// change; leaving the field or Ctrl+Enter keeps the text, and Escape restores it. The editor then parses the block again.
-// A raw block without a rendering, for example the definitions of link references, and a block of HTML show their text,
-// and the field takes the place of the text.
+// shows as its text, as in the rest of the editor. The user switches the block between its rendering and its source,
+// and the two never show at the same time: a double click or the button "Edit source" shows a field with the text of the
+// block in the place of the rendering; leaving the field, Ctrl+Enter (Cmd+Enter on macOS) or the button "Show rendering"
+// keeps the text and shows the rendering again, and Escape restores the text and shows the rendering. The editor then
+// parses the block again. A raw block without a rendering, for example the definitions of link references, and a block of
+// HTML show their text, and the field takes the place of the text in the same way.
 
 import type { Node } from '@tiptap/pm/model';
 import { Plugin } from '@tiptap/pm/state';
@@ -42,9 +43,12 @@ class SourceView implements NodeView {
   readonly dom: HTMLElement;
   private readonly shown: HTMLElement;
   private readonly sourceText: HTMLElement;
+  private readonly done: HTMLButtonElement;
   private field: HTMLTextAreaElement | undefined;
+  private close: ((keep: boolean) => void) | undefined;
+  /** stale is true when the text of the block changed while its field was open, so its rendering is old. */
+  private stale = false;
   private stopRender: () => void = () => undefined;
-  private timer: ReturnType<typeof setTimeout> | undefined;
 
   constructor(
     private node: Node,
@@ -58,7 +62,11 @@ class SourceView implements NodeView {
     this.sourceText = element('pre', { class: `nsmd-raw nsmd-raw-${kind} nsmd-unit-source`, 'aria-hidden': 'true' });
     const edit = button('Edit source', icon('source'), () => this.open());
     edit.classList.add('nsmd-unit-edit');
-    this.dom = element('div', { class: `nsmd-unit nsmd-unit-${kind}` }, this.shown, this.sourceText, edit);
+    // The button that shows the rendering again while the field is open; a button keeps the focus in the field on its
+    // mousedown, so the field stays open until the click. show() gives it its name.
+    this.done = button('Show rendering', icon('read'), () => this.close?.(true));
+    this.done.classList.add('nsmd-unit-done');
+    this.dom = element('div', { class: `nsmd-unit nsmd-unit-${kind}` }, this.shown, this.sourceText, edit, this.done);
     this.dom.addEventListener('dblclick', (event) => {
       if (!this.field && this.view.editable) {
         event.preventDefault();
@@ -74,6 +82,9 @@ class SourceView implements NodeView {
     this.stopRender = () => undefined;
     const rendered = isRendered(this.node);
     this.dom.classList.toggle('nsmd-unit-rendered', rendered);
+    const label = rendered ? 'Show rendering' : 'Show text';
+    this.done.title = label;
+    this.done.setAttribute('aria-label', label);
     this.sourceText.textContent = rendered ? text : '';
     if (rendered) {
       this.shown.className = 'nsmd-unit-view nsmd-rendered';
@@ -84,7 +95,7 @@ class SourceView implements NodeView {
     }
   }
 
-  /** open opens the field of the source of the block. */
+  /** open shows the field of the source of the block in the place of its rendering. */
   private open(): void {
     if (this.field || !this.view.editable) {
       return;
@@ -95,19 +106,22 @@ class SourceView implements NodeView {
     field.rows = Math.max(2, original.split('\n').length + 1);
     this.field = field;
     this.dom.classList.add('nsmd-unit-editing');
-    this.dom.append(field);
+    this.shown.after(field);
     let done = false;
     const close = (keep: boolean) => {
       if (done) {
         return;
       }
       done = true;
-      clearTimeout(this.timer);
       const text = field.value;
       this.field = undefined;
+      this.close = undefined;
       field.remove();
       this.dom.classList.remove('nsmd-unit-editing');
-      this.show(original);
+      if (this.stale) {
+        this.stale = false;
+        this.show(sourceOf(this.node));
+      }
       const pos = this.getPos();
       if (keep && text !== original && pos !== undefined) {
         this.host.commit(pos, text);
@@ -115,12 +129,9 @@ class SourceView implements NodeView {
         this.view.focus();
       }
     };
+    this.close = close;
     field.addEventListener('input', () => {
       field.rows = Math.max(2, field.value.split('\n').length + 1);
-      if (isRendered(this.node)) {
-        clearTimeout(this.timer);
-        this.timer = setTimeout(() => this.show(field.value), 250);
-      }
     });
     field.addEventListener('keydown', (event) => {
       if (event.key === 'Escape') {
@@ -141,7 +152,9 @@ class SourceView implements NodeView {
     }
     const changed = node.attrs !== this.node.attrs && sourceOf(node) !== sourceOf(this.node);
     this.node = node;
-    if (changed && !this.field) {
+    if (changed && this.field) {
+      this.stale = true;
+    } else if (changed) {
       this.show(sourceOf(node));
     }
     return true;
@@ -157,7 +170,10 @@ class SourceView implements NodeView {
 
   stopEvent(event: Event): boolean {
     const target = event.target;
-    return target instanceof globalThis.Node && (this.field?.contains(target) === true || (target instanceof Element && target.closest('.nsmd-unit-edit') !== null));
+    return (
+      target instanceof globalThis.Node &&
+      (this.field?.contains(target) === true || (target instanceof Element && target.closest('.nsmd-unit-edit, .nsmd-unit-done') !== null))
+    );
   }
 
   ignoreMutation(): boolean {
@@ -165,7 +181,6 @@ class SourceView implements NodeView {
   }
 
   destroy(): void {
-    clearTimeout(this.timer);
     this.stopRender();
   }
 }

@@ -227,15 +227,19 @@ describe('the level "render"', () => {
     expect(editor.getMarkdown()).toBe(text.replace('# Title', '# TiNew tle'));
   });
 
-  it('changes a block through its source below the rendering, in one step of Undo', () => {
+  it('switches a block to its source in the place of the rendering, and changes it in one step of Undo', () => {
     const editor = open(text, [math()]);
     const unit = element.querySelector<HTMLElement>('.nsmd-unit-rendered')!;
     unit.dispatchEvent(new MouseEvent('dblclick', { bubbles: true }));
     const field = unit.querySelector('textarea')!;
     expect(field.value).toBe('$$\nx^2\n$$');
-    // The rendering stays above the field.
-    expect(unit.querySelector('.nsmd-unit-view .math')).not.toBeNull();
+    // The field takes the place of the rendering, which the style sheet hides while the field is open.
+    expect(unit.classList.contains('nsmd-unit-editing')).toBe(true);
+    expect(field.previousElementSibling?.classList.contains('nsmd-unit-view')).toBe(true);
     field.value = '$$\ny^3\n$$';
+    field.dispatchEvent(new Event('input'));
+    // The hidden rendering does not follow the typing.
+    expect(unit.querySelector('.math')?.textContent).toBe('math(x^2)');
     field.dispatchEvent(new FocusEvent('blur'));
     expect(editor.getMarkdown()).toBe(text.replace('x^2', 'y^3'));
     expect(element.querySelector('.math')?.textContent).toBe('math(y^3)');
@@ -253,6 +257,20 @@ describe('the level "render"', () => {
     expect(editor.getMarkdown()).toBe(text.replace('$$\nx^2\n$$', 'A paragraph\n\n- an item'));
     expect(editor.tiptap.state.doc.child(1).type.name).toBe('paragraph');
     expect(editor.tiptap.state.doc.child(2).type.name).toBe('bulletList');
+  });
+
+  it('keeps the new source and shows the rendering again with the button "Show rendering"', () => {
+    const editor = open(text, [math()]);
+    const unit = element.querySelector<HTMLElement>('.nsmd-unit-rendered')!;
+    unit.querySelector<HTMLButtonElement>('.nsmd-unit-edit')!.click();
+    const done = unit.querySelector<HTMLButtonElement>('.nsmd-unit-done')!;
+    expect(done.getAttribute('aria-label')).toBe('Show rendering');
+    unit.querySelector('textarea')!.value = '$$\nz\n$$';
+    done.click();
+    expect(editor.getMarkdown()).toBe(text.replace('x^2', 'z'));
+    expect(element.querySelector('textarea')).toBeNull();
+    expect(element.querySelector('.nsmd-unit-editing')).toBeNull();
+    expect(element.querySelector('.math')?.textContent).toBe('math(z)');
   });
 
   it('restores the source with Escape', () => {

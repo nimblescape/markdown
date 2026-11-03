@@ -216,9 +216,10 @@ and `markdown.previewScripts`.
   renderer without these plugins. A block whose HTML differs becomes a block
   of the level "render" ([R-GEN-012](plugins.md#r-gen-012)), for example a
   code block `mermaid`, math between `$$` or a container `:::`. Its
-  rendering is the HTML of markdown-it with these plugins, and its source
-  opens below it. The policy of the page stays the same, so a script inside
-  this HTML does not run.
+  rendering is the HTML of markdown-it with these plugins, and the user
+  switches between this rendering and its source, which never show at the
+  same time ([R-GEN-012](plugins.md#r-gen-012)). The policy of the page
+  stays the same, so a script inside this HTML does not run.
 - Only blocks: a paragraph, a heading, a list and a table always stay
   blocks of the editor. A code block stays a code block of the editor, with
   the syntax colors of the editor, when its HTML with these plugins is still
