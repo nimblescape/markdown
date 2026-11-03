@@ -11,8 +11,8 @@ their documents stay in this repository until each has a repository of its
 own.
 
 [docs/specification.md](docs/specification.md) is the normative
-specification: the scope, the architecture, the open questions and the plan
-of the steps, with the documents of the parts, for example
+specification: the scope, the architecture and the open questions, with the
+documents of the parts, for example
 [docs/editor.md](docs/editor.md) and [docs/history.md](docs/history.md).
 The first steps are built: the npm workspaces; the source of a file, with
 its changes and their origin, which several editors share; the core, which
@@ -34,7 +34,7 @@ with the proposed changes as tracked changes.
 The repository holds one npm package for each part, as npm workspaces in
 `packages/`
 ([R-ARCH-002](docs/specification.md#r-arch-002)). The other parts get their
-packages with their steps of the plan.
+packages with their steps of the [plan](docs/plan.md).
 
 | Package | Part |
 | --- | --- |

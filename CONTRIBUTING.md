@@ -10,7 +10,7 @@ This guide explains the files, the development, the tests and the use of the
 npm packages of nimblescape Markdown before their release.
 [docs/specification.md](docs/specification.md) is the normative
 specification: what the libraries must, should and may do, each requirement
-with an ID, the open questions and the plan of the steps. It gives the scope
+with an ID, and the open questions. It gives the scope
 and the architecture, and its section "Documents" lists the documents of
 the parts, for example [docs/editor.md](docs/editor.md),
 [docs/history.md](docs/history.md) and, for the reflection tool, which
