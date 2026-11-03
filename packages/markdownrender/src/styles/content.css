@@ -11,7 +11,8 @@ the text of the editor, so that both look the same. The element that holds the c
 element of a rendering, and the text of the editor. Every color and font comes from a token --nsmd-*, which the element
 of the page around the content sets: the editor (nsmd-editor), or the element of a rendering without an editor
 (nsmd-document). On the web, a page sets the tokens for its theme; the defaults below follow the light or dark scheme
-of the browser. The palette of seven colors, --nsmd-color-*, gives the colors of the alerts and of the plugins. In VS
+of the browser. The palette of seven colors, --nsmd-color-*, gives the colors of the alerts, of the plugins and of the
+syntax colors of code, --nsmd-syntax-*. In VS
 Code, vscode.css of @nimblescape/markdownvscode sets the tokens from the variables --vscode-* of the theme.
 */
 
@@ -45,6 +46,12 @@ Code, vscode.css of @nimblescape/markdownvscode sets the tokens from the variabl
   --nsmd-alert-important: var(--nsmd-color-purple);
   --nsmd-alert-warning: var(--nsmd-color-yellow);
   --nsmd-alert-caution: var(--nsmd-color-red);
+  --nsmd-syntax-keyword: var(--nsmd-color-red);
+  --nsmd-syntax-string: var(--nsmd-color-green);
+  --nsmd-syntax-constant: var(--nsmd-color-blue);
+  --nsmd-syntax-title: var(--nsmd-color-purple);
+  --nsmd-syntax-type: var(--nsmd-color-orange);
+  --nsmd-syntax-comment: var(--nsmd-muted);
   --nsmd-font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
   --nsmd-font-size: 16px;
   --nsmd-line-height: 1.6;
@@ -113,6 +120,57 @@ Code, vscode.css of @nimblescape/markdownvscode sets the tokens from the variabl
 .nsmd-content pre code {
   padding: 0;
   background: none;
+}
+
+/*
+The syntax colors of code (docs/editor.md, R-EDIT-003): the classes hljs-* of highlight.js, each on a token of a code
+block with a language, in six roles.
+*/
+.nsmd-content pre :is(.hljs-keyword, .hljs-selector-tag, .hljs-template-tag, .hljs-doctag, .hljs-deletion) {
+  color: var(--nsmd-syntax-keyword);
+}
+
+.nsmd-content pre :is(.hljs-string, .hljs-regexp, .hljs-char, .hljs-addition) {
+  color: var(--nsmd-syntax-string);
+}
+
+.nsmd-content
+  pre
+  :is(
+    .hljs-number,
+    .hljs-literal,
+    .hljs-symbol,
+    .hljs-attr,
+    .hljs-attribute,
+    .hljs-property,
+    .hljs-selector-id,
+    .hljs-selector-class,
+    .hljs-selector-attr,
+    .hljs-selector-pseudo,
+    .hljs-link,
+    .hljs-code
+  ) {
+  color: var(--nsmd-syntax-constant);
+}
+
+.nsmd-content pre :is(.hljs-title, .hljs-section, .hljs-name) {
+  color: var(--nsmd-syntax-title);
+}
+
+.nsmd-content pre :is(.hljs-built_in, .hljs-type, .hljs-variable, .hljs-template-variable, .hljs-bullet) {
+  color: var(--nsmd-syntax-type);
+}
+
+.nsmd-content pre :is(.hljs-comment, .hljs-quote, .hljs-meta) {
+  color: var(--nsmd-syntax-comment);
+}
+
+.nsmd-content pre .hljs-emphasis {
+  font-style: italic;
+}
+
+.nsmd-content pre .hljs-strong {
+  font-weight: 600;
 }
 
 .nsmd-content blockquote {

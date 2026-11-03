@@ -220,6 +220,11 @@ folders of the extension ([R-VSC-007](platforms.md#r-vsc-007)).
    integrating code bundles with the same plugins as its renderer, whose
    functions get a copy of the data of their tokens
    ([R-LAYOUT-002](#r-layout-002), proposal)?
+5. Syntax colors: does the renderer also give the syntax colors of code
+   blocks of the editor ([R-EDIT-003](editor.md#r-edit-003)), so that the
+   view "Pages" and the PDF show them, and a layout that wants code without
+   colors sets the variables `--nsmd-syntax-*` to the color of the text
+   (proposal: yes)?
 
 ---
 

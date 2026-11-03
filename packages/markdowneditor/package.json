@@ -55,6 +55,7 @@
     "@tiptap/extension-bold": "^3.32.2",
     "@tiptap/extension-code": "^3.32.2",
     "@tiptap/extension-code-block": "^3.32.2",
+    "@tiptap/extension-code-block-lowlight": "^3.32.2",
     "@tiptap/extension-horizontal-rule": "^3.32.2",
     "@tiptap/extension-image": "^3.32.2",
     "@tiptap/extension-italic": "^3.32.2",
@@ -67,6 +68,8 @@
     "@tiptap/starter-kit": "^3.32.2",
     "@types/markdown-it": "^14.2.0",
     "diff": "^9.0.0",
+    "highlight.js": "~11.11.1",
+    "lowlight": "^3.3.0",
     "markdown-it": "^14.3.3",
     "prosemirror-markdown": "^1.13.9",
     "string-width": "^8.3.0"
