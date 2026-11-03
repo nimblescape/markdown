@@ -63,7 +63,13 @@ support CommonMark and GFM: headings, emphasis, strikethrough, links,
 autolinks, images, lists, task lists, quotes, GitHub alerts (`> [!NOTE]`),
 code blocks with syntax colors, tables and thematic breaks; standard
 footnotes; the front matter; HTML and comments as raw parts that keep their
-text.
+text. The syntax colors of code blocks come from highlight.js through
+lowlight, with the common languages of highlight.js. *(proposal)* A code
+block without a language that highlight.js knows has no colors, as on
+GitHub. The colors come from six variables `--nsmd-syntax-*` (keyword,
+string, constant, title, type, comment), which take the palette of seven
+colors of the theme ([R-THEME-001](platforms.md#r-theme-001)), so that they
+follow the light and the dark theme and the theme of VS Code.
 
 ### R-GEN-009
 

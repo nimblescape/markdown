@@ -83,8 +83,8 @@ must hold a comment that names the format, like a DOCTYPE, in the same form
 as the comment of the format of Markdown Notes
 ([R-NOTE-007](https://github.com/nimblescape/markdownnotes-vscode/blob/main/docs/requirements.md#r-note-007)):
 
-- *(proposal)* The first line names the format, its version, the kind of
-  the file and the address of the specification:
+- The first line names the format, its version, the kind of the file and
+  the address of the specification:
   `<!-- nimblescape-course v1.0.0 assignment spec=https://github.com/nimblescape/course-vscode/blob/main/docs/format.md`.
   The kind is `course`, `chapter`, `assignment` or `feedback`.
 - Short lines of words follow, which tell an AI agent to print the rules of
@@ -92,8 +92,10 @@ as the comment of the format of Markdown Notes
   ([R-COURSE-005](#r-course-005)) before it reads, changes or writes the
   file. The last line is `-->`. GitHub and the Markdown preview do not show
   the comment.
-- The comment is the first block of the file, with a blank line after it.
-  The README files of a course have no front matter, because GitHub shows a
+- The comment stands at the start of the file, with a blank line after it.
+  In a README with notes, the comment of the course and the comment of the
+  format of Markdown Notes both stand at the start of the file, in any
+  order. The README files of a course have no front matter, because GitHub shows a
   front matter as a table.
 - The version is a semantic version, with the rules of the version of the
   comment of Markdown Notes: a program writes a comment anew only when its
@@ -131,13 +133,17 @@ the course module.
 **Sections by role.** Each kind of file has sections with fixed roles. The
 name of a section is in the language of the course, and the module keeps the
 names of each role for each language, for example "Anforderungen" in German
-and "Requirements" in English for the role "requirements". *(proposal)* The
-file `.course/course.yml` holds the settings of a course: `course`, the name
-of the course, for example `ts-2`; `language`, `de` or `en`; and `readme`,
+and "Requirements" in English for the role "requirements". The file
+`.course/course.yml` holds the settings of a course: `course`, the name of
+the course, for example `ts-2`; `language`, `de` or `en`; and `readme`,
 `chapters` and `assignments`, the patterns of the paths of the README files,
-with `*` and `**`, each a pattern or a list of patterns. The kind in the
-comment of the format of a file wins over the patterns; the patterns find
-the files that have no comment yet.
+with `*` and `**`, each a pattern or a list of patterns. The course module
+and the feedback program read the name and the language of a course from
+this file. Each README names its kind in its comment of the format
+([R-COURSE-004](#r-course-004)), and the kind in the comment wins over the
+patterns; with the patterns, `course check` finds the README files that have
+no comment yet. The defaults of the patterns are the folders of the courses
+of majikmate.
 
 ### R-COURSE-007
 
@@ -304,20 +310,13 @@ each feedback file and read the course and its language from
 2. Level of AI use: where does an assignment state the level of AI use that
    it allows: a line at the head of its README, its chapter, or
    `.course/course.yml` ([R-COURSE-011](#r-course-011))?
-3. Settings: does the language of a course move from `.github/feedback.yml`
-   to `.course/course.yml`, so that the course module and the feedback
-   program read it from one place ([R-COURSE-006](#r-course-006))?
-4. Notes in a README: the format of Markdown Notes wants its comment on the
-   first line of a file. Does a README with notes hold the comment of the
-   course first and the comment of the notes after it, with a new minor
-   version of the format of Markdown Notes ([R-COURSE-004](#r-course-004))?
-5. Integrity: a student can change the history file in `.workhistory/`. Does
+3. Integrity: a student can change the history file in `.workhistory/`. Does
    the course protect it like `FEEDBACK.md`, or does the reflection tool
    check it against the commits ([R-COURSE-003](#r-course-003))?
-6. Feedback program: does `majikmate/course-feedback` stay a program of its
+4. Feedback program: does `majikmate/course-feedback` stay a program of its
    own (proposal), or does it become a part of `course-vscode`
    ([R-FEED-004](#r-feed-004))?
-7. Other files: does the module also define the form of the tutorial pages,
+5. Other files: does the module also define the form of the tutorial pages,
    the walkthroughs and the cheat sheet, or only the README files of the
    course, the chapters and the assignments ([R-COURSE-001](#r-course-001))?
 

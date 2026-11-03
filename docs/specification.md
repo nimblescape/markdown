@@ -304,6 +304,8 @@ use:
 | `markdown-it-task-lists` | ISC | Task lists |
 | `prosemirror-markdown` | MIT | The bridge between the tokens of markdown-it and the document of the editor |
 | `string-width` | MIT | The width of the cells of a table |
+| `lowlight`, `@tiptap/extension-code-block-lowlight` | MIT | The syntax colors of code blocks in the editor ([R-EDIT-003](editor.md#r-edit-003)); `lowlight` uses `devlop` and `dequal` (MIT) |
+| `highlight.js` | BSD-3-Clause | The languages of the syntax colors, through `lowlight` ([R-EDIT-003](editor.md#r-edit-003)) |
 | `yaml` *(proposal)* | ISC | The front matter in YAML ([R-FM-005](editor.md#r-fm-005)) |
 | `@decimalturn/toml-patch` *(proposal)* | MIT | The front matter in TOML ([R-FM-005](editor.md#r-fm-005)) |
 | `jsonc-parser` *(proposal)* | MIT | The front matter in JSON, also with comments ([R-FM-005](editor.md#r-fm-005)) |
@@ -359,7 +361,7 @@ the [platforms](platforms.md#6-open-questions).
 | --- | --- | --- | --- |
 | 1 | Setup of the repository: the npm package, an example page for the web, CI with a check of the licenses | [R-GEN-007](#r-gen-007), [R-GEN-011](#r-gen-011) | built |
 | 2 | The core on ProseMirror: Markdown into the document of the editor and back, with tests of the round trip | [R-GEN-009](editor.md#r-gen-009), [R-SRC-003](source.md#r-src-003), [R-EDIT-004](editor.md#r-edit-004) to [R-EDIT-006](editor.md#r-edit-006) | built |
-| 3 | Rendered editing of CommonMark and GFM: toolbar, format bar, insert menu, slash menu, block handles, find and replace, read-only mode, the mode to learn Markdown | [R-EDIT-003](editor.md#r-edit-003), [R-GEN-003](editor.md#r-gen-003), [R-EDIT-007](editor.md#r-edit-007), [R-GEN-008](editor.md#r-gen-008), [R-GEN-013](editor.md#r-gen-013) | built, without the syntax colors of code blocks |
+| 3 | Rendered editing of CommonMark and GFM: toolbar, format bar, insert menu, slash menu, block handles, find and replace, read-only mode, the mode to learn Markdown | [R-EDIT-003](editor.md#r-edit-003), [R-GEN-003](editor.md#r-gen-003), [R-EDIT-007](editor.md#r-edit-007), [R-GEN-008](editor.md#r-gen-008), [R-GEN-013](editor.md#r-gen-013) | built, with the syntax colors of code blocks |
 | 4 | Tables: handles, markers for new rows and columns, the table menu | [R-EDIT-008](editor.md#r-edit-008) to [R-EDIT-010](editor.md#r-edit-010) | built, without the switch of the header row, because a table without a header row is not in version 1 |
 | 5 | The form of the front matter with both modes and the JSON schema | [R-FM-001](editor.md#r-fm-001) to [R-FM-006](editor.md#r-fm-006) | built |
 | 6 | The adapter for the webviews of VS Code and the theme of VS Code | [R-GEN-004](platforms.md#r-gen-004), [R-VSC-001](platforms.md#r-vsc-001) to [R-VSC-003](platforms.md#r-vsc-003), [R-VSC-005](platforms.md#r-vsc-005), [R-VSC-006](platforms.md#r-vsc-006), [R-THEME-001](platforms.md#r-theme-001), [R-THEME-003](platforms.md#r-theme-003) | built, with an example extension; the setting of the files that open in the editor comes with Notes (step 8) |

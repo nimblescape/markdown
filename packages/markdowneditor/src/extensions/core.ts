@@ -4,14 +4,15 @@
 
 // The Tiptap extensions of the document of the editor (docs/editor.md, R-EDIT-003; docs/specification.md, R-GEN-011):
 // the nodes and marks of CommonMark and GFM from the extensions of Tiptap, footnotes, the front matter, and raw nodes
-// for HTML and for text that no block of Markdown holds. Attributes that only record the form of the Markdown text,
+// for HTML and for text that no block of Markdown holds. Code blocks get the syntax colors of highlight.js through
+// lowlight. Attributes that only record the form of the Markdown text,
 // such as the character of a bullet, let the serializer write a changed block in the form that it had; the editor does
 // not render them.
 
 import { type AnyExtension, Node, mergeAttributes } from '@tiptap/core';
 import Bold from '@tiptap/extension-bold';
 import Code from '@tiptap/extension-code';
-import CodeBlock from '@tiptap/extension-code-block';
+import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import HorizontalRule from '@tiptap/extension-horizontal-rule';
 import Image from '@tiptap/extension-image';
 import Italic from '@tiptap/extension-italic';
@@ -25,6 +26,15 @@ import type { Fragment, Node as PmNode } from '@tiptap/pm/model';
 import { Plugin, type EditorState, type Transaction } from '@tiptap/pm/state';
 import { ReplaceAroundStep, ReplaceStep } from '@tiptap/pm/transform';
 import StarterKit from '@tiptap/starter-kit';
+import { common, createLowlight } from 'lowlight';
+
+/**
+ * syntax gives the syntax colors of code blocks (R-EDIT-003): the common languages of highlight.js, through lowlight. A
+ * code block without a language that it knows keeps its text without colors, as on GitHub: its highlightAuto returns
+ * the text alone, because the extension of Tiptap would otherwise guess the language of each such block.
+ */
+const lowlight = createLowlight(common);
+const syntax = { ...lowlight, highlightAuto: (value: string) => ({ type: 'root', children: [{ type: 'text', value }] }) };
 
 /** Alignment is the alignment of a column of a GFM table, from its delimiter row. */
 export type Alignment = 'left' | 'center' | 'right' | null;
@@ -226,13 +236,13 @@ export function coreExtensions(): AnyExtension[] {
         return [...(this.parent?.() ?? []), { tag: 'ins' }];
       },
     }),
-    CodeBlock.extend({
+    CodeBlockLowlight.extend({
       addAttributes() {
         // fence is the fence of a fenced code block, for example ``` or ~~~~, and empty for an indented code block;
         // info is the whole info string of the fence, whose first word is the language.
         return { ...this.parent?.(), fence: formAttribute('```'), info: formAttribute('') };
       },
-    }),
+    }).configure({ lowlight: syntax, defaultLanguage: null }),
     HorizontalRule.extend({ addAttributes: () => ({ markup: formAttribute('---') }) }),
     Link.extend({
       addAttributes() {
