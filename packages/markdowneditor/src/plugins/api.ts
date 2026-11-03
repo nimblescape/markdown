@@ -132,6 +132,11 @@ export interface PluginEditor {
   /** refreshPlugins asks the plugins again for their generated parts, threads and schema of the front matter, after a change of their data. */
   refreshPlugins(): void;
   /**
+   * reparse parses the text of the file again after the syntax of a plugin changed, for example the blocks that a plugin
+   * of the level "render" knows; only the top-level blocks whose node changes change, and the text stays the same.
+   */
+  reparse(): void;
+  /**
    * proposeChange shows a change of the text of the file as a tracked change with "Accept" and "Reject" (R-AI-006), for
    * example a change of the AI; the result says how the proposal ended.
    */

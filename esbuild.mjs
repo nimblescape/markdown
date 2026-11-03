@@ -19,9 +19,7 @@
 // In the root of the repository, --demo builds the example page in demo/dist/ with all libraries, from the sources of
 // the packages and the script of Paged.js, and writes the notices of the licenses of the libraries in
 // demo/dist/THIRD-PARTY-NOTICES.md. --serve
-// serves the example page on http://localhost:8000 and builds it again after each change. --vscode builds the example
-// extension for VS Code in demo/vscode/dist/: the extension, the script of its page with its notices, the styles, and
-// the script of Paged.js for its pages.
+// serves the example page on http://localhost:8000 and builds it again after each change.
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
@@ -31,7 +29,6 @@ import { thirdPartyNotices } from './scripts/third-party-notices.mjs';
 const production = process.argv.includes('--production');
 const demo = process.argv.includes('--demo') || process.argv.includes('--serve');
 const serve = process.argv.includes('--serve');
-const vscode = process.argv.includes('--vscode');
 
 /** source is the condition of the exports of the packages of the workspaces that points to their sources. */
 const source = 'nimblescape-source';
@@ -100,7 +97,7 @@ function notices(file, about, inputs = {}) {
   };
 }
 
-if (!demo && !vscode) {
+if (!demo) {
   // The build of the package in the current folder.
   if (production) {
     fs.rmSync('dist', { recursive: true, force: true });
@@ -123,43 +120,6 @@ if (!demo && !vscode) {
   for (const style of styles) {
     await esbuild.build({ ...common, entryPoints: [path.join('src/styles', style)], outfile: path.join('dist', style), conditions: [source] });
   }
-} else if (vscode) {
-  const out = 'demo/vscode/dist';
-  fs.rmSync(out, { recursive: true, force: true });
-  // The extension runs in the extension host of the desktop and of the web, so it is one CommonJS module without an API
-  // of Node.js; VS Code gives the module `vscode`.
-  await esbuild.build({
-    ...common,
-    entryPoints: ['demo/vscode/src/extension.ts'],
-    outfile: `${out}/extension.cjs`,
-    format: 'cjs',
-    platform: 'browser',
-    external: ['vscode'],
-    conditions: [source],
-  });
-  await esbuild.build({
-    ...common,
-    entryPoints: {
-      webview: 'demo/vscode/src/webview.ts',
-      markdown: 'packages/markdowneditor/src/styles/markdown.css',
-      vscode: 'packages/markdownvscode/src/styles/vscode.css',
-    },
-    outdir: out,
-    format: 'iife',
-    platform: 'browser',
-    conditions: [source],
-    metafile: true,
-    plugins: [
-      raw,
-      notices(
-        `${out}/THIRD-PARTY-NOTICES.md`,
-        'The script `demo/vscode/dist/webview.js` of the example extension of nimblescape Markdown, with the script of Paged.js `demo/vscode/dist/paged.polyfill.js` for its pages, holds these packages.',
-        pagedJsInputs('.'),
-      ),
-    ],
-  });
-  // The pages of the example extension load the script of Paged.js from dist/.
-  copyPagedJs(out, '.');
 } else {
   const options = {
     ...common,

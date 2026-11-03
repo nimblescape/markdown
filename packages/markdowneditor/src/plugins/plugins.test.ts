@@ -304,6 +304,71 @@ describe('the level "render"', () => {
     expect(editor.getMarkdown()).toBe(source.text);
   });
 
+  it('parses the text again after the syntax of a plugin changed, and waits until the cursor leaves a code block', async () => {
+    // The plugin knows its syntax only while `known` is true, as the plugin of the extensions of the Markdown preview of
+    // VS Code knows the blocks of their last analysis (docs/plugins.md, R-PLUGIN-001).
+    let known = false;
+    const late: MarkdownPlugin = {
+      name: 'late',
+      apiVersion: 1,
+      extendMarkdownIt: (md) => {
+        md.block.ruler.before('paragraph', 'late', (state, startLine, _endLine, silent) => {
+          const line = state.src.slice(state.bMarks[startLine] + state.tShift[startLine], state.eMarks[startLine]);
+          if (!known || state.level !== 0 || !line.startsWith('!! ')) {
+            return false;
+          }
+          if (!silent) {
+            const token = state.push('late_block', 'div', 0);
+            token.content = line;
+            token.map = [startLine, startLine + 1];
+          }
+          state.line = startLine + 1;
+          return true;
+        });
+        md.core.ruler.after('block', 'late_fence', (state) => {
+          state.tokens.filter((token) => known && token.type === 'fence' && token.info === 'demo').forEach((token) => (token.type = 'late_block'));
+        });
+        md.renderer.rules.late_block = (tokens, index) => `<div class="late">${md.utils.escapeHtml(tokens[index].content)}</div>`;
+      },
+    };
+    const text = 'Text\n\n!! one\n\n```demo\na\n```\n';
+    const source = new TextSource(text);
+    const changes: string[] = [];
+    source.onChange((change) => changes.push(change.text));
+    const editor = open('', [late], { source });
+    const types = () => {
+      const doc = editor.tiptap.state.doc;
+      return [...Array(doc.childCount).keys()].map((index) => doc.child(index).type.name);
+    };
+    expect(types()).toEqual(['paragraph', 'paragraph', 'codeBlock']);
+    known = true;
+    editor.reparse();
+    expect(types()).toEqual(['paragraph', 'rawBlock', 'rawBlock']);
+    expect(element.querySelectorAll('.nsmd-unit-rendered .late')).toHaveLength(2);
+    expect(editor.getMarkdown()).toBe(text);
+    expect(changes).toEqual([]);
+    expect(editor.tiptap.can().undo()).toBe(false);
+    known = false;
+    editor.reparse();
+    expect(types()).toEqual(['paragraph', 'paragraph', 'codeBlock']);
+    // With the cursor in the code block, the code block stays until the cursor leaves it.
+    let code = 0;
+    editor.tiptap.state.doc.forEach((node, offset) => {
+      if (node.type.name === 'codeBlock') {
+        code = offset;
+      }
+    });
+    select(editor, code + 1);
+    known = true;
+    editor.reparse();
+    expect(types()).toEqual(['paragraph', 'paragraph', 'codeBlock']);
+    select(editor, 2);
+    await Promise.resolve();
+    expect(types()).toEqual(['paragraph', 'rawBlock', 'rawBlock']);
+    expect(editor.getMarkdown()).toBe(text);
+    expect(changes).toEqual([]);
+  });
+
   it('keeps the line breaks and the byte order mark of the file when a source changes', () => {
     const file = '﻿Text\r\n\r\n$$\r\nx\r\n$$\r\n';
     const editor = open(file, [math()]);

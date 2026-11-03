@@ -2,7 +2,7 @@
 // © 2026 Hannes Stauss (scalarion@nimblescape.com)
 // Licensed under the MIT License. See LICENSE in the repository root for details.
 
-// The rendered changes (docs/platforms.md, R-VSC-009): the editor of one side of a diff marks what changed against the
+// The rendered changes (docs/editor.md, R-EDIT-012): the editor of one side of a diff marks what changed against the
 // text of the other side. The older version is the side `original`, on the left; the newer version is the side
 // `modified`, on the right. Both sides compute the same rows from the same two texts:
 //

@@ -82,36 +82,27 @@ same pull request.
 | `packages/markdowneditor/src/plugins/generated.ts`, `packages/markdowneditor/src/plugins/threads.ts`, `packages/markdowneditor/src/plugins/cache.ts` | The read-only generated parts ([R-EDIT-011](docs/editor.md#r-edit-011)), the threads beside the text with their icons and their panel ([R-GEN-014](docs/editor.md#r-gen-014)), and the cache of the parts and threads of each document. |
 | `packages/markdowneditor/src/styles/markdown.css` | The styles of the editor: the styles of rendered content of the renderer, which it imports, and the styles of the interaction ([R-THEME-001](docs/platforms.md#r-theme-001)). |
 | `packages/markdowneditor/src/types/` | The types of the packages without types of their own. |
-| `packages/markdownvscode/src/index.ts`, `packages/markdownvscode/src/webview.ts` | The exports of `@nimblescape/markdownvscode`, the adapter for VS Code: the side of the extension, and the side of the page as `@nimblescape/markdownvscode/webview`. |
-| `packages/markdownvscode/src/extension/editor.ts` | `registerMarkdownEditor`: the custom text editor ([R-VSC-001](docs/platforms.md#r-vsc-001)), the text editor to the side ([R-VSC-002](docs/platforms.md#r-vsc-002)), the changes between each page and its document ([R-VSC-005](docs/platforms.md#r-vsc-005)), and the views "Edit" and "Pages" with the files that the page reads through the extension ([R-VSC-007](docs/platforms.md#r-vsc-007)). |
-| `packages/markdownvscode/src/extension/page.ts` | The HTML of the page of the webview, with the frame of the pages and the policy of its content. |
-| `packages/markdownvscode/src/webview/connection.ts` | `connectVsCode`: the source of the page, its changes to and from the document, the fonts, the keys that stay in the page ([R-VSC-006](docs/platforms.md#r-vsc-006)), the channels of the plugins to the extension, and the view, the frame and the host of the pages ([R-VSC-007](docs/platforms.md#r-vsc-007)). |
-| `packages/markdownvscode/src/messages.ts` | The messages between the extension and the page, and the check of the messages of the page. |
-| `packages/markdownvscode/src/styles/vscode.css` | The theme of VS Code: the tokens `--nsmd-*` from the variables `--vscode-*` of the color theme, and the fonts ([R-THEME-001](docs/platforms.md#r-theme-001), [R-THEME-003](docs/platforms.md#r-theme-003)). |
-| `packages/markdownvscode/src/test/fakeVscode.ts` | A small API of VS Code for the tests of the adapter, with a webview panel whose messages wait until a test gives them. |
-| `packages/*/src/**/*.test.ts` | The unit tests, with vitest: the source (`packages/markdowntext/src/source/source.test.ts`), the AI without a provider of its own, with a provider of prepared answers (`packages/markdownai/src/*.test.ts`), the edits and the schema of the front matter (`packages/markdowntext/src/frontMatter/*.test.ts`), the renderer without a page and in a page of happy-dom (`packages/markdownrender/src/renderer.test.ts`, `packages/markdownrender/src/page.test.ts`), the layout folder format, the text of the pages and the page of a document in its layout (`packages/markdownlayout/src/format.test.ts`, `text.test.ts` and `page.test.ts`), the functions of the plugins in the page of the PDF, the files of the page in the frame and the pages that follow the text in a page of happy-dom (`packages/markdownlayout/src/pageRenders.test.ts`, `embed.test.ts` and `livePages.test.ts`), the PDF with an installed browser (`packages/markdownlayout/src/pdf/pdf.test.ts`; without a browser, this test runs only in CI, where Google Chrome is installed), the round trip of the Markdown (`packages/markdowneditor/src/markdown/codec.test.ts`), the editor, two editors of one source, its interaction, its tables, the form of the front matter, the proposed changes, the plugin API and the nonce of its style elements in a page of happy-dom (`editor.test.ts`, `source.test.ts`, `ui/interaction.test.ts`, `ui/table/grid.test.ts`, `ui/frontMatterForm.test.ts`, `ui/proposals.test.ts`, `plugins/plugins.test.ts` and `styleNonce.test.ts` in `packages/markdowneditor/src/`), and the adapter for VS Code with the small API of VS Code, also the views "Edit" and "Pages" (`packages/markdownvscode/src/editor.test.ts`). |
+| `packages/*/src/**/*.test.ts` | The unit tests, with vitest: the source (`packages/markdowntext/src/source/source.test.ts`), the AI without a provider of its own, with a provider of prepared answers (`packages/markdownai/src/*.test.ts`), the edits and the schema of the front matter (`packages/markdowntext/src/frontMatter/*.test.ts`), the renderer without a page and in a page of happy-dom (`packages/markdownrender/src/renderer.test.ts`, `packages/markdownrender/src/page.test.ts`), the layout folder format, the text of the pages and the page of a document in its layout (`packages/markdownlayout/src/format.test.ts`, `text.test.ts` and `page.test.ts`), the functions of the plugins in the page of the PDF, the files of the page in the frame and the pages that follow the text in a page of happy-dom (`packages/markdownlayout/src/pageRenders.test.ts`, `embed.test.ts` and `livePages.test.ts`), the PDF with an installed browser (`packages/markdownlayout/src/pdf/pdf.test.ts`; without a browser, this test runs only in CI, where Google Chrome is installed), the round trip of the Markdown (`packages/markdowneditor/src/markdown/codec.test.ts`), the editor, two editors of one source, its interaction, its tables, the form of the front matter, the proposed changes, the plugin API and the nonce of its style elements in a page of happy-dom (`editor.test.ts`, `source.test.ts`, `ui/interaction.test.ts`, `ui/table/grid.test.ts`, `ui/frontMatterForm.test.ts`, `ui/proposals.test.ts`, `plugins/plugins.test.ts` and `styleNonce.test.ts` in `packages/markdowneditor/src/`), and the rendered changes (`packages/markdowneditor/src/ui/changes.test.ts`). |
 | `test/corpus/` | The Markdown files of the tests of the round trip: GFM, the front matter in TOML and JSON, the format of Markdown Notes and the documents and layouts of Markdown Paper. [test/corpus/README.md](test/corpus/README.md) explains them. |
 | `demo/index.html`, `demo/main.ts` | The example page: two editors of one source, the rendered editor on the left and the Markdown text on the right; a change in one shows at once in the other. The button "Rendering" shows the rendering of the renderer in place of the text, and the button "Pages" the pages of the text in the built-in layout `plain`. |
-| `demo/examplePlugin.ts` | The plugin of the example page and of the example extension: a CSV table at the level "render", a read-only citation and a thread beside the text. |
-| `demo/vscode/` | The example extension for VS Code: it opens each Markdown file in the editor, with the adapter. It is never published. |
-| `.vscode/launch.json`, `.vscode/tasks.json` | Runs the example extension in a new window of VS Code, after its build. |
+| `demo/examplePlugin.ts` | The plugin of the example page: a CSV table at the level "render", a read-only citation and a thread beside the text. |
 | `licenses.json` | The license that was decided for each package that the packages of the workspaces need at run time ([R-GEN-011](docs/specification.md#r-gen-011)). |
 | `scripts/check-licenses.mjs`, `scripts/check-licenses.test.mjs` | The check of `package-lock.json` against `licenses.json` and its test. |
-| `scripts/third-party-notices.mjs` | Writes the notices of the packages of a bundle from the installed packages, for the example page and the example extension. |
-| `esbuild.mjs` | In the folder of a package, builds a `dist/<name>.js` for each entry point of its exports, for Node.js when its export has the condition `node`, and a `dist/<name>.css` for each file of `src/styles/`, with the texts of the imports with the suffix `?raw`, and copies the script of Paged.js for a package that exports it; in the root, with `--demo` or `--serve`, builds the example page in `demo/dist/`, and with `--vscode` the example extension in `demo/vscode/dist/`, with the script of Paged.js for its pages, from the sources of the packages. |
+| `scripts/third-party-notices.mjs` | Writes the notices of the packages of a bundle from the installed packages, for the example page. |
+| `esbuild.mjs` | In the folder of a package, builds a `dist/<name>.js` for each entry point of its exports, for Node.js when its export has the condition `node`, and a `dist/<name>.css` for each file of `src/styles/`, with the texts of the imports with the suffix `?raw`, and copies the script of Paged.js for a package that exports it; in the root, with `--demo` or `--serve`, builds the example page in `demo/dist/`, with the script of Paged.js for its pages, from the sources of the packages. |
 | `tsconfig.json`, `packages/*/tsconfig.build.json` | The settings of the type check of all packages, and of the declarations of each package in its `dist/`. |
 | `eslint.config.mjs`, `vitest.config.mts` | The settings of the check of the code with ESLint and of the unit tests. `eslint.config.mjs` is the same as in every nimblescape extension, except its lists of the ignored files and of the scripts of pages. |
 | `package.json` | The manifest of the root of the workspaces: private, never published, with the development tools and the commands below. Each package has its own manifest with its libraries. |
 | `package-lock.json` | The locked libraries and development tools. npm writes this file, and nobody edits it by hand. |
 | `.node-version` | The Node release of the development tools. `actions/setup-node` in the workflows and local Node version managers read it. |
-| `.github/workflows/ci.yml` | Checks the types, the code style and the licenses, runs the tests, builds the packages, the example page and the example extension, and packs the npm packages, for every push to `main`, every pull request and the commit of every release. The release publishes the npm packages of this workflow, so a change of it needs a dry run (rule 4 of the [release rules](#release-rules)). |
+| `.github/workflows/ci.yml` | Checks the types, the code style and the licenses, runs the tests, builds the packages and the example page, and packs the npm packages, for every push to `main`, every pull request and the commit of every release. The release publishes the npm packages of this workflow, so a change of it needs a dry run (rule 4 of the [release rules](#release-rules)). |
 | `.github/workflows/release.yml` | Releases a version of all npm packages on a manual start: commits the version to a temporary branch, tests and packs it with `ci.yml`, and only then moves `main` to it, creates its tag and GitHub release and publishes the packages to npmjs.com. A dry run tests without a change. The section [Release](#release) explains it. |
 | `.github/workflows/release-dry-run.yml` | Fails on a pull request that changes the release process (`release.yml`, `ci.yml` or `scripts/release-checks.mjs`) until a dry run on its branch tested the change (rule 4 of the [release rules](#release-rules)). |
 | `scripts/release-checks.mjs`, `scripts/release-checks.test.mjs` | The check of rule 4 of the [release rules](#release-rules), which `release.yml` and `release-dry-run.yml` run, and its test. |
 | `scripts/npm-setup.sh` | Sets up the publishing to npmjs.com: the environment `npm`, the first version of each package and its trusted publisher ([npmjs.com setup](#npmjscom-setup)). |
 | `CHANGELOG.md` | The changes of each released version; the release takes the section of its version as the notes of its GitHub release. |
 | `.github/dependabot.yml` | Proposes weekly updates of the libraries, of the development tools and of the pinned actions. TypeScript stays at 6.0.3, as in every nimblescape repository ([R-GEN-007](docs/specification.md#r-gen-007)). |
-| `packages/*/dist/`, `demo/dist/`, `demo/vscode/dist/` | The built packages, the built example page and the built example extension, kept out of Git. |
+| `packages/*/dist/`, `demo/dist/` | The built packages and the built example page, kept out of Git. |
 
 ## Development
 
@@ -127,7 +118,6 @@ typescript-eslint and vitest, on the Node.js release in `.node-version`.
 | `npm test` | Runs the unit tests with vitest. |
 | `npm run build` | Builds each package in the order of the workspaces in `package.json`, `@nimblescape/markdowntext` first: its JavaScript in `dist/`, its styles and its declarations `dist/**/*.d.ts`. `npm run build -w packages/markdowntext` builds one package. |
 | `npm run demo` | Builds the example page and serves it on <http://localhost:8000>; it builds again after each change. `node esbuild.mjs --demo` only builds it. |
-| `npm run demo:vscode` | Builds the example extension for VS Code in `demo/vscode/dist/`. |
 | `npm run pack` | Packs each package from its `dist/` into `nimblescape-<name>-<version>.tgz` in the root, after `npm run build`. |
 
 ## Packages
@@ -156,24 +146,6 @@ A new package gets its folder with a `package.json` in the form of the
 others, a `tsconfig.build.json`, a `README.md` and a `LICENSE`, and its place
 in `workspaces` of the root `package.json`, after the packages that it
 depends on.
-
-## The example extension for VS Code
-
-`demo/vscode/` is a small extension that opens each Markdown file in the
-editor of rendered Markdown, with `@nimblescape/markdownvscode`
-([R-VSC-001](docs/platforms.md#r-vsc-001)). It is a tool of the development
-and is never published. To try it, open this repository in VS Code and
-start "Example extension" in "Run and Debug" (F5): the task builds it with
-`npm run demo:vscode`, and a new window of VS Code opens with the extension.
-In that window, a Markdown file opens in the editor; the button
-"Open Text Editor to the Side" in the title of the editor opens its text,
-and the button "Switch to Pages" shows the pages of the file in its layout
-([R-VSC-007](docs/platforms.md#r-vsc-007)); a double click on a page goes
-back to that block in "Edit". A changed Markdown file in the view "Source
-Control" opens in a diff with the editor on both sides
-([R-VSC-009](docs/platforms.md#r-vsc-009)); the arrow buttons in the title
-of the editor go to the previous and to the next change. After a change of
-the code, run the build again and reload the window.
 
 ## The round trip of the Markdown
 
@@ -208,10 +180,8 @@ Code, and its declarations; `@nimblescape/markdownrender` also holds
 `dist/paged.polyfill.js`, the script of Paged.js, unchanged, with the
 notices of the packages in it in `dist/THIRD-PARTY-NOTICES.md`, and
 `dist/pdf/index.js`, the entry point `./pdf` for Node.js only,
-`@nimblescape/markdowneditor` holds
-`dist/markdown.css` with the styles of `content.css` in it, and
-`@nimblescape/markdownvscode` holds
-`dist/webview.js` for the page and `dist/vscode.css`. A package
+and `@nimblescape/markdowneditor` holds
+`dist/markdown.css` with the styles of `content.css` in it. A package
 bundles only its own code: the other packages of the workspaces, Tiptap,
 ProseMirror and markdown-it stay dependencies, so that the page that uses
 the editor has one copy of ProseMirror, and the bundle of that page carries
@@ -308,7 +278,7 @@ is.
 | Part | Where | Value |
 | --- | --- | --- |
 | Organization | [npmjs.com](https://www.npmjs.com/org/nimblescape) | `nimblescape`, the scope of the packages |
-| Packages | npmjs.com | `@nimblescape/markdowntext`, `@nimblescape/markdownai`, `@nimblescape/markdownrender`, `@nimblescape/markdownlayout`, `@nimblescape/markdowneditor` and `@nimblescape/markdownvscode`, public, after the first release |
+| Packages | npmjs.com | `@nimblescape/markdowntext`, `@nimblescape/markdownai`, `@nimblescape/markdownrender`, `@nimblescape/markdownlayout` and `@nimblescape/markdowneditor`, public, after the first release |
 | Trusted publisher | the settings of each package on npmjs.com, "Trusted Publisher" | GitHub Actions, the repository `nimblescape/markdown`, the workflow `release.yml`, the environment `npm` |
 | Environment | the settings of the repository, "Environments" | `npm`, reachable from the tags `v*` and the branch `main` only |
 

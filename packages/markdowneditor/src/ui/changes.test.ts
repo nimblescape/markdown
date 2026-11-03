@@ -3,7 +3,7 @@
 // © 2026 Hannes Stauss (scalarion@nimblescape.com)
 // Licensed under the MIT License. See LICENSE in the repository root for details.
 
-// The tests of the rendered changes (docs/platforms.md, R-VSC-009): the rows of the diff of the top-level blocks, the
+// The tests of the rendered changes (docs/editor.md, R-EDIT-012): the rows of the diff of the top-level blocks, the
 // marks of the removed and the new blocks and words on each side, the spacers of the rows, the text of the other side
 // after a change, and that the text of the file stays the same.
 

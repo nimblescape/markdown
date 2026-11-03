@@ -175,7 +175,7 @@ percent of the width of the text. The colors are gray, red, orange, yellow,
 green, blue and purple. Lists
 in cells, a dropdown and a table without a header row are not in version 1.
 
-## 6. Read-only mode and generated parts
+## 6. Read-only mode, generated parts and rendered changes
 
 ### R-GEN-008
 
@@ -216,6 +216,29 @@ part can hold whole blocks, for example the code block of a listing: the
 cursor then stays in the text before or after it, and Backspace at the start
 of the text after it and Delete at the end of the text before it delete the
 whole part.
+
+### R-EDIT-012
+
+**Rendered changes.** The editor must show the changes of its text against
+another version of the text, for one side of a diff that shows two editors
+side by side, the older version on the left and the newer version on the
+right (`showChanges`). The diff of VS Code is such a diff
+([R-VSC-009](https://github.com/nimblescape/markdownnotes-vscode/blob/main/docs/requirements.md#r-vsc-009) of Markdown Notes).
+
+- Each side marks its changes: the left side the removed blocks with a red
+  background, the right side the new blocks with a green background, and
+  in a changed block the removed or the new words. The editor compares the
+  top-level blocks of both sides with the array diff of the library `diff`
+  ([R-SRC-002](source.md#r-src-002)); a changed block pairs with the
+  similar block of the same kind on the other side, and the editor compares
+  the words of such a pair with the word diff. The marks change no text.
+- The blocks of both sides line up: where one side has blocks that the
+  other side does not have, or a block of one side is higher, the other
+  side shows an empty, hatched space of the same height. Both sides scroll
+  together: each side gives its heights and its scroll place, and takes
+  those of the other side.
+- Each new text of a side updates the marks of both sides.
+- The editor goes to the previous and to the next change on both sides.
 
 ## 7. Mode to learn Markdown
 

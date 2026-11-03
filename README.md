@@ -23,10 +23,11 @@ text, the insert menu "+" and the slash commands, the handles of the blocks,
 find and replace, read-only mode and a mode that shows the Markdown marks
 beside the rendered text; the tables with handles, markers and a table menu;
 the form of the front matter, with a JSON schema, for YAML, TOML and
-JSON; the adapter for VS Code, which opens the editor as a custom text
-editor with the theme of VS Code; the plugin API, version 1; and the
-renderer, which shows the text as HTML without edit functions, without the
-editor, and on which the editor is built. The layout comes in the next step.
+JSON; the plugin API, version 1; the renderer, which shows the text as HTML
+without edit functions, without the editor, and on which the editor is
+built; the layout, with the pages of a document and the PDF; the rendered
+changes of a file against another version; and the provider API of an AI
+with the proposed changes as tracked changes.
 
 ## Packages
 
@@ -42,7 +43,6 @@ packages with their steps of the plan.
 | [`@nimblescape/markdownrender`](packages/markdownrender) | The renderer: the text of a file as HTML without edit functions, from markdown-it 14, with the plugins of the renderer; without the editor and without a page |
 | [`@nimblescape/markdownlayout`](packages/markdownlayout) | The layout: the text of a file in its layout as pages, with the layout code of Markdown Paper, the built-in layout `plain` and Paged.js |
 | [`@nimblescape/markdowneditor`](packages/markdowneditor) | The editor of rendered Markdown for the web and for the webviews of VS Code, built on the renderer |
-| [`@nimblescape/markdownvscode`](packages/markdownvscode) | The adapter for VS Code: the editor as a custom text editor, which keeps the file a text document of VS Code, and the theme of VS Code |
 
 ## Use
 
@@ -112,15 +112,15 @@ The [README of the package](packages/markdownlayout/README.md) explains the
 host, which reads the files of the layouts, and the PDF in Node.js with the
 entry point `@nimblescape/markdownlayout/pdf`.
 
-In VS Code, an extension registers the editor as a custom text editor with
-`registerMarkdownEditor` of `@nimblescape/markdownvscode`; the
-[README of the package](packages/markdownvscode/README.md) shows the
-extension and its page.
+In VS Code, the extension that uses the editor registers it as a custom
+text editor with its own adapter, for example nimblescape Markdown Notes
+([R-VSC-001](https://github.com/nimblescape/markdownnotes-vscode/blob/main/docs/requirements.md#r-vsc-001) of Notes); the libraries have
+no package for a platform
+([R-ARCH-002](docs/specification.md#r-arch-002)).
 
 The packages are not on npmjs.com before the release.
 [CONTRIBUTING.md](CONTRIBUTING.md) explains the development, the example
-page (`npm run demo`), the example extension for VS Code
-(`npm run demo:vscode`) and how another repository installs the packages
+page (`npm run demo`) and how another repository installs the packages
 from GitHub.
 
 ## License
