@@ -250,12 +250,12 @@ Markdown Notes, Markdown Paper, the reflection tool and the course module.
 Their repositories are `nimblescape/markdownnotes-vscode`,
 `nimblescape/markdownpaper-vscode`, `nimblescape/workhistory-vscode`,
 `nimblescape/workreflection-vscode`
-([R-REFL-017](reflection.md#r-refl-017)) and `nimblescape/course-vscode`;
-their npm packages start with `@nimblescape/`, and the publisher of their
-VS Code extensions is `nimblescape`. majikmate provides the academic
-context: it owns the courses, for example `majikmate/module-ts-2`, and the
-feedback program `majikmate/course-feedback`
-([R-FEED-004](course.md#r-feed-004)), which use these products. A product
+([R-REFL-017](reflection.md#r-refl-017)), `nimblescape/course-vscode` and
+the feedback program of the course module, `nimblescape/course-feedback`
+([R-FEED-004](course.md#r-feed-004)); their npm packages start with
+`@nimblescape/`, and the publisher of their VS Code extensions is
+`nimblescape`. majikmate provides the academic context: it owns the
+courses, for example `majikmate/module-ts-2`, which use these products. A product
 of majikmate may depend on a product of nimblescape, and a product of
 nimblescape does not depend on a product or a course of majikmate.
 
