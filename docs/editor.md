@@ -305,6 +305,22 @@ macOS) opens the clone.
 *(proposal)* The input of a plugin takes the place of the input of the form
 in both modes.
 
+### R-FM-007
+
+**Values of the front matter in the text.** The text can hold the value of
+a key of the front matter between two hidden markers:
+
+```markdown
+This is <wbr><!--{title}-->A paper<!--{/title}--> of <wbr><!--{author.name}-->Hannes Stauss<!--{/author.name}-->.
+```
+
+The key of a value under another key is the path of the keys with `.`, for
+example `author.name`. The renderer shows only the value, as GitHub does.
+The editor hides the markers and shows the value as a generated part
+([R-EDIT-011](#r-edit-011)). A formatter writes the current value of the
+key between the markers, for example the formatter of Notes, which also
+inserts such values with `/ref` ([R-NOTES-001](plugins.md#r-notes-001)).
+
 ## 9. Threads beside the text
 
 ### R-GEN-014

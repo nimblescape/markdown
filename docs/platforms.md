@@ -196,7 +196,7 @@ stable, the adapter uses it in place of the connection of the two panels.
 
 ### R-VSC-010
 
-*(proposal)* **The extensions of the Markdown preview.** The editor shows
+**The extensions of the Markdown preview.** The editor shows
 the syntax that other extensions add to the Markdown preview of VS Code,
 without a change of these extensions. Such an extension declares its parts
 in its package.json: `markdown.markdownItPlugins`, with a function
@@ -306,9 +306,6 @@ uses the font of the editor. A change of these settings shows at once.
    extensions ([R-VSC-008](#r-vsc-008)), all proposals?
 2. Web: two editors side by side for the rendered changes
    ([R-VSC-009](#r-vsc-009), proposal)?
-3. VS Code: does the editor show the syntax of the extensions of the
-   Markdown preview, as blocks of the level "render"
-   ([R-VSC-010](#r-vsc-010), proposal)?
 
 ---
 

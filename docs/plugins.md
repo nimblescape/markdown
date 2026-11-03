@@ -22,6 +22,13 @@ their functions through a documented plugin API. The plugins of each
 extension live in the repository of that extension. The libraries hold the
 general functions; a plugin adds only the functions of its extension.
 
+The libraries hold the standard footnotes and the values of the front
+matter in the text ([R-FM-007](editor.md#r-fm-007)). The captions with
+numbers, `/ref` and the listings stay in Notes in version 1
+([R-NOTES-001](#r-notes-001)). The form of the front matter of the editor
+([R-FM-001](editor.md#r-fm-001)) takes the place of the view "Front Matter"
+of Paper ([R-PAPER-001](#r-paper-001)).
+
 ## 2. Levels of a plugin
 
 ### R-GEN-012
@@ -45,7 +52,7 @@ edit" later, without a change of the file format. The Markdown API of VS
 Code (`markdown.markdownItPlugins`, `markdown.previewStyles`,
 `markdown.previewScripts`) is the reference of the plugin API.
 
-*(proposal)* A block of the level "render" is a top-level block with a
+A block of the level "render" is a top-level block with a
 token that a plugin shows, or with a token that no node of the editor
 takes; the editor keeps it as one unit with its text. Its view shows the
 rendering: the HTML of markdown-it with the syntax of the plugins, and the
@@ -148,9 +155,9 @@ and the removal of the notes from the output to the renderer. It marks the
 parts that it generates as read-only ([R-EDIT-011](editor.md#r-edit-011)):
 the numbers in captions, the text of references (`/ref`), and the code and
 the cite of listings. It hides the anchors of the captions and the headings
-and the comments of the listings. Until the libraries show the values of
-the front matter in the text (open question 1), Notes hides their markers
-and marks the values as read-only. Notes integrates the AI chat as notes
+and the comments of the listings. The libraries show the values of the
+front matter in the text ([R-FM-007](editor.md#r-fm-007)); Notes inserts
+them with `/ref`, and its formatter writes their current values. Notes integrates the AI chat as notes
 ([R-AI-001](ai.md#r-ai-001)).
 
 ## 4. Markdown Paper
@@ -167,15 +174,13 @@ the PDF through the layout ([R-LAYOUT-001](rendering.md#r-layout-001)), and
 the prompt protocol through the history
 ([R-HIST-005](history.md#r-hist-005)). It marks the parts that it generates
 as read-only ([R-EDIT-011](editor.md#r-edit-011)): the text of citations,
-the reference list and the generated lists.
+the reference list and the generated lists. For a file in the editor, the
+form of the front matter of the editor ([R-FM-001](editor.md#r-fm-001))
+takes the place of the view "Front Matter" of Paper.
 
 ## 5. Open questions
 
-1. Split of functions: standard footnotes in the libraries (proposal: yes);
-   captions with numbers, `/ref` and listings stay in Notes in version 1
-   (proposal: yes); the values of the front matter in the text in the
-   libraries (proposal: yes); the form of the front matter replaces the view
-   "Front Matter" of Paper (proposal: yes).
+None.
 
 ---
 
