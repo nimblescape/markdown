@@ -32,6 +32,11 @@ updates:
       # packages/markdownvscode), so that the adapter uses no newer API (R-VSC-003).
       - dependency-name: '@types/vscode'
         update-types: ['version-update:semver-minor', 'version-update:semver-major']
+      # TypeScript stays at 6.0.3 in every nimblescape repository (R-GEN-007): typescript-eslint supports TypeScript
+      # only up to 6.0, and TypeScript 7 has no language service for the plugin of nimblescape TypeScript. A move to
+      # another version of TypeScript is one decision for all repositories together.
+      - dependency-name: 'typescript'
+        update-types: ['version-update:semver-major', 'version-update:semver-minor', 'version-update:semver-patch']
   - package-ecosystem: github-actions
     directory: /
     schedule:

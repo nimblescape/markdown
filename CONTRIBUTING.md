@@ -110,13 +110,13 @@ same pull request.
 | `scripts/release-checks.mjs`, `scripts/release-checks.test.mjs` | The check of rule 4 of the [release rules](#release-rules), which `release.yml` and `release-dry-run.yml` run, and its test. |
 | `scripts/npm-setup.sh` | Sets up the publishing to npmjs.com: the environment `npm`, the first version of each package and its trusted publisher ([npmjs.com setup](#npmjscom-setup)). |
 | `CHANGELOG.md` | The changes of each released version; the release takes the section of its version as the notes of its GitHub release. |
-| `.github/dependabot.yml` | Proposes weekly updates of the libraries, of the development tools and of the pinned actions. |
+| `.github/dependabot.yml` | Proposes weekly updates of the libraries, of the development tools and of the pinned actions. TypeScript stays at 6.0.3, as in every nimblescape repository ([R-GEN-007](docs/specification.md#r-gen-007)). |
 | `packages/*/dist/`, `demo/dist/`, `demo/vscode/dist/` | The built packages, the built example page and the built example extension, kept out of Git. |
 
 ## Development
 
-The development tools are TypeScript, esbuild, ESLint and vitest, on the
-Node.js release in `.node-version`.
+The development tools are TypeScript 6.0.3, esbuild, ESLint with
+typescript-eslint and vitest, on the Node.js release in `.node-version`.
 
 | Command | Effect |
 | --- | --- |
