@@ -235,7 +235,8 @@ and the script goes away.
 
 ## Release
 
-Nothing is released before the release decision
+Nothing is released before the release decision, and the packages are
+released together with nimblescape Markdown Notes
 ([R-GEN-007](docs/specification.md#r-gen-007)). The release process is the
 same as for the other nimblescape npm packages, for example the package
 `@nimblescape/markdownnotes` of Markdown Notes, without the Marketplace.
