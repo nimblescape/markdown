@@ -592,7 +592,9 @@ export class EditorChanges {
 
   /**
    * tops returns the top of each row in the coordinates of the window, and at the end the bottom of the last row: the
-   * top of the first block of a row, or the top of its spacer for a row without blocks on this side.
+   * top of the first block of a row that the page shows, or the top of its spacer for a row without such a block on
+   * this side. A block that a plugin hides, for example the definition of a note, has no box, so its top is no place
+   * on the page.
    */
   private tops(): number[] {
     const view = this.editor.view;
@@ -602,8 +604,14 @@ export class EditorChanges {
     view.state.doc.forEach((_node, offset) => starts.push(offset));
     const tops = rows.map((row, index) => {
       const [from, to] = side === 'original' ? row.original : row.modified;
-      const element = from < to ? (view.nodeDOM(starts[from]) as HTMLElement | null) : this.spacers[index];
-      return element?.getBoundingClientRect?.().top ?? 0;
+      for (let block = from; block < to; block++) {
+        const element = view.nodeDOM(starts[block]) as HTMLElement | null;
+        if (element && (element.getClientRects?.().length ?? 0) > 0) {
+          return element.getBoundingClientRect().top;
+        }
+      }
+      // The spacer of a row stands after its blocks, where a row without shown blocks starts.
+      return this.spacers[index]?.getBoundingClientRect?.().top ?? 0;
     });
     tops.push(contentBottom(view));
     return tops;
