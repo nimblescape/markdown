@@ -29,7 +29,7 @@
     "demo": "node esbuild.mjs --serve",
     "demo:vscode": "node esbuild.mjs --vscode",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint .",
+    "lint": "eslint",
     "test": "vitest run",
     "licenses": "node scripts/check-licenses.mjs",
     "pack": "npm pack --workspaces"
