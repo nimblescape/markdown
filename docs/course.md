@@ -333,10 +333,12 @@ module: `cs read` reads the course, with its name and language from
 `.course/course.yml`; `cs instructions feedback` prints the rules of the
 feedback, the rules of the format and `.course/instructions/feedback.md` of
 the course; `cs feedback --form` prints the form of the answer; and
-`cs feedback` writes `FEEDBACK.md` with the score. The program takes `cs`
-from the npm package `@nimblescape/course`, in the version that
-`versions.course` of its `config.yml` names. It keeps its checks, skills,
-engines and prompts. The workflow of a course runs the feedback program at
+`cs feedback` writes `FEEDBACK.md` with the score. The program runs the
+command of the npm package `@nimblescape/course` with npx and installs
+nothing, in the version that `versions.course` of its `config.yml` names;
+for a version that is not on npm, `versions.course` names a commit of
+`nimblescape/course-vscode`, and the program builds and runs that commit.
+It keeps its checks, skills, engines and prompts. The workflow of a course runs the feedback program at
 the tag that `FEEDBACK_VERSION` names, `v1`. The tag `v1` is the version of
 the program that uses the course module, so only a course in the format of
 the module ([R-COURSE-005](#r-course-005)) may use it; the four -2 courses of
