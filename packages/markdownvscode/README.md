@@ -41,13 +41,21 @@ export function activate(context: vscode.ExtensionContext): void {
       // A setting of the extension decides which files open in the editor.
       opens: (document) => true,
       openTextCommand: 'publisher.extension.openText',
+      // The buttons of a diff with the editor on both sides (R-VSC-009).
+      nextChangeCommand: 'publisher.extension.nextChange',
+      previousChangeCommand: 'publisher.extension.previousChange',
     }),
   );
 }
 ```
 
 The `package.json` of the extension contributes the custom editor, the
-command and its button in the title of the editor:
+commands and their buttons in the title of the editor. The priority of the
+editor names the diff editor as well, so that VS Code opens a diff of a file
+with the editor on both sides
+([R-VSC-009](../../docs/platforms.md#r-vsc-009)); this needs VS Code 1.133 or
+newer. The adapter sets the context key `<viewType>.diff` while the active
+tab is such a diff, for the buttons to the previous and the next change:
 
 ```json
 {
@@ -57,7 +65,7 @@ command and its button in the title of the editor:
         "viewType": "publisher.extension.editor",
         "displayName": "Rendered Markdown",
         "selector": [{ "filenamePattern": "*.md" }],
-        "priority": "default"
+        "priority": { "textEditor": "default", "diffEditor": "default" }
       }
     ],
     "commands": [
@@ -65,7 +73,9 @@ command and its button in the title of the editor:
         "command": "publisher.extension.openText",
         "title": "Open Text Editor to the Side",
         "icon": "$(go-to-file)"
-      }
+      },
+      { "command": "publisher.extension.previousChange", "title": "Previous Change", "icon": "$(arrow-up)" },
+      { "command": "publisher.extension.nextChange", "title": "Next Change", "icon": "$(arrow-down)" }
     ],
     "menus": {
       "editor/title": [
@@ -73,7 +83,9 @@ command and its button in the title of the editor:
           "command": "publisher.extension.openText",
           "when": "activeCustomEditorId == publisher.extension.editor",
           "group": "navigation"
-        }
+        },
+        { "command": "publisher.extension.previousChange", "when": "publisher.extension.editor.diff", "group": "navigation@1" },
+        { "command": "publisher.extension.nextChange", "when": "publisher.extension.editor.diff", "group": "navigation@2" }
       ]
     }
   },
@@ -94,15 +106,17 @@ the source of the connection. The extension bundles it for the browser.
 
 ```ts
 import { MarkdownEditor } from '@nimblescape/markdowneditor';
-import { connectVsCode } from '@nimblescape/markdownvscode/webview';
+import { connectVsCode, followDiff } from '@nimblescape/markdownvscode/webview';
 
 void connectVsCode().then((connection) => {
-  new MarkdownEditor(connection.element, {
+  const editor = new MarkdownEditor(connection.element, {
     source: connection.source,
     editable: connection.editable,
     host: connection.host,
     plugins: [],
   });
+  // While the page is a side of a diff, the editor shows the changes against the other side.
+  followDiff(connection, editor);
 });
 ```
 

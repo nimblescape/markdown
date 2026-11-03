@@ -7,12 +7,18 @@
 // creates the editor with the source of the connection, for example
 // `new MarkdownEditor(connection.element, { source: connection.source, editable: connection.editable })`, and shows
 // the pages of the file in `connection.pagesFrame` with the host `connection.pages` (docs/rendering.md, R-LAYOUT-003).
+// `followDiff(connection, editor)` shows the rendered changes while the page is a side of a diff (docs/platforms.md,
+// R-VSC-009).
 
 export {
   connectVsCode,
+  followDiff,
   vscodeOrigin,
   type ConnectOptions,
+  type DiffChanges,
+  type DiffEditor,
   type VsCodeConnection,
+  type VsCodeDiff,
   type VsCodePagesHost,
   type VsCodePluginChannel,
   type VsCodePluginHost,
@@ -20,6 +26,9 @@ export {
 } from './webview/connection';
 export {
   editorElementId,
+  type DiffLayout,
+  type DiffPosition,
+  type DiffSide,
   pagesElementId,
   type HostMessage,
   type PageFiles,

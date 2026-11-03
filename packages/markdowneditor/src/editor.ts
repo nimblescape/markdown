@@ -50,6 +50,7 @@ import { sourceViews } from './plugins/render';
 import { setOpenThread, threadEntries, threadsKey, threadsPlugin, type ThreadEntry } from './plugins/threads';
 import { Interaction, type InteractionOptions } from './ui/interaction';
 import { type ProposalResult, type ProposedChange, proposalsKey, proposalsOf, proposalsPlugin, type Tracked } from './ui/proposals';
+import { type ChangesOptions, EditorChanges } from './ui/changes';
 
 /** textMark is the character that marks a position in the text of a block for textOffset, a character of private use. */
 const textMark = '\uE000';
@@ -148,6 +149,8 @@ export class MarkdownEditor implements PluginEditor {
   private readonly proposals = new Map<string, (result: ProposalResult) => void>();
   /** origin is the origin of the change that the editor gives the source now, when it is no change of the user. */
   private origin: Origin | undefined;
+  /** changes shows the rendered changes against the text of the other side of a diff (docs/platforms.md, R-VSC-009). */
+  private changes: EditorChanges | undefined;
 
   /**
    * @param element - The element of the page that holds the editor.
@@ -563,6 +566,26 @@ export class MarkdownEditor implements PluginEditor {
     };
   }
 
+  /**
+   * showChanges shows the rendered changes of this editor as one side of a diff (docs/platforms.md, R-VSC-009): the
+   * marks of the changed blocks and words against the text of the other side, the rows that line up with the other
+   * side and the scroll together (src/ui/changes.ts). A second call replaces the first one.
+   * @param options - The side, the text of the other side and the listeners for the other side.
+   * @returns The changes, which take the text, the heights and the scroll position of the other side.
+   */
+  showChanges(options: ChangesOptions): EditorChanges {
+    this.changes?.destroy();
+    const changes = new EditorChanges(this.tiptap, options, (text) => this.codec.parse(text).doc);
+    this.changes = changes;
+    return changes;
+  }
+
+  /** hideChanges removes the rendered changes. */
+  hideChanges(): void {
+    this.changes?.destroy();
+    this.changes = undefined;
+  }
+
   /** isEditable is false in read-only mode. */
   get isEditable(): boolean {
     return this.tiptap.isEditable;
@@ -576,6 +599,16 @@ export class MarkdownEditor implements PluginEditor {
     // A switch of the mode is no change of the text, so onChange is not called.
     this.tiptap.setEditable(editable, false);
     this.interaction.refresh();
+  }
+
+  /**
+   * setReadOnlyToggle shows or hides the switch between editing and reading in the toolbar (R-GEN-008), for example
+   * for the older version of a diff, which cannot change (docs/platforms.md, R-VSC-009). The option `readOnlyToggle`
+   * false leaves out the switch for good.
+   * @param shown - false hides the switch.
+   */
+  setReadOnlyToggle(shown: boolean): void {
+    this.interaction.setReadOnlyToggle(shown);
   }
 
   /** isLearning is true while the mode to learn Markdown is on (R-GEN-013). */
@@ -819,6 +852,7 @@ export class MarkdownEditor implements PluginEditor {
 
   /** destroy removes the editor and its interaction from its element, the editor from its source, and its plugins. */
   destroy(): void {
+    this.hideChanges();
     [...this.proposals.keys()].forEach((id) => this.settle(id, 'outdated'));
     this.disposables.splice(0).forEach((disposable) => dispose(disposable));
     this.stopListening.forEach((stop) => stop());

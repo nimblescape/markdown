@@ -169,8 +169,11 @@ In that window, a Markdown file opens in the editor; the button
 "Open Text Editor to the Side" in the title of the editor opens its text,
 and the button "Switch to Pages" shows the pages of the file in its layout
 ([R-VSC-007](docs/platforms.md#r-vsc-007)); a double click on a page goes
-back to that block in "Edit". After a change of the code, run the build
-again and reload the window.
+back to that block in "Edit". A changed Markdown file in the view "Source
+Control" opens in a diff with the editor on both sides
+([R-VSC-009](docs/platforms.md#r-vsc-009)); the arrow buttons in the title
+of the editor go to the previous and to the next change. After a change of
+the code, run the build again and reload the window.
 
 ## The round trip of the Markdown
 

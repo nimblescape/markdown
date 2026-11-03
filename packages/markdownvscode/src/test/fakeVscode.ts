@@ -3,8 +3,8 @@
 // Licensed under the MIT License. See LICENSE in the repository root for details.
 
 // A small API of VS Code for the tests of the adapter: URIs, ranges, text documents, workspace edits, the files, the
-// custom editors, the commands and the settings, and a webview panel whose messages wait in queues, so that a test decides
-// when each side gets them. The page side of a test runs in the window of happy-dom.
+// custom editors, the commands and the settings, the tabs of one group, and a webview panel whose messages wait in
+// queues, so that a test decides when each side gets them. The page side of a test runs in the window of happy-dom.
 
 import type * as vscode from 'vscode';
 import type { VsCode } from '../extension/editor';
@@ -21,11 +21,12 @@ class Emitter<T> {
   }
 }
 
-/** FakeUri is a URI with a scheme and a path. */
+/** FakeUri is a URI with a scheme, a path and a query, for example the query of a version of Git. */
 export class FakeUri {
   constructor(
     readonly scheme: string,
     readonly path: string,
+    readonly query = '',
   ) {}
   static file(path: string): FakeUri {
     return new FakeUri('file', path);
@@ -49,8 +50,22 @@ export class FakeUri {
     return new FakeUri(base.scheme, segments.join('/') || '/');
   }
   toString(): string {
-    return `${this.scheme}://${this.path}`;
+    return `${this.scheme}://${this.path}${this.query ? `?${this.query}` : ''}`;
   }
+}
+
+/** FakeTab is a tab of the group of the editors; a tab without input is, for example, a diff of two custom editors. */
+export interface FakeTab {
+  readonly label: string;
+  readonly input: unknown;
+  readonly isPreview: boolean;
+  readonly group: FakeTabGroup;
+}
+
+/** FakeTabGroup is the group of the editors, with its active tab. */
+export interface FakeTabGroup {
+  readonly viewColumn: number;
+  activeTab: FakeTab | undefined;
 }
 
 /** FakePosition is a line and a character. */
@@ -211,6 +226,12 @@ export interface FakeVsCode {
   change(document: FakeDocument, text: string): void;
   /** changeSettings tells the adapter that settings of a section changed. */
   changeSettings(section: string): void;
+  /** group is the one group of the editors. */
+  readonly group: FakeTabGroup;
+  /** showTab makes a new tab the active tab of the group, by default a tab without input, as a diff. */
+  showTab(label: string, input?: unknown): FakeTab;
+  /** closed are the tabs that the adapter closed. */
+  readonly closed: FakeTab[];
 }
 
 /** fakeVsCode returns a new fake API. */
@@ -223,6 +244,10 @@ export function fakeVsCode(): FakeVsCode {
   const settings: Record<string, unknown> = {};
   const writable = new Map<string, boolean>();
   const files = new Map<string, Uint8Array>();
+  const tabs = new Emitter<unknown>();
+  const tabGroups = new Emitter<unknown>();
+  const group: FakeTabGroup = { viewColumn: 1, activeTab: undefined };
+  const closed: FakeTab[] = [];
   let registered: ReturnType<FakeVsCode['provider']>;
   const fake: FakeVsCode = {
     api: undefined as unknown as VsCode,
@@ -247,6 +272,14 @@ export function fakeVsCode(): FakeVsCode {
     changeSettings(section) {
       configuration.fire({ affectsConfiguration: (affected) => affected === section || affected.startsWith(`${section}.`) || section.startsWith(`${affected}.`) });
     },
+    group,
+    showTab(label, input) {
+      const tab: FakeTab = { label, input, isPreview: false, group };
+      group.activeTab = tab;
+      tabs.fire({ opened: [tab], closed: [], changed: [] });
+      return tab;
+    },
+    closed,
   };
   const api = {
     Uri: FakeUri,
@@ -264,6 +297,20 @@ export function fakeVsCode(): FakeVsCode {
       registerCustomEditorProvider: (viewType: string, provider: vscode.CustomTextEditorProvider, options: unknown) => {
         registered = { viewType, provider, options };
         return { dispose: () => (registered = undefined) };
+      },
+      tabGroups: {
+        all: [group],
+        activeTabGroup: group,
+        onDidChangeTabs: tabs.event,
+        onDidChangeTabGroups: tabGroups.event,
+        close: (tab: FakeTab) => {
+          closed.push(tab);
+          if (group.activeTab === tab) {
+            group.activeTab = undefined;
+          }
+          tabs.fire({ opened: [], closed: [tab], changed: [] });
+          return Promise.resolve(true);
+        },
       },
     },
     commands: {

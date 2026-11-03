@@ -877,3 +877,58 @@ a green background, and "Accept" and "Reject" stand after it. In read-only mode,
 .nsmd-editor .ProseMirror[contenteditable='false'] .nsmd-change-actions {
   display: none;
 }
+
+/*
+The rendered changes (docs/platforms.md, R-VSC-009): the side `original` marks the removed blocks and words in red, the
+side `modified` the new blocks and words in green; a changed block has a lighter background and a bar at its left, and
+its changed words a stronger one. A spacer is the empty space where the other side has more, with thin lines as in
+the diff of VS Code.
+*/
+
+.nsmd-editor.nsmd-diff-original {
+  --nsmd-diff-color: var(--nsmd-color-red);
+}
+
+.nsmd-editor.nsmd-diff-modified {
+  --nsmd-diff-color: var(--nsmd-color-green);
+}
+
+.nsmd-editor.nsmd-diff .ProseMirror > .nsmd-diff-block {
+  background: color-mix(in srgb, var(--nsmd-diff-color) 16%, transparent);
+  box-shadow: -6px 0 0 color-mix(in srgb, var(--nsmd-diff-color) 16%, transparent), -9px 0 0 var(--nsmd-diff-color);
+}
+
+.nsmd-editor.nsmd-diff .ProseMirror > .nsmd-diff-changed {
+  background: color-mix(in srgb, var(--nsmd-diff-color) 7%, transparent);
+  box-shadow: -6px 0 0 color-mix(in srgb, var(--nsmd-diff-color) 7%, transparent), -9px 0 0 var(--nsmd-diff-color);
+}
+
+.nsmd-editor.nsmd-diff .ProseMirror .nsmd-diff-word {
+  background: color-mix(in srgb, var(--nsmd-diff-color) 32%, transparent);
+  border-radius: 2px;
+}
+
+/* A spacer ends each row of the diff, also with the height 0: as a block of its own formatting context it never lets
+   the margins of the blocks around it collapse, so that its height adds to the height of its row exactly. The blocks
+   have no top margin, so that the space between two rows stays the bottom margin of the block before. */
+.nsmd-editor.nsmd-diff .ProseMirror > * {
+  margin-top: 0;
+}
+
+.nsmd-editor.nsmd-diff .ProseMirror .nsmd-diff-spacer {
+  display: flow-root;
+  margin: 0;
+  padding: 0;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent 0 6px,
+    color-mix(in srgb, var(--nsmd-color-gray) 22%, transparent) 6px 7px
+  );
+  pointer-events: none;
+  user-select: none;
+}
+
+/* The spacer before the first row lines up the start of the text: it stands for no block, so it has no hatch. */
+.nsmd-editor.nsmd-diff .ProseMirror .nsmd-diff-lead {
+  background-image: none;
+}

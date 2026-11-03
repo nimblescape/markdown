@@ -7,7 +7,7 @@
   "publisher": "nimblescape",
   "license": "MIT",
   "engines": {
-    "vscode": "^1.125.0"
+    "vscode": "^1.133.0"
   },
   "main": "./dist/extension.cjs",
   "browser": "./dist/extension.cjs",
@@ -27,7 +27,10 @@
             "filenamePattern": "*.md"
           }
         ],
-        "priority": "default"
+        "priority": {
+          "textEditor": "default",
+          "diffEditor": "default"
+        }
       }
     ],
     "commands": [
@@ -48,10 +51,32 @@
         "title": "Switch to Edit",
         "category": "nimblescape Markdown",
         "icon": "$(edit)"
+      },
+      {
+        "command": "nimblescape.markdownExample.previousChange",
+        "title": "Previous Change",
+        "category": "nimblescape Markdown",
+        "icon": "$(arrow-up)"
+      },
+      {
+        "command": "nimblescape.markdownExample.nextChange",
+        "title": "Next Change",
+        "category": "nimblescape Markdown",
+        "icon": "$(arrow-down)"
       }
     ],
     "menus": {
       "editor/title": [
+        {
+          "command": "nimblescape.markdownExample.previousChange",
+          "when": "nimblescape.markdownExample.editor.diff",
+          "group": "navigation@1"
+        },
+        {
+          "command": "nimblescape.markdownExample.nextChange",
+          "when": "nimblescape.markdownExample.editor.diff",
+          "group": "navigation@2"
+        },
         {
           "command": "nimblescape.markdownExample.showPages",
           "when": "activeCustomEditorId == nimblescape.markdownExample.editor && !nimblescape.markdownExample.editor.pages",
@@ -76,6 +101,14 @@
         {
           "command": "nimblescape.markdownExample.showEdit",
           "when": "activeCustomEditorId == nimblescape.markdownExample.editor"
+        },
+        {
+          "command": "nimblescape.markdownExample.previousChange",
+          "when": "nimblescape.markdownExample.editor.diff"
+        },
+        {
+          "command": "nimblescape.markdownExample.nextChange",
+          "when": "nimblescape.markdownExample.editor.diff"
         }
       ]
     }

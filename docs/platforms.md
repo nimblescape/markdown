@@ -175,15 +175,18 @@ tab of a diff, and the editor of each side gets the text of the other side.
 - Each side marks its changes: the left side the removed blocks with a red
   background, the right side the new blocks with a green background, and
   in a changed block the removed or the new words. The editor compares the
-  blocks with the line diff of the library `diff`
-  ([R-SRC-002](source.md#r-src-002)), and the words of a changed block with
-  its word diff.
+  top-level blocks of both sides with the array diff of the library `diff`
+  ([R-SRC-002](source.md#r-src-002)); a changed block pairs with the
+  similar block of the same kind on the other side, and the editor compares
+  the words of such a pair with the word diff.
 - The blocks of both sides line up: where one side has blocks that the
-  other side does not have, the other side shows an empty space of the same
-  height. Both sides scroll together.
+  other side does not have, or a block of one side is higher, the other
+  side shows an empty, hatched space of the same height. Both sides scroll
+  together.
 - Each change of the right side updates the marks of both sides.
 - Buttons in the title of the editor go to the previous and to the next
-  change.
+  change on both sides. The extension contributes their commands and names
+  them in the options of the adapter.
 - *(proposal)* On the web, a page shows two editors side by side with the
   same functions of the editor.
 

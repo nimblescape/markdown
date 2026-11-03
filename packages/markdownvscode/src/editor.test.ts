@@ -3,9 +3,10 @@
 // © 2026 Hannes Stauss (scalarion@nimblescape.com)
 // Licensed under the MIT License. See LICENSE in the repository root for details.
 
-// The tests of the adapter for VS Code (docs/platforms.md, R-GEN-004, R-VSC-001 to R-VSC-008, R-THEME-003): the custom
+// The tests of the adapter for VS Code (docs/platforms.md, R-GEN-004, R-VSC-001 to R-VSC-009, R-THEME-003): the custom
 // text editor with its page, the text and the changes between the page and the document, also when both change at the
-// same time, the read-only mode, the fonts, the text editor to the side, and a MarkdownEditor in the page.
+// same time, the read-only mode, the fonts, the text editor to the side, a MarkdownEditor in the page, and the rendered
+// changes in a diff.
 
 import { MarkdownEditor } from '@nimblescape/markdowneditor';
 import type { TextChange } from '@nimblescape/markdowntext';
@@ -13,7 +14,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { registerMarkdownEditor, type MarkdownEditorHandle, type MarkdownEditorRegistration, type PluginPanelChannel } from './extension/editor';
 import { editorElementId, pageMessage, pagesElementId } from './messages';
 import { FakeRange, FakeUri, fakeVsCode, openPanel, type FakeDocument, type FakePanel, type FakeVsCode } from './test/fakeVscode';
-import { connectVsCode, vscodeOrigin, type VsCodeConnection } from './webview/connection';
+import { connectVsCode, followDiff, vscodeOrigin, type VsCodeConnection } from './webview/connection';
 
 const text = '# Title\n\nFirst paragraph.\n\nSecond paragraph.\n';
 const viewType = 'nimblescape.test.editor';
@@ -321,6 +322,13 @@ describe('the messages of the page', () => {
     expect(pageMessage({ type: 'selection', selection: { anchor: 'x', head: 2 } })).toBeUndefined();
     expect(pageMessage({ type: 'plugin', plugin: 'notes', message: { ask: 'login' } })).toEqual({ type: 'plugin', plugin: 'notes', message: { ask: 'login' } });
     expect(pageMessage({ type: 'plugin', plugin: 'not a name', message: 1 })).toBeUndefined();
+    expect(pageMessage({ type: 'diffLayout', rows: '0:1', heights: [20, 0.5], start: 40, more: 1 })).toEqual({ type: 'diffLayout', rows: '0:1', heights: [20, 0.5], start: 40 });
+    expect(pageMessage({ type: 'diffLayout', rows: '0:1', heights: [-1], start: 0 })).toBeUndefined();
+    expect(pageMessage({ type: 'diffLayout', rows: '0:1', heights: [1] })).toBeUndefined();
+    expect(pageMessage({ type: 'diffLayout', rows: 1, heights: [] })).toBeUndefined();
+    expect(pageMessage({ type: 'diffScroll', row: 2, offset: -12.5 })).toEqual({ type: 'diffScroll', row: 2, offset: -12.5 });
+    expect(pageMessage({ type: 'diffScroll', row: -1, offset: 0 })).toBeUndefined();
+    expect(pageMessage({ type: 'diffScroll', row: 1, offset: Number.NaN })).toBeUndefined();
     expect(pageMessage({ type: 'run', command: 'x' })).toBeUndefined();
     expect(pageMessage('ready')).toBeUndefined();
     expect(pageMessage(null)).toBeUndefined();
@@ -494,6 +502,118 @@ describe('the editor in the page', () => {
       await panel.settle();
       expect(editor.getMarkdown()).toBe(document.text);
       expect(editor.tiptap.state.doc.firstChild?.attrs.text).toBe('---\ntitle: B\n---');
+    } finally {
+      editor.destroy();
+    }
+  });
+});
+
+describe('the rendered changes', () => {
+  const older = '# Title\n\nThe old words.\n\nStays.\n';
+  const newer = '# Title\n\nThe new words.\n\nStays.\n\nAdded.\n';
+  const gitUri = (ref: string) => new FakeUri('git', '/work/docs/file.md', JSON.stringify({ path: '/work/docs/file.md', ref }));
+  const diffCommands = { nextChangeCommand: 'test.nextChange', previousChangeCommand: 'test.previousChange' };
+
+  /** sent returns the messages of a type that the extension sent to a page. */
+  const sent = (panel: FakePanel, type: string) => panel.toPage.filter((message) => (message as { type: string }).type === type);
+
+  /** openDiff opens a diff of the version of Git and the file, the newer side first, as VS Code resolves them. */
+  async function openDiff(options: Partial<MarkdownEditorRegistration> = {}) {
+    register({ ...diffCommands, ...options });
+    fake.writable.set('git', false);
+    const original = fake.open(older, gitUri('~'));
+    const modified = fake.open(newer);
+    const tab = fake.showTab('file.md (Working Tree)');
+    const modifiedPanel = await openPanel(fake, modified);
+    const originalPanel = await openPanel(fake, original);
+    return { original, modified, tab, originalPanel, modifiedPanel };
+  }
+
+  it('connects the two sides of a diff: each page gets its side and the text of the other side, and the older side is read-only', async () => {
+    const { originalPanel, modifiedPanel } = await openDiff();
+    expect(sent(originalPanel, 'diff')).toEqual([{ type: 'diff', side: 'original', text: newer, editable: false }]);
+    expect(sent(modifiedPanel, 'diff')).toEqual([{ type: 'diff', side: 'modified', text: older, editable: true }]);
+    expect(fake.executed).toContainEqual(['setContext', `${viewType}.diff`, true]);
+    expect(fake.commands.has('test.nextChange') && fake.commands.has('test.previousChange')).toBe(true);
+  });
+
+  it('finds the older side by its version of Git, else by the order in which the sides open', async () => {
+    register(diffCommands);
+    fake.writable.set('git', false);
+    fake.showTab('file.md (abc)');
+    const child = await openPanel(fake, fake.open(newer, gitUri('abc')));
+    const parent = await openPanel(fake, fake.open(older, gitUri('abc^')));
+    expect(sent(parent, 'diff')).toEqual([{ type: 'diff', side: 'original', text: newer, editable: false }]);
+    expect(sent(child, 'diff')).toEqual([{ type: 'diff', side: 'modified', text: older, editable: false }]);
+    fake.showTab('a.md ↔ b.md');
+    const first = await openPanel(fake, fake.open(older, FakeUri.file('/work/a.md')));
+    const second = await openPanel(fake, fake.open(newer, FakeUri.file('/work/b.md')));
+    expect(sent(first, 'diff')).toEqual([{ type: 'diff', side: 'original', text: newer, editable: false }]);
+    expect(sent(second, 'diff')).toEqual([{ type: 'diff', side: 'modified', text: older, editable: true }]);
+  });
+
+  it('gives the other page the heights of the rows, the scroll place and each new text, and goes to a change from the commands', async () => {
+    const { modified, originalPanel, modifiedPanel } = await openDiff();
+    originalPanel.pageApi.postMessage({ type: 'diffLayout', rows: '0:1', heights: [20, 30], start: 48 });
+    originalPanel.deliverToHost();
+    expect(sent(modifiedPanel, 'diffLayout')).toEqual([{ type: 'diffLayout', rows: '0:1', heights: [20, 30], start: 48 }]);
+    modifiedPanel.pageApi.postMessage({ type: 'diffScroll', row: 2, offset: 4 });
+    modifiedPanel.deliverToHost();
+    expect(sent(originalPanel, 'diffScroll')).toEqual([{ type: 'diffScroll', row: 2, offset: 4 }]);
+    fake.change(modified, `${newer}\nMore.\n`);
+    expect(sent(originalPanel, 'diffText')).toEqual([{ type: 'diffText', text: `${newer}\nMore.\n` }]);
+    originalPanel.active = false;
+    await fake.commands.get('test.nextChange')?.();
+    expect(sent(modifiedPanel, 'diffGo')).toEqual([{ type: 'diffGo', direction: 'next' }]);
+    originalPanel.active = true;
+    await fake.commands.get('test.previousChange')?.();
+    expect(sent(originalPanel, 'diffGo')).toEqual([{ type: 'diffGo', direction: 'previous' }]);
+    modifiedPanel.dispose();
+    fake.showTab('other.md', { uri: FakeUri.file('/work/other.md') });
+    expect(fake.executed.at(-1)).toEqual(['setContext', `${viewType}.diff`, false]);
+  });
+
+  it('opens the text diff of VS Code for a file that the extension does not open', async () => {
+    const { original, modified, tab, originalPanel } = await openDiff({ opens: () => false });
+    expect(fake.closed).toEqual([tab]);
+    expect(fake.executed).toContainEqual(['vscode.diff', original.uri, modified.uri, 'file.md (Working Tree)', { viewColumn: 1, preview: false, override: true }]);
+    expect(sent(originalPanel, 'diff')).toEqual([]);
+  });
+
+  it('shows the changes in the editor of the page: the older side read-only, without the switch to editing', async () => {
+    register(diffCommands);
+    fake.writable.set('git', false);
+    const original = fake.open(older, gitUri('~'));
+    const modified = fake.open(newer);
+    fake.showTab('file.md (Working Tree)');
+    const panel = await openPanel(fake, original);
+    const connecting = connectVsCode({ api: panel.pageApi });
+    await panel.settle();
+    const connection = await connecting;
+    connections.push(connection);
+    const editor = new MarkdownEditor(connection.element, { source: connection.source, editable: connection.editable, id: 'page', host: connection.host });
+    try {
+      const stopDiff = followDiff(connection, editor);
+      expect(connection.diff).toBeUndefined();
+      const other = await openPanel(fake, modified);
+      await panel.settle();
+      expect(connection.diff?.side).toBe('original');
+      expect(connection.editable).toBe(false);
+      expect(editor.isEditable).toBe(false);
+      const toggle = [...connection.element.querySelectorAll<HTMLButtonElement>('.nsmd-toolbar button')].find((button) => button.title.includes('editing'));
+      expect(toggle?.hidden).toBe(true);
+      const marked = (name: string) => [...connection.element.querySelectorAll(`.${name}`)].map((node) => node.textContent);
+      expect(marked('nsmd-diff-changed')).toEqual(['The old words.']);
+      expect(marked('nsmd-diff-word')).toEqual(['old']);
+      fake.change(modified, newer.replace('new words', 'old words'));
+      await panel.settle();
+      expect(marked('nsmd-diff-changed')).toEqual([]);
+      for (let wait = 0; wait < 20 && sent(other, 'diffLayout').length === 0; wait++) {
+        await new Promise((resolve) => setTimeout(resolve, 20));
+        await panel.settle();
+      }
+      expect(sent(other, 'diffLayout').length).toBeGreaterThan(0);
+      stopDiff();
     } finally {
       editor.destroy();
     }

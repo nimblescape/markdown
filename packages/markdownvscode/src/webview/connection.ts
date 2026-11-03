@@ -13,13 +13,29 @@
 // gives the host of the layout part: it reads the files of the layouts through the extension, and maps the URI of a
 // file to its address in the webview.
 //
+// In a diff of VS Code, the page is one side (docs/platforms.md, R-VSC-009): the connection gives the side, the text of
+// the other side with each new text, and carries the heights of the rows and the scroll place between the two pages;
+// `followDiff` connects them with the rendered changes of the editor. The older side cannot change.
+//
 // VS Code gives each key of a webview to its own key bindings as well, and Undo and Redo of a custom text editor work
 // on the document of VS Code, step by step as the page sent the changes. A key that the page handled, and Undo and Redo
 // in a field of text, stay in the page, so that Undo of the editor undoes the steps of the user and a key of the
 // editor, for example Ctrl+K for a link, starts no key binding of VS Code.
 
 import { applyPatches, mergeTexts, patchesBetween, TextSource, type Origin, type TextPatch } from '@nimblescape/markdowntext';
-import { editorElementId, fromBase64, type HostMessage, type PageFiles, type PageFonts, type PageMessage, pagesElementId, type PageView } from '../messages';
+import {
+  type DiffLayout,
+  type DiffPosition,
+  type DiffSide,
+  editorElementId,
+  fromBase64,
+  type HostMessage,
+  type PageFiles,
+  type PageFonts,
+  type PageMessage,
+  pagesElementId,
+  type PageView,
+} from '../messages';
 
 /** VsCodeWebviewApi is the part of the API of the webview that the page needs, from `acquireVsCodeApi()`. */
 export interface VsCodeWebviewApi {
@@ -75,6 +91,28 @@ export interface VsCodePagesHost {
   readonly embed: readonly string[];
 }
 
+/** VsCodeDiff is the side of the page in a diff of VS Code (docs/platforms.md, R-VSC-009). */
+export interface VsCodeDiff {
+  /** side is `original` for the older version, on the left, and `modified` for the newer version, on the right. */
+  readonly side: DiffSide;
+  /** text is the last text of the other side. */
+  readonly text: string;
+  /** layout is the last layout of the rows of the other side, or undefined before the first one. */
+  readonly layout: DiffLayout | undefined;
+  /** onText calls a listener with each new text of the other side, and returns a function that stops it. */
+  onText(listener: (text: string) => void): () => void;
+  /** postLayout gives the other side the natural heights of the rows of this side. */
+  postLayout(layout: DiffLayout): void;
+  /** onLayout calls a listener with each layout of the rows of the other side, and returns a function that stops it. */
+  onLayout(listener: (layout: DiffLayout) => void): () => void;
+  /** postScroll gives the other side the place at the top of the view of this side. */
+  postScroll(position: DiffPosition): void;
+  /** onScroll calls a listener with each scroll place of the other side, and returns a function that stops it. */
+  onScroll(listener: (position: DiffPosition) => void): () => void;
+  /** onGo calls a listener when the user goes to the next or the previous change, and returns a function that stops it. */
+  onGo(listener: (direction: 'next' | 'previous') => void): () => void;
+}
+
 /** VsCodeConnection is the connection of the page to the document of VS Code. */
 export interface VsCodeConnection {
   /** source holds the text of the document: the editors of the page take it as their source. */
@@ -100,6 +138,10 @@ export interface VsCodeConnection {
   readonly pluginScripts: readonly string[];
   /** nonce is the nonce of the scripts of the page, which the policy of its content asks for. */
   readonly nonce: string;
+  /** diff is the side of the page in a diff of VS Code, or undefined while the page is no side of a diff. */
+  readonly diff: VsCodeDiff | undefined;
+  /** onDiff calls a listener when the page becomes a side of a diff, and returns a function that stops it. */
+  onDiff(listener: (diff: VsCodeDiff) => void): () => void;
   /** onView calls a listener after each switch of the view, and returns a function that stops it. */
   onView(listener: (view: PageView) => void): () => void;
   /** setView switches the view of the page, for example to "edit" after a double click on a page. */
@@ -159,6 +201,84 @@ function keepKey(event: KeyboardEvent): void {
   }
 }
 
+/**
+ * DiffChanges is what followDiff needs from the rendered changes of the editor, the EditorChanges of
+ * @nimblescape/markdowneditor.
+ */
+export interface DiffChanges {
+  setOther(text: string): void;
+  setOtherLayout(layout: DiffLayout): void;
+  scrollTo(position: DiffPosition): void;
+  next(): boolean;
+  previous(): boolean;
+}
+
+/** DiffEditor is what followDiff needs from the editor of the page, the MarkdownEditor of @nimblescape/markdowneditor. */
+export interface DiffEditor {
+  showChanges(options: {
+    readonly side: DiffSide;
+    readonly other: string;
+    readonly onLayout?: (layout: DiffLayout) => void;
+    readonly onScroll?: (position: DiffPosition) => void;
+  }): DiffChanges;
+  setEditable(editable: boolean): void;
+  setReadOnlyToggle?(shown: boolean): void;
+}
+
+/**
+ * followDiff shows the rendered changes in the editor of the page while the page is a side of a diff
+ * (docs/platforms.md, R-VSC-009): the marks against the text of the other side, the rows that line up with the other
+ * side, the scroll together, and the next and the previous change. The older side is read-only, without the switch to
+ * editing.
+ * @param connection - The connection of the page.
+ * @param editor - The editor of the page.
+ * @returns A function that stops it.
+ */
+export function followDiff(connection: VsCodeConnection, editor: DiffEditor): () => void {
+  const stops: (() => void)[] = [];
+  const show = (diff: VsCodeDiff) => {
+    stops.splice(0).forEach((stop) => stop());
+    if (diff.side === 'original' || !connection.editable) {
+      editor.setEditable(false);
+      editor.setReadOnlyToggle?.(false);
+    }
+    const changes = editor.showChanges({
+      side: diff.side,
+      other: diff.text,
+      onLayout: (layout) => diff.postLayout(layout),
+      onScroll: (position) => diff.postScroll(position),
+    });
+    if (diff.layout) {
+      changes.setOtherLayout(diff.layout);
+    }
+    stops.push(
+      diff.onText((text) => changes.setOther(text)),
+      diff.onLayout((layout) => changes.setOtherLayout(layout)),
+      diff.onScroll((position) => changes.scrollTo(position)),
+      diff.onGo((direction) => (direction === 'next' ? changes.next() : changes.previous())),
+    );
+  };
+  const stop = connection.onDiff(show);
+  if (connection.diff) {
+    show(connection.diff);
+  }
+  return () => {
+    stop();
+    stops.splice(0).forEach((each) => each());
+  };
+}
+
+/** listen adds a listener to a set, and returns a function that removes it. */
+function listen<T>(listeners: Set<(value: T) => void>, listener: (value: T) => void): () => void {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
+
+/** call calls the listeners of a set with a value. */
+function call<T>(listeners: Set<(value: T) => void>, value: T): void {
+  [...listeners].forEach((listener) => listener(value));
+}
+
 /** Known is the last version of the document that the page knows, with its text. */
 interface Known {
   readonly version: number;
@@ -190,6 +310,14 @@ class Connection implements VsCodeConnection {
   /** waiting holds the reads of files that wait for the answer of the extension, by their IDs. */
   private readonly waiting = new Map<number, (data: Uint8Array | undefined) => void>();
   private readonly viewListeners = new Set<(view: PageView) => void>();
+  /** diffState is the side of the page in a diff, with the last text and layout of the other side. */
+  private diffState: { side: DiffSide; text: string; layout: DiffLayout | undefined } | undefined;
+  private diffApi: VsCodeDiff | undefined;
+  private readonly diffListeners = new Set<(diff: VsCodeDiff) => void>();
+  private readonly diffTextListeners = new Set<(text: string) => void>();
+  private readonly diffLayoutListeners = new Set<(layout: DiffLayout) => void>();
+  private readonly diffScrollListeners = new Set<(position: DiffPosition) => void>();
+  private readonly diffGoListeners = new Set<(direction: 'next' | 'previous') => void>();
   private readonly stop: (() => void)[] = [];
   /** listeners holds the listeners of the messages of the plugins, by the name of the plugin. */
   private readonly listeners = new Map<string, Set<(message: unknown) => void>>();
@@ -292,9 +420,16 @@ class Connection implements VsCodeConnection {
     return script?.nonce || script?.getAttribute('nonce') || '';
   }
 
+  get diff(): VsCodeDiff | undefined {
+    return this.diffApi;
+  }
+
+  onDiff(listener: (diff: VsCodeDiff) => void): () => void {
+    return listen(this.diffListeners, listener);
+  }
+
   onView(listener: (view: PageView) => void): () => void {
-    this.viewListeners.add(listener);
-    return () => this.viewListeners.delete(listener);
+    return listen(this.viewListeners, listener);
   }
 
   setView(view: PageView): void {
@@ -313,6 +448,9 @@ class Connection implements VsCodeConnection {
     this.stop.length = 0;
     this.listeners.clear();
     this.viewListeners.clear();
+    for (const listeners of [this.diffListeners, this.diffTextListeners, this.diffLayoutListeners, this.diffScrollListeners, this.diffGoListeners]) {
+      listeners.clear();
+    }
     this.waiting.forEach((resolve) => resolve(undefined));
     this.waiting.clear();
   }
@@ -384,6 +522,63 @@ class Connection implements VsCodeConnection {
       case 'plugin':
         [...(this.listeners.get(message.plugin) ?? [])].forEach((listener) => listener(message.message));
         break;
+      case 'diff':
+        this.takeDiff(message);
+        break;
+      case 'diffText':
+        if (this.diffState && typeof message.text === 'string') {
+          this.diffState.text = message.text;
+          call(this.diffTextListeners, message.text);
+        }
+        break;
+      case 'diffLayout':
+        if (this.diffState) {
+          const layout: DiffLayout = { rows: message.rows, heights: message.heights, start: message.start };
+          this.diffState.layout = layout;
+          call(this.diffLayoutListeners, layout);
+        }
+        break;
+      case 'diffScroll':
+        call(this.diffScrollListeners, { row: message.row, offset: message.offset });
+        break;
+      case 'diffGo':
+        call(this.diffGoListeners, message.direction);
+        break;
+    }
+  }
+
+  /**
+   * takeDiff makes the page a side of a diff, or takes the text of the other side again, for example after the page
+   * started again. The page tells the listeners once the editor can exist, after the text of the document.
+   */
+  private takeDiff(message: Extract<HostMessage, { type: 'diff' }>): void {
+    this.canEdit = message.editable;
+    if (this.diffState && this.diffState.side === message.side) {
+      if (this.diffState.text !== message.text) {
+        this.diffState.text = message.text;
+        call(this.diffTextListeners, message.text);
+      }
+      return;
+    }
+    this.diffState = { side: message.side, text: message.text, layout: undefined };
+    const state = this.diffState;
+    this.diffApi = {
+      side: state.side,
+      get text() {
+        return state.text;
+      },
+      get layout() {
+        return state.layout;
+      },
+      onText: (listener) => listen(this.diffTextListeners, listener),
+      postLayout: (layout) => this.post({ type: 'diffLayout', rows: layout.rows, heights: [...layout.heights], start: layout.start }),
+      onLayout: (listener) => listen(this.diffLayoutListeners, listener),
+      postScroll: (position) => this.post({ type: 'diffScroll', row: position.row, offset: position.offset }),
+      onScroll: (listener) => listen(this.diffScrollListeners, listener),
+      onGo: (listener) => listen(this.diffGoListeners, listener),
+    };
+    if (this.textSource) {
+      call(this.diffListeners, this.diffApi);
     }
   }
 
