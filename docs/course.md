@@ -126,7 +126,10 @@ conventions and the topics of its chapters. They are in
 `cs instructions <topic>` prints them after the rules of the format. A
 course has no `AGENTS.md` and no other file of rules for AI agents, because
 the students get the repository by the sync of a template, and the rules
-stay hidden.
+stay hidden. AI agents run each command of the course module only with npx,
+`npx -y @nimblescape/course <command>`, and never install the package
+globally; the format, the help of the command and the files of each course
+name it only in this form.
 
 **When a course changes to these forms.** A course gets the comment of the
 format ([R-COURSE-004](#r-course-004)) and gives up its copies of the forms in
