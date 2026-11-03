@@ -28,7 +28,9 @@ holds the requirements of the module.
 **A course in a repository.** The course module must define the form of the
 files of a course in a Git repository: the README of the course, the README
 of each chapter with its learning objectives, the README of each assignment
-with its requirements, and the feedback file of each assignment. The README
+with its requirements, the feedback file of each assignment, the tutorial
+pages, the walkthroughs, the plan of the course, the cheat sheet, and the
+overviews, the README of a folder that links each of its files. The README
 files must be readable as structured data ([R-COURSE-009](#r-course-009)),
 and each file must tell an AI agent where its rules are
 ([R-COURSE-004](#r-course-004), [R-COURSE-005](#r-course-005)). The module
@@ -88,7 +90,11 @@ as the comment of the format of Markdown Notes
 - The first line names the format, its version, the kind of the file and
   the address of the specification:
   `<!-- nimblescape-course v1.0.0 assignment spec=https://github.com/nimblescape/course-vscode/blob/main/docs/format.md`.
-  The kind is `course`, `chapter`, `assignment` or `feedback`.
+  The kind is `course`, `chapter`, `assignment`, `feedback`, `tutorial`,
+  `walkthrough`, `plan` (the plan of the course), `cheat-sheet` or
+  `overview` (the README of a folder that links each of its files). The
+  sections 4 to 13 of `docs/format.md` of `nimblescape/course-vscode` define
+  the form of each kind.
 - Short lines of words follow, which tell an AI agent to print the rules of
   the kind of the file with `npx -y @nimblescape/course instructions <kind>`
   ([R-COURSE-005](#r-course-005)) before it reads, changes or writes the
@@ -110,8 +116,8 @@ as the comment of the format of Markdown Notes
 rules of a topic as Markdown; without a topic, it prints the list of the
 topics, in the same way as `mp instructions` of Markdown Paper
 ([R-CLI-003](https://github.com/nimblescape/markdownpaper-vscode/blob/main/docs/requirements.md#r-cli-003)).
-The topics are `course`, `chapter`, `assignment`, `objectives` (the six
-levels of the revised taxonomy with their verbs) and `feedback`. The
+The topics are the kinds of the files ([R-COURSE-004](#r-course-004)) and
+`objectives` (the six levels of the revised taxonomy with their verbs). The
 documents in `docs/` of the repository are the source of the instructions.
 These instructions replace the copies of the forms in each course. A course
 keeps only its own rules in its repository: its students, its language, its
@@ -143,9 +149,9 @@ name of a section is in the language of the course, and the module keeps the
 names of each role for each language, for example "Anforderungen" in German
 and "Requirements" in English for the role "requirements". The file
 `.course/course.yml` holds the settings of a course: `course`, the name of
-the course, for example `ts-2`; `language`, `de` or `en`; and `readme`,
-`chapters` and `assignments`, the patterns of the paths of the README files,
-with `*` and `**`, each a pattern or a list of patterns. The course module
+the course, for example `ts-2`; `language`, `de` or `en`; and the patterns
+of the paths of the files of each kind, for example `readme`, `chapters` and
+`assignments`, with `*` and `**`, each a pattern or a list of patterns. The course module
 and the feedback program read the name and the language of a course from
 this file. Each README names its kind in its comment of the format
 ([R-COURSE-004](#r-course-004)), and the kind in the comment wins over the
@@ -323,7 +329,12 @@ the course; `cs feedback --form` prints the form of the answer; and
 `cs feedback` writes `FEEDBACK.md` with the score. Until the npm release of
 `@nimblescape/course`, the program builds `cs` from
 `nimblescape/course-vscode` at the commit that `versions.course` of its
-`config.yml` names. It keeps its checks, skills, engines and prompts.
+`config.yml` names. It keeps its checks, skills, engines and prompts. The
+workflow of a course runs the feedback program at the tag that
+`FEEDBACK_VERSION` names, `v1`. The tag `v1` is the version of the program
+that uses the course module, so only a course in the format of the module
+([R-COURSE-005](#r-course-005)) may use it; the four -2 courses of majikmate
+are in this format.
 
 ## 7. Open questions
 
@@ -333,10 +344,7 @@ the course; `cs feedback --form` prints the form of the answer; and
 2. Integrity: a student can change the history file in `.workhistory/`. Does
    the course protect it like `FEEDBACK.md`, or does the reflection tool
    check it against the commits ([R-COURSE-003](#r-course-003))?
-3. Other files: does the module also define the form of the tutorial pages,
-   the walkthroughs and the cheat sheet, or only the README files of the
-   course, the chapters and the assignments ([R-COURSE-001](#r-course-001))?
-4. Marketplace: does the release 0.1.0 also publish the VS Code extension
+3. Marketplace: does the release 0.1.0 also publish the VS Code extension
    on the Marketplace, or only the npm package
    ([R-COURSE-002](#r-course-002))?
 
