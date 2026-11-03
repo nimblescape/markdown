@@ -53,8 +53,8 @@ The `package.json` of the extension contributes the custom editor, the
 commands and their buttons in the title of the editor. The priority of the
 editor names the diff editor as well, so that VS Code opens a diff of a file
 with the editor on both sides
-([R-VSC-009](../../docs/platforms.md#r-vsc-009)); this needs VS Code 1.133 or
-newer. The adapter sets the context key `<viewType>.diff` while the active
+([R-VSC-009](../../docs/platforms.md#r-vsc-009)); VS Code 1.125 and later know
+this priority. The adapter sets the context key `<viewType>.diff` while the active
 tab is such a diff, for the buttons to the previous and the next change:
 
 ```json

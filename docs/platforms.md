@@ -166,8 +166,7 @@ changed file in the view "Source Control", in the timeline and with
 ([R-VSC-001](#r-vsc-001)). VS Code opens a custom text editor in a diff only
 when the priority of the editor in the package.json of the extension also
 names the diff editor, `"priority": { "textEditor": "default",
-"diffEditor": "default" }`, which needs VS Code 1.133 or newer
-([R-VSC-003](#r-vsc-003)). Each side is a panel of its own. The left side
+"diffEditor": "default" }`; VS Code 1.125 and later know this priority. Each side is a panel of its own. The left side
 is read-only; the right side is editable when its file system can write.
 The adapter connects the two panels that VS Code opens together for one
 tab of a diff, and the editor of each side gets the text of the other side.
