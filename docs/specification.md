@@ -300,16 +300,16 @@ use:
 | --- | --- | --- |
 | Tiptap 3 (`@tiptap/core`, `@tiptap/pm`, `@tiptap/starter-kit` and the `@tiptap/extension-*` packages of the nodes and marks) | MIT | The rendered editor and its extension API |
 | ProseMirror, through `@tiptap/pm` | MIT | The engine of the rendered editor ([R-GEN-009](editor.md#r-gen-009)) |
-| markdown-it, `markdown-it-footnote` | MIT | Parsing and rendering of Markdown |
+| markdown-it, `markdown-it-footnote` | MIT | Parsing and rendering of Markdown; markdown-it uses `entities` (BSD-2-Clause), and only its command line program uses `argparse` (Python-2.0), which no bundle holds |
 | `markdown-it-task-lists` | ISC | Task lists |
 | `prosemirror-markdown` | MIT | The bridge between the tokens of markdown-it and the document of the editor |
 | `string-width` | MIT | The width of the cells of a table |
 | `lowlight`, `@tiptap/extension-code-block-lowlight` | MIT | The syntax colors of code blocks in the editor ([R-EDIT-003](editor.md#r-edit-003)); `lowlight` uses `devlop` and `dequal` (MIT) |
 | `highlight.js` | BSD-3-Clause | The languages of the syntax colors, through `lowlight` ([R-EDIT-003](editor.md#r-edit-003)) |
-| `yaml` *(proposal)* | ISC | The front matter in YAML ([R-FM-005](editor.md#r-fm-005)) |
-| `@decimalturn/toml-patch` *(proposal)* | MIT | The front matter in TOML ([R-FM-005](editor.md#r-fm-005)) |
-| `jsonc-parser` *(proposal)* | MIT | The front matter in JSON, also with comments ([R-FM-005](editor.md#r-fm-005)) |
-| `@cfworker/json-schema` *(proposal)* | MIT | The check of the front matter against its JSON schema, without eval ([R-FM-004](editor.md#r-fm-004)) |
+| `yaml` | ISC | The front matter in YAML ([R-FM-005](editor.md#r-fm-005)) |
+| `@decimalturn/toml-patch` | MIT | The front matter in TOML ([R-FM-005](editor.md#r-fm-005)) |
+| `jsonc-parser` | MIT | The front matter in JSON, also with comments ([R-FM-005](editor.md#r-fm-005)) |
+| `@cfworker/json-schema` | MIT | The check of the front matter against its JSON schema, without eval ([R-FM-004](editor.md#r-fm-004)) |
 | `diff` *(proposal)* | BSD-3-Clause | The patches between two texts, and the blocks that a change from outside changes ([R-SRC-002](source.md#r-src-002)) |
 | `pagedjs` *(proposal)* | MIT | The pages of a layout ([R-LAYOUT-003](rendering.md#r-layout-003)); the layout package holds its script `paged.polyfill.js`, which holds `event-emitter`, `d`, `es5-ext`, `type` and `es6-symbol` (MIT and ISC), `css-tree` (MIT) with `mdn-data` (CC0-1.0) and `source-map` (BSD-3-Clause), and `clear-cut` (MIT) |
 | `pdf-lib` *(proposal)* | MIT | The finish of the PDF: the removal of the marks of the soft hyphens and the metadata ([R-LAYOUT-002](rendering.md#r-layout-002)); it uses `@pdf-lib/standard-fonts` and `@pdf-lib/upng` (MIT), `pako` (MIT and Zlib) and `tslib` (0BSD) |
@@ -344,12 +344,7 @@ use:
 
 ## 6. Open questions
 
-1. Names: the contribution point `nimblescape.markdown.extensions`
-   (proposal)?
-2. Licenses: `markdown-it-task-lists` (ISC), `entities` (BSD-2-Clause, used
-   by markdown-it) and `argparse` (Python-2.0, only in the command line
-   program of markdown-it, in no bundle).
-3. The package of the AI: `@nimblescape/markdownai` for the provider API,
+1. The package of the AI: `@nimblescape/markdownai` for the provider API,
    the context, the tool of the proposed changes and the loop of a chat
    ([R-ARCH-002](#r-arch-002), proposal)?
 

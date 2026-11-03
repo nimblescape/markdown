@@ -43,12 +43,12 @@ use them. Notes uses the editor for each answer of a note in its side view,
 and the editor must also be able to edit a whole file in the editor area. A
 setting of the extension chooses which Markdown files open in the editor:
 `all`, `notesAndPapers` (files with the comment of the format of Notes or
-with a layout) or `none`. *(proposal)* The default is `all`. "Reopen Editor
+with a layout) or `none`. The default is `all`. "Reopen Editor
 With" of VS Code always offers the text editor.
 
 ### R-VSC-001
 
-*(proposal)* **A custom text editor.** Notes registers the editor as a
+**A custom text editor.** Notes registers the editor as a
 custom text editor of VS Code, so that the file stays a normal text
 document: save, the dirty mark, hot exit, Git diffs, the timeline and other
 extensions work as for the text editor.
@@ -134,11 +134,13 @@ as `blob:` URLs, the page of the webview may also load its own files with
 
 ### R-VSC-008
 
-*(proposal)* **The plugins of other extensions.** An extension contributes
-plugins of the editor ([R-PLUGIN-002](plugins.md#r-plugin-002)) in its
-package.json, for example Paper:
-`"contributes": { "nimblescape.markdown.extensions": { "editorScripts":
-["dist/editorPlugins.js"] } }`. An extension that registers the editor with
+**The plugins of other extensions.** An extension contributes plugins of
+the editor ([R-PLUGIN-002](plugins.md#r-plugin-002)) in its package.json,
+through the contribution point `nimblescape.markdown.extensions`, for
+example Paper: `"contributes": { "nimblescape.markdown.extensions": {
+"editorScripts": ["dist/editorPlugins.js"] } }`.
+
+*(proposal)* An extension that registers the editor with
 the option `contributedPlugins`, for example Notes, gives its page these
 scripts of all enabled extensions, in the order of the IDs of the
 extensions; a script must be a file `.js` in the folder of its extension.
@@ -158,10 +160,14 @@ listener of the plugin.
 example its changes in Git, must show rendered in the editor, in a split
 window: the older version on the left, the newer version on the right.
 
-*(proposal)* The diff of VS Code shows the editor on both sides, for
-example for a changed file in the view "Source Control", in the timeline
-and with "Compare with Saved", because the editor is a custom text editor
-([R-VSC-001](#r-vsc-001)). Each side is a panel of its own. The left side
+The diff of VS Code shows the editor on both sides, for example for a
+changed file in the view "Source Control", in the timeline and with
+"Compare with Saved", because the editor is a custom text editor
+([R-VSC-001](#r-vsc-001)). VS Code opens a custom text editor in a diff only
+when the priority of the editor in the package.json of the extension also
+names the diff editor, `"priority": { "textEditor": "default",
+"diffEditor": "default" }`, which needs VS Code 1.133 or newer
+([R-VSC-003](#r-vsc-003)). Each side is a panel of its own. The left side
 is read-only; the right side is editable when its file system can write.
 The adapter connects the two panels that VS Code opens together for one
 tab of a diff, and the editor of each side gets the text of the other side.
@@ -178,8 +184,8 @@ tab of a diff, and the editor of each side gets the text of the other side.
 - Each change of the right side updates the marks of both sides.
 - Buttons in the title of the editor go to the previous and to the next
   change.
-- On the web, a page shows two editors side by side with the same
-  functions of the editor.
+- *(proposal)* On the web, a page shows two editors side by side with the
+  same functions of the editor.
 
 VS Code has an API for the diffs of custom editors that gives both
 documents and both panels at once (`customEditorDiffs`). It is a proposed
@@ -203,13 +209,22 @@ and `markdown.previewScripts`.
   contribute plugins of the editor ([R-VSC-008](#r-vsc-008)), for example
   Notes and Paper, because their plugins of the editor show their syntax.
 - These functions run in the extension host, not in the page. So the
-  adapter parses the text of the file with them in the extension host. Each
-  top-level block whose tokens differ from the tokens of the renderer
-  without these plugins becomes a block of the level "render"
-  ([R-GEN-012](plugins.md#r-gen-012)), for example a code block `mermaid`,
-  math between `$$` or a container `:::`. Its rendering is the HTML of
-  markdown-it with these plugins, and its source opens below it. The policy
-  of the page stays the same, so a script inside this HTML does not run.
+  adapter renders the top-level blocks of the file with them in the
+  extension host, and compares the HTML of each block with the HTML of the
+  renderer without these plugins. A block whose HTML differs becomes a block
+  of the level "render" ([R-GEN-012](plugins.md#r-gen-012)), for example a
+  code block `mermaid`, math between `$$` or a container `:::`. Its
+  rendering is the HTML of markdown-it with these plugins, and its source
+  opens below it. The policy of the page stays the same, so a script inside
+  this HTML does not run.
+- Only blocks: a paragraph, a heading, a list and a table always stay
+  blocks of the editor. A code block stays a code block of the editor, with
+  the syntax colors of the editor, when its HTML with these plugins is still
+  code (`pre`), for example with other colors; only a code block whose
+  language a plugin shows as something else, for example a diagram, becomes
+  a block of the level "render". A listing and the other generated parts
+  ([R-EDIT-011](editor.md#r-edit-011)) stay read-only parts of their plugin,
+  and these plugins never render them.
 - The page loads the style sheets of `markdown.previewStyles` and the
   scripts of `markdown.previewScripts` from the folders of their
   extensions, in the same way as the plugins of other extensions; the
@@ -219,9 +234,10 @@ and `markdown.previewScripts`.
   does, because the scripts of these extensions, for example of diagrams,
   wait for it.
 - A plugin that changes the text inside a paragraph, for example the codes
-  of emoji, makes the whole paragraph such a block. A script that needs
-  other parts of the Markdown preview may not work. A setting of the
-  extension turns these extensions off in the editor.
+  of emoji or math between `$`, shows nothing in the editor: the paragraph
+  shows the text as it is written. A script that needs other parts of the
+  Markdown preview may not work. A setting of the extension turns these
+  extensions off in the editor.
 - On the web, a page gives a markdown-it plugin to the editor as a plugin
   of the level "render" with `extendMarkdownIt`
   ([R-PLUGIN-001](plugins.md#r-plugin-001)), also without a change of the
@@ -273,27 +289,21 @@ change any variable or bring a theme of its own.
 
 ### R-THEME-003
 
-*(proposal)* **Fonts in VS Code.** In VS Code, the text uses the font, the
+**Fonts in VS Code.** In VS Code, the text uses the font, the
 size and the line height of the settings of the Markdown preview, and code
 uses the font of the editor. A change of these settings shows at once.
 
 ## 6. Open questions
 
-1. VS Code: does Notes register the editor as a custom text editor for the
-   main view of a file ([R-VSC-001](#r-vsc-001), proposal), and is `all` the
-   default of the setting ([R-GEN-004](#r-gen-004))?
-2. Fonts: the fonts of the settings of the Markdown preview in VS Code
-   ([R-THEME-003](#r-theme-003), proposal)?
-3. VS Code: the form of the adapter ([R-VSC-001](#r-vsc-001)), the
+1. VS Code: the form of the adapter ([R-VSC-001](#r-vsc-001)), the
    changes between the page and the document
    ([R-VSC-005](#r-vsc-005)), Undo and the keys of the editor
    ([R-VSC-006](#r-vsc-006)), the views "Edit" and "Pages"
-   ([R-VSC-007](#r-vsc-007)), and the plugins of other extensions
-   ([R-VSC-008](#r-vsc-008)), all proposals?
-4. VS Code: the details of the rendered changes, which come from the diff of
-   VS Code with the editor on both sides ([R-VSC-009](#r-vsc-009),
-   proposal)?
-5. VS Code: does the editor show the syntax of the extensions of the
+   ([R-VSC-007](#r-vsc-007)), and the details of the plugins of other
+   extensions ([R-VSC-008](#r-vsc-008)), all proposals?
+2. Web: two editors side by side for the rendered changes
+   ([R-VSC-009](#r-vsc-009), proposal)?
+3. VS Code: does the editor show the syntax of the extensions of the
    Markdown preview, as blocks of the level "render"
    ([R-VSC-010](#r-vsc-010), proposal)?
 
