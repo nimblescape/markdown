@@ -153,7 +153,8 @@ and marks the values as read-only. Notes integrates the AI chat as notes
 ### R-PAPER-001
 
 **The plugins of Paper.** Paper adds the schema of the front matter of the
-layout, and `layout` and `repos` read-only with Ctrl+click to the clone
+layout, and `layout` and `repos` read-only with Ctrl+click (Cmd+click on
+macOS) to the clone
 ([R-FM-006](editor.md#r-fm-006)). It adds citations: `/cite` with Zotero,
 `/research`, the hidden comment of the sources, and the hidden codes of the
 special sections. It adds the generated lists, the layouts, the pages and

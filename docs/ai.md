@@ -14,6 +14,11 @@ editor of a file, which proposes changes of the text
 [specification](specification.md) of nimblescape Markdown and normative in
 the same way. [Section 4](#4-open-questions) lists its open questions.
 
+**For now, nimblescape Markdown builds no AI chats.** No provider, no chat
+in Notes and no memory are built until a later decision. The tracked
+changes of the editor ([R-AI-006](#r-ai-006)) and the package
+`@nimblescape/markdownai` ([R-AI-002](#r-ai-002)) stay as they are.
+
 ## 1. AI chats
 
 ### R-AI-001

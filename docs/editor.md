@@ -198,8 +198,8 @@ example by the formatter, may change a generated part
 ([R-SRC-002](source.md#r-src-002)). *(proposal)* The cursor jumps over a
 generated part, and the user deletes it only as a whole, in one step of
 undo. A plugin may give a form for the data of a generated part, for
-example the page of a citation. Ctrl+click on a reference goes to its
-target.
+example the page of a citation. Ctrl+click (Cmd+click on macOS) on a
+reference goes to its target.
 
 *(proposal)* A selection that touches a generated part holds the whole
 part. The user cannot change the format of a piece of a part. Backspace and
@@ -294,7 +294,8 @@ quotes of the text that it replaces. The edits are code of the source
 ### R-FM-006
 
 **Inputs of plugins.** A plugin may give the input of a key, for example
-Paper for `layout` and `repos`: read-only, and Ctrl+click opens the clone.
+Paper for `layout` and `repos`: read-only, and Ctrl+click (Cmd+click on
+macOS) opens the clone.
 *(proposal)* The input of a plugin takes the place of the input of the form
 in both modes.
 
