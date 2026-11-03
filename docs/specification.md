@@ -281,7 +281,7 @@ repositories of their own. The same holds for the course module
 | [How the reflection tool works](reflection-guide.md) | The documentation of the reflection tool: how it works, step by step, with the scientific basis of each step; the report links to it and cites no literature | Documentation of [R-REFL-020](reflection.md#r-refl-020) |
 | [Plugins and format extensions](plugins.md) | The plugin API, the levels of a plugin, the plugins of Markdown Notes and Markdown Paper | [R-GEN-005](plugins.md#r-gen-005), [R-GEN-012](plugins.md#r-gen-012), [R-PLUGIN-001](plugins.md#r-plugin-001), [R-PLUGIN-002](plugins.md#r-plugin-002), [R-NOTES-001](plugins.md#r-notes-001), [R-PAPER-001](plugins.md#r-paper-001) |
 | [AI](ai.md) | AI chats, tracked changes, pluggable providers, the API key, the memory | [R-AI-001](ai.md#r-ai-001), [R-AI-006](ai.md#r-ai-006), [R-AI-002](ai.md#r-ai-002), [R-AI-005](ai.md#r-ai-005), [R-AI-003](ai.md#r-ai-003) |
-| [Platforms](platforms.md) | The adapters of VS Code, of the web and of the command line; the theme | [R-PLAT-001](platforms.md#r-plat-001), [R-GEN-004](platforms.md#r-gen-004), [R-VSC-001](platforms.md#r-vsc-001) to [R-VSC-003](platforms.md#r-vsc-003), [R-VSC-005](platforms.md#r-vsc-005) to [R-VSC-008](platforms.md#r-vsc-008), [R-WEB-001](platforms.md#r-web-001), [R-CLI-001](platforms.md#r-cli-001), [R-THEME-001](platforms.md#r-theme-001) to [R-THEME-003](platforms.md#r-theme-003) |
+| [Platforms](platforms.md) | The adapters of VS Code, of the web and of the command line; the theme | [R-PLAT-001](platforms.md#r-plat-001), [R-GEN-004](platforms.md#r-gen-004), [R-VSC-001](platforms.md#r-vsc-001) to [R-VSC-003](platforms.md#r-vsc-003), [R-VSC-005](platforms.md#r-vsc-005) to [R-VSC-010](platforms.md#r-vsc-010), [R-WEB-001](platforms.md#r-web-001), [R-CLI-001](platforms.md#r-cli-001), [R-THEME-001](platforms.md#r-theme-001) to [R-THEME-003](platforms.md#r-theme-003) |
 
 ## 5. Libraries, licenses and release
 
@@ -300,16 +300,16 @@ use:
 | --- | --- | --- |
 | Tiptap 3 (`@tiptap/core`, `@tiptap/pm`, `@tiptap/starter-kit` and the `@tiptap/extension-*` packages of the nodes and marks) | MIT | The rendered editor and its extension API |
 | ProseMirror, through `@tiptap/pm` | MIT | The engine of the rendered editor ([R-GEN-009](editor.md#r-gen-009)) |
-| markdown-it, `markdown-it-footnote` | MIT | Parsing and rendering of Markdown |
+| markdown-it, `markdown-it-footnote` | MIT | Parsing and rendering of Markdown; markdown-it uses `entities` (BSD-2-Clause), and only its command line program uses `argparse` (Python-2.0), which no bundle holds |
 | `markdown-it-task-lists` | ISC | Task lists |
 | `prosemirror-markdown` | MIT | The bridge between the tokens of markdown-it and the document of the editor |
 | `string-width` | MIT | The width of the cells of a table |
 | `lowlight`, `@tiptap/extension-code-block-lowlight` | MIT | The syntax colors of code blocks in the editor ([R-EDIT-003](editor.md#r-edit-003)); `lowlight` uses `devlop` and `dequal` (MIT) |
 | `highlight.js` | BSD-3-Clause | The languages of the syntax colors, through `lowlight` ([R-EDIT-003](editor.md#r-edit-003)) |
-| `yaml` *(proposal)* | ISC | The front matter in YAML ([R-FM-005](editor.md#r-fm-005)) |
-| `@decimalturn/toml-patch` *(proposal)* | MIT | The front matter in TOML ([R-FM-005](editor.md#r-fm-005)) |
-| `jsonc-parser` *(proposal)* | MIT | The front matter in JSON, also with comments ([R-FM-005](editor.md#r-fm-005)) |
-| `@cfworker/json-schema` *(proposal)* | MIT | The check of the front matter against its JSON schema, without eval ([R-FM-004](editor.md#r-fm-004)) |
+| `yaml` | ISC | The front matter in YAML ([R-FM-005](editor.md#r-fm-005)) |
+| `@decimalturn/toml-patch` | MIT | The front matter in TOML ([R-FM-005](editor.md#r-fm-005)) |
+| `jsonc-parser` | MIT | The front matter in JSON, also with comments ([R-FM-005](editor.md#r-fm-005)) |
+| `@cfworker/json-schema` | MIT | The check of the front matter against its JSON schema, without eval ([R-FM-004](editor.md#r-fm-004)) |
 | `diff` *(proposal)* | BSD-3-Clause | The patches between two texts, and the blocks that a change from outside changes ([R-SRC-002](source.md#r-src-002)) |
 | `pagedjs` *(proposal)* | MIT | The pages of a layout ([R-LAYOUT-003](rendering.md#r-layout-003)); the layout package holds its script `paged.polyfill.js`, which holds `event-emitter`, `d`, `es5-ext`, `type` and `es6-symbol` (MIT and ISC), `css-tree` (MIT) with `mdn-data` (CC0-1.0) and `source-map` (BSD-3-Clause), and `clear-cut` (MIT) |
 | `pdf-lib` *(proposal)* | MIT | The finish of the PDF: the removal of the marks of the soft hyphens and the metadata ([R-LAYOUT-002](rendering.md#r-layout-002)); it uses `@pdf-lib/standard-fonts` and `@pdf-lib/upng` (MIT), `pako` (MIT and Zlib) and `tslib` (0BSD) |
@@ -344,12 +344,7 @@ use:
 
 ## 6. Open questions
 
-1. Names: the contribution point `nimblescape.markdown.extensions`
-   (proposal)?
-2. Licenses: `markdown-it-task-lists` (ISC), `entities` (BSD-2-Clause, used
-   by markdown-it) and `argparse` (Python-2.0, only in the command line
-   program of markdown-it, in no bundle).
-3. The package of the AI: `@nimblescape/markdownai` for the provider API,
+1. The package of the AI: `@nimblescape/markdownai` for the provider API,
    the context, the tool of the proposed changes and the loop of a chat
    ([R-ARCH-002](#r-arch-002), proposal)?
 
@@ -380,6 +375,8 @@ the [platforms](platforms.md#6-open-questions).
 | 13 | The source: the text, the selections and the changes of a file with their origin, the changes from outside, the front matter and the parts that no plugin knows | [R-SRC-001](source.md#r-src-001) to [R-SRC-003](source.md#r-src-003), [R-GEN-006](source.md#r-gen-006), [R-EDIT-002](editor.md#r-edit-002) | built; each platform adapter gives the files in its own step |
 | 14 | The renderer: content without edit functions from markdown-it 14, without the editor, with the plugins of the renderer | [R-REN-001](rendering.md#r-ren-001) to [R-REN-003](rendering.md#r-ren-003) | built; the editor is built on it, and the example page shows its rendering |
 | 15 | The layout: the layouts with the schemas of their front matter, the layout code of Markdown Paper, pages and PDF from the same rendering as the view | [R-LAYOUT-001](rendering.md#r-layout-001) to [R-LAYOUT-004](rendering.md#r-layout-004) | 15a built: the package `@nimblescape/markdownlayout` with the layouts, the text in pages, the page for Paged.js and the view of the pages, shown in the example page; 15b built: the PDF in Node.js with the entry point `@nimblescape/markdownlayout/pdf` and the functions of the plugins in the page of the PDF; 15c built: the switch between "Edit" and "Pages" in VS Code and in the example page, with pages that follow the text and a double click that goes to the block in "Edit" |
+| 16 | The rendered changes of a file: the diff of VS Code with the editor on both sides, the marks of the changes, the blocks that line up and scroll together; two editors side by side on the web | [R-VSC-009](platforms.md#r-vsc-009) | built for VS Code: the marks of the changes in the editor, the blocks that line up and scroll together, the buttons to the previous and the next change, and `followDiff` of `@nimblescape/markdownvscode/webview`, shown in the example extension; the two editors on the web wait for the decision of the proposal |
+| 17 | The extensions of the Markdown preview of VS Code in the editor, as blocks of the level "render" | [R-VSC-010](platforms.md#r-vsc-010), [R-GEN-012](plugins.md#r-gen-012) | planned; waits for the decision of the proposal |
 
 Steps 12 to 15 give the parts of [section 3](#3-architecture) that the
 first plan did not name their steps, so their numbers do not give their

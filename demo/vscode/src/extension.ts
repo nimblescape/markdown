@@ -10,7 +10,10 @@
 import * as vscode from 'vscode';
 import { registerMarkdownEditor } from '@nimblescape/markdownvscode';
 
-/** activate registers the editor, the command that opens the text editor to the side and the commands of the views. */
+/**
+ * activate registers the editor, the command that opens the text editor to the side, the commands of the views and the
+ * commands of the changes of a diff.
+ */
 export function activate(context: vscode.ExtensionContext): void {
   const dist = vscode.Uri.joinPath(context.extensionUri, 'dist');
   context.subscriptions.push(
@@ -21,6 +24,9 @@ export function activate(context: vscode.ExtensionContext): void {
       openTextCommand: 'nimblescape.markdownExample.openText',
       showPagesCommand: 'nimblescape.markdownExample.showPages',
       showEditCommand: 'nimblescape.markdownExample.showEdit',
+      // The buttons of the next and the previous change in a diff (docs/platforms.md, R-VSC-009).
+      nextChangeCommand: 'nimblescape.markdownExample.nextChange',
+      previousChangeCommand: 'nimblescape.markdownExample.previousChange',
       // The build copies the script of Paged.js of @nimblescape/markdownlayout to dist/.
       pagesScripts: [vscode.Uri.joinPath(dist, 'paged.polyfill.js')],
     }),

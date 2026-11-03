@@ -89,6 +89,8 @@ export class Interaction {
   private readonly menu: Menu;
   private readonly asker: Asker;
   private learning: boolean;
+  /** readOnlyShown is false while the toolbar hides the switch between editing and reading. */
+  private readOnlyShown = true;
   private editor: Editor | undefined;
   private formatBar: FormatBar | undefined;
   private handles: BlockHandles | undefined;
@@ -206,7 +208,7 @@ export class Interaction {
         insertItems: () => this.insertItems(),
         openFind: () => this.openFind(),
         learn: (this.options.learnToggle ?? true) ? { isOn: () => this.learning, toggle: () => this.setLearnMode(!this.learning) } : undefined,
-        editing: (this.options.readOnlyToggle ?? true) ? { isOn: () => editor.isEditable, toggle: editing.toggle } : undefined,
+        editing: (this.options.readOnlyToggle ?? true) ? { isOn: () => editor.isEditable, toggle: editing.toggle, isShown: () => this.readOnlyShown } : undefined,
       });
       this.header.append(this.toolbar.dom);
     }
@@ -256,6 +258,16 @@ export class Interaction {
     this.menu.close();
     this.findBar?.open();
     return true;
+  }
+
+  /**
+   * setReadOnlyToggle shows or hides the switch between editing and reading in the toolbar, for example while the
+   * editor shows a version that cannot change (R-GEN-008).
+   * @param shown - false hides the switch.
+   */
+  setReadOnlyToggle(shown: boolean): void {
+    this.readOnlyShown = shown;
+    this.toolbar?.update();
   }
 
   /** refresh shows the state of the editor again, after a new text or a switch between editing and reading. */

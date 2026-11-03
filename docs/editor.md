@@ -128,10 +128,10 @@ buttons:
 | Text style | Paragraph, heading 1 to 6 (`#`), quote (`>`), code block | Library |
 | Bold | `**text**` | Library |
 | Italic | `*text*` | Library |
-| Underline | `<ins>text</ins>` *(proposal, [open question 1](#10-open-questions))* | Library |
+| Underline | `<ins>text</ins>` | Library |
 | Strikethrough | `~~text~~` | Library |
 | Code | `` `text` `` | Library |
-| Color | *([open question 1](#10-open-questions))* | Notes |
+| Color | A highlight of Notes in one of its colors | Notes |
 | List | `-`, `1.`, `- [ ]` | Library |
 | Link | `[text](address)` | Library |
 
@@ -201,13 +201,13 @@ listing, and the plugin then writes the part again. The plugin that
 generates a part marks it as read-only through the plugin API
 ([R-PLUGIN-001](plugins.md#r-plugin-001)). A change from outside, for
 example by the formatter, may change a generated part
-([R-SRC-002](source.md#r-src-002)). *(proposal)* The cursor jumps over a
+([R-SRC-002](source.md#r-src-002)). The cursor jumps over a
 generated part, and the user deletes it only as a whole, in one step of
 undo. A plugin may give a form for the data of a generated part, for
 example the page of a citation. Ctrl+click (Cmd+click on macOS) on a
 reference goes to its target.
 
-*(proposal)* A selection that touches a generated part holds the whole
+A selection that touches a generated part holds the whole
 part. The user cannot change the format of a piece of a part. Backspace and
 Delete next to a part delete the whole part. Text that the user types at the
 edge of a part does not become a piece of the part. Replace leaves a match
@@ -266,19 +266,19 @@ marks `readOnly` stays read-only in both modes.
 
 **Edit mode of the form.** In the edit mode, the user also adds and removes
 keys and structured values, such as lists and maps, also nested. A button
-switches between the modes. *(proposal)* A file without a schema opens in
+switches between the modes. A file without a schema opens in
 the edit mode. The user also renames keys. A new key gets one of the kinds
 text, number, yes or no, list, or group of keys.
 
 ### R-FM-004
 
 **JSON schemas.** The schema of a front matter is a JSON file. Each layout
-has a schema of the front matter of its documents. *(proposal)* The schema
+has a schema of the front matter of its documents. The schema
 is standard JSON Schema (draft 2020-12) without keywords of its own:
 `required`, `title`, `description`, `readOnly`, `enum`, `type`, `pattern`,
 `format`, `minimum`, `default`, and the order of `properties`. A validator
 without eval checks it, because the page policy of a webview of VS Code
-forbids eval. *(proposal)* The validator is the library
+forbids eval. The validator is the library
 `@cfworker/json-schema`. Each problem shows at its value with a message in
 plain words, and the head of the form counts the problems. The integrating
 code gives the schema and can change it, for example after a change of the
@@ -288,7 +288,7 @@ layout.
 
 **An edit changes only its value.** An edit must change only the edited
 value: comments, order and quotes of the other keys stay, and each edit is
-one step of undo. *(proposal)* For YAML, the library `yaml` gives the
+one step of undo. For YAML, the library `yaml` gives the
 place of each value, and the edit replaces only the lines of that value; a
 value inside a flow collection, for example `[a, b]`, changes the text of
 that collection. For TOML, the library `@decimalturn/toml-patch` changes the
@@ -324,17 +324,12 @@ click on the icon close it.
 
 ## 10. Open questions
 
-1. Format bar: underline as `<ins>text</ins>` (proposal) or no underline?
-   "Color" as the colors of the highlights of Notes (proposal) or as a color
-   of the text in HTML ([R-EDIT-007](#r-edit-007))?
-2. Tables: are the two comments for cell colors and column widths right
+1. Tables: are the two comments for cell colors and column widths right
    ([R-EDIT-010](#r-edit-010), proposal)? Is a dropdown needed?
-3. Mode to learn Markdown: all marks muted plus the block of the cursor in
+2. Mode to learn Markdown: all marks muted plus the block of the cursor in
    full color (proposal), or only the marks at the cursor
    ([R-GEN-013](#r-gen-013))? Can the user edit the marks directly
    (proposal: no)?
-4. Front matter form ([R-FM-003](#r-fm-003)): does a file without a schema
-   open in the edit mode (proposal: yes)?
 
 ---
 

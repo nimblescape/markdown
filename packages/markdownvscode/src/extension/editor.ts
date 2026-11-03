@@ -21,12 +21,21 @@
 // part of such a plugin in the other extension connects later, through `addPlugin` of the registration; the messages
 // that its part on the page sends before wait for it.
 //
+// The rendered changes (docs/platforms.md, R-VSC-009): the package.json of the extension asks for the editor in the
+// diffs of VS Code, with `"priority": { "textEditor": "default", "diffEditor": "default" }` (VS Code 1.125 and later).
+// VS Code then opens the editor on both sides of a diff, each side a panel of its own, and the API of VS Code knows no
+// input for the tab of such a diff. So a panel that opens while the active tab of its group has no input is a side of
+// a diff, and the next panel that opens for the same tab soon after is the other side: the code connects the two. It
+// gives each page its side and the text of the other side, and carries the heights of the rows and the scroll place
+// between the two pages. The commands of the registration go to the next and the previous change, with the context
+// key `<view type>.diff`, which is true while the active tab is such a diff.
+//
 // The code gets the API of VS Code as a parameter and imports no module `vscode`, so that the tests give it an API of
 // their own; it uses no Node.js API, so that it runs in the extension host of the web as well.
 
 import { applyPatches, mergeTexts, patchesBetween, type TextSelection } from '@nimblescape/markdowntext';
 import type * as vscode from 'vscode';
-import { type HostMessage, type PageFiles, type PageFolder, type PageFonts, pageMessage, type PageMessage, type PageView, pluginName, toBase64 } from '../messages';
+import { type DiffSide, type HostMessage, type PageFiles, type PageFolder, type PageFonts, pageMessage, type PageMessage, type PageView, pluginName, toBase64 } from '../messages';
 import { newNonce, pageHtml } from './page';
 
 /** VsCode is the API of VS Code, the module `vscode` of the extension. */
@@ -66,6 +75,13 @@ export interface MarkdownEditorRegistration {
    */
   readonly showPagesCommand?: string;
   readonly showEditCommand?: string;
+  /**
+   * nextChangeCommand and previousChangeCommand are the IDs of the commands that go to the next and to the previous
+   * change of a diff (docs/platforms.md, R-VSC-009); the package.json of the extension contributes the commands and
+   * their buttons in the title of the editor, with the context key `<view type>.diff`.
+   */
+  readonly nextChangeCommand?: string;
+  readonly previousChangeCommand?: string;
   /**
    * pagesScripts are the scripts of the pages, Paged.js last: the extension copies `paged.polyfill.js` of
    * @nimblescape/markdownlayout to the folder of its scripts. The page may load them.
@@ -176,9 +192,50 @@ export interface PluginPanelChannel {
 export function registerMarkdownEditor(api: VsCode, registration: MarkdownEditorRegistration): MarkdownEditorHandle {
   const panels = new Set<EditorPanel>();
   const added = new Set<AddedPlugin>();
+  /** waiting holds the first panel of a diff until its other side opens, by the group and the label of the tab. */
+  const waiting = new Map<string, { readonly panel: EditorPanel; readonly at: number }>();
+  /** diffs holds the connected sides of the diffs. */
+  const diffs = new Set<Diff>();
+  const diffContext = registration.nextChangeCommand || registration.previousChangeCommand ? `${registration.viewType}.diff` : undefined;
+  let diffActive: boolean | undefined;
+  /** activeDiff returns the diff of the active tab. */
+  const activeDiff = (): Diff | undefined => {
+    const group = api.window.tabGroups?.activeTabGroup;
+    const tab = group?.activeTab;
+    return tab && tab.input === undefined ? [...diffs].find((diff) => diff.column === group.viewColumn && diff.label === tab.label) : undefined;
+  };
+  /** showDiff sets the context key of the diff, for the buttons of the changes in the title of the editor. */
+  const showDiff = () => {
+    const active = activeDiff() !== undefined;
+    if (diffContext && active !== diffActive) {
+      diffActive = active;
+      void api.commands.executeCommand('setContext', diffContext, active);
+    }
+  };
+  /** connectDiff connects the two panels of a diff, or opens the text diff for a file that does not open in the editor. */
+  const connectDiff = async (first: EditorPanel, second: EditorPanel, tab: vscode.Tab) => {
+    const [original, modified] = diffSides(first, second);
+    if (registration.opens && !registration.opens(modified.document)) {
+      // The text diff of VS Code takes the place of the diff: the option `override` of the command opens the editor of
+      // the text, as "Reopen Editor With" does for a file.
+      await api.window.tabGroups.close(tab);
+      await api.commands.executeCommand('vscode.diff', original.uri, modified.uri, tab.label, {
+        viewColumn: tab.group.viewColumn,
+        preview: tab.isPreview,
+        override: true,
+      });
+      return;
+    }
+    const diff: Diff = { original, modified, column: tab.group.viewColumn, label: tab.label };
+    diffs.add(diff);
+    original.setDiff('original', modified);
+    modified.setDiff('modified', original);
+    showDiff();
+  };
   const provider: vscode.CustomTextEditorProvider = {
     resolveCustomTextEditor: async (document, webviewPanel) => {
-      if (registration.opens && !registration.opens(document)) {
+      const diffTab = diffTabOf(api, webviewPanel);
+      if (!diffTab && registration.opens && !registration.opens(document)) {
         // The text editor takes the place of the panel in the same group.
         await api.commands.executeCommand('vscode.openWith', document.uri, 'default', webviewPanel.viewColumn);
         webviewPanel.dispose();
@@ -189,7 +246,19 @@ export function registerMarkdownEditor(api: VsCode, registration: MarkdownEditor
       webviewPanel.onDidDispose(() => {
         panels.delete(panel);
         panel.dispose();
+        [...diffs].filter((diff) => diff.original === panel || diff.modified === panel).forEach((diff) => diffs.delete(diff));
+        showDiff();
       });
+      if (diffTab) {
+        const key = `${diffTab.group.viewColumn}\n${diffTab.label}`;
+        const first = waiting.get(key);
+        waiting.delete(key);
+        if (first && !first.panel.isDisposed && Date.now() - first.at <= diffPairTime) {
+          await connectDiff(first.panel, panel, diffTab);
+        } else {
+          waiting.set(key, { panel, at: Date.now() });
+        }
+      }
     },
   };
   const disposables: vscode.Disposable[] = [
@@ -197,6 +266,24 @@ export function registerMarkdownEditor(api: VsCode, registration: MarkdownEditor
       webviewOptions: { retainContextWhenHidden: registration.retainContextWhenHidden ?? true },
     }),
   ];
+  if (diffContext && api.window.tabGroups) {
+    disposables.push(api.window.tabGroups.onDidChangeTabs(showDiff), api.window.tabGroups.onDidChangeTabGroups(showDiff));
+  }
+  for (const [command, direction] of [
+    [registration.nextChangeCommand, 'next'],
+    [registration.previousChangeCommand, 'previous'],
+  ] as const) {
+    if (command) {
+      disposables.push(
+        api.commands.registerCommand(command, () => {
+          const diff = activeDiff();
+          // The side with the focus goes, else the newer side; the other side follows its scroll.
+          const side = diff && (diff.original.active ? diff.original : diff.modified);
+          side?.goToChange(direction);
+        }),
+      );
+    }
+  }
   /** panelOf returns the panel of a file, the active one when no file is given, as for the button in the title. */
   const panelOf = (uri?: vscode.Uri): EditorPanel | undefined => {
     const key = uri?.toString();
@@ -248,6 +335,63 @@ export function registerMarkdownEditor(api: VsCode, registration: MarkdownEditor
   };
 }
 
+/** Diff holds the two connected sides of a diff, with the group and the label of its tab. */
+interface Diff {
+  readonly original: EditorPanel;
+  readonly modified: EditorPanel;
+  readonly column: vscode.ViewColumn;
+  readonly label: string;
+}
+
+/** diffPairTime is the time in milliseconds in which the second side of a diff opens after the first one. */
+const diffPairTime = 2000;
+
+/**
+ * diffTabOf returns the tab of a diff that a panel opens in: the active tab of the group of the panel, when the API of
+ * VS Code knows no input for it, as for a diff of two custom editors.
+ * @param api - The API of VS Code.
+ * @param panel - The panel.
+ */
+function diffTabOf(api: VsCode, panel: vscode.WebviewPanel): vscode.Tab | undefined {
+  const group = api.window.tabGroups?.all.find((each) => each.viewColumn === panel.viewColumn);
+  const tab = group?.activeTab;
+  return tab && tab.input === undefined ? tab : undefined;
+}
+
+/** gitRef returns the reference of a version of Git, from the URI of the Git extension, or undefined. */
+function gitRef(uri: vscode.Uri): string | undefined {
+  if (uri.scheme !== 'git') {
+    return undefined;
+  }
+  try {
+    const query: unknown = JSON.parse(uri.query);
+    return isRecord(query) && typeof query.ref === 'string' ? query.ref : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/** parentOf is true when a reference of Git names the parent of another one, for example `abc^` of `abc`. */
+const parentOf = (parent: string, child: string): boolean => [`${child}^`, `${child}~`, `${child}~1`, `${child}^1`].includes(parent);
+
+/**
+ * diffSides returns the older and the newer side of the two panels of a diff. VS Code does not say which panel is on
+ * the left: the document that cannot change is the older version, for example a version from Git; of two versions from
+ * Git, the version of the parent commit is the older one; else the panel that opened first is the older one, as VS Code
+ * opens them for the command `vscode.diff`.
+ */
+function diffSides(first: EditorPanel, second: EditorPanel): [EditorPanel, EditorPanel] {
+  if (first.writable !== second.writable) {
+    return first.writable ? [second, first] : [first, second];
+  }
+  const firstRef = gitRef(first.uri);
+  const secondRef = gitRef(second.uri);
+  if (firstRef !== undefined && secondRef !== undefined && parentOf(secondRef, firstRef)) {
+    return [second, first];
+  }
+  return [first, second];
+}
+
 /** slashed returns the address of a folder with a slash at its end. */
 const slashed = (address: string): string => (address.endsWith('/') ? address : `${address}/`);
 
@@ -285,6 +429,9 @@ class EditorPanel {
   private readonly connections = new Map<object, () => void>();
   /** pluginScripts are the addresses of the scripts of the plugins of other extensions in the webview. */
   private readonly pluginScripts: string[];
+  /** diffSide is the side of the panel in a diff, and partner the panel of the other side. */
+  private diffSide: DiffSide | undefined;
+  private partner: EditorPanel | undefined;
 
   constructor(
     private readonly api: VsCode,
@@ -441,6 +588,55 @@ class EditorPanel {
     return this.panel.active;
   }
 
+  /** isDisposed is true after the panel closed. */
+  get isDisposed(): boolean {
+    return this.disposed;
+  }
+
+  /** writable is false when the file system of the file cannot write, for example an older version from Git. */
+  get writable(): boolean {
+    return this.api.workspace.fs.isWritableFileSystem(this.document.uri.scheme) !== false;
+  }
+
+  /**
+   * setDiff makes the panel a side of a diff (docs/platforms.md, R-VSC-009): the page gets its side and the text of the
+   * other side, and each new text of the other side. The older side is read-only.
+   * @param side - The side of the panel.
+   * @param partner - The panel of the other side.
+   */
+  setDiff(side: DiffSide, partner: EditorPanel): void {
+    this.diffSide = side;
+    this.partner = partner;
+    this.subscriptions.push(
+      this.api.workspace.onDidChangeTextDocument((event) => {
+        if (event.document.uri.toString() === partner.uri.toString()) {
+          this.post({ type: 'diffText', text: partner.document.getText() });
+        }
+      }),
+    );
+    this.sendDiff();
+  }
+
+  /**
+   * goToChange asks the page to go to the next or the previous change of the diff.
+   * @param direction - The direction.
+   */
+  goToChange(direction: 'next' | 'previous'): void {
+    this.post({ type: 'diffGo', direction });
+  }
+
+  /** forward gives the page a message of the page of the other side of the diff. */
+  private forward(message: HostMessage): void {
+    this.post(message);
+  }
+
+  /** sendDiff gives the page its side in the diff and the text of the other side. */
+  private sendDiff(): void {
+    if (this.diffSide && this.partner) {
+      this.post({ type: 'diff', side: this.diffSide, text: this.partner.document.getText(), editable: this.editable() });
+    }
+  }
+
   /**
    * setView switches the page to a view (docs/rendering.md, R-LAYOUT-003).
    * @param view - The view: "edit" or "pages".
@@ -540,12 +736,20 @@ class EditorPanel {
       case 'plugin':
         this.deliver(message.plugin, message.message);
         break;
+      case 'diffLayout':
+      case 'diffScroll':
+        // The page of the other side of the diff gets the heights of the rows and the scroll place of this page.
+        this.partner?.forward(message);
+        break;
     }
   }
 
-  /** editable is false when the file system of the file cannot write, for example an older version from Git. */
+  /**
+   * editable is false when the file system of the file cannot write, for example an older version from Git, and for the
+   * older side of a diff.
+   */
   private editable(): boolean {
-    return this.api.workspace.fs.isWritableFileSystem(this.document.uri.scheme) !== false;
+    return this.diffSide !== 'original' && this.writable;
   }
 
   /** fonts returns the fonts of the settings of the Markdown preview (R-THEME-003). */
@@ -584,6 +788,7 @@ class EditorPanel {
       files: this.files(),
       plugins: this.pluginScripts,
     });
+    this.sendDiff();
   }
 
   /** sendText sends a change of the document that the page did not make. */

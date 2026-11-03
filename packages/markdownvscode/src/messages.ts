@@ -25,6 +25,11 @@
 // - For the pages, the page asks with `read` for a file of a layout, and the extension answers with `file`, the bytes
 //   of the file in Base64 or nothing: VS Code gives the page the messages as JSON, which has no bytes. The extension
 //   reads only the files of the folders from which the page may load files.
+// - In a diff of VS Code, each side is a panel of its own (docs/platforms.md, R-VSC-009). When the extension connects
+//   the two panels of a diff, it sends each page `diff`: its side, the text of the other side and whether the page may
+//   change its text; then `diffText` with each new text of the other side. Each page sends `diffLayout`, the heights of
+//   its rows, and `diffScroll`, the place at the top of its view after the user scrolled; the extension gives them to
+//   the other page. `diffGo` asks the page to go to the next or the previous change.
 
 import type { TextPatch, TextSelection } from '@nimblescape/markdowntext';
 
@@ -69,6 +74,22 @@ export interface PageFiles {
   readonly scripts: readonly string[];
 }
 
+/** DiffSide is the side of a page in a diff: the older version (`original`, on the left) or the newer one (`modified`). */
+export type DiffSide = 'original' | 'modified';
+
+/** DiffLayout is the natural height of each row of the diff on one side, with the key of the rows and the start of the first row. */
+export interface DiffLayout {
+  readonly rows: string;
+  readonly heights: readonly number[];
+  readonly start: number;
+}
+
+/** DiffPosition is a place in the rows of the diff: the index of a row and the offset from its top, in pixels. */
+export interface DiffPosition {
+  readonly row: number;
+  readonly offset: number;
+}
+
 /** HostMessage is a message from the extension to the page. */
 export type HostMessage =
   | {
@@ -94,6 +115,11 @@ export type HostMessage =
   | { readonly type: 'fonts'; readonly fonts: PageFonts }
   | { readonly type: 'view'; readonly view: PageView }
   | { readonly type: 'file'; readonly id: number; readonly base64?: string }
+  | { readonly type: 'diff'; readonly side: DiffSide; readonly text: string; readonly editable: boolean }
+  | { readonly type: 'diffText'; readonly text: string }
+  | ({ readonly type: 'diffLayout' } & DiffLayout)
+  | ({ readonly type: 'diffScroll' } & DiffPosition)
+  | { readonly type: 'diffGo'; readonly direction: 'next' | 'previous' }
   | PluginMessage;
 
 /** PluginMessage is a message of a plugin of the editor, by the name of the plugin, in both directions. */
@@ -114,6 +140,8 @@ export type PageMessage =
   | { readonly type: 'openText' }
   | { readonly type: 'view'; readonly view: PageView }
   | { readonly type: 'read'; readonly id: number; readonly url: string }
+  | ({ readonly type: 'diffLayout' } & DiffLayout)
+  | ({ readonly type: 'diffScroll' } & DiffPosition)
   | PluginMessage;
 
 /**
@@ -178,6 +206,20 @@ export function pageMessage(value: unknown): PageMessage | undefined {
       return value.view === 'edit' || value.view === 'pages' ? { type: 'view', view: value.view } : undefined;
     case 'read':
       return isCount(value.id) && typeof value.url === 'string' ? { type: 'read', id: value.id, url: value.url } : undefined;
+    case 'diffLayout':
+      return typeof value.rows === 'string' &&
+        value.rows.length <= 200_000 &&
+        Array.isArray(value.heights) &&
+        value.heights.length <= 100_000 &&
+        value.heights.every((height) => typeof height === 'number' && Number.isFinite(height) && height >= 0) &&
+        typeof value.start === 'number' &&
+        Number.isFinite(value.start)
+        ? { type: 'diffLayout', rows: value.rows, heights: value.heights as number[], start: value.start }
+        : undefined;
+    case 'diffScroll':
+      return isCount(value.row) && typeof value.offset === 'number' && Number.isFinite(value.offset)
+        ? { type: 'diffScroll', row: value.row, offset: value.offset }
+        : undefined;
     case 'selection': {
       const selection = value.selection;
       return isRecord(selection) && isCount(selection.anchor) && isCount(selection.head)

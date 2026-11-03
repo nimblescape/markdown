@@ -16,6 +16,8 @@ import type { Menu, MenuItem } from './menu';
 export interface Switch {
   isOn: () => boolean;
   toggle: () => void;
+  /** isShown is false while the toolbar hides the switch; the default is true. */
+  isShown?: () => boolean;
 }
 
 /** ToolbarHost is what the toolbar needs from the editor. */
@@ -104,6 +106,7 @@ export class Toolbar {
       this.learn.title = on ? 'Hide the Markdown marks' : 'Show the Markdown marks';
     }
     if (this.editing) {
+      this.editing.hidden = this.host.editing?.isShown?.() === false;
       // The button names the mode that it switches to.
       const label = editable ? 'Read' : 'Edit';
       this.editing.replaceChildren(icon(editable ? 'read' : 'edit'), element('span', {}, label));

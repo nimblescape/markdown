@@ -18,6 +18,7 @@ export type { SerializeOptions } from './markdown/serialize';
 export type { InteractionOptions } from './ui/interaction';
 export type { FormatButton } from './ui/formatBar';
 export type { ProposalResult, ProposedChange } from './ui/proposals';
+export { changeRows, EditorChanges, type ChangeLayout, type ChangePosition, type ChangeRow, type ChangeSide, type ChangesOptions } from './ui/changes';
 export type { MenuItem } from './ui/menu';
 export type { LearnMarks, MarkText, NodeText } from './ui/learnMode';
 export type { FrontMatterInput, FrontMatterInputContext, FrontMatterMode } from './ui/frontMatterForm';
