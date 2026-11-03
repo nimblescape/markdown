@@ -47,9 +47,13 @@ in the same form as the nimblescape extensions with an npm package
 VS Code extension, and the folder `.course/` for the files that it keeps in
 the repository of a course. The npm package is `@nimblescape/course`, its
 command is `cs`, and the comment of the format names the format
-`nimblescape-course`. The npm package is released as version 0.1.0 by the
-release workflow of `nimblescape/course-vscode`; until a program can install
-it from npm, it builds `cs` from the repository at a fixed commit.
+`nimblescape-course`. Each release publishes both: the VS Code extension on
+the Visual Studio Marketplace and the npm package on npmjs.com; the first
+release is version 0.1.0. The release workflow `release.yml` of
+`nimblescape/course-vscode` publishes the npm package with trusted
+publishing, through the environment `npm`; only the first version of the
+package is published by hand with `scripts/npm-setup.sh`, which also sets
+the trusted publisher.
 
 ### R-COURSE-003
 
@@ -329,15 +333,16 @@ module: `cs read` reads the course, with its name and language from
 `.course/course.yml`; `cs instructions feedback` prints the rules of the
 feedback, the rules of the format and `.course/instructions/feedback.md` of
 the course; `cs feedback --form` prints the form of the answer; and
-`cs feedback` writes `FEEDBACK.md` with the score. Until the npm release of
-`@nimblescape/course`, the program builds `cs` from
-`nimblescape/course-vscode` at the commit that `versions.course` of its
-`config.yml` names. It keeps its checks, skills, engines and prompts. The
-workflow of a course runs the feedback program at the tag that
-`FEEDBACK_VERSION` names, `v1`. The tag `v1` is the version of the program
-that uses the course module, so only a course in the format of the module
-([R-COURSE-005](#r-course-005)) may use it; the four -2 courses of majikmate
-are in this format.
+`cs feedback` writes `FEEDBACK.md` with the score. The program runs the
+command of the npm package `@nimblescape/course` with npx and installs
+nothing, in the version that `versions.course` of its `config.yml` names;
+for a version that is not on npm, `versions.course` names a commit of
+`nimblescape/course-vscode`, and the program builds and runs that commit.
+It keeps its checks, skills, engines and prompts. The workflow of a course runs the feedback program at
+the tag that `FEEDBACK_VERSION` names, `v1`. The tag `v1` is the version of
+the program that uses the course module, so only a course in the format of
+the module ([R-COURSE-005](#r-course-005)) may use it; the four -2 courses of
+majikmate are in this format.
 
 ## 7. Open questions
 
@@ -347,9 +352,6 @@ are in this format.
 2. Integrity: a student can change the history file in `.workhistory/`. Does
    the course protect it like `FEEDBACK.md`, or does the reflection tool
    check it against the commits ([R-COURSE-003](#r-course-003))?
-3. Marketplace: does the release 0.1.0 also publish the VS Code extension
-   on the Marketplace, or only the npm package
-   ([R-COURSE-002](#r-course-002))?
 
 ## Sources
 
