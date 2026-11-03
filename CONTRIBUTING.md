@@ -104,7 +104,12 @@ same pull request.
 | `package.json` | The manifest of the root of the workspaces: private, never published, with the development tools and the commands below. Each package has its own manifest with its libraries. |
 | `package-lock.json` | The locked libraries and development tools. npm writes this file, and nobody edits it by hand. |
 | `.node-version` | The Node release of the development tools. `actions/setup-node` in the workflows and local Node version managers read it. |
-| `.github/workflows/ci.yml` | Checks the types, the code style and the licenses, runs the tests, builds the packages, the example page and the example extension, and packs the npm packages, for every push to `main` and every pull request. It publishes nothing. |
+| `.github/workflows/ci.yml` | Checks the types, the code style and the licenses, runs the tests, builds the packages, the example page and the example extension, and packs the npm packages, for every push to `main`, every pull request and the commit of every release. The release publishes the npm packages of this workflow, so a change of it needs a dry run (rule 4 of the [release rules](#release-rules)). |
+| `.github/workflows/release.yml` | Releases a version of all npm packages on a manual start: commits the version to a temporary branch, tests and packs it with `ci.yml`, and only then moves `main` to it, creates its tag and GitHub release and publishes the packages to npmjs.com. A dry run tests without a change. The section [Release](#release) explains it. |
+| `.github/workflows/release-dry-run.yml` | Fails on a pull request that changes the release process (`release.yml`, `ci.yml` or `scripts/release-checks.mjs`) until a dry run on its branch tested the change (rule 4 of the [release rules](#release-rules)). |
+| `scripts/release-checks.mjs`, `scripts/release-checks.test.mjs` | The check of rule 4 of the [release rules](#release-rules), which `release.yml` and `release-dry-run.yml` run, and its test. |
+| `scripts/npm-setup.sh` | Sets up the publishing to npmjs.com: the environment `npm`, the first version of each package and its trusted publisher ([npmjs.com setup](#npmjscom-setup)). |
+| `CHANGELOG.md` | The changes of each released version; the release takes the section of its version as the notes of its GitHub release. |
 | `.github/dependabot.yml` | Proposes weekly updates of the libraries, of the development tools and of the pinned actions. |
 | `packages/*/dist/`, `demo/dist/`, `demo/vscode/dist/` | The built packages, the built example page and the built example extension, kept out of Git. |
 
@@ -227,6 +232,103 @@ and the script goes away.
 
 ## Release
 
-The release workflow of the npm packages comes with step 11 of the
-[plan](docs/specification.md#plan), the same as for the other nimblescape
-npm packages. Until then, nothing is published.
+Nothing is released before the release decision
+([R-GEN-007](docs/specification.md#r-gen-007)). The release process is the
+same as for the other nimblescape npm packages, for example the package
+`@nimblescape/markdownnotes` of Markdown Notes, without the Marketplace.
+
+A released version is a tag `v<version>` whose `<version>` equals the
+version in the `package.json` of each package in `packages/`. All packages
+have the same version, and each package needs the other packages of the
+workspaces in exactly this version. The workflow "Release" creates the
+version, its tag, its GitHub release and the version of each package on
+npmjs.com in one run. To release a version, follow these steps:
+
+1. Optional: add a section `## <version>` to `CHANGELOG.md` on `main`. The section describes the changes for the users (see [Release rules](#release-rules)).
+2. In the tab "Actions", choose the workflow "Release", then "Run workflow" on the branch `main`. Enter the version, for example `0.1.7`. When `CHANGELOG.md` has no section for the version, enter its notes too: they become the section.
+
+The run has four jobs:
+
+1. "Version commit" checks that the run starts from `main`, that the version has the form `<major>.<minor>.<patch>`, that all packages have the same version and that the new version is not lower, that its tag does not exist, and, in a release, that a dry run tested the files of the release process with `scripts/release-checks.mjs dry-run` (rule 4 of the [release rules](#release-rules)). It sets the version in the `package.json` of each package, in the dependencies of the packages on each other and in `package-lock.json`, adds the section of the notes to `CHANGELOG.md` when the file has none, commits the change as "Release `<version>`" and pushes it to the temporary branch `release/run-<run ID>`, not to `main`. When `main` holds the version and its section already, it commits nothing. It first deletes the temporary branches of earlier runs, so that its push creates a new branch and needs no force.
+2. "CI" runs the workflow `ci.yml` for the commit of the version, because a push with the token of a workflow starts no other workflow. The npm packages that this job tests and packs are the files of the release, so the release repeats no test and no build.
+3. "Main, tag and GitHub release" runs only when CI passed. It moves `main` to the commit of the version as a fast-forward and deletes the temporary branch. When `main` changed during the run, it stops before the tag. Then it creates the tag `v<version>` on the commit and the release of the tag with the GitHub CLI `gh`. The section of the version in `CHANGELOG.md` becomes the notes, and the npm package of each package (for example `nimblescape-markdowneditor-<version>.tgz`) becomes a file of the release. A release that exists keeps its notes and receives only a file that it does not hold.
+4. "Publish to npmjs.com" downloads the npm packages of the GitHub release and publishes them with `npm publish --access public`, each package after the packages of the workspaces that it needs, with [trusted publishing](https://docs.npmjs.com/trusted-publishers): npm exchanges the OpenID Connect token of the job for a token of npmjs.com that can publish only the package, and adds the provenance of the build. It skips a version that npmjs.com holds already, and it stops with a message before it publishes anything when a package does not exist yet (see [npmjs.com setup](#npmjscom-setup)).
+
+`main` receives the version commit only after CI passed. When CI fails,
+`main`, the tags, the releases and npmjs.com stay unchanged, and the
+version can still be released: fix the cause on `main` and start the release
+of the same version again. The jobs move and push with the token of the
+workflow, so a rule of `main` that blocks direct pushes stops the release.
+
+A dry run tests a release without a change: choose "Dry run" when you start
+the workflow. The run makes the version commit on its temporary branch, runs
+CI for it and deletes the branch; it changes neither `main`, a tag, a release
+nor npmjs.com. Its run name ends with "(dry run)". A dry run may start from
+another branch than `main`, so it also tests a change of `release.yml` on
+that branch before the change reaches `main`.
+
+When a job fails, remove the cause and choose "Re-run failed jobs" on the
+run. A re-run keeps the tag and the files that the GitHub release already
+holds, and the publish job skips a version that npmjs.com already holds, so
+a re-run never publishes a version twice. GitHub allows a re-run only within
+30 days of the run. A new run deletes the temporary branch of a failed run,
+so a failed run can no longer be re-run after a new run started.
+
+The workflow `release-dry-run.yml` and the script `scripts/release-checks.mjs`
+with its test are the same as in the extension repositories of nimblescape.
+
+### Release rules
+
+The npm packages of this repository follow these rules. Only rule 4 has a
+check in the workflows, `scripts/release-checks.mjs dry-run`; everyone
+follows the other rules without a check.
+
+1. **The names never change.** A package keeps its name `@nimblescape/markdown<part>` ([R-ARCH-002](docs/specification.md#r-arch-002)), and nimblescape never publishes a package under a new name.
+2. **No deletion.** nimblescape never deletes a package or a version on npmjs.com. No workflow, npm script or file of `scripts/` runs `npm unpublish`, after which npmjs.com never accepts the number of that version again.
+3. **Only changes for the users, at most one version in 7 days.** A version is published only when it changes something for the users of a package, its section in `CHANGELOG.md` describes that change, and at least 7 days passed since the newest release; an urgent fix may come earlier. A change for the users changes the code of a package (`src/`, which the build bundles into `dist/`), another file of a package that is not a document, or a field of a `package.json` that changes how the package works, for example `exports`. A change only of the documents, the tests, the example page and extension or the build tools does not count: it reaches the users with the next version that changes a package.
+4. **Dry run first.** A change of the release process is tested with a dry run before it reaches `main`. The files of the release process are `release.yml`, `ci.yml`, whose npm packages the release publishes, and `scripts/release-checks.mjs`. The workflow "Release dry run" runs on every pull request. When the pull request changes one of these files, also in an update by Dependabot, the check `dry-run` fails until a successful dry run, or the newest release, had these files as they are at the head of the pull request. Start the workflow "Release" on the branch of the pull request with "Dry run" and a version without a tag (with notes when `CHANGELOG.md` has no section for the version), then re-run the job "release dry run" of the pull request. A pull request from a fork cannot meet the rule, because the dry run needs a branch of this repository. A pull request whose base branch has no `release.yml` yet, such as the first pull request of the release process, passes the check with a notice, because GitHub starts the workflow "Release" only from the default branch; the job "Version commit" of the first release runs the check on `main`. The job "Version commit" of a release runs the check `dry-run` again, so a change that reached `main` without a dry run stops the release until a dry run tested it. Do not make "release dry run" a required check of `main`: the release moves `main` to its version commit, which has no result of the check.
+5. **Only GitHub Actions.** Only the job "Publish to npmjs.com" publishes, with trusted publishing and no token. No other workflow, npm script or file of `scripts/` runs `npm publish`, apart from `scripts/npm-setup.sh` for the first version of each package, because npmjs.com sets up a trusted publisher only for a package that exists.
+
+## npmjs.com setup
+
+The job "Publish to npmjs.com" publishes with
+[trusted publishing](https://docs.npmjs.com/trusted-publishers): npmjs.com
+trusts the workflow `release.yml` of this repository in the environment
+`npm` for each package, and accepts the OpenID Connect token of its job
+instead of a token. No npm token is stored in GitHub. npm adds the
+provenance of the build only for a public repository, which this repository
+is.
+
+### What exists
+
+| Part | Where | Value |
+| --- | --- | --- |
+| Organization | [npmjs.com](https://www.npmjs.com/org/nimblescape) | `nimblescape`, the scope of the packages |
+| Packages | npmjs.com | `@nimblescape/markdowntext`, `@nimblescape/markdownai`, `@nimblescape/markdownrender`, `@nimblescape/markdownlayout`, `@nimblescape/markdowneditor` and `@nimblescape/markdownvscode`, public, after the first release |
+| Trusted publisher | the settings of each package on npmjs.com, "Trusted Publisher" | GitHub Actions, the repository `nimblescape/markdown`, the workflow `release.yml`, the environment `npm` |
+| Environment | the settings of the repository, "Environments" | `npm`, reachable from the tags `v*` and the branch `main` only |
+
+### Setup
+
+`npm publish` with provenance fails when `repository.url` of the
+`package.json` of a package names another repository, so a rename of the
+repository needs the trusted publishers again. The script
+`scripts/npm-setup.sh` sets up the environment, the first version of each
+package and the trusted publishers. It needs the GitHub CLI and npm 11.15.0
+or newer, both signed in, with an npm account that may publish in the
+organization `nimblescape` and has two-factor authentication. It shows what
+it sets up and asks before it changes anything; it changes nothing that
+already exists, so it can run again:
+
+```sh
+gh auth login
+npm login
+scripts/npm-setup.sh            # before the first release: the environment only
+scripts/npm-setup.sh 0.1.0      # after the release 0.1.0: the first versions and the trusted publishers
+```
+
+The first release stops in the job "Publish to npmjs.com", because no package
+exists yet. Run the script with the version of that release, then re-run the
+failed job: it finds the versions on npmjs.com and ends without a change. A
+package that is added to the workspaces later needs the same setup after the
+first release that holds it.
