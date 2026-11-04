@@ -37,6 +37,7 @@ export {
   type RenderFunction,
   type ThreadMarker,
 } from './plugins/api';
+export { frontMatterValuesPlugin, valueNodeName, valueTokenType } from './plugins/frontMatterValues';
 export { generatedWrite } from './plugins/generated';
 export { outsideChange } from './markdown/update';
 export { loadPlugins, sharedModules, type LoadOptions } from './plugins/shared';

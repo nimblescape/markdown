@@ -49,6 +49,11 @@ The front matter at the start of a text, in YAML, TOML or JSON
 - `checkFrontMatter` checks the data against a JSON schema, draft 2020-12,
   and gives each problem the path of its value and a message in plain words
   ([R-FM-004](../../docs/editor.md#r-fm-004)).
+- `frontMatterValues` returns the values of the keys as the text shows
+  them between the markers of `valueMarkers`, for example
+  `<wbr><!--{author.name}-->Hannes Stauss<!--{/author.name}-->`, by their
+  paths ([R-FM-007](../../docs/editor.md#r-fm-007)). The editor and the
+  formatters use it, so that they show and write the same text.
 
 The package needs no page, so that the editor, the renderer, the layout and
 the command line use the same code.
