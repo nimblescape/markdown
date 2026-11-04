@@ -18,7 +18,10 @@ requirement marked *(proposal)* is not decided yet, and [section
 9](#9-open-questions) lists these open questions. Each requirement has an ID
 as its heading. The documentation [How the reflection tool
 works](reflection-guide.md) describes in detail how the reflection tool
-works ([R-REFL-020](#r-refl-020)).
+works ([R-REFL-020](#r-refl-020)). The
+[mockup](https://github.com/nimblescape/workreflection-vscode/tree/main/docs/mockup)
+in the repository of the reflection tool shows a design of its views with
+example data.
 
 ## 1. Scope
 
