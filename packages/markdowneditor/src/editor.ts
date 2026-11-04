@@ -45,6 +45,7 @@ import {
   pluginParts,
 } from './plugins/api';
 import { DocCache } from './plugins/cache';
+import { frontMatterValuesPlugin } from './plugins/frontMatterValues';
 import { generatedPlugin, generatedWrite, validParts } from './plugins/generated';
 import { sourceViews } from './plugins/render';
 import { setOpenThread, threadEntries, threadsKey, threadsPlugin, type ThreadEntry } from './plugins/threads';
@@ -166,7 +167,8 @@ export class MarkdownEditor implements PluginEditor {
     element.classList.add('nsmd-editor');
     this.id = options.id ?? `markdowneditor-${++editorCount}`;
     this.textSource = options.source;
-    const plugins = options.plugins ?? [];
+    // Every editor has the plugin of the values of the front matter in the text (R-FM-007), before the other plugins.
+    const plugins = [frontMatterValuesPlugin, ...(options.plugins ?? [])];
     this.parts = pluginParts(plugins);
     addStyles(plugins, element.ownerDocument, options.styleNonce);
     this.generated = new DocCache((doc) => validParts(doc, plugins.flatMap((plugin) => plugin.generated?.(doc) ?? [])));

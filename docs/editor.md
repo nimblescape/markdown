@@ -343,6 +343,14 @@ The editor hides the markers and shows the value as a generated part
 ([R-EDIT-011](#r-edit-011)). A formatter writes the current value of the
 key between the markers, for example the formatter of Notes, which also
 inserts such values with `/ref` ([R-NOTES-001](plugins.md#r-notes-001)).
+*(proposal)* A start marker and an end marker count only as a pair of the
+same key in one line. The value is read-only only when the front matter has
+its key; the value of another key is text that the user edits. Ctrl+click
+(Cmd+click on macOS) on a read-only value goes to the input of its key in
+the form. The text of a value is in one line, a list of texts, numbers or
+yes and no is its items, joined by commas, and the path of a key in a map
+in a list has the index of the item, for example `authors.0.name`. The
+source gives these values (`frontMatterValues`), also for formatters.
 
 ## 9. Threads beside the text
 
