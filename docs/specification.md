@@ -21,8 +21,11 @@ and pull requests can link to it, for example
 `[R-GEN-001](docs/specification.md#r-gen-001)`. The ID of a requirement
 stays the same when the requirement moves to another document, and the table
 of [section 4](#4-documents) shows the document of each ID. The Claude
-document [One plan of all products](https://claude.ai/artifact/SatbygA2FkJiW3ob623NEy) is the one plan: the open steps in
-their order, the open decisions, and the steps that are built.
+document [One plan of all products](https://claude.ai/artifact/SatbygA2FkJiW3ob623NEy) is the one plan: it shows only
+the open points, each with the text of the requirements that it names. The
+built steps 1 to 18 of the libraries keep their numbers; their list is in the
+[last version of the plan file](https://github.com/nimblescape/markdown/blob/23c2c0a/docs/plan.md#71-nimblescape-markdown-the-libraries) in
+the history of this repository.
 
 ## 1. Scope
 
@@ -356,14 +359,17 @@ use:
   its Dependabot proposes no other version of TypeScript: typescript-eslint
   supports TypeScript only up to 6.0. A move to another version of
   TypeScript is one decision for all repositories together.
-- One plan holds the steps of all products: the Claude document
+- One plan holds the open points of all products: the Claude document
   [One plan of all products](https://claude.ai/artifact/SatbygA2FkJiW3ob623NEy), for the libraries, Markdown Notes,
   Markdown Paper, nimblescape PlantUML, the course module, the history and
-  the reflection tool. No repository holds a plan or a list of open work; a
-  document links to the plan. The plan names the requirements of each step
-  by their IDs, with links into the repositories, and the requirements stay
-  the normative text. A change that builds a step, adds a step, decides an
-  open question or makes a new one also changes the plan.
+  the reflection tool. It shows only what is open: the open steps, the
+  decisions and the actions that wait for the owner, and the cleanup. Each
+  open point shows the text of the requirements that it names, copied from
+  the repositories with links to them; the requirements stay the normative
+  text. No repository holds a plan or a list of open work; a document links
+  to the plan. A change that builds a step, adds a step, decides an open
+  question or makes a new one, or changes a requirement that the plan shows,
+  also changes the plan. A step that is built leaves the plan.
 - The editor of nimblescape Markdown and the clean editing view of Markdown
   Notes have the same functions for the notes and for the paper: the editor
   shows the text rendered, and the clean editing view is the text-only
