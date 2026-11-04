@@ -9,8 +9,8 @@ Licensed under the MIT License. See LICENSE in the repository root for details.
 
 This document defines the history: a product of nimblescape of its own
 beside nimblescape Markdown ([R-ARCH-003](specification.md#r-arch-003)) that
-records every action on any file, saves it through a pluggable backend and
-replays it, and the history extension of VS Code, which records every file
+records every action on any file and saves it through a pluggable backend,
+and the history extension of VS Code, which records every file
 of the workspace in the same way. The history is general infrastructure: it
 knows no reflection tool, no paper and no course. The reflection tool is a
 plugin of the history and a product of its own, with a document of its own,
@@ -78,7 +78,7 @@ an edit of the user.
 **AI agents in cloud sessions.** The history should also record the changes
 of AI agents that work in cloud sessions, for example Claude Code on the
 web, the cloud agent of GitHub Copilot and OpenAI Codex, and this should
-need only configuration in the repository. *(proposal)* Each such agent
+need only configuration in the repository. Each such agent
 delivers its changes through Git, so the history records each commit that
 reaches the repository as a step, with the origin AI and the name of the
 agent when the commit or its pull request shows them: by its author, by its
@@ -93,7 +93,10 @@ which the Copilot CLI also reads, `.github/hooks/*.json` for Copilot, and
 `.codex/hooks.json` for Codex where it runs hooks. Claude Code runs the
 hooks of `.claude/settings.json` in a cloud session with one repository
 outside a project, but not in a thread of a project or in a session with
-several repositories; there only the commits record the session. The other
+several repositories; there only the commits record the session. Before
+the history uses the hooks of an agent, a test shows that the agent commits
+the history file reliably; until then, the commits of the agent record its
+session. The other
 way is an HTTP hook that sends each step to a server backend of the history
 ([R-HIST-002](#r-hist-002)). It stays an option, because it needs settings
 outside the repository: an allowed host in the network settings of the cloud
@@ -123,10 +126,13 @@ over HTTP and stores them, for example in a database.
 `.workhistory/<path of the file>.jsonl` in the repository of the document
 ([R-GEN-007](specification.md#r-gen-007)), with one step per line and the
 change of each edit as a text patch. A second backend keeps the history in
-the local store of the platform. When the user goes back and then acts
-again, the later steps stay as a branch.
+the local store of the platform.
 
 ## 3. Back, forward and replay
+
+**For now, the history has no way back.** The history records the steps;
+the way back and forward through the steps and the replay are not built
+until a later decision.
 
 ### R-HIST-003
 
@@ -202,35 +208,25 @@ share one format of hooks. A change whose source VS Code does not report,
 for example an accepted inline completion of Copilot or a change by Git,
 gets the origin "other program", unless a commit shows its AI agent
 ([R-HIST-011](#r-hist-011)), and the user may mark it as an edit of the AI.
-*(proposal)* When the user switches it on, the history extension also
+When the user switches it on, the history extension also
 receives the OpenTelemetry data of AI tools on a local port, for example the
 agent runs of Copilot Chat, the events of Claude Code and the events of the
 AI chat of nimblescape Markdown ([R-HIST-010](#r-hist-010)), with the
 prompts, the answers and the tool calls. It gives a change of a file the
 origin AI and the name of the tool when a tool call of that tool at the same
 time names that file. It marks a change of unknown source as "probably AI" when
-its form shows it, for example several lines inserted at once at the cursor,
-and the user confirms it.
+its form shows it, for example several lines inserted at once at the cursor;
+the mark needs no confirmation of the user.
 
 ## 6. Open questions
 
 1. Backends: which backend is the default ([R-HIST-002](#r-hist-002)): the
    file in the repository of the document, so that others such as
    supervisors see it through Git (proposal), or the local store on the
-   computer of the author? Later steps kept as a branch (proposal) or
-   dropped? The form of the file of [R-HIST-006](#r-hist-006) (proposal)?
+   computer of the author? The form of the file of
+   [R-HIST-006](#r-hist-006) (proposal)?
 2. Files that are not text: does the history keep the content of each
    version, or only its hash and its size (proposal)?
-3. AI tools: the OpenTelemetry data of AI tools, the match of tool calls
-   with the changes of files, and the mark "probably AI"
-   ([R-VSC-004](#r-vsc-004), proposal)?
-4. Cloud sessions: commits as steps with the origin from the commit, and
-   hooks in the repository that write the details into the history file of
-   the repository, which goes with the next commit
-   ([R-HIST-011](#r-hist-011), proposal)? Does each agent commit this file
-   reliably? This needs a test with each agent. How does the history get the
-   details of a thread of a project of Claude Code, where the hooks of the
-   repository do not run?
 
 ---
 

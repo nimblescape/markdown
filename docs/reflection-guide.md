@@ -67,9 +67,10 @@ step:
 
 **Steps of unknown source.** A change whose source no one reported has the
 origin "other program", or "probably AI" when its form shows it, for example
-several lines inserted at once at the cursor. These steps stay apart in
-every measure until the author marks them, and the report shows their
-number.
+several lines inserted at once at the cursor. A step of the origin "other
+program" stays apart in every measure until the author marks it; a step
+marked "probably AI" counts as a step of the AI. The report shows the number
+of both.
 
 **Generated parts.** Parts that a plugin generates, for example the reference
 list or the numbers of captions, have the origin "other program" and count

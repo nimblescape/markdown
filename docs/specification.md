@@ -59,7 +59,7 @@ they decide where they use the libraries
 | Editor | A part that shows the text in a form that the user changes |
 | Renderer | A part that turns the text into content without edit functions |
 | Layout | A part that puts rendered content into a layout: styles, templates, pages, PDF |
-| History | The recorder of every action on any file, a product of its own ([R-ARCH-003](#r-arch-003)): it saves the actions and replays them |
+| History | The recorder of every action on any file, a product of its own ([R-ARCH-003](#r-arch-003)): it saves the actions |
 | Backend | A plugin of the history that stores the steps of a history and reads them back |
 | Platform adapter | The code that connects the libraries to one platform, for example VS Code |
 | Plugin | An object that adds functions to one part |
@@ -117,7 +117,7 @@ flowchart TB
     plugins -. plug in .-> layout
   end
   subgraph historyProduct["History of nimblescape: for every file"]
-    history["History<br/>every action, replay, pluggable backends"]
+    history["History<br/>every action, pluggable backends"]
   end
   subgraph reflectionProduct["Reflection tool of nimblescape: a plugin of the history"]
     reflection["Reflection tool<br/>classes, views, feedback, API"]

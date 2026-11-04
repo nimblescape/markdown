@@ -232,8 +232,9 @@ the output of automation and of AI without a check (Parasuraman & Manzey,
 origin of each episode ([R-HIST-001](history.md#r-hist-001)): for the user
 and for the AI, it gives the episodes, the time and the share of the final
 text of each class, for the whole document or set of files, and for each
-section or file. Changes with the origin "other program" or "probably AI"
-([R-VSC-004](history.md#r-vsc-004)) count apart until the user marks them.
+section or file. Changes with the origin "other program" count apart until
+the user marks them; changes with the mark "probably AI"
+([R-VSC-004](history.md#r-vsc-004)) count as changes of the AI.
 With the roles ([R-REFL-018](#r-refl-018)), it also gives the episodes that
 each party directed and judged. This shows which cognitive work the author
 moved to the AI, in the sense of cognitive offloading: an action that
@@ -277,7 +278,7 @@ and links to the documentation ([R-REFL-020](#r-refl-020)).
 The timeline follows the visualizations of the writing process in keystroke
 logging (Leijten & Van Waes, 2013), and the views as a whole follow the
 dashboards of learning analytics (Verbert et al., 2013). A click on a mark
-opens its episode in the history ([R-HIST-003](history.md#r-hist-003)). The
+opens its episode. The
 colors come from the theme ([R-THEME-001](platforms.md#r-theme-001)), and
 every view also tells the classes and the origins apart without color: about
 8% of men of European origin have a red-green color deficiency (Birch,
