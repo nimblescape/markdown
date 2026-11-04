@@ -185,7 +185,7 @@ so that search and copy find whole words, and gets the title, the author,
 the subtitle as its subject and the language of the layout in its metadata.
 The code is the PDF code of nimblescape Markdown Paper.
 
-*(proposal)* **The functions of the plugins in the PDF.** In the page of the
+**The functions of the plugins in the PDF.** In the page of the
 PDF, no integrating code fills the placeholders of the plugins, as the view
 of the pages does. So the page holds the data of its placeholders as JSON,
 and a script of the page registers the functions of the plugins
@@ -197,10 +197,11 @@ token, with the methods `attrIndex` and `attrGet`.
 
 ### R-LAYOUT-003
 
-*(proposal)* **Pages.** The page engine is Paged.js. A button switches the
-editor between "Edit" and "Pages"; in "Pages", the highlights of the notes
-and "Add Note" work, and a double click on a page goes to that place in
-"Edit".
+**Pages.** A button must switch the editor between "Edit" and "Pages".
+"Pages" shows the pages of the layout; the text cannot be edited there, but
+the highlights of the notes and "Add Note" work, and a double click on a
+page goes to that place in "Edit". *(proposal)* The page engine is
+Paged.js.
 
 *(proposal)* The view of the pages shows the page of the document in a
 frame, so that the style sheets of the layout change only the frame. The
@@ -226,15 +227,9 @@ folders of the extension ([R-VSC-007](https://github.com/nimblescape/markdownnot
 
 ## 5. Open questions
 
-1. Pages: the switch between "Edit" and "Pages"
-   ([R-LAYOUT-003](#r-layout-003), proposal)?
-2. Raw HTML in a rendering: the safe way with a fixed list of elements by
+1. Raw HTML in a rendering: the safe way with a fixed list of elements by
    default ([R-REN-001](#r-ren-001), proposal), or a sanitizer library, whose
    license needs a decision ([R-GEN-011](specification.md#r-gen-011))?
-3. The functions of the plugins in the PDF: a script of the page that the
-   integrating code bundles with the same plugins as its renderer, whose
-   functions get a copy of the data of their tokens
-   ([R-LAYOUT-002](#r-layout-002), proposal)?
 
 ---
 

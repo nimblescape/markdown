@@ -53,6 +53,10 @@ user. An AI tool reports its own actions and edits through the API of the
 history ([R-HIST-010](#r-hist-010)); a change by another program gets the
 origin "other program", and the user may mark it as an edit of the AI.
 
+A step of a file that is not text, for example an image or a PDF, records
+only the hash and the size of the new version, not its content, so that the
+history shows when the file changed and by whom and stays small.
+
 ### R-HIST-010
 
 **The API for actions.** The history must have an API through which an AI
@@ -203,8 +207,6 @@ the mark needs no confirmation of the user.
    supervisors see it through Git (proposal), or the local store on the
    computer of the author? The form of the file of
    [R-HIST-006](#r-hist-006) (proposal)?
-2. Files that are not text: does the history keep the content of each
-   version, or only its hash and its size (proposal)?
 
 ---
 
