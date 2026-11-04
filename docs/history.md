@@ -17,7 +17,7 @@ plugin of the history and a product of its own, with a document of its own,
 [reflection.md](reflection.md). Until the history has a repository of
 its own, this document stays with the [specification](specification.md) of
 nimblescape Markdown and is normative in the same way. [Section
-6](#6-open-questions) lists its open questions.
+5](#5-open-questions) lists its open questions.
 
 ## 1. Steps
 
@@ -128,29 +128,7 @@ over HTTP and stores them, for example in a database.
 change of each edit as a text patch. A second backend keeps the history in
 the local store of the platform.
 
-## 3. Back, forward and replay
-
-**For now, the history has no way back.** The history records the steps;
-the way back and forward through the steps and the replay are not built
-until a later decision.
-
-### R-HIST-003
-
-**Back and forward.** The user must be able to move back and forward through
-the steps. The text and the selection follow, as with undo and redo, and
-each position shows the document as it was after that step and the action of
-that step: the selection marked, the question and the answer beside the
-text, the changes of an edit marked. The history must tell the steps of the
-user and the steps of the AI apart, and a view mode must mark the text by
-its origin.
-
-### R-HIST-004
-
-**Replay.** Replay must play the steps from the start or from a chosen step,
-one after the other. It applies the recorded results and does not ask the AI
-again. "Run again" sends a recorded question to the AI as a new question.
-
-## 4. Use of the history
+## 3. Use of the history
 
 ### R-HIST-005
 
@@ -182,7 +160,7 @@ every platform, and the file form of a history must be readable without the
 editor, so that a plugin can analyze a history on its own, for example the
 history that a student submits with an assignment.
 
-## 5. The history extension of VS Code
+## 4. The history extension of VS Code
 
 ### R-VSC-004
 
@@ -218,7 +196,7 @@ time names that file. It marks a change of unknown source as "probably AI" when
 its form shows it, for example several lines inserted at once at the cursor;
 the mark needs no confirmation of the user.
 
-## 6. Open questions
+## 5. Open questions
 
 1. Backends: which backend is the default ([R-HIST-002](#r-hist-002)): the
    file in the repository of the document, so that others such as
