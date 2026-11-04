@@ -17,9 +17,12 @@ normative in the same way.
 
 ### R-GEN-002
 
-**One view to read and to edit.** The libraries replace the clean editing
-view and the visual editor of Markdown Notes and the Markdown preview of VS
-Code.
+**One view to read and to edit.** The libraries replace the visual editor
+of Markdown Notes and the Markdown preview of VS Code. The clean editing
+view of Markdown Notes stays beside them: it is the text-only editor that
+keeps the format of the file, and the view to learn Markdown
+([decision 67](https://github.com/nimblescape/markdownnotes-vscode/blob/main/docs/requirements.md#decisions)
+of Markdown Notes).
 
 ### R-EDIT-001
 
