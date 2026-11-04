@@ -69,11 +69,12 @@ apply to every open step:
   `npx -y @nimblescape/course check`, and never install them globally
   ([R-COURSE-005](course.md#r-course-005); decision 53 of
   [Markdown Paper](https://github.com/nimblescape/markdownpaper-vscode/blob/main/docs/requirements.md#decisions)).
-- Each new feature of the editor, or of a plugin of Markdown Notes or
-  Markdown Paper for it, gets its solution in the clean editing view of
-  Markdown Notes in the same step, for the notes and for the paper. The
-  clean editing view is the text-only editor that keeps the format of the
-  file (decisions 67 and 68 of
+- The editor of nimblescape Markdown and the clean editing view of
+  Markdown Notes have the same functions for the notes and for the paper:
+  the editor shows the text rendered, and the clean editing view is the
+  text-only editor that keeps the format of the file. Each new feature of
+  one of them, or of a plugin of Markdown Notes or Markdown Paper for them,
+  gets its solution in the other in the same step (decisions 67 and 68 of
   [Markdown Notes](https://github.com/nimblescape/markdownnotes-vscode/blob/main/docs/requirements.md#decisions)).
 - A pull request is merged or squash merged; nobody force pushes.
 
