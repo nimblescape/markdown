@@ -409,8 +409,6 @@ rules of the course, and the student sees the same report as the teacher.
 on the command line or on a server. The rules of a course, which reach the
 reflection tool through an adapter (see below), may state:
 
-- the level of AI use that the assignment allows, and the report shows the
-  work beside this level;
 - goals, for example a minimum share of own intellectual work;
 - *(proposal)* the learning objectives of the assignment, each with the
   level that it aims at on the scale of the cognitive process (section 4),
@@ -421,22 +419,24 @@ reflection tool through an adapter (see below), may state:
 - whether the teacher may see an overview of the course that compares
   students.
 
+The rules state no level of AI use that an assignment allows, because no
+concrete level can say which use of AI is allowed and which is not.
+
 **Where the context comes from.** *(proposal)* The reflection tool knows no
-course. The learning objectives, their levels, the parts of the work and the
-allowed level of AI use come from an adapter: a program of the course, of
-Markdown Paper or of another kind of work that reads its files and gives
-this context to the reflection tool. For example, an extension of a course
+course. The learning objectives, their levels and the parts of the work come
+from an adapter: a program of the course, of Markdown Paper or of another
+kind of work that reads its files and gives this context to the reflection
+tool. For example, an extension of a course
 reads the README files of the course and of the assignment. With this
 context, the classifier also gives each episode the parts of the work that
 it works on, so that each part of the work belongs to an objective. Without
 an adapter, the report shows the work without objectives
 ([R-REFL-021](reflection.md#r-refl-021)).
 
-**Basis.** The levels of AI use come from the AI Assessment Scale (Perkins
-et al., 2024). The levels of the learning objectives use the revised
-taxonomy of Bloom (Krathwohl, 2002).
+**Basis.** The levels of the learning objectives use the revised taxonomy of
+Bloom (Krathwohl, 2002).
 
-*Status:* established framework.
+*Status:* established taxonomy.
 
 ## 13. Data and limits
 
@@ -547,11 +547,6 @@ Peer-reviewed work comes first; a book is marked as such.
   types and levels of human interaction with automation. *IEEE Transactions
   on Systems, Man, and Cybernetics – Part A: Systems and Humans, 30*(3),
   286–297. <https://doi.org/10.1109/3468.844354>
-- Perkins, M., Furze, L., Roe, J., & MacVaugh, J. (2024). The Artificial
-  Intelligence Assessment Scale (AIAS): A framework for ethical integration
-  of generative AI in educational assessment. *Journal of University
-  Teaching and Learning Practice, 21*(6).
-  <https://doi.org/10.53761/q3azde36>
 - Risko, E. F., & Gilbert, S. J. (2016). Cognitive offloading. *Trends in
   Cognitive Sciences, 20*(9), 676–688.
   <https://doi.org/10.1016/j.tics.2016.07.002>
