@@ -4,9 +4,9 @@
 
 // The browser that prints the PDF (docs/rendering.md, R-LAYOUT-002): the program that the integrating code names, else
 // the program of an environment variable, else an installed Google Chrome, Chromium, Microsoft Edge or Brave. Without
-// one, the error NoBrowserError says where to get Chrome and how to name another program. The search is the search of
-// nimblescape Markdown Paper, which also downloads Chromium when the user agrees; the layout part downloads nothing.
-// The module runs in Node.js.
+// one, the error NoBrowserError says where to get Chrome and how to name another program. nimblescape Markdown Paper
+// uses this search, with its own environment variable, and also downloads Chromium when the user agrees; the layout
+// part downloads nothing. The module runs in Node.js.
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';

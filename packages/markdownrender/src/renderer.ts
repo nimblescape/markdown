@@ -15,7 +15,7 @@ import type MarkdownIt from 'markdown-it';
 import Renderer from 'markdown-it/lib/renderer.mjs';
 import type Token from 'markdown-it/lib/token.mjs';
 import { createMarkdownIt, type FootnotePlace } from './markdownIt';
-import { alertTitles, alertTitleType, columnsType, prepareOutput, type AlertKind } from './output';
+import { outputRules, prepareOutput } from './output';
 import { addStyles, fenceRender, renderOf, renderParts, type RenderFunction, type RenderPlugin } from './plugins';
 import { closeOpen, openCount, rawHtmlRules, type RawHtml } from './rawHtml';
 
@@ -97,9 +97,7 @@ export class MarkdownRenderer {
     const rules: Renderer['rules'] = { ...md.renderer.rules };
     rawHtmlRules(rules, md, options.rawHtml ?? 'safe');
     const escape = md.utils.escapeHtml;
-    rules[alertTitleType] = (tokens, index) => `<p class="markdown-alert-title">${alertTitles[(tokens[index].meta as { kind: AlertKind }).kind]}</p>\n`;
-    rules[columnsType] = (tokens, index) =>
-      `<colgroup>${(tokens[index].meta as { widths: number[] }).widths.map((width) => `<col style="width: ${width}%">`).join('')}</colgroup>\n`;
+    Object.assign(rules, outputRules);
     for (const kind of this.renders.keys()) {
       if (!kind.startsWith(fenceRender)) {
         const own = rules[kind];

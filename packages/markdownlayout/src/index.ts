@@ -42,6 +42,7 @@ export {
   documentLayout,
   findLayout,
   folderOf,
+  layoutScript,
   loadLayout,
   renderPage,
   rewriteCss,
@@ -77,4 +78,4 @@ export {
   type Part,
   type TextFound,
 } from './text';
-export { footnoteType, layoutHtmlType, listType } from './tokens';
+export { decodedTarget, footnoteType, layoutHtml, layoutHtmlType, listType, plainText, trailingAnchor } from './tokens';
