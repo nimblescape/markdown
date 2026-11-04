@@ -53,6 +53,12 @@ run a script or load a resource. The integrating code may choose that raw
 HTML shows as its text, as in the editor, or as the file writes it, for a
 text that it trusts.
 
+**Syntax colors.** The renderer gives code blocks the syntax colors of the
+editor ([R-EDIT-003](editor.md#r-edit-003)), with the same languages and the
+same variables `--nsmd-syntax-*`, so that the view "Pages" and the PDF show
+them. A layout that wants code without colors sets these variables to the
+color of the text.
+
 ### R-REN-003
 
 **The renderer without the editor.** The renderer must run without the
@@ -95,18 +101,19 @@ tables, the generated lists (table of contents, lists of figures, tables and
 listings, the reference list), pages and PDF. Layouts are content, for
 example the layout `plain` and the layouts of PHT. Each layout has a JSON
 schema of the front matter of its documents
-([R-FM-004](editor.md#r-fm-004)).
+([R-FM-004](editor.md#r-fm-004)). A layout may hold this schema as a file:
+`layout.json` names it in the field `frontMatterSchema` (version 1.1.0 of
+the layout folder format), the layout gets its fields from the schema when
+`layout.json` gives none, and a layout without the file gets the schema of
+its fields.
 
 *(proposal)* The layout part is the package `@nimblescape/markdownlayout`. A
 layout is a folder with `layout.json` in the layout folder format
 `nimblescape-layout` of Markdown Paper, version 1.1.0: its style sheets, the
 templates of its fixed pages, its fields, its language and its rules for
-headings, contents, hyphens, listings and the name of the PDF. Version 1.1.0
-adds the field `frontMatterSchema`, the file of the JSON schema of the front
-matter in the layout folder; the layout gets its fields from the schema when
-`layout.json` gives none, and a layout without the file gets the schema of
-its fields. The package reads the layouts of the format 1.0.0 of Paper
-without a change. A document names its layout with the field `layout` of
+headings, contents, hyphens, listings and the name of the PDF, and the
+file of its schema. The package reads the layouts of the format 1.0.0 of
+Paper without a change. A document names its layout with the field `layout` of
 its front matter: the folder `layouts/<name>/` in the folder of the document
 or in a folder above it, up to the top folder of the search; a layout that
 the integrating code finds, for a name with `/`, for example a layout on
@@ -211,22 +218,13 @@ folders of the extension ([R-VSC-007](https://github.com/nimblescape/markdownnot
 
 1. Pages: the switch between "Edit" and "Pages"
    ([R-LAYOUT-003](#r-layout-003), proposal)?
-2. Schema of a layout: the file of the schema in the layout folder, for
-   example `frontmatter.schema.json`, named in the field
-   `frontMatterSchema` of `layout.json`, gives the fields when `layout.json`
-   has none (format 1.1.0, [R-LAYOUT-001](#r-layout-001), proposal)?
-3. Raw HTML in a rendering: the safe way with a fixed list of elements by
+2. Raw HTML in a rendering: the safe way with a fixed list of elements by
    default ([R-REN-001](#r-ren-001), proposal), or a sanitizer library, whose
    license needs a decision ([R-GEN-011](specification.md#r-gen-011))?
-4. The functions of the plugins in the PDF: a script of the page that the
+3. The functions of the plugins in the PDF: a script of the page that the
    integrating code bundles with the same plugins as its renderer, whose
    functions get a copy of the data of their tokens
    ([R-LAYOUT-002](#r-layout-002), proposal)?
-5. Syntax colors: does the renderer also give the syntax colors of code
-   blocks of the editor ([R-EDIT-003](editor.md#r-edit-003)), so that the
-   view "Pages" and the PDF show them, and a layout that wants code without
-   colors sets the variables `--nsmd-syntax-*` to the color of the text
-   (proposal: yes)?
 
 ---
 
