@@ -416,7 +416,7 @@ every platform:
   and gives their context in this form. The adapter belongs to the product
   of that kind of work, and never to the history. For example, the course
   module reads the README files of a course and of its assignments
-  ([R-COURSE-011](course.md#r-course-011)), and Markdown Paper gives the
+  ([R-COURSE-011](https://github.com/nimblescape/course-vscode/blob/main/docs/requirements.md#r-course-011)), and Markdown Paper gives the
   chapters of a paper as its parts.
 - *Platforms:* in VS Code, an adapter is an extension that registers with
   the API of the reflection extension ([R-REFL-017](#r-refl-017)); on the

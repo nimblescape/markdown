@@ -247,13 +247,13 @@ documents of the history and of the reflection tool stay in this repository.
 form of the files of a course in a repository, its README files and its
 feedback files, with a comment of the format and instructions for AI agents,
 and it reads these files as structured data
-([R-COURSE-001](course.md#r-course-001)). It is a product of its own, not a
+([R-COURSE-001](https://github.com/nimblescape/course-vscode/blob/main/docs/requirements.md#r-course-001)). It is a product of its own, not a
 part of nimblescape Markdown or of the history: the repository
 `nimblescape/course-vscode`, the npm package `@nimblescape/course` and the
-folder `.course/` ([R-COURSE-002](course.md#r-course-002)). It is the
+folder `.course/` ([R-COURSE-002](https://github.com/nimblescape/course-vscode/blob/main/docs/requirements.md#r-course-002)). It is the
 adapter of a course for the reflection tool
-([R-COURSE-003](course.md#r-course-003)). Until its document moves to the
-repository of the course module, it stays in this repository.
+([R-COURSE-003](https://github.com/nimblescape/course-vscode/blob/main/docs/requirements.md#r-course-003)). Its requirements are in
+[docs/requirements.md](https://github.com/nimblescape/course-vscode/blob/main/docs/requirements.md) of its repository.
 
 ### R-ARCH-005
 
@@ -265,7 +265,7 @@ Their repositories are `nimblescape/markdownnotes-vscode`,
 `nimblescape/workreflection-vscode`
 ([R-REFL-017](reflection.md#r-refl-017)), `nimblescape/course-vscode` and
 the feedback program of the course module, `nimblescape/course-feedback`
-([R-FEED-004](course.md#r-feed-004)); their npm packages start with
+([R-FEED-004](https://github.com/nimblescape/course-vscode/blob/main/docs/requirements.md#r-feed-004)); their npm packages start with
 `@nimblescape/`, and the publisher of their VS Code extensions is
 `nimblescape`. majikmate provides the academic context: it owns the
 courses, for example `majikmate/module-ts-2`, which use these products. A product
@@ -279,8 +279,8 @@ the renderer and the layout, which share one document; the plugins of the
 format extensions, the AI and the platforms have documents of their own too.
 The history and the reflection tool are products of their own
 ([R-ARCH-003](#r-arch-003)); their documents stay here until they have
-repositories of their own. The same holds for the course module
-([R-ARCH-004](#r-arch-004)).
+repositories of their own. The requirements of the course module are in its
+repository ([R-ARCH-004](#r-arch-004)).
 
 | Document | Content | Requirements |
 | --- | --- | --- |
@@ -290,7 +290,6 @@ repositories of their own. The same holds for the course module
 | [Renderer and layout](rendering.md) | The renderer: content without edit functions, plugins of the renderer. The layout: layouts, pages and PDF | [R-REN-001](rendering.md#r-ren-001) to [R-REN-003](rendering.md#r-ren-003), [R-LAYOUT-001](rendering.md#r-layout-001) to [R-LAYOUT-004](rendering.md#r-layout-004) |
 | [History](history.md) | The recorder of every action on any file, a product of its own: steps, the API for actions, AI agents in cloud sessions, storage backends, the use of the history by plugins, the history extension of VS Code | [R-AI-004](history.md#r-ai-004), [R-HIST-001](history.md#r-hist-001), [R-HIST-002](history.md#r-hist-002), [R-HIST-005](history.md#r-hist-005) to [R-HIST-008](history.md#r-hist-008), [R-HIST-010](history.md#r-hist-010), [R-HIST-011](history.md#r-hist-011), [R-VSC-004](history.md#r-vsc-004) |
 | [Reflection tool](reflection.md) | The reflection tool, a plugin of the history and a product of its own: classes and roles of the work, analysis, views, feedback, assignments, API, the package and the extension, scientific basis | [R-REFL-001](reflection.md#r-refl-001) to [R-REFL-022](reflection.md#r-refl-022) |
-| [Course module](course.md) | The course module, a product of its own: the form of the README files and of the feedback files of a course, the comment of the format, the instructions for AI agents, the structured reading, the checks and the adapter of the reflection tool | [R-COURSE-001](course.md#r-course-001) to [R-COURSE-012](course.md#r-course-012), [R-FEED-001](course.md#r-feed-001) to [R-FEED-004](course.md#r-feed-004) |
 | [How the reflection tool works](reflection-guide.md) | The documentation of the reflection tool: how it works, step by step, with the scientific basis of each step; the report links to it and cites no literature | Documentation of [R-REFL-020](reflection.md#r-refl-020) |
 | [Plugins and format extensions](plugins.md) | The plugin API, the levels of a plugin, the plugins of Markdown Notes and Markdown Paper | [R-GEN-005](plugins.md#r-gen-005), [R-GEN-012](plugins.md#r-gen-012), [R-PLUGIN-001](plugins.md#r-plugin-001), [R-PLUGIN-002](plugins.md#r-plugin-002), [R-NOTES-001](plugins.md#r-notes-001), [R-PAPER-001](plugins.md#r-paper-001) |
 | [AI](ai.md) | AI chats, tracked changes, pluggable providers, the API key, the memory | [R-AI-001](ai.md#r-ai-001), [R-AI-006](ai.md#r-ai-006), [R-AI-002](ai.md#r-ai-002), [R-AI-005](ai.md#r-ai-005), [R-AI-003](ai.md#r-ai-003) |
