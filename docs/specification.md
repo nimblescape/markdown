@@ -20,9 +20,9 @@ last section. Each requirement has an ID as its heading, so that code, tests
 and pull requests can link to it, for example
 `[R-GEN-001](docs/specification.md#r-gen-001)`. The ID of a requirement
 stays the same when the requirement moves to another document, and the table
-of [section 4](#4-documents) shows the document of each ID. The
-[plan](plan.md) is the one plan of all products: the open steps in their
-order, the open decisions, and the steps that are built.
+of [section 4](#4-documents) shows the document of each ID. The Claude
+document [One plan of all products](https://claude.ai/artifact/SatbygA2FkJiW3ob623NEy) is the one plan: the open steps in
+their order, the open decisions, and the steps that are built.
 
 ## 1. Scope
 
@@ -282,7 +282,6 @@ repositories of their own. The same holds for the course module
 | Document | Content | Requirements |
 | --- | --- | --- |
 | [Specification](specification.md), this document | Scope, terms, architecture, libraries, licenses and release | [R-GEN-001](#r-gen-001), [R-GEN-015](#r-gen-015), [R-ARCH-001](#r-arch-001), [R-GEN-010](#r-gen-010), [R-ARCH-002](#r-arch-002), [R-ARCH-003](#r-arch-003), [R-ARCH-004](#r-arch-004), [R-ARCH-005](#r-arch-005), [R-GEN-011](#r-gen-011), [R-GEN-007](#r-gen-007) |
-| [Plan](plan.md) | The one plan of all products: the open steps in their order, the decisions that wait for the owner, the requirements that are still proposals, the actions of the owner and the built steps | None: the plan names the requirements of each step |
 | [Source](source.md) | The text, the selections and the changes; the formats of the front matter and of the files | [R-SRC-001](source.md#r-src-001) to [R-SRC-003](source.md#r-src-003), [R-GEN-006](source.md#r-gen-006) |
 | [Editor](editor.md) | The editors of a file and the rendered Markdown editor: the round trip, the interaction, tables, the read-only mode and the read-only generated parts, the rendered changes, the mode to learn Markdown, the form of the front matter, threads beside the text | [R-GEN-002](editor.md#r-gen-002), [R-EDIT-001](editor.md#r-edit-001) to [R-EDIT-012](editor.md#r-edit-012), [R-GEN-009](editor.md#r-gen-009), [R-GEN-003](editor.md#r-gen-003), [R-GEN-008](editor.md#r-gen-008), [R-GEN-013](editor.md#r-gen-013), [R-FM-001](editor.md#r-fm-001) to [R-FM-007](editor.md#r-fm-007), [R-GEN-014](editor.md#r-gen-014) |
 | [Renderer and layout](rendering.md) | The renderer: content without edit functions, plugins of the renderer. The layout: layouts, pages and PDF | [R-REN-001](rendering.md#r-ren-001) to [R-REN-003](rendering.md#r-ren-003), [R-LAYOUT-001](rendering.md#r-layout-001) to [R-LAYOUT-004](rendering.md#r-layout-004) |
@@ -357,12 +356,14 @@ use:
   its Dependabot proposes no other version of TypeScript: typescript-eslint
   supports TypeScript only up to 6.0. A move to another version of
   TypeScript is one decision for all repositories together.
-- One plan holds the steps of all products: [docs/plan.md](plan.md) of this
-  repository, for the libraries, Markdown Notes, Markdown Paper, nimblescape
-  PlantUML, the course module, the history and the reflection tool. No other
-  document of these repositories holds a plan or a list of open work; it
-  links to the plan. A change that builds a step, adds a step, decides an
-  open question or makes a new one changes the plan in the same change.
+- One plan holds the steps of all products: the Claude document
+  [One plan of all products](https://claude.ai/artifact/SatbygA2FkJiW3ob623NEy), for the libraries, Markdown Notes,
+  Markdown Paper, nimblescape PlantUML, the course module, the history and
+  the reflection tool. No repository holds a plan or a list of open work; a
+  document links to the plan. The plan names the requirements of each step
+  by their IDs, with links into the repositories, and the requirements stay
+  the normative text. A change that builds a step, adds a step, decides an
+  open question or makes a new one also changes the plan.
 - The editor of nimblescape Markdown and the clean editing view of Markdown
   Notes have the same functions for the notes and for the paper: the editor
   shows the text rendered, and the clean editing view is the text-only
@@ -374,8 +375,9 @@ use:
 
 ## 6. Open questions
 
-This document has no open questions. [Section 4 of the plan](plan.md#4-decisions-that-wait-for-the-owner)
-lists the open questions of all products in one table. The documents of the
+This document has no open questions. The section "Decisions that wait for
+you" of the [one plan of all products](https://claude.ai/artifact/SatbygA2FkJiW3ob623NEy) lists the open questions of
+all products in one table. The documents of the
 parts list their own open questions: the
 [editor](editor.md#10-open-questions), the
 [renderer and the layout](rendering.md#5-open-questions), the
