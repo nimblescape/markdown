@@ -168,8 +168,8 @@ command of the table menu is one step of undo.
 
 ### R-EDIT-010
 
-*(proposal)* **What GFM cannot store.** A cell color is a comment at the
-start of the cell, `<!--cell red-->`; the widths of the columns are a
+**What GFM cannot store.** A cell color is a comment at the start of the
+cell, `<!--cell red-->`; the widths of the columns are a
 comment on the line before the table, `<!-- table: widths=30,70 -->`, in
 percent of the width of the text. The colors are gray, red, orange, yellow,
 green, blue and purple. Lists
@@ -371,9 +371,7 @@ click on the icon close it.
 
 ## 10. Open questions
 
-1. Tables: are the two comments for cell colors and column widths right
-   ([R-EDIT-010](#r-edit-010), proposal)? Is a dropdown needed?
-2. Mode to learn Markdown: all marks muted plus the block of the cursor in
+1. Mode to learn Markdown: all marks muted plus the block of the cursor in
    full color (proposal), or only the marks at the cursor
    ([R-GEN-013](#r-gen-013))? Can the user edit the marks directly
    (proposal: no)?

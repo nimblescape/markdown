@@ -338,8 +338,12 @@ command of the npm package `@nimblescape/course` with npx and installs
 nothing, in the version that `versions.course` of its `config.yml` names;
 for a version that is not on npm, `versions.course` names a commit of
 `nimblescape/course-vscode`, and the program builds and runs that commit.
-It keeps its checks, skills, engines and prompts. The workflow of a course runs the feedback program at
-the tag that `FEEDBACK_VERSION` names, `v1`. The tag `v1` is the version of
+It keeps its checks, skills, engines and prompts. The workflow of a course
+runs the feedback program as the action `nimblescape/course-feedback@v1`,
+which runs all its steps; the workflow keeps only its triggers, its
+permissions and its concurrency, and gives each step only the secret that
+the step needs. Each release of the program creates its tag `v<version>`
+and moves the tag `v1` to it. The tag `v1` is the version of
 the program that uses the course module, so only a course in the format of
 the module ([R-COURSE-005](#r-course-005)) may use it; the four -2 courses of
 majikmate are in this format.
