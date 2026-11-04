@@ -34,7 +34,8 @@ with the proposed changes as tracked changes.
 The repository holds one npm package for each part, as npm workspaces in
 `packages/`
 ([R-ARCH-002](docs/specification.md#r-arch-002)). The other parts get their
-packages with their steps of the [one plan of all products](https://claude.ai/artifact/SatbygA2FkJiW3ob623NEy).
+packages later; the [one plan of all products](https://claude.ai/artifact/SatbygA2FkJiW3ob623NEy) lists the decisions
+that wait for the owner.
 
 | Package | Part |
 | --- | --- |
