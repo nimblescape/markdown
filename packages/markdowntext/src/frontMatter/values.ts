@@ -6,8 +6,7 @@
 // front matter between two hidden markers, for example `<wbr><!--{title}-->A paper<!--{/title}-->`. The key of a value
 // under another key is the path of the keys with `.`, for example `author.name`. The start marker has `<wbr>` before it:
 // a line that starts with a comment of HTML is a block of HTML, which shows without the Markdown of its paragraph. The
-// editor, the formatters and the commands that insert such values take the values of a front matter from here, so that
-// they all write the same text.
+// editor takes the values of a front matter from here, and formatters and the commands that insert such values can.
 
 import type { FrontMatterFormat } from './detect';
 import { readFrontMatter, tomlText } from './edit';

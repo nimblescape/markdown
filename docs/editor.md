@@ -350,8 +350,7 @@ its key; the value of another key is text that the user edits. Ctrl+click
 the form. The text of a value is in one line, a list of texts, numbers or
 yes and no is its items, joined by commas, and the path of a key in a map
 in a list has the index of the item, for example `authors.0.name`. The
-source gives these values (`frontMatterValues`), so that the editor and the
-formatters show and write the same text.
+source gives these values (`frontMatterValues`), also for formatters.
 
 ## 9. Threads beside the text
 

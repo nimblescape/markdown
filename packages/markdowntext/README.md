@@ -52,8 +52,8 @@ The front matter at the start of a text, in YAML, TOML or JSON
 - `frontMatterValues` returns the values of the keys as the text shows
   them between the markers of `valueMarkers`, for example
   `<wbr><!--{author.name}-->Hannes Stauss<!--{/author.name}-->`, by their
-  paths ([R-FM-007](../../docs/editor.md#r-fm-007)). The editor and the
-  formatters use it, so that they show and write the same text.
+  paths ([R-FM-007](../../docs/editor.md#r-fm-007)), for the editor and
+  for formatters.
 
 The package needs no page, so that the editor, the renderer, the layout and
 the command line use the same code.
