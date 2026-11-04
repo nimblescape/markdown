@@ -189,7 +189,9 @@ and "Add Note" work, and a double click on a page goes to that place in
 frame, so that the style sheets of the layout change only the frame. The
 page holds Paged.js until the functions of the plugins have shown their
 tokens in the frame; Paged.js then starts when the page has not changed for
-200 ms, at the latest 10 s after the page loaded. On a screen, the pages
+200 ms and no drawing of a script of the page waits, at the latest 10 s after
+the page loaded; a slow drawing names a later time up to which the page
+waits for it. On a screen, the pages
 stand on a grey background with a gap between them; the PDF has no screen
 styles.
 

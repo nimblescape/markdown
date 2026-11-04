@@ -8,7 +8,7 @@
 // slots of its placeholders as JSON, a script of the page registers the functions of the plugins, and the script of the
 // layout fills the placeholders as the renderer does, also when a function fails.
 
-import { afterEach, describe, expect, test } from 'vitest';
+import { afterEach, describe, expect, test, vi } from 'vitest';
 import type { RenderPlugin } from '@nimblescape/markdownrender';
 import handlersJs from './page/handlers.js?raw';
 import { type Host, renderPage } from './page';
@@ -19,7 +19,15 @@ import { createLayoutRenderer } from './text';
 const host: Host = { reader: { read: async () => undefined }, resource: (url) => url, sources: 'file:', scripts: [], nonce: 'abc' };
 
 /** PageWindow is the window with the script of the layout. */
-type PageWindow = Window & { paperHandlers?: { fill(root: ParentNode): void; addRender(kind: string, render: unknown): void } };
+type PageWindow = Window & {
+  paperHandlers?: {
+    fill(root: ParentNode): void;
+    addRender(kind: string, render: unknown): void;
+    pending: ((root: ParentNode) => boolean | number)[];
+    beforePages: ((root: ParentNode) => void)[];
+    before(): Promise<void>;
+  };
+};
 
 /** tokens are the data of the tokens that the functions of the plugins got. */
 let tokens: { source: string; token: TokenData & { attrGet(name: string): string | null } }[] = [];
@@ -110,5 +118,51 @@ describe('the script of the layout', () => {
     expect(() => registerRenders(plugins)).toThrow('The page has no script of the layout');
     new Function(handlersJs)();
     expect(() => registerRenders([{ name: 'no name', apiVersion: 1 }])).toThrow('needs a name');
+  });
+});
+
+describe('the start of Paged.js', () => {
+  test('a drawing that waits holds Paged.js up to 10 seconds, and a slow drawing up to its own time', async () => {
+    vi.useFakeTimers();
+    try {
+      load('<main class="paper-text"><p>Text</p></main>');
+      const handlers = (window as PageWindow).paperHandlers!;
+      const start = Date.now();
+      // The fast drawing never ends; the slow one says that it waits up to 30 seconds after the start.
+      handlers.pending.push(() => true, () => start + 30_000);
+      const copied: number[] = [];
+      handlers.beforePages.push(() => copied.push(Date.now() - start));
+      let started = false;
+      void handlers.before().then(() => {
+        started = true;
+      });
+      await vi.advanceTimersByTimeAsync(20_000);
+      expect(started).toBe(false);
+      await vi.advanceTimersByTimeAsync(11_000);
+      expect(started).toBe(true);
+      expect(copied).toHaveLength(1);
+      expect(copied[0]).toBeGreaterThan(30_000);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  test('without a slow drawing, Paged.js starts 200 milliseconds after the last change', async () => {
+    vi.useFakeTimers();
+    try {
+      load('<main class="paper-text"><p>Text</p></main>');
+      const handlers = (window as PageWindow).paperHandlers!;
+      const start = Date.now();
+      // A slow drawing that is drawn: its time is over.
+      handlers.pending.push(() => start - 1);
+      let started = false;
+      void handlers.before().then(() => {
+        started = true;
+      });
+      await vi.advanceTimersByTimeAsync(1_000);
+      expect(started).toBe(true);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

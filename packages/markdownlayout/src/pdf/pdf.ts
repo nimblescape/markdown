@@ -5,8 +5,8 @@
 // The print of the page of a document to a PDF (docs/rendering.md, R-LAYOUT-002): an installed browser without a window
 // loads the HTML file of the page, Paged.js makes the pages, and the browser prints them in the size of the pages of
 // the layout. Then the PDF loses the marks of the soft hyphens, so that search and copy find whole words, and gets the
-// title, the author and the language of the document in its metadata. The same code is in nimblescape Markdown Paper.
-// The module runs in Node.js.
+// title, the author and the language of the document in its metadata. nimblescape Markdown Paper prints its PDF with
+// this code. The module runs in Node.js.
 
 import { pathToFileURL } from 'node:url';
 import * as zlib from 'node:zlib';

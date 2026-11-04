@@ -55,6 +55,26 @@ schema of the front matter of the layout
 their tokens in the frame, and then Paged.js makes the pages. The same page
 is the page of the PDF ([R-LAYOUT-002](../../docs/rendering.md#r-layout-002)).
 
+## Drawings and the script of the layout
+
+The script of the layout in the page starts Paged.js when the content is
+complete ([R-LAYOUT-003](../../docs/rendering.md#r-layout-003)). A script of
+the page that draws, for example diagrams, tells it that a drawing still
+waits: a function in `window.paperHandlers.pending` returns `true` while the
+drawing waits, at most 10 seconds after the page loaded, or the time (as
+`Date.now()` gives it) up to which the page waits for a slow drawing. The
+functions in `window.paperHandlers.beforePages` run right before Paged.js
+makes the pages, for example to copy what Paged.js would lose.
+
+```js
+window.paperHandlers.pending.push((root) => root.querySelector('.diagram:not(.drawn)') !== null);
+window.paperHandlers.beforePages.push((root) => copyShadowRoots(root));
+```
+
+Code that makes the pages itself, without `renderPage`, loads the text of
+`layoutScript` into its page before Paged.js, for the start of Paged.js, the
+page numbers and the last lines of the justified paragraphs.
+
 ## The pages that follow the text
 
 `LivePages` is the view "Pages" of an editor
@@ -110,7 +130,9 @@ const { pdf, messages } = await printPage(page); // the bytes of the PDF, and th
 `printPage` searches an installed browser; the option `browser` names its
 program, else the environment variable `NIMBLESCAPE_BROWSER`. Without a
 browser, the error `NoBrowserError` says where to get Google Chrome. The
-package downloads no browser.
+package downloads no browser. `Browser` is the connection to the browser
+over the Chrome DevTools Protocol, for example for the tests of the pages
+of a program.
 
 In the page of the PDF, the page itself shows the tokens of the plugins
 before Paged.js makes the pages. A script of the page registers the

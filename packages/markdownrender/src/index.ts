@@ -8,7 +8,18 @@
 // look of the editor.
 
 export { createMarkdownIt, type FootnotePlace, type MarkdownItExtension, type MarkdownItOptions } from './markdownIt';
-export { alertTitles, cellColorPattern, headingText, slug, widthsPattern, type AlertKind, type OutputOptions } from './output';
+export {
+  addOutputRules,
+  alertTitles,
+  cellColorPattern,
+  headingText,
+  outputRules,
+  prepareOutput,
+  slug,
+  widthsPattern,
+  type AlertKind,
+  type OutputOptions,
+} from './output';
 export {
   addStyles,
   checkPlugins,
