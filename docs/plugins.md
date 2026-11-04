@@ -79,7 +79,7 @@ toMarkdown?, commands?, keys?, menus?, frontMatterSchema?, activate?(editor,
 host) }`. `activate` gets the API of the editor and of the platform, and
 returns what to dispose.
 
-*(proposal)* Version 1 has these details. The members `name`,
+Version 1 has these details. The members `name`,
 `apiVersion`, `extendMarkdownIt`, `styles` and `render` are the plugin of
 the renderer ([R-REN-002](rendering.md#r-ren-002)), so that the same object
 works in the renderer and in the editor.
@@ -100,17 +100,17 @@ works in the renderer and in the editor.
 | `frontMatterSchema`, `frontMatterInputs` | The schema of the front matter and the inputs of keys ([R-FM-004](editor.md#r-fm-004), [R-FM-006](editor.md#r-fm-006)); the schema of the integrating code comes first |
 | `generated` | The generated parts of a document, which are read-only ([R-EDIT-011](editor.md#r-edit-011)) |
 | `threads` | The threads of a document and the function that fills the panel of a thread ([R-GEN-014](editor.md#r-gen-014)) |
-| `formatRules` | *(proposal)* The format rules of the syntax of the plugin for the AI, a text in Markdown ([R-AI-001](ai.md#r-ai-001)) |
+| `formatRules` | The format rules of the syntax of the plugin for the AI, a text in Markdown ([R-AI-001](ai.md#r-ai-001)) |
 | `activate` | Starts the plugin in an editor |
 
 The API of the editor for the plugins gives the Tiptap editor, the text as
 Markdown, the place in the text of the file of a position of the document,
-exact inside a block (*(proposal)* at the edge of a mark, outside the mark,
+exact inside a block (at the edge of a mark, outside the mark,
 or with the side 1 inside the marks of the text after the position), the commands by their full names, the panel of a thread, and a
 refresh of the generated parts and threads after a change of the data of a
-plugin. *(proposal)* The refresh also asks the plugins again for the schema
+plugin. The refresh also asks the plugins again for the schema
 of the front matter, for example after the part of a plugin on the platform
-sent the schema of the layout of a paper. *(proposal)* The API of the editor
+sent the schema of the layout of a paper. The API of the editor
 also takes proposed changes of the text, which the editor shows as tracked
 changes ([R-AI-006](ai.md#r-ai-006)). A transaction that takes a change of the text from outside has the
 meta `outsideChange`, so that a plugin that guards its parts against the
@@ -126,7 +126,7 @@ Notes).
 
 ### R-PLUGIN-002
 
-*(proposal)* **The plugins of other bundles.** A page that uses the editor
+**The plugins of other bundles.** A page that uses the editor
 can load plugins that another bundle holds, for example the plugins of Paper
 in the editor of Notes. The bundle of such plugins is a script that holds no
 copy of Tiptap, ProseMirror or the libraries: it uses the modules of the

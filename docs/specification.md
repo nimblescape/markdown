@@ -166,7 +166,7 @@ plugins. The editor must be built on the renderer: it shows each block with
 the view of the renderer and adds the edit functions; the renderer and the
 layout run without the editor.
 
-*(proposal)* The editor reads the text with the markdown-it of its renderer,
+The editor reads the text with the markdown-it of its renderer,
 and shows each block of the level "render" with its renderer and the
 plugins ([R-GEN-012](plugins.md#r-gen-012)). The other blocks are nodes of
 the editor; they have the styles of rendered content of the renderer
@@ -203,7 +203,7 @@ that they run in the page, in the extension host of VS Code and on a
 server. A provider of one AI, for example the Claude API, is a part of that
 package with its own entry point.
 
-*(proposal)* **Form of the workspaces.** Each package must live in the
+**Form of the workspaces.** Each package must live in the
 folder `packages/<name>/` with its own `package.json`, `src/`, README and
 license file, and its build must write its files to `dist/`. The root
 package of the repository is private and is never published. A package must
@@ -322,10 +322,10 @@ use:
 | `@decimalturn/toml-patch` | MIT | The front matter in TOML ([R-FM-005](editor.md#r-fm-005)) |
 | `jsonc-parser` | MIT | The front matter in JSON, also with comments ([R-FM-005](editor.md#r-fm-005)) |
 | `@cfworker/json-schema` | MIT | The check of the front matter against its JSON schema, without eval ([R-FM-004](editor.md#r-fm-004)) |
-| `diff` *(proposal)* | BSD-3-Clause | The patches between two texts, and the blocks that a change from outside changes ([R-SRC-002](source.md#r-src-002)) |
-| `pagedjs` *(proposal)* | MIT | The pages of a layout ([R-LAYOUT-003](rendering.md#r-layout-003)); the layout package holds its script `paged.polyfill.js`, which holds `event-emitter`, `d`, `es5-ext`, `type` and `es6-symbol` (MIT and ISC), `css-tree` (MIT) with `mdn-data` (CC0-1.0) and `source-map` (BSD-3-Clause), and `clear-cut` (MIT) |
-| `pdf-lib` *(proposal)* | MIT | The finish of the PDF: the removal of the marks of the soft hyphens and the metadata ([R-LAYOUT-002](rendering.md#r-layout-002)); it uses `@pdf-lib/standard-fonts` and `@pdf-lib/upng` (MIT), `pako` (MIT and Zlib) and `tslib` (0BSD) |
-| `hyphen` *(proposal)* | ISC | The soft hyphens of the text of the pages by the language of the layout ([R-LAYOUT-004](rendering.md#r-layout-004)); its patterns come from the hyphenation patterns of TeX (hyph-utf8), each language with its own authors and license |
+| `diff` | BSD-3-Clause | The patches between two texts, and the blocks that a change from outside changes ([R-SRC-002](source.md#r-src-002)) |
+| `pagedjs` | MIT | The pages of a layout ([R-LAYOUT-003](rendering.md#r-layout-003)); the layout package holds its script `paged.polyfill.js`, which holds `event-emitter`, `d`, `es5-ext`, `type` and `es6-symbol` (MIT and ISC), `css-tree` (MIT) with `mdn-data` (CC0-1.0) and `source-map` (BSD-3-Clause), and `clear-cut` (MIT) |
+| `pdf-lib` | MIT | The finish of the PDF: the removal of the marks of the soft hyphens and the metadata ([R-LAYOUT-002](rendering.md#r-layout-002)); it uses `@pdf-lib/standard-fonts` and `@pdf-lib/upng` (MIT), `pako` (MIT and Zlib) and `tslib` (0BSD) |
+| `hyphen` | ISC | The soft hyphens of the text of the pages by the language of the layout ([R-LAYOUT-004](rendering.md#r-layout-004)); its patterns come from the hyphenation patterns of TeX (hyph-utf8), each language with its own authors and license |
 
 ### R-GEN-007
 

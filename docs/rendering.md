@@ -26,7 +26,7 @@ content without edit functions: HTML, with a view for each kind of token. It
 must use markdown-it 14, the version of the Markdown preview of VS Code,
 with footnotes and task lists.
 
-*(proposal)* The renderer is the package `@nimblescape/markdownrender`. It
+The renderer is the package `@nimblescape/markdownrender`. It
 writes the HTML that GitHub writes where GitHub has one: a block quote whose
 first line is the marker of an alert, such as `> [!NOTE]`, becomes
 `<div class="markdown-alert markdown-alert-note">` with the title
@@ -59,7 +59,7 @@ same variables `--nsmd-syntax-*`, so that the view "Pages" and the PDF show
 them. A layout that wants code without colors sets these variables to the
 color of the text.
 
-*(proposal)* The languages are the common languages of highlight.js, in one
+The languages are the common languages of highlight.js, in one
 list for the renderer and the editor; a code block without a language, or
 with another language, has no colors. Each line of the code ends the
 elements of its colors, so that the number of a line of a listing stands in
@@ -74,7 +74,7 @@ plugin that sets the function `highlight` of markdown-it keeps its own.
 **The renderer without the editor.** The renderer must run without the
 editor, so that the command line needs no editor code.
 
-*(proposal)* `toHtml(text)` returns the HTML without a page, with the tokens
+`toHtml(text)` returns the HTML without a page, with the tokens
 that plugins show in a page; `render(text, element)` shows the rendering in
 an element of a page and runs the functions of the plugins. The package
 needs no code of the editor, of Tiptap or of ProseMirror.
@@ -91,7 +91,7 @@ markdown-it plugin, or a function `render(source, element)`. Examples:
 diagrams of PlantUML and Mermaid, math, GitHub alerts, syntax colors for
 source code, and the removal of the notes from the output.
 
-*(proposal)* A plugin of the renderer is the object `{ name, apiVersion: 1,
+A plugin of the renderer is the object `{ name, apiVersion: 1,
 extendMarkdownIt?, styles?, render? }`, the level "render" of the plugin
 object of the editor ([R-PLUGIN-001](plugins.md#r-plugin-001)), so that the
 same object works in the renderer and in the editor. `render` maps the type
@@ -117,7 +117,7 @@ the layout folder format), the layout gets its fields from the schema when
 `layout.json` gives none, and a layout without the file gets the schema of
 its fields.
 
-*(proposal)* The layout part is the package `@nimblescape/markdownlayout`. A
+The layout part is the package `@nimblescape/markdownlayout`. A
 layout is a folder with `layout.json` in the layout folder format
 `nimblescape-layout` of Markdown Paper, version 1.1.0: its style sheets, the
 templates of its fixed pages, its fields, its language and its rules for
@@ -142,7 +142,7 @@ script.
 Markdown Paper: Paper adds only its own parts to the layout, through its
 plugins ([R-PAPER-001](plugins.md#r-paper-001)).
 
-*(proposal)* The layout is a plugin of the renderer
+The layout is a plugin of the renderer
 ([R-REN-002](#r-ren-002)) whose rule works only in a rendering with a
 layout, so that the same renderer renders a text with and without a layout.
 In a rendering with a layout, each footnote goes to the foot of the page of
@@ -171,7 +171,7 @@ Paper, which writes the cite after the caption.
 view, so that the view and the PDF never differ
 ([R-GEN-010](specification.md#r-gen-010)).
 
-*(proposal)* **The PDF.** The entry point `@nimblescape/markdownlayout/pdf`
+**The PDF.** The entry point `@nimblescape/markdownlayout/pdf`
 makes the PDF in Node.js, for example on the command line and in the
 extension host of VS Code on the desktop. The page of the PDF is the page of
 the view of the pages, with the files of the disk: an installed browser
@@ -200,10 +200,10 @@ token, with the methods `attrIndex` and `attrGet`.
 **Pages.** A button must switch the editor between "Edit" and "Pages".
 "Pages" shows the pages of the layout; the text cannot be edited there, but
 the highlights of the notes and "Add Note" work, and a double click on a
-page goes to that place in "Edit". *(proposal)* The page engine is
+page goes to that place in "Edit". The page engine is
 Paged.js.
 
-*(proposal)* The view of the pages shows the page of the document in a
+The view of the pages shows the page of the document in a
 frame, so that the style sheets of the layout change only the frame. The
 page holds Paged.js until the functions of the plugins have shown their
 tokens in the frame; Paged.js then starts when the page has not changed for
@@ -213,7 +213,7 @@ waits for it. On a screen, the pages
 stand on a grey background with a gap between them; the PDF has no screen
 styles.
 
-*(proposal)* **The pages follow the text.** While "Pages" shows, the pages
+**The pages follow the text.** While "Pages" shows, the pages
 show again 600 ms after the last change of the text, at the same place of
 the frame; hidden pages make no new pages until they show again. A double
 click on a block of the pages switches to "Edit" and puts the cursor at the

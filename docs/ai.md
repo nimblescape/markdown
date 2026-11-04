@@ -32,18 +32,18 @@ a thread of a note of Markdown Notes: the AI answers in the thread as one
 more author. Notes integrates the chat; the libraries have no chat of their
 own.
 
-*(proposal)* The editor gives this context with `aiContext`: the text of the
+The editor gives this context with `aiContext`: the text of the
 file, the selection as places in the text, the schema of the front matter,
 and the format rules of the plugins, which each plugin gives in its member
 `formatRules` ([R-PLUGIN-001](plugins.md#r-plugin-001)).
 
 ### R-AI-006
 
-*(proposal)* **Tracked changes.** The editor shows each proposed change as a
+**Tracked changes.** The editor shows each proposed change as a
 tracked change: the removed text struck through, the new text marked, with
 "Accept" and "Reject".
 
-*(proposal)* These are the details.
+These are the details.
 
 - A proposed change is `{ id, from, to, text, origin? }`: the range of the
   text of the file that it replaces, as the source counts the text, the new
@@ -82,7 +82,7 @@ end, or an error. The integrating code registers the providers, and the user
 picks one. The first and for now only provider is the Claude API, with
 streaming and tool use.
 
-*(proposal)* These are the details, in the package
+These are the details, in the package
 `@nimblescape/markdownai` ([R-ARCH-002](specification.md#r-arch-002)).
 
 - A provider is `{ name, models(), stream(request, signal) }`. A request has
@@ -140,11 +140,7 @@ the Claude API; a second tool searches the other notes and chats.
 
 ## 4. Open questions
 
-1. Tracked changes: does the editor show proposed changes as tracked changes,
-   with the details of [R-AI-006](#r-ai-006) (proposal)?
-2. Providers: the details of the provider API, the tool `propose_change`
-   and the loop of a chat ([R-AI-002](#r-ai-002), proposal)?
-3. Memory: the memory in the repository of the document (proposal) or for
+1. Memory: the memory in the repository of the document (proposal) or for
    each user ([R-AI-003](#r-ai-003))? May the AI write the memory without
    asking (proposal: yes, with a setting that makes it ask)?
 

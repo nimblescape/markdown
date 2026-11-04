@@ -43,7 +43,7 @@ code editor for source code, the form of the front matter
 ([section 7](#7-front-matter-form)), and the AI ([ai.md](ai.md)), which
 proposes changes.
 
-*(proposal)* Each editor of a file shares the source of the file
+Each editor of a file shares the source of the file
 ([R-SRC-001](source.md#r-src-001)) and has an ID in it. The rendered
 Markdown editor gives each change of the user to the source as a change
 with the origin `user` and its ID, and takes each change with another
@@ -67,7 +67,7 @@ code blocks with syntax colors, tables and thematic breaks; standard
 footnotes; the front matter; HTML and comments as raw parts that keep their
 text. The syntax colors of code blocks come from highlight.js through
 lowlight, with the common languages of highlight.js, the same as in the
-renderer ([R-REN-001](rendering.md#r-ren-001)). *(proposal)* A code
+renderer ([R-REN-001](rendering.md#r-ren-001)). A code
 block without a language that highlight.js knows has no colors, as on
 GitHub. The colors come from six variables `--nsmd-syntax-*` (keyword,
 string, constant, title, type, comment), which take the palette of seven
@@ -113,7 +113,7 @@ document editor of Claude Desktop and of Claude on the web. It must have a
 toolbar, an insert menu "+", and slash commands: `/` in the text opens the
 same list of items, and typed words filter it. It must have handles to move
 blocks, and find and replace. Its code is original: no code and no design
-file of the Claude interface is copied. *(proposal)* The toolbar holds undo
+file of the Claude interface is copied. The toolbar holds undo
 and redo, the text style and the list of the block of the cursor, the
 insert menu, find and replace, and the switch of read-only mode. Ctrl+F opens find and replace; Alt+Up and
 Alt+Down move the block of the cursor (Cmd in place of Ctrl on macOS).
@@ -139,7 +139,7 @@ buttons:
 
 A button whose function comes from an extension must show only when that
 extension is active. An extension may add buttons, for example "Cite" of
-Paper. *(proposal)* A button of an extension may also show only where it
+Paper. A button of an extension may also show only where it
 applies, for example "Research" of Paper only in a paper. A button must show
 as active when the whole selection has its format.
 Bold, italic, strikethrough, code and link must have the keys Ctrl+B,
@@ -163,7 +163,7 @@ column or the table, sort a column, align a column, color cells, switch the
 header row, and insert items. Sort must keep the header row, compare numbers
 as numbers, and compare text in the order of the language of the document.
 Align must write the alignment of the column into the delimiter row of GFM
-(`:---`, `:---:`, `---:`). *(proposal)* Sort puts numbers before texts and
+(`:---`, `:---:`, `---:`). Sort puts numbers before texts and
 empty cells last; the language of the document is the key `lang` of the
 front matter, else the language that the integrating code gives. Each
 command of the table menu is one step of undo.
@@ -249,7 +249,7 @@ right (`showChanges`). The diff of VS Code is such a diff
 **Structured editor of the front matter.** The editor must show the front
 matter as a form, not as text, for every Markdown file and for every format
 of [R-SRC-003](source.md#r-src-003). Notes and Paper add only their own
-parts. *(proposal)* The front matter stays the first block of the file: it
+parts. The front matter stays the first block of the file: it
 has no handles of a block, no block moves before it, and Backspace does not
 remove it; a new text, select all and undo may remove it. A front matter
 that does not parse shows its text with the problem, and the user edits the
@@ -261,7 +261,7 @@ form shows the values as text. The integrating code may show the text in place o
 **Read-only mode of the form.** In the read-only mode, the keys are fixed:
 the user changes only values, and only where the schema allows it. The
 schema defines what the front matter must hold, which keys the user can
-edit, and which values each key allows. *(proposal)* A file with a schema
+edit, and which values each key allows. A file with a schema
 opens in the read-only mode. The form shows the keys of the schema in the
 order of `properties`, then the other keys of the file. A key of the schema
 that the file does not have shows as an empty field; a value in it adds the
@@ -309,7 +309,7 @@ quotes of the text that it replaces. The edits are code of the source
 **Inputs of plugins.** A plugin may give the input of a key, for example
 Paper for `layout` and `repos`: read-only, and Ctrl+click (Cmd+click on
 macOS) opens the clone.
-*(proposal)* The input of a plugin takes the place of the input of the form
+The input of a plugin takes the place of the input of the form
 in both modes.
 
 ### R-FM-007
@@ -327,7 +327,7 @@ The editor hides the markers and shows the value as a generated part
 ([R-EDIT-011](#r-edit-011)). A formatter writes the current value of the
 key between the markers, for example the formatter of Notes, which also
 inserts such values with `/ref` ([R-NOTES-001](plugins.md#r-notes-001)).
-*(proposal)* A start marker and an end marker count only as a pair of the
+A start marker and an end marker count only as a pair of the
 same key in one line. The value is read-only only when the front matter has
 its key; the value of another key is text that the user edits. Ctrl+click
 (Cmd+click on macOS) on a read-only value goes to the input of its key in
@@ -347,7 +347,7 @@ library decides whether it uses these icons or a view of its own: in VS
 Code, Notes can show the threads in its side view; on a web page, the icons
 beside the text show them. The icons are code of this project.
 
-*(proposal)* The icons stand at the right of the text, beside the first
+The icons stand at the right of the text, beside the first
 line of the passage, with the number of answers. The panel of a thread opens
 beside the text at the height of the passage and marks the passage; the
 plugin of the thread fills the panel. The close button, Escape and a second
