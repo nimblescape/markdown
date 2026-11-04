@@ -42,6 +42,7 @@ same pull request.
 | `packages/markdownrender/src/renderer.ts` | `MarkdownRenderer`: the text of a file as HTML without a page (`toHtml`), and in a page with the functions of the plugins (`render`, `fill`) ([R-REN-001](docs/rendering.md#r-ren-001), [R-REN-003](docs/rendering.md#r-ren-003)). |
 | `packages/markdownrender/src/markdownIt.ts` | The markdown-it of nimblescape Markdown, for the renderer and the editor: HTML, links in the text, footnotes and task lists, and the markdown-it plugins of the plugins. |
 | `packages/markdownrender/src/output.ts` | The output as GitHub writes it: GitHub alerts, the IDs of the headings, the comments of the tables and the lines of the blocks. |
+| `packages/markdownrender/src/syntax.ts` | The syntax colors of code blocks with highlight.js: the languages, which the editor gives to lowlight, and the colors of the code of a block, each line on its own ([R-REN-001](docs/rendering.md#r-ren-001)). |
 | `packages/markdownrender/src/rawHtml.ts` | The raw HTML of the file in the rendering: `safe`, `text` or `trusted`. |
 | `packages/markdownrender/src/plugins.ts` | The plugins of the renderer ([R-REN-002](docs/rendering.md#r-ren-002)), the level "render" of the plugins of the editor: their check, their parts and their styles. |
 | `packages/markdownrender/src/styles/content.css` | The styles of rendered content, for a rendering and for the text of the editor, with the tokens `--nsmd-*` of the theme ([R-GEN-010](docs/specification.md#r-gen-010), [R-THEME-001](docs/platforms.md#r-theme-001)). |

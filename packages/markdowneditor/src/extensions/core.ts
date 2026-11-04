@@ -9,6 +9,7 @@
 // such as the character of a bullet, let the serializer write a changed block in the form that it had; the editor does
 // not render them.
 
+import { syntaxLanguages } from '@nimblescape/markdownrender';
 import { type AnyExtension, Node, mergeAttributes } from '@tiptap/core';
 import Bold from '@tiptap/extension-bold';
 import Code from '@tiptap/extension-code';
@@ -26,14 +27,15 @@ import type { Fragment, Node as PmNode } from '@tiptap/pm/model';
 import { Plugin, type EditorState, type Transaction } from '@tiptap/pm/state';
 import { ReplaceAroundStep, ReplaceStep } from '@tiptap/pm/transform';
 import StarterKit from '@tiptap/starter-kit';
-import { common, createLowlight } from 'lowlight';
+import { createLowlight } from 'lowlight';
 
 /**
- * syntax gives the syntax colors of code blocks (R-EDIT-003): the common languages of highlight.js, through lowlight. A
- * code block without a language that it knows keeps its text without colors, as on GitHub: its highlightAuto returns
- * the text alone, because the extension of Tiptap would otherwise guess the language of each such block.
+ * syntax gives the syntax colors of code blocks (R-EDIT-003): the languages of the renderer (docs/rendering.md,
+ * R-REN-001), through lowlight. A code block without a language that it knows keeps its text without colors, as on
+ * GitHub: its highlightAuto returns the text alone, because the extension of Tiptap would otherwise guess the language
+ * of each such block.
  */
-const lowlight = createLowlight(common);
+const lowlight = createLowlight(syntaxLanguages);
 const syntax = { ...lowlight, highlightAuto: (value: string) => ({ type: 'root', children: [{ type: 'text', value }] }) };
 
 /** Alignment is the alignment of a column of a GFM table, from its delimiter row. */

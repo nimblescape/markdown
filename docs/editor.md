@@ -63,7 +63,8 @@ autolinks, images, lists, task lists, quotes, GitHub alerts (`> [!NOTE]`),
 code blocks with syntax colors, tables and thematic breaks; standard
 footnotes; the front matter; HTML and comments as raw parts that keep their
 text. The syntax colors of code blocks come from highlight.js through
-lowlight, with the common languages of highlight.js. *(proposal)* A code
+lowlight, with the common languages of highlight.js, the same as in the
+renderer ([R-REN-001](rendering.md#r-ren-001)). *(proposal)* A code
 block without a language that highlight.js knows has no colors, as on
 GitHub. The colors come from six variables `--nsmd-syntax-*` (keyword,
 string, constant, title, type, comment), which take the palette of seven

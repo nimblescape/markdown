@@ -59,6 +59,16 @@ same variables `--nsmd-syntax-*`, so that the view "Pages" and the PDF show
 them. A layout that wants code without colors sets these variables to the
 color of the text.
 
+*(proposal)* The languages are the common languages of highlight.js, in one
+list for the renderer and the editor; a code block without a language, or
+with another language, has no colors. Each line of the code ends the
+elements of its colors, so that the number of a line of a listing stands in
+no element of a color and a page breaks a code block between whole lines.
+The page of a layout has the rules of the colors, with the colors of the
+light theme of the editor as the defaults of the variables. The integrating
+code may switch the colors off (the option `syntaxColors: false`), and a
+plugin that sets the function `highlight` of markdown-it keeps its own.
+
 ### R-REN-003
 
 **The renderer without the editor.** The renderer must run without the

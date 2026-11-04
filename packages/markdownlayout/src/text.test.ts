@@ -485,7 +485,10 @@ describe('listings', () => {
       '<p id="lst-reading-fields" class="caption listing-caption" data-line="2"><span class="caption-label">Listing 1</span><span class="caption-separator">: </span>' +
         '<span class="caption-text">Reading the fields</span></p>',
     );
-    expect(body.html).toContain('<pre class="listing"><code data-line="6" class="language-typescript">export function readFields() {\n  return 1;\n}\n</code></pre>');
+    expect(body.html).toContain(
+      '<pre class="listing"><code data-line="6" class="language-typescript"><span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> ' +
+        '<span class="hljs-title function_">readFields</span>(<span class="hljs-params"></span>) {\n  <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;\n}\n</code></pre>',
+    );
     expect(body.html).toContain('<span class="caption-text">Die ganze Datei</span></p>');
     expect(body.html).toContain(`<p data-line="18">Lis${softHyphen}ting: kein Code folgt</p>`);
     expect(body.html).toContain('Wie <a href="#lst-reading-fields">Listing 1</a> zeigt.');
@@ -529,12 +532,25 @@ describe('listings', () => {
     const markdown = `${listings}\n\`\`\`ts\nother();\n\`\`\`\n`;
     const html = renderBody(markdown, layoutOf({ listings: { lineNumbers: true } })).html;
     expect(html).toContain(
-      '<code data-line="6" class="language-typescript"><span class="line-number" data-number="1" aria-hidden="true"></span>export function readFields() {\n' +
-        '<span class="line-number" data-number="2" aria-hidden="true"></span>  return 1;\n' +
+      '<code data-line="6" class="language-typescript"><span class="line-number" data-number="1" aria-hidden="true"></span>' +
+        '<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">readFields</span>(<span class="hljs-params"></span>) {\n' +
+        '<span class="line-number" data-number="2" aria-hidden="true"></span>  <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;\n' +
         '<span class="line-number" data-number="3" aria-hidden="true"></span>}\n</code>',
     );
-    expect(html).toContain('<pre class="listing"><code data-line="14" class="language-ts"><span class="line-number" data-number="1" aria-hidden="true"></span>const a = 1;\n</code></pre>');
-    expect(html).toContain('<pre><code data-line="22" class="language-ts">other();\n</code></pre>');
+    expect(html).toContain(
+      '<pre class="listing"><code data-line="14" class="language-ts"><span class="line-number" data-number="1" aria-hidden="true"></span>' +
+        '<span class="hljs-keyword">const</span> a = <span class="hljs-number">1</span>;\n</code></pre>',
+    );
+    expect(html).toContain('<pre><code data-line="22" class="language-ts"><span class="hljs-title function_">other</span>();\n</code></pre>');
+  });
+
+  test('the number of a line of a listing stands in no element of a syntax color, also in a comment of several lines', () => {
+    const html = renderBody('Listing 1: Ein Kommentar\n\n```ts\n/* one\ntwo */\nx();\n```\n', layoutOf({ listings: { lineNumbers: true } })).html;
+    expect(html).toContain(
+      '<span class="line-number" data-number="1" aria-hidden="true"></span><span class="hljs-comment">/* one</span>\n' +
+        '<span class="line-number" data-number="2" aria-hidden="true"></span><span class="hljs-comment">two */</span>\n' +
+        '<span class="line-number" data-number="3" aria-hidden="true"></span><span class="hljs-title function_">x</span>();\n</code>',
+    );
   });
 
   test('the listings of the appendices are numbered A1, and the captions get no soft hyphens', () => {

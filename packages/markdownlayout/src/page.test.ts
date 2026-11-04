@@ -7,10 +7,12 @@
 // matter, the policy of the scripts, the script of the layout and the hold of Paged.js. A reader of files in memory
 // stands for the disk. The tests come from the tests of the layout code of nimblescape Markdown Paper.
 
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, test } from 'vitest';
 import type { RenderPlugin } from '@nimblescape/markdownrender';
 import { formatText } from './format';
-import { findLayout, type Host, loadLayout, type Reader, renderPage, rewriteCss, rewriteHtml } from './page';
+import { baseCss, findLayout, type Host, loadLayout, type Reader, renderPage, rewriteCss, rewriteHtml } from './page';
 import { createLayoutRenderer } from './text';
 
 const encoder = new TextEncoder();
@@ -146,6 +148,24 @@ describe('the page', () => {
     expect(page.html).toContain('window.paperHandlers.hold();\nwindow.PagedConfig');
     expect(page.text.slots.map((slot) => slot.kind)).toEqual(['fence:diagram']);
     expect(page.html).toContain('<div class="nsmd-render" data-nsmd-render="0">');
+  });
+
+  test('the page shows the syntax colors of the editor: the same classes with the same variables, with the colors of the light theme', async () => {
+    const page = await renderPage(hostOf({}), createLayoutRenderer(), 'file:///repo/a.md', '```ts\nconst a = 1;\n```\n');
+    expect(page.html).toContain('<span class="hljs-keyword">const</span>');
+    const roles = (css: string): Map<string, string> => {
+      const found = new Map<string, string>();
+      for (const rule of css.matchAll(/pre\s*:is\(([^)]*)\)\s*\{\s*color: var\((--nsmd-syntax-[a-z]+)/g)) {
+        for (const name of rule[1].split(',')) {
+          found.set(name.trim(), rule[2]);
+        }
+      }
+      return found;
+    };
+    const editor = roles(readFileSync(join(__dirname, '../../markdownrender/src/styles/content.css'), 'utf8'));
+    expect(editor.size).toBeGreaterThan(20);
+    expect(roles(baseCss)).toEqual(editor);
+    expect(baseCss).toContain('color: var(--nsmd-syntax-keyword, #d1242f);');
   });
 });
 

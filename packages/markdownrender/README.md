@@ -37,7 +37,9 @@ editor shows them: the color of a cell and the widths of the columns. Raw
 HTML of the file shows safely by default: comments do not show, a fixed list
 of elements without attributes and the anchors `<a id="…">` show as HTML, and
 any other raw HTML shows as its text. The option `rawHtml` changes this to
-`text` or `trusted`.
+`text` or `trusted`. A code block with a language gets the syntax colors of
+the editor, the classes `hljs-*` of highlight.js; the option
+`syntaxColors: false` leaves them out.
 
 ## Plugins
 

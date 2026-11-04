@@ -18,6 +18,7 @@ import { createMarkdownIt, type FootnotePlace } from './markdownIt';
 import { outputRules, prepareOutput } from './output';
 import { addStyles, fenceRender, renderOf, renderParts, type RenderFunction, type RenderPlugin } from './plugins';
 import { closeOpen, openCount, rawHtmlRules, type RawHtml } from './rawHtml';
+import { highlightCode } from './syntax';
 
 /** RendererOptions are the options of a renderer. */
 export interface RendererOptions {
@@ -41,6 +42,11 @@ export interface RendererOptions {
    * or `text` when the text is a part of a file, whose first lines are text.
    */
   readonly frontMatter?: 'skip' | 'text';
+  /**
+   * syntaxColors gives the code blocks with a language the syntax colors of the editor (src/syntax.ts); the default is
+   * true. A plugin that sets the function `highlight` of markdown-it keeps its own.
+   */
+  readonly syntaxColors?: boolean;
 }
 
 /** RenderSlot is a token that a plugin shows in a page, at its placeholder in the HTML. */
@@ -149,7 +155,9 @@ export class MarkdownRenderer {
     const saved = this.slots;
     this.slots = [];
     try {
-      const html = this.renderer.render(this.parse(text, env), this.markdownIt.options, env) + closeOpen(env);
+      const options = this.markdownIt.options;
+      const colored = this.options.syntaxColors === false || options.highlight ? options : { ...options, highlight: highlightCode };
+      const html = this.renderer.render(this.parse(text, env), colored, env) + closeOpen(env);
       return { html, slots: this.slots };
     } finally {
       this.slots = saved;

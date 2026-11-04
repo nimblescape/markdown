@@ -370,8 +370,9 @@ export function compose(loaded: LoadedLayout, values: Readonly<Record<string, st
  * part of the layout does not work in Paged.js. A footnote goes to the foot of its page with its number in the text,
  * the generated lists show the page of each entry, the number of a line of a listing shows, and the comments of the
  * tables of the editor show (docs/editor.md, R-EDIT-010). A link has the color of the text without a mark, and a long
- * address breaks at the end of a line. A layout changes the look of each of them with its own rules, and decides
- * whether a template is a page of its own. */
+ * address breaks at the end of a line. The code blocks have the syntax colors of the editor (docs/rendering.md,
+ * R-REN-001), with the colors of its light theme as the defaults of the variables --nsmd-syntax-*. A layout changes the
+ * look of each of them with its own rules, and decides whether a template is a page of its own. */
 export const baseCss = `.footnote {
   float: footnote;
 }
@@ -414,6 +415,31 @@ table.nsmd-table-fixed {
 [data-color="green"] { background: #e5f4e4; }
 [data-color="blue"] { background: #e7f1fb; }
 [data-color="purple"] { background: #efedff; }
+/* The syntax colors of code, as in the editor; a layout sets the variables --nsmd-syntax-*, for example to the color of the text. */
+pre :is(.hljs-keyword, .hljs-selector-tag, .hljs-template-tag, .hljs-doctag, .hljs-deletion) {
+  color: var(--nsmd-syntax-keyword, #d1242f);
+}
+pre :is(.hljs-string, .hljs-regexp, .hljs-char, .hljs-addition) {
+  color: var(--nsmd-syntax-string, #1a7f37);
+}
+pre :is(.hljs-number, .hljs-literal, .hljs-symbol, .hljs-attr, .hljs-attribute, .hljs-property, .hljs-selector-id, .hljs-selector-class, .hljs-selector-attr, .hljs-selector-pseudo, .hljs-link, .hljs-code) {
+  color: var(--nsmd-syntax-constant, #0969da);
+}
+pre :is(.hljs-title, .hljs-section, .hljs-name) {
+  color: var(--nsmd-syntax-title, #8250df);
+}
+pre :is(.hljs-built_in, .hljs-type, .hljs-variable, .hljs-template-variable, .hljs-bullet) {
+  color: var(--nsmd-syntax-type, #bc4c00);
+}
+pre :is(.hljs-comment, .hljs-quote, .hljs-meta) {
+  color: var(--nsmd-syntax-comment, #59636e);
+}
+pre .hljs-emphasis {
+  font-style: italic;
+}
+pre .hljs-strong {
+  font-weight: 600;
+}
 `;
 
 /**
