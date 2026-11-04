@@ -56,9 +56,9 @@ function collect(data: unknown, prefix: string, values: Map<string, string>): vo
     if (isScalar(value)) {
       values.set(key, scalarText(value));
     } else if (Array.isArray(value) && value.length > 0 && value.every(isScalar)) {
-      // A list of scalars is its items, joined by commas; its items also have their own keys, for example `authors.0`.
+      // A list of scalars is its items, joined by commas; the maps in another list have the index of their item in
+      // their paths, for example `authors.0.name`.
       values.set(key, value.map(scalarText).join(', '));
-      collect(value, `${key}.`, values);
     } else if (value !== null && typeof value === 'object') {
       collect(value, `${key}.`, values);
     }
