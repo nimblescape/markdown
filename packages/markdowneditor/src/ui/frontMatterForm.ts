@@ -57,8 +57,6 @@ export interface FrontMatterFormHost {
   schema(): JsonSchema | undefined;
   /** inputs are the inputs of plugins. */
   inputs: readonly FrontMatterInput[];
-  /** isLearning returns true while the mode to learn Markdown is on, which also shows the text of the front matter. */
-  isLearning(): boolean;
   /** forms holds the forms of the editor, which the interaction shows again after a switch of a mode. */
   forms: Set<FrontMatterForm>;
 }
@@ -281,7 +279,7 @@ export class FrontMatterForm implements NodeView {
     this.host.forms.delete(this);
   }
 
-  /** refresh shows the form again, after a switch between editing and reading or of the mode to learn Markdown. */
+  /** refresh shows the form again, for example after a switch between editing and reading. */
   refresh(): void {
     this.render();
   }
@@ -318,9 +316,6 @@ export class FrontMatterForm implements NodeView {
       this.dom.append(this.textView(error));
     } else {
       this.dom.append(this.mapView([], data as Record<string, unknown>, schemaAt(schema, [])));
-    }
-    if (this.host.isLearning()) {
-      this.dom.append(element('pre', { class: 'nsmd-fm-source', 'aria-label': 'The text of the front matter' }, this.text));
     }
     this.restore(focus);
   }

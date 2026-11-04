@@ -39,7 +39,6 @@ const editor = new MarkdownEditor(document.querySelector('#editor')!, {
   onChange: (changed) => console.log(changed.getMarkdown()),
 });
 editor.setEditable(false); // read-only mode
-editor.setLearnMode(true); // show the Markdown marks
 ```
 
 A proposed change of the AI, or of another program, shows as a tracked

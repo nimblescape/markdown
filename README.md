@@ -56,7 +56,6 @@ const editor = new MarkdownEditor(document.querySelector('#editor')!, {
   onChange: (changed) => console.log(changed.getMarkdown()),
 });
 editor.setEditable(false); // read-only mode
-editor.setLearnMode(true); // show the Markdown marks
 editor.setFrontMatterSchema({ type: 'object', required: ['title'] }); // the schema of the form of the front matter
 ```
 
@@ -83,9 +82,8 @@ const result = await rendered.proposeChange({ id: 'ai-1', from: 2, to: 7, text: 
 // 'accepted', 'rejected' or 'outdated'
 ```
 
-The options `toolbar`, `readOnlyToggle` and `learnToggle` leave out the
-toolbar or its switches, and `learnMode` starts the editor with the
-Markdown marks shown.
+The options `toolbar` and `readOnlyToggle` leave out the toolbar or its
+switch of read-only mode.
 
 The renderer shows the same text without edit functions, for example for a
 view or a command line:

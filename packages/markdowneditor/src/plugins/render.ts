@@ -42,7 +42,6 @@ const isRendered = (node: Node): boolean => node.type.name === 'rawBlock' && nod
 class SourceView implements NodeView {
   readonly dom: HTMLElement;
   private readonly shown: HTMLElement;
-  private readonly sourceText: HTMLElement;
   private readonly done: HTMLButtonElement;
   private field: HTMLTextAreaElement | undefined;
   private close: ((keep: boolean) => void) | undefined;
@@ -58,15 +57,13 @@ class SourceView implements NodeView {
   ) {
     const kind = node.type.name === 'htmlBlock' ? 'html' : 'text';
     this.shown = element('div', { class: 'nsmd-unit-view' });
-    // In the mode to learn Markdown, the text of a rendered block shows below its rendering.
-    this.sourceText = element('pre', { class: `nsmd-raw nsmd-raw-${kind} nsmd-unit-source`, 'aria-hidden': 'true' });
     const edit = button('Edit source', icon('source'), () => this.open());
     edit.classList.add('nsmd-unit-edit');
     // The button that shows the rendering again while the field is open; a button keeps the focus in the field on its
     // mousedown, so the field stays open until the click. show() gives it its name.
     this.done = button('Show rendering', icon('read'), () => this.close?.(true));
     this.done.classList.add('nsmd-unit-done');
-    this.dom = element('div', { class: `nsmd-unit nsmd-unit-${kind}` }, this.shown, this.sourceText, edit, this.done);
+    this.dom = element('div', { class: `nsmd-unit nsmd-unit-${kind}` }, this.shown, edit, this.done);
     this.dom.addEventListener('dblclick', (event) => {
       if (!this.field && this.view.editable) {
         event.preventDefault();
@@ -85,7 +82,6 @@ class SourceView implements NodeView {
     const label = rendered ? 'Show rendering' : 'Show text';
     this.done.title = label;
     this.done.setAttribute('aria-label', label);
-    this.sourceText.textContent = rendered ? text : '';
     if (rendered) {
       this.shown.className = 'nsmd-unit-view nsmd-rendered';
       this.stopRender = this.host.renderer().render(text, this.shown);

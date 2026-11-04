@@ -43,9 +43,8 @@ levels:
 - *Render and edit:* in addition a plugin of the editor: nodes and marks
   with their views, which token becomes which node or mark, how a changed
   node is written, commands, keys, input rules, items of the menus (insert,
-  slash, format bar, block menu, table menu), panels, highlights, the schema
-  of the front matter, and the marks for the mode to learn Markdown
-  ([R-GEN-013](editor.md#r-gen-013)).
+  slash, format bar, block menu, table menu), panels, highlights, and the
+  schema of the front matter.
 
 A plugin may start with the level "render" and add the level "render and
 edit" later, without a change of the file format. The Markdown API of VS
@@ -63,7 +62,6 @@ file, so that it may become other blocks, in one step of undo. A block
 without a rendering, for example the definitions of link references, and a
 block of HTML show their text. A code block that the user writes with a
 language that a plugin shows becomes such a unit when the cursor leaves it.
-In the mode to learn Markdown, the text of a unit shows below its rendering.
 
 The user switches a block of the level "render" between its rendering and
 its source; the two never show at the same time. A double click or the
@@ -99,7 +97,6 @@ works in the renderer and in the editor.
 | `commands` | Commands by name; the full name of a command is `plugin.command` |
 | `keys` | A key for a command of the plugin, for example `Mod-Alt-m` |
 | `menus` | The items of the insert menu and of the slash commands, the buttons of the format bar, the items of the block menu and of the table menu |
-| `learnMarks` | The marks of the nodes and marks of the plugin in the mode to learn Markdown ([R-GEN-013](editor.md#r-gen-013)) |
 | `frontMatterSchema`, `frontMatterInputs` | The schema of the front matter and the inputs of keys ([R-FM-004](editor.md#r-fm-004), [R-FM-006](editor.md#r-fm-006)); the schema of the integrating code comes first |
 | `generated` | The generated parts of a document, which are read-only ([R-EDIT-011](editor.md#r-edit-011)) |
 | `threads` | The threads of a document and the function that fills the panel of a thread ([R-GEN-014](editor.md#r-gen-014)) |

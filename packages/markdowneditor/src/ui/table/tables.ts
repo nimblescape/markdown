@@ -4,8 +4,7 @@
 
 // The view of the comments of the tables (docs/editor.md, R-EDIT-010): the comment of the widths of the columns,
 // `<!-- table: widths=30,70 -->` on the line before a table, gives the columns of the table their widths and hides
-// itself; in the mode to learn Markdown, it shows as the file writes it. The colors of the cells come from the
-// attribute of each cell, which the CSS shows.
+// itself. The colors of the cells come from the attribute of each cell, which the CSS shows.
 
 import type { Node } from '@tiptap/pm/model';
 import { Plugin, PluginKey, type EditorState } from '@tiptap/pm/state';
@@ -40,11 +39,11 @@ function tableWidthsOf(doc: Node): TableWidths[] {
 export const tablesKey = new PluginKey<TableWidths[]>('nsmdTables');
 
 /** decorationsOf returns the widths of the cells of the first row, and the class that hides each comment. */
-function decorationsOf(state: EditorState, tables: readonly TableWidths[], learn: boolean): DecorationSet {
+function decorationsOf(state: EditorState, tables: readonly TableWidths[]): DecorationSet {
   const decorations: Decoration[] = [];
   for (const { comment, table, widths } of tables) {
     decorations.push(
-      Decoration.node(comment.pos, comment.pos + comment.size, { class: learn ? 'nsmd-table-widths' : 'nsmd-table-widths nsmd-hidden' }),
+      Decoration.node(comment.pos, comment.pos + comment.size, { class: 'nsmd-table-widths nsmd-hidden' }),
       Decoration.node(table.pos, table.pos + table.node.nodeSize, { class: 'nsmd-table-fixed' }),
     );
     const first = table.node.firstChild;
@@ -62,11 +61,8 @@ function decorationsOf(state: EditorState, tables: readonly TableWidths[], learn
   return DecorationSet.create(state.doc, decorations);
 }
 
-/**
- * tablesPlugin returns the plugin of the comments of the tables.
- * @param isLearning - Returns true while the mode to learn Markdown is on, which shows the comments as text.
- */
-export function tablesPlugin(isLearning: (state: EditorState) => boolean): Plugin<TableWidths[]> {
+/** tablesPlugin returns the plugin of the comments of the tables. */
+export function tablesPlugin(): Plugin<TableWidths[]> {
   return new Plugin<TableWidths[]>({
     key: tablesKey,
     state: {
@@ -76,7 +72,7 @@ export function tablesPlugin(isLearning: (state: EditorState) => boolean): Plugi
     props: {
       decorations(state) {
         const tables = tablesKey.getState(state) ?? [];
-        return tables.length > 0 ? decorationsOf(state, tables, isLearning(state)) : undefined;
+        return tables.length > 0 ? decorationsOf(state, tables) : undefined;
       },
     },
   });

@@ -19,9 +19,9 @@ The first version of the packages.
   and for the webviews of VS Code. Each block that the user does not change
   keeps its text byte for byte. It has a toolbar, a format bar, an insert
   menu, slash commands, block handles, find and replace, tables, a read-only
-  mode, a mode to learn Markdown, a form of the front matter, syntax colors
-  of code blocks, threads beside the text, proposed changes as tracked
-  changes, and version 1 of the plugin API.
+  mode, a form of the front matter, syntax colors of code blocks, threads
+  beside the text, proposed changes as tracked changes, and version 1 of the
+  plugin API.
 - `@nimblescape/markdownlayout`: layouts with the schema of their front
   matter, the pages of a document with Paged.js, and the PDF in Node.js.
 - `@nimblescape/markdownai`: the provider API of an AI, the context of the

@@ -205,11 +205,7 @@ describe('the form of the front matter', () => {
     expect(opened.getMarkdown()).toBe('{\n  "title": "New"\n}\n\nText\n');
   });
 
-  it('shows the text of the front matter in the mode to learn Markdown, and no form when the option says so', () => {
-    open(text, { learnMode: true });
-    expect(form().querySelector('.nsmd-fm-source')?.textContent).toBe(text.split('\n\n')[0]);
-    editor?.destroy();
-    element.remove();
+  it('shows no form when the option says so', () => {
     open(text, { frontMatterForm: false });
     expect(element.querySelector('.nsmd-fm')).toBeNull();
     expect(element.querySelector('.nsmd-raw-front-matter')).not.toBeNull();

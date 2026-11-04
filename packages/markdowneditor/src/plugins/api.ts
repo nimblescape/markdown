@@ -6,8 +6,8 @@
 // At the level "render", it adds syntax to the markdown-it of the editor, styles, and a view for each new kind of token
 // (docs/rendering.md, R-REN-002); the editor keeps the text of such a block byte for byte as one unit, and the user
 // changes it through its source. At the level "render and edit", it adds nodes and marks, which token becomes which node
-// or mark, how a changed node is written, commands, keys, items of the menus, the schema and the inputs of the front
-// matter, and the marks of the mode to learn Markdown. Both levels may mark generated parts as read-only
+// or mark, how a changed node is written, commands, keys, items of the menus, and the schema and the inputs of the
+// front matter. Both levels may mark generated parts as read-only
 // (docs/editor.md, R-EDIT-011) and show threads beside the text (R-GEN-014). `activate` gets the API of the editor and
 // of the platform, and returns what to dispose. pluginParts combines the plugins of an editor into the parts that the
 // codec, the extensions and the interaction of the editor take.
@@ -20,7 +20,6 @@ import type { JsonSchema } from '@nimblescape/markdowntext';
 import type { Writers } from '../markdown/serialize';
 import type { FormatButton } from '../ui/formatBar';
 import type { FrontMatterInput } from '../ui/frontMatterForm';
-import type { LearnMarks } from '../ui/learnMode';
 import type { MenuItem } from '../ui/menu';
 import type { ProposalResult, ProposedChange } from '../ui/proposals';
 
@@ -168,8 +167,6 @@ export interface MarkdownPlugin extends RenderPlugin {
   readonly keys?: Readonly<Record<string, string>>;
   /** menus are the items of the plugin in the menus of the editor. */
   readonly menus?: PluginMenus;
-  /** learnMarks are the marks that the mode to learn Markdown shows for the nodes and marks of the plugin. */
-  readonly learnMarks?: LearnMarks;
   /** frontMatterSchema is the JSON schema of the front matter, or returns it (R-FM-004). */
   readonly frontMatterSchema?: JsonSchema | ((editor: Editor) => JsonSchema | undefined);
   /** frontMatterInputs are the inputs of the plugin for the values of keys of the front matter (R-FM-006). */
@@ -202,7 +199,6 @@ export interface PluginParts {
   readonly extensions: AnyExtension[];
   readonly commands: Map<string, PluginCommand>;
   readonly keys: Map<string, string>;
-  readonly learnMarks: Required<LearnMarks>;
 }
 
 /** dispose disposes what a plugin returned. */
@@ -230,7 +226,6 @@ export function pluginParts(plugins: readonly MarkdownPlugin[]): PluginParts {
     extensions: [],
     commands: new Map(),
     keys: new Map(),
-    learnMarks: { marks: {}, nodes: {} },
   };
   for (const plugin of plugins) {
     Object.assign(parts.tokens, plugin.fromMarkdown);
@@ -246,8 +241,6 @@ export function pluginParts(plugins: readonly MarkdownPlugin[]): PluginParts {
       }
       parts.keys.set(key, `${plugin.name}.${command}`);
     }
-    Object.assign(parts.learnMarks.marks, plugin.learnMarks?.marks);
-    Object.assign(parts.learnMarks.nodes, plugin.learnMarks?.nodes);
   }
   return parts;
 }

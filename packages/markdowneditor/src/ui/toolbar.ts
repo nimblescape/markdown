@@ -2,10 +2,10 @@
 // © 2026 Hannes Stauss (scalarion@nimblescape.com)
 // Licensed under the MIT License. See LICENSE in the repository root for details.
 
-// The toolbar (docs/editor.md, R-GEN-003, R-GEN-008, R-GEN-013): a bar at the top of the editor with undo and redo,
-// the text style and the list of the block of the cursor, the insert menu "+", find and replace, the switch of the
-// mode to learn Markdown and the switch between editing and reading. The code that integrates the editor decides
-// whether the two switches show. In read-only mode, the toolbar shows only the buttons that do not change the text.
+// The toolbar (docs/editor.md, R-GEN-003, R-GEN-008): a bar at the top of the editor with undo and redo, the text
+// style and the list of the block of the cursor, the insert menu "+", find and replace, and the switch between editing
+// and reading. The code that integrates the editor decides whether the switch shows. In read-only mode, the toolbar
+// shows only the buttons that do not change the text.
 
 import type { Editor } from '@tiptap/core';
 import { button, element, icon } from './dom';
@@ -26,8 +26,6 @@ export interface ToolbarHost {
   menu: Menu;
   insertItems: () => MenuItem[];
   openFind: () => void;
-  /** learn is the switch of the mode to learn Markdown, or undefined when the toolbar does not show it. */
-  learn?: Switch;
   /** editing is the switch between editing and reading, or undefined when the toolbar does not show it. */
   editing?: Switch;
 }
@@ -40,7 +38,6 @@ export class Toolbar {
   private readonly style: HTMLButtonElement;
   private readonly list: HTMLButtonElement;
   private readonly editingOnly: HTMLElement[];
-  private readonly learn: HTMLButtonElement | undefined;
   private readonly editing: HTMLButtonElement | undefined;
 
   /**
@@ -59,10 +56,6 @@ export class Toolbar {
     const first = separator();
     const second = separator();
     this.editingOnly = [this.undo, this.redo, first, this.style, this.list, insert, second];
-    if (host.learn) {
-      const learn = host.learn;
-      this.learn = button('Show the Markdown marks', icon('learn'), () => learn.toggle());
-    }
     if (host.editing) {
       const editing = host.editing;
       this.editing = button('Read', icon('read'), () => editing.toggle());
@@ -79,7 +72,6 @@ export class Toolbar {
       insert,
       second,
       find,
-      this.learn,
       element('span', { class: 'nsmd-toolbar-space' }),
       this.editing,
     );
@@ -87,7 +79,7 @@ export class Toolbar {
     this.update();
   }
 
-  /** update shows the state of the editor in the buttons: undo, the text style, the switches. */
+  /** update shows the state of the editor in the buttons: undo, the text style, the switch. */
   update(): void {
     const { editor } = this.host;
     const editable = editor.isEditable;
@@ -99,12 +91,6 @@ export class Toolbar {
     this.style.replaceChildren(element('span', {}, textStyleName(editor)), icon('chevron'));
     const inList = editor.isActive('bulletList') || editor.isActive('orderedList') || editor.isActive('taskList');
     this.list.classList.toggle('nsmd-button-active', inList);
-    if (this.learn && this.host.learn) {
-      const on = this.host.learn.isOn();
-      this.learn.classList.toggle('nsmd-button-active', on);
-      this.learn.setAttribute('aria-pressed', on ? 'true' : 'false');
-      this.learn.title = on ? 'Hide the Markdown marks' : 'Show the Markdown marks';
-    }
     if (this.editing) {
       this.editing.hidden = this.host.editing?.isShown?.() === false;
       // The button names the mode that it switches to.

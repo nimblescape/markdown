@@ -11,8 +11,7 @@ This document defines the editor: the part that shows the text in a form
 that the user changes ([section 3](specification.md#3-architecture) of the
 specification), and the rendered Markdown editor, its first editor. It is
 part of the [specification](specification.md) of nimblescape Markdown and
-normative in the same way. [Section 10](#10-open-questions) lists its open
-questions.
+normative in the same way.
 
 ## 1. General
 
@@ -36,9 +35,9 @@ command or a moved row.
 same time, for example the rendered editor and the text editor beside it. An
 edit in one must show at once in the others. Editors are, for example, the
 rendered Markdown editor ([section 2](#2-the-rendered-markdown-editor) to
-[section 9](#9-threads-beside-the-text)), the text editor of a platform or a
+[section 8](#8-threads-beside-the-text)), the text editor of a platform or a
 code editor for source code, the form of the front matter
-([section 8](#8-front-matter-form)), and the AI ([ai.md](ai.md)), which
+([section 7](#7-front-matter-form)), and the AI ([ai.md](ai.md)), which
 proposes changes.
 
 *(proposal)* Each editor of a file shares the source of the file
@@ -112,8 +111,7 @@ same list of items, and typed words filter it. It must have handles to move
 blocks, and find and replace. Its code is original: no code and no design
 file of the Claude interface is copied. *(proposal)* The toolbar holds undo
 and redo, the text style and the list of the block of the cursor, the
-insert menu, find and replace, and the switches of the mode to learn
-Markdown and of read-only mode. Ctrl+F opens find and replace; Alt+Up and
+insert menu, find and replace, and the switch of read-only mode. Ctrl+F opens find and replace; Alt+Up and
 Alt+Down move the block of the cursor (Cmd in place of Ctrl on macOS).
 
 ### R-EDIT-007
@@ -240,23 +238,7 @@ right (`showChanges`). The diff of VS Code is such a diff
 - Each new text of a side updates the marks of both sides.
 - The editor goes to the previous and to the next change on both sides.
 
-## 7. Mode to learn Markdown
-
-### R-GEN-013
-
-**A mode to learn Markdown.** When the user switches this mode on, the
-editor must show the Markdown marks under the rendered text, for example
-`**` around bold text and `#` before a heading. The marks must be the marks
-of the file: for a block that the user did not change, the marks that the
-file has, for example `__` when the file writes bold with underscores. The
-marks must not be part of the text: they do not change the document, the
-cursor jumps over them, and copying copies the rendered text. The
-integrating code has a setting for the mode, and the user has a toggle. An
-extension of the level "render and edit" gives the marks of its own nodes.
-*(proposal)* The marks show in a muted color in the whole document and in
-full color in the block of the cursor.
-
-## 8. Front matter form
+## 7. Front matter form
 
 ### R-FM-001
 
@@ -268,9 +250,7 @@ has no handles of a block, no block moves before it, and Backspace does not
 remove it; a new text, select all and undo may remove it. A front matter
 that does not parse shows its text with the problem, and the user edits the
 text. In the read-only mode of the editor ([R-GEN-008](#r-gen-008)), the
-form shows the values as text; in the mode to learn Markdown
-([R-GEN-013](#r-gen-013)), it also shows the text of the front matter. The
-integrating code may show the text in place of the form.
+form shows the values as text. The integrating code may show the text in place of the form.
 
 ### R-FM-002
 
@@ -352,7 +332,7 @@ yes and no is its items, joined by commas, and the path of a key in a map
 in a list has the index of the item, for example `authors.0.name`. The
 source gives these values (`frontMatterValues`), also for formatters.
 
-## 9. Threads beside the text
+## 8. Threads beside the text
 
 ### R-GEN-014
 
@@ -368,13 +348,6 @@ line of the passage, with the number of answers. The panel of a thread opens
 beside the text at the height of the passage and marks the passage; the
 plugin of the thread fills the panel. The close button, Escape and a second
 click on the icon close it.
-
-## 10. Open questions
-
-1. Mode to learn Markdown: all marks muted plus the block of the cursor in
-   full color (proposal), or only the marks at the cursor
-   ([R-GEN-013](#r-gen-013))? Can the user edit the marks directly
-   (proposal: no)?
 
 ---
 
