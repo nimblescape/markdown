@@ -62,6 +62,20 @@ const renderer = new MarkdownRenderer({ plugins: [diagrams] });
 const dispose = renderer.render(text, document.querySelector('#rendering')!);
 ```
 
+A plugin that works in the markdown-it of another program, for example in
+the Markdown preview of VS Code, gives that rendering the output of the
+renderer: `addOutputRules(md)` adds the rules of the title of an alert and
+of the widths of the columns of a table, and `prepareOutput(tokens)` turns
+the tokens of a rendering into the output of the renderer, with the GitHub
+alerts, the colors of the cells and the widths of the columns.
+
+```ts
+import { addOutputRules, prepareOutput } from '@nimblescape/markdownrender';
+
+addOutputRules(md);
+md.core.ruler.push('output', (state) => prepareOutput(state.tokens, { headingIds: false, lines: false }));
+```
+
 The element of a rendering gets the styles of rendered content from
 `content.css` with the classes `nsmd-document nsmd-content`:
 

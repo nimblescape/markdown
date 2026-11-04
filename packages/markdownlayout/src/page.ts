@@ -444,6 +444,14 @@ body.paper {
 }
 `;
 
+/**
+ * layoutScript is the text of the script of the layout (src/page/handlers.js), which every page of renderPage holds:
+ * the start of Paged.js when the content is complete, the page numbers and the last lines of the justified paragraphs.
+ * Code that makes the pages itself, without renderPage, loads it into its page before Paged.js, for example the pages in
+ * the Markdown preview of VS Code of nimblescape Markdown Paper.
+ */
+export const layoutScript: string = handlersJs;
+
 /** Page is the page of a document in its layout. */
 export interface Page {
   html: string;

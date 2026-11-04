@@ -21,6 +21,8 @@
 // These changes work on the tokens of one rendering, after the parse: the editor reads the text with the same
 // markdown-it, and its tokens stay as markdown-it writes them.
 
+import type MarkdownIt from 'markdown-it';
+import type { RenderRule } from 'markdown-it/lib/renderer.mjs';
 import Token from 'markdown-it/lib/token.mjs';
 
 /** AlertKind is the kind of a GitHub alert. */
@@ -185,6 +187,25 @@ function placeLines(tokens: readonly Token[]): void {
       token.attrSet('data-line', String(token.map[0]));
     }
   }
+}
+
+/**
+ * outputRules are the rules of markdown-it that write the tokens of the output that markdown-it does not know: the
+ * title of an alert and the widths of the columns of a table.
+ */
+export const outputRules: Readonly<Record<string, RenderRule>> = {
+  [alertTitleType]: (tokens, index) => `<p class="markdown-alert-title">${alertTitles[(tokens[index].meta as { kind: AlertKind }).kind]}</p>\n`,
+  [columnsType]: (tokens, index) =>
+    `<colgroup>${(tokens[index].meta as { widths: number[] }).widths.map((width) => `<col style="width: ${width}%">`).join('')}</colgroup>\n`,
+};
+
+/**
+ * addOutputRules gives a markdown-it of another program the rules of the output of the renderer, for example the
+ * markdown-it of the Markdown preview of VS Code, in which a plugin calls prepareOutput on the tokens of a rendering.
+ * @param md - The markdown-it.
+ */
+export function addOutputRules(md: MarkdownIt): void {
+  Object.assign(md.renderer.rules, outputRules);
 }
 
 /**

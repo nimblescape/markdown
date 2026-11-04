@@ -13,7 +13,7 @@ import spec from 'commonmark-spec';
 import type MarkdownIt from 'markdown-it';
 import { describe, expect, it } from 'vitest';
 import { createMarkdownIt } from './markdownIt';
-import { headingText, slug } from './output';
+import { addOutputRules, headingText, prepareOutput, slug } from './output';
 import type { RenderPlugin } from './plugins';
 import { safeHtml } from './rawHtml';
 import { MarkdownRenderer, type RendererOptions } from './renderer';
@@ -185,6 +185,21 @@ describe('the output as GitHub writes it', () => {
     );
     // The comment of the widths belongs to the table on the next line only.
     expect(html('<!-- table: widths=60,40 -->\n\n| a |\n|---|\n| b |\n')).not.toContain('colgroup');
+  });
+});
+
+describe('the output in a markdown-it of another program', () => {
+  it('writes the alerts and the widths of the columns with addOutputRules and prepareOutput, as the renderer does', () => {
+    const md = createMarkdownIt();
+    addOutputRules(md);
+    const text = '> [!NOTE]\n> A hint.\n\n<!-- table: widths=30,70 -->\n| A | B |\n| --- | --- |\n| 1 | 2 |\n';
+    const tokens = md.parse(text, {});
+    prepareOutput(tokens, { headingIds: false, lines: false });
+    const html = md.renderer.render(tokens, md.options, {});
+    expect(html).toContain('<div class="markdown-alert markdown-alert-note">\n<p class="markdown-alert-title">Note</p>\n<p>A hint.</p>\n</div>');
+    expect(html).toContain('<colgroup><col style="width: 30%"><col style="width: 70%"></colgroup>');
+    expect(html).not.toContain('data-line');
+    expect(new MarkdownRenderer({ lines: false }).toHtml(text).html).toContain(html.slice(0, html.indexOf('</div>')));
   });
 });
 

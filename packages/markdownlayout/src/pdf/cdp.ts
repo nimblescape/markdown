@@ -5,8 +5,8 @@
 // A connection to a browser without a window over the Chrome DevTools Protocol through two pipes (docs/rendering.md,
 // R-LAYOUT-002): the browser starts with `--remote-debugging-pipe`, reads the messages of the program from its file
 // descriptor 3 and writes its own to the file descriptor 4, each a JSON text that ends with a zero byte. The pipes
-// need no network port and no package such as Puppeteer, which would download its own Chromium. The same code is in
-// nimblescape Markdown Paper. The module runs in Node.js.
+// need no network port and no package such as Puppeteer, which would download its own Chromium. nimblescape Markdown
+// Paper also uses the connection for the tests of its pages. The module runs in Node.js.
 
 import { type ChildProcess, spawn } from 'node:child_process';
 import * as fs from 'node:fs';

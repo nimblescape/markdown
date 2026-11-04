@@ -7,5 +7,6 @@
 // command line and in the extension host of VS Code on the desktop; the main entry point runs everywhere.
 
 export { browserVariable, candidates, findBrowser, NoBrowserError } from './browser';
+export { Browser } from './cdp';
 export { fileHost, fileReader, folderUrl, metadataOf, pagedJsFile, printPage, type FileHostOptions, type PrintOptions } from './export';
 export { finishPdf, printPdf, type Metadata, type PrintResult } from './pdf';

@@ -8,8 +8,10 @@
 //   functions of the plugins must have shown their tokens, and the scripts of the page must have drawn, for example
 //   diagrams. Paged.js starts when the page has loaded, the integrating code has released the page (`hold` and
 //   `release`, for code that fills the page after it loaded), no function of `pending` says that a drawing waits, and
-//   the page has not changed for 200 milliseconds, at the latest 10 seconds after the page loaded. The functions of
-//   `beforePages` then run, for example to copy what Paged.js would lose.
+//   the page has not changed for 200 milliseconds, at the latest 10 seconds after the page loaded. A function of
+//   `pending` returns true while a drawing waits, or the time (as `Date.now()` gives it) up to which the page waits for
+//   a slow drawing, for example a diagram that a program draws one after the other; that time can be later than the 10
+//   seconds. The functions of `beforePages` then run, for example to copy what Paged.js would lose.
 // - The page numbers. Paged.js restarts the page numbers on the page of an element with `counter-reset: page 1`, with a
 //   rule `counter-reset` on that page. Chromium no longer carries a counter that a page resets to the next pages, so
 //   they would count on from the pages before. After Paged.js has made a page, the handler counts the pages as
@@ -198,7 +200,10 @@
     fill(root) {
       fill(root, renders);
     },
-    /** pending are functions of the integrating code that return true while a drawing of the page waits. */
+    /**
+     * pending are functions of the integrating code that return true while a drawing of the page waits, or the time up
+     * to which the page waits for a slow drawing, which can be later than the 10 seconds.
+     */
     pending: [],
     /** beforePages are functions of the integrating code that run right before Paged.js makes the pages. */
     beforePages: [],
@@ -253,15 +258,26 @@
         .then(
           () =>
             new Promise((resolve) => {
-              const end = Date.now() + 10000;
+              let end = Date.now() + 10000;
               let last = Date.now();
               const observer = new MutationObserver(() => {
                 last = Date.now();
               });
               observer.observe(document.body, { childList: true, subtree: true, attributes: true, characterData: true });
               const check = () => {
-                const waiting = handlers.pending.some((test) => test(document.body));
-                if (Date.now() > end || (!waiting && Date.now() - last >= 200)) {
+                const now = Date.now();
+                let waiting = false;
+                for (const test of handlers.pending) {
+                  const result = test(document.body);
+                  if (typeof result === 'number') {
+                    // A slow drawing waits up to its own time.
+                    end = Math.max(end, result);
+                    waiting = waiting || now <= result;
+                  } else if (result) {
+                    waiting = true;
+                  }
+                }
+                if (now > end || (!waiting && now - last >= 200)) {
                   observer.disconnect();
                   for (const run of handlers.beforePages) {
                     run(document.body);
