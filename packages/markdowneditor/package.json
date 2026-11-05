@@ -68,7 +68,7 @@
     "@tiptap/starter-kit": "^3.32.2",
     "@types/markdown-it": "^14.2.0",
     "diff": "^9.0.0",
-    "highlight.js": "~11.11.1",
+    "highlight.js": "~11.12.0",
     "lowlight": "^3.3.0",
     "markdown-it": "^14.3.3",
     "prosemirror-markdown": "^1.13.9",
