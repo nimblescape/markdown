@@ -66,6 +66,11 @@ describe('the page', () => {
     expect(page.html).toMatch(/<section class="paper-template paper-template-cover" data-template="cover"[^>]*>\n<img src="https:\/\/resource\/repo\/layouts\/thesis\/images\/logo.png"><h1>Agenten<\/h1>\n<\/section>/);
     expect(page.html).not.toContain('alert(1)');
     expect(page.html).toContain(`script-src 'nonce-abc'`);
+    // A layout can come from a third party: the page loads nothing from the internet and no form sends data.
+    const policy = /<meta http-equiv="Content-Security-Policy" content="([^"]*)">/.exec(page.html)?.[1] ?? '';
+    expect(policy).toContain("default-src 'none'");
+    expect(policy).toContain("form-action 'none'");
+    expect(policy).not.toMatch(/https:(?!\/\/)/);
     expect(page.html).toContain('<base href="https://resource/repo/paper/">');
     expect(page.html).toContain('--field-kapitelumbruch: "ja";');
     // The body, the template sections and the text have the fields as attributes, because Paged.js applies the

@@ -13,8 +13,9 @@
 //    fill the templates with the fields.
 // 3. Turn the text into HTML with the renderer and the plugin of the layout (src/text.ts), with soft hyphens by the
 //    language of the layout.
-// 4. Write the page: a policy that lets only the scripts of the page run, the base address of the folder of the file
-//    for its images, the style sheets, the fields as CSS variables and as attributes, the fixed pages and the text, the
+// 4. Write the page: a policy that lets only the scripts of the page run, loads nothing from the internet, because a
+//    layout can come from a third party and its templates hold the fields, and lets no form send data; the base
+//    address of the folder of the file for its images, the style sheets, the fields as CSS variables and as attributes, the fixed pages and the text, the
 //    data of the placeholders of the plugins (src/pageRenders.ts), the script of the layout (src/page/handlers.js), and
 //    the scripts of the integrating code, with Paged.js.
 //
@@ -535,10 +536,11 @@ export async function renderPage(host: Host, renderer: MarkdownRenderer, documen
   const title = values.title?.trim() || values.file;
   const policy = [
     "default-src 'none'",
-    `img-src ${host.sources} https: data: blob:`,
+    `img-src ${host.sources} data: blob:`,
     `font-src ${host.sources} data: blob:`,
     `style-src ${host.sources} 'unsafe-inline'`,
     `script-src 'nonce-${host.nonce}'`,
+    "form-action 'none'",
   ].join('; ');
   const nonce = escapeHtml(host.nonce);
   const scripts = host.scripts.map((script) =>

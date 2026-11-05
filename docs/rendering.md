@@ -41,17 +41,18 @@ cell and the widths of the columns. The styles of rendered content
 (`content.css`) are the same for a rendering and for the text of the editor
 ([R-GEN-010](specification.md#r-gen-010)).
 
-*(proposal)* **Raw HTML.** The renderer has no sanitizer. By default, raw
-HTML of the file shows safely: comments do not show; the elements of a fixed
+**Raw HTML.** The renderer has no sanitizer and no dependency for raw HTML.
+Raw HTML of the file shows safely: comments do not show; the elements of a fixed
 list without attributes (for example `ins`, `sub`, `sup`, `kbd`, `br`,
 `details` and `summary`), the anchors `<a id="…">` and `<a name="…">`, and
 the check boxes of task lists show as HTML; any other raw HTML shows as its
 text. An end tag shows as HTML only when it closes the last element that the
 raw HTML opened, and the rendering closes the elements that the raw HTML of
 a paragraph or of the whole text leaves open. No raw HTML of the file can
-run a script or load a resource. The integrating code may choose that raw
-HTML shows as its text, as in the editor, or as the file writes it, for a
-text that it trusts.
+run a script or load a resource. The list is fixed: a layout cannot add
+elements or attributes to it, because a layout can come from a third party.
+The integrating code may choose that raw HTML shows as its text, as in the
+editor.
 
 **Syntax colors.** The renderer gives code blocks the syntax colors of the
 editor ([R-EDIT-003](editor.md#r-edit-003)), with the same languages and the
@@ -134,7 +135,13 @@ JSON fill the templates, and the field `lang` gives the layout its language.
 The page of a document is one HTML page with the style sheets of the layout,
 the fields as CSS variables and attributes, the filled templates, the text
 and the scripts; it lets only its own scripts run, and a template holds no
-script.
+script. Because a layout can come from a third party and its templates hold
+the fields of the front matter, the page loads nothing from the internet:
+its images, fonts and style sheets come only from the folders that the
+integrating code allows, such as the workspace, the layout and the
+extension, and no form of the page can send data. An image of a document
+from the internet does not show in the pages and in the PDF; the author
+saves it in the workspace.
 
 ### R-LAYOUT-004
 
@@ -227,9 +234,7 @@ folders of the extension ([R-VSC-007](https://github.com/nimblescape/markdownnot
 
 ## 5. Open questions
 
-1. Raw HTML in a rendering: the safe way with a fixed list of elements by
-   default ([R-REN-001](#r-ren-001), proposal), or a sanitizer library, whose
-   license needs a decision ([R-GEN-011](specification.md#r-gen-011))?
+No question is open.
 
 ---
 

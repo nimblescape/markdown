@@ -14,7 +14,8 @@ The first version of the packages.
   in YAML, TOML or JSON.
 - `@nimblescape/markdownrender`: the renderer of Markdown with markdown-it,
   as GitHub shows it, with GitHub alerts, footnotes, task lists, the IDs of
-  the headings and plugins of the renderer.
+  the headings, raw HTML only from a fixed list of safe elements, and plugins
+  of the renderer.
 - `@nimblescape/markdowneditor`: the editor of rendered Markdown, for the web
   and for the webviews of VS Code. Each block that the user does not change
   keeps its text byte for byte. It has a toolbar, a format bar, an insert
@@ -23,7 +24,8 @@ The first version of the packages.
   beside the text, proposed changes as tracked changes, and version 1 of the
   plugin API.
 - `@nimblescape/markdownlayout`: layouts with the schema of their front
-  matter, the pages of a document with Paged.js, and the PDF in Node.js.
+  matter, the pages of a document with Paged.js, and the PDF in Node.js; the
+  page runs only its own scripts and loads nothing from the internet.
 - `@nimblescape/markdownai`: the provider API of an AI, the context of the
   document, the tool of the proposed changes and the loop of a chat, without
   a provider of its own.
