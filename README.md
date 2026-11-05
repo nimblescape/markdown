@@ -11,8 +11,8 @@ their documents stay in this repository until each has a repository of its
 own.
 
 [docs/specification.md](docs/specification.md) is the normative
-specification: the scope, the architecture, the open questions and the plan
-of the steps, with the documents of the parts, for example
+specification: the scope, the architecture and the open questions, with the
+documents of the parts, for example
 [docs/editor.md](docs/editor.md) and [docs/history.md](docs/history.md).
 The first steps are built: the npm workspaces; the source of a file, with
 its changes and their origin, which several editors share; the core, which
@@ -34,7 +34,8 @@ with the proposed changes as tracked changes.
 The repository holds one npm package for each part, as npm workspaces in
 `packages/`
 ([R-ARCH-002](docs/specification.md#r-arch-002)). The other parts get their
-packages with their steps of the plan.
+packages later; the [one plan of all products](https://claude.ai/artifact/SatbygA2FkJiW3ob623NEy) lists the decisions
+that wait for the owner.
 
 | Package | Part |
 | --- | --- |
@@ -55,7 +56,6 @@ const editor = new MarkdownEditor(document.querySelector('#editor')!, {
   onChange: (changed) => console.log(changed.getMarkdown()),
 });
 editor.setEditable(false); // read-only mode
-editor.setLearnMode(true); // show the Markdown marks
 editor.setFrontMatterSchema({ type: 'object', required: ['title'] }); // the schema of the form of the front matter
 ```
 
@@ -82,9 +82,8 @@ const result = await rendered.proposeChange({ id: 'ai-1', from: 2, to: 7, text: 
 // 'accepted', 'rejected' or 'outdated'
 ```
 
-The options `toolbar`, `readOnlyToggle` and `learnToggle` leave out the
-toolbar or its switches, and `learnMode` starts the editor with the
-Markdown marks shown.
+The options `toolbar` and `readOnlyToggle` leave out the toolbar or its
+switch of read-only mode.
 
 The renderer shows the same text without edit functions, for example for a
 view or a command line:

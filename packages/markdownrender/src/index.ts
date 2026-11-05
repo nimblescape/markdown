@@ -33,3 +33,4 @@ export {
 } from './plugins';
 export { isSafeTag, plainElements, safeHtml, type RawHtml } from './rawHtml';
 export { MarkdownRenderer, type Rendering, type RendererOptions, type RenderSlot } from './renderer';
+export { highlightCode, syntaxLanguages } from './syntax';

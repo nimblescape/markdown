@@ -23,7 +23,7 @@ on the computer of the user, the views, the theme, the signed-in GitHub
 user, secrets such as the AI key, commands and settings, opening a link, and
 a message channel from a plugin to its extension.
 
-*(proposal)* **A strict policy of styles.** The editor adds style elements
+**A strict policy of styles.** The editor adds style elements
 to the page: the base styles of Tiptap and the styles of the plugins. A page
 whose policy allows only style elements with a nonce gives this nonce to the
 editor (`styleNonce`), so that its policy needs no `'unsafe-inline'` for
@@ -98,7 +98,7 @@ its own theme, for example the adapter of VS Code of Notes to the active
 color theme of VS Code ([R-VSC-011](https://github.com/nimblescape/markdownnotes-vscode/blob/main/docs/requirements.md#r-vsc-011)
 of Notes).
 
-*(proposal)* The palette of seven colors (gray, red, orange, yellow, green,
+The palette of seven colors (gray, red, orange, yellow, green,
 blue, purple) is the variables `--nsmd-color-gray` to
 `--nsmd-color-purple`; the colors of the alerts come from it. The style
 sheet of the editor holds the styles of rendered content of the renderer

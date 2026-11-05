@@ -17,13 +17,14 @@ import { addOutputRules, headingText, prepareOutput, slug } from './output';
 import type { RenderPlugin } from './plugins';
 import { safeHtml } from './rawHtml';
 import { MarkdownRenderer, type RendererOptions } from './renderer';
+import { highlightCode, syntaxLanguages } from './syntax';
 
 /** html returns the HTML of a text with a renderer with options. */
 const html = (text: string, options: RendererOptions = {}): string => new MarkdownRenderer({ lines: false, ...options }).toHtml(text).html;
 
 describe('the HTML of markdown-it 14', () => {
   it('writes each example of the CommonMark specification as the specification does, except the bare addresses that GFM links', () => {
-    const renderer = new MarkdownRenderer({ rawHtml: 'trusted', headingIds: false, lines: false, frontMatter: 'text' });
+    const renderer = new MarkdownRenderer({ rawHtml: 'trusted', headingIds: false, lines: false, frontMatter: 'text', syntaxColors: false });
     const differ = spec.tests
       .filter((example) => {
         const own = renderer.toHtml(example.markdown.replace(/→/g, '\t')).html;
@@ -185,6 +186,35 @@ describe('the output as GitHub writes it', () => {
     );
     // The comment of the widths belongs to the table on the next line only.
     expect(html('<!-- table: widths=60,40 -->\n\n| a |\n|---|\n| b |\n')).not.toContain('colgroup');
+  });
+});
+
+describe('the syntax colors of code blocks', () => {
+  it('gives the code of a block with a language of the editor the classes of highlight.js, with its HTML escaped', () => {
+    expect(html('```ts\nconst a = "<b>";\n```\n')).toBe(
+      '<pre><code class="language-ts"><span class="hljs-keyword">const</span> a = <span class="hljs-string">&quot;&lt;b&gt;&quot;</span>;\n</code></pre>\n',
+    );
+    expect(html('```Python\nprint(1)\n```\n')).toContain('<span class="hljs-built_in">print</span>(<span class="hljs-number">1</span>)');
+  });
+
+  it('gives no colors to a block without a language, or with a language that the editor does not know, as on GitHub', () => {
+    expect(html('```\nconst a = 1;\n```\n')).toBe('<pre><code>const a = 1;\n</code></pre>\n');
+    expect(html('```mermaid\ngraph TD\n```\n')).toBe('<pre><code class="language-mermaid">graph TD\n</code></pre>\n');
+    expect(html('    const a = 1;\n')).toBe('<pre><code>const a = 1;\n</code></pre>\n');
+  });
+
+  it('ends the elements of the colors at the end of each line, so that each line stands on its own', () => {
+    expect(html('```js\n/* one\ntwo */\n```\n')).toBe(
+      '<pre><code class="language-js"><span class="hljs-comment">/* one</span>\n<span class="hljs-comment">two */</span>\n</code></pre>\n',
+    );
+  });
+
+  it('has the languages of the editor, and no colors when the integrating code or a plugin chooses so', () => {
+    expect(Object.keys(syntaxLanguages)).toEqual(expect.arrayContaining(['bash', 'go', 'json', 'python', 'typescript', 'xml', 'yaml']));
+    expect(highlightCode('x', 'nothing')).toBe('');
+    expect(html('```ts\nconst a = 1;\n```\n', { syntaxColors: false })).toBe('<pre><code class="language-ts">const a = 1;\n</code></pre>\n');
+    const own: RenderPlugin = { name: 'own', apiVersion: 1, extendMarkdownIt: (md) => md.set({ highlight: (code) => `<i>${code}</i>` }) };
+    expect(html('```ts\nx\n```\n', { plugins: [own] })).toBe('<pre><code class="language-ts"><i>x\n</i></code></pre>\n');
   });
 });
 

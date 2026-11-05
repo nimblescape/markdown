@@ -11,8 +11,8 @@
 //   closes the elements that the raw HTML of a paragraph, or of the whole text, leaves open, so that the HTML of the
 //   rendering stays whole inside the element of a layout. No raw HTML of the file can run a script or load a resource.
 // - `text`: all raw HTML shows as its text, as in the editor, which shows each block of HTML of the file as its text.
-// - `trusted`: raw HTML shows as the file writes it, only for a text that the integrating code trusts, for example the
-//   file of the user in a page whose content security policy allows no scripts.
+// - `trusted`: raw HTML shows as the file writes it. It is only for the test of the renderer against the examples of the
+//   CommonMark specification; no product uses it, because only the fixed list is safe (R-REN-001).
 
 import type MarkdownIt from 'markdown-it';
 import type Renderer from 'markdown-it/lib/renderer.mjs';

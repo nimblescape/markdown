@@ -6,8 +6,8 @@
 // editor on the left and the Markdown text in a text field on the right. A change in either editor shows at once in the
 // other one: the text field takes the patches of each change, so that its cursor stays, and the rendered editor changes
 // only the blocks whose text changed (docs/source.md, R-SRC-002). The head of the page shows the origin of the last
-// change and the selection of the rendered editor in the text. The toolbar of the editor switches the read-only mode
-// and the mode to learn Markdown. The front matter shows as a form with the example schema below; "Edit keys" switches
+// change and the selection of the rendered editor in the text. The toolbar of the editor switches the read-only mode.
+// The front matter shows as a form with the example schema below; "Edit keys" switches
 // the form to the edit of the keys. The example plugin (examplePlugin.ts) shows the plugin API: a CSV table at the level
 // "render", a read-only citation and a thread beside the text. The button "Rendering" shows the rendering of the
 // renderer (docs/rendering.md, R-REN-001) in place of the text field: the same text as HTML without edit functions,

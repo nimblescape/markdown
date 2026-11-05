@@ -2,7 +2,7 @@
 // © 2026 Hannes Stauss (scalarion@nimblescape.com)
 // Licensed under the MIT License. See LICENSE in the repository root for details.
 
-// The interaction of the editor (docs/editor.md, R-GEN-003, R-EDIT-007, R-GEN-008, R-GEN-013): it puts the toolbar,
+// The interaction of the editor (docs/editor.md, R-GEN-003, R-EDIT-007, R-GEN-008): it puts the toolbar,
 // the bar of find and replace, the format bar, the menus and the handles of the blocks around the text, and gives the
 // editor the plugins and the keys of these parts as one Tiptap extension. The keys are those of R-EDIT-007, and also
 // Ctrl+F for find and replace and Alt+Up and Alt+Down to move the block of the cursor (Cmd in place of Ctrl on macOS).
@@ -22,7 +22,6 @@ import { FindBar } from './findBar';
 import { FormatBar, type FormatButton } from './formatBar';
 import { type FrontMatterForm, type FrontMatterInput, frontMatterView } from './frontMatterForm';
 import { insertItems } from './items';
-import { isLearning, type LearnMarks, learnPlugin, setLearning } from './learnMode';
 import { Menu, type MenuItem } from './menu';
 import { slashPlugin } from './slash';
 import { TableHandles } from './table/tableHandles';
@@ -35,10 +34,6 @@ export interface InteractionOptions {
   toolbar?: boolean;
   /** readOnlyToggle false leaves out the button that switches between editing and reading; the default is true. */
   readOnlyToggle?: boolean;
-  /** learnMode true starts the editor in the mode to learn Markdown; the default is false. */
-  learnMode?: boolean;
-  /** learnToggle false leaves out the button of the mode to learn Markdown; the default is true. */
-  learnToggle?: boolean;
   /** formatButtons are the buttons that extensions add to the format bar, for example Comment of Notes. */
   formatButtons?: FormatButton[];
   /** insertItems returns the items that extensions add to the insert menu and to the slash commands. */
@@ -47,8 +42,6 @@ export interface InteractionOptions {
   blockItems?: (editor: Editor, block: { node: PmNode; pos: number }) => MenuItem[];
   /** tableItems returns the items that extensions add to the table menu of a table. */
   tableItems?: (editor: Editor, table: { node: PmNode; pos: number }) => MenuItem[];
-  /** learnMarks are the marks that the mode to learn Markdown shows for the nodes and marks of extensions. */
-  learnMarks?: LearnMarks;
   /**
    * language is the language of the document, for example `de`, for the order of the texts of a sorted column. The
    * default is the key `lang` of the front matter, else the language of the page.
@@ -88,7 +81,6 @@ export class Interaction {
   readonly box: HTMLElement;
   private readonly menu: Menu;
   private readonly asker: Asker;
-  private learning: boolean;
   /** readOnlyShown is false while the toolbar hides the switch between editing and reading. */
   private readOnlyShown = true;
   private editor: Editor | undefined;
@@ -113,7 +105,6 @@ export class Interaction {
     root.append(this.header, this.box);
     this.menu = new Menu(this.box, 'Items');
     this.asker = new Asker(this.box);
-    this.learning = options.learnMode ?? false;
     this.schema = options.frontMatterSchema;
     document.addEventListener('mousedown', this.onDocumentDown, true);
     document.addEventListener('mouseup', this.onDocumentUp, true);
@@ -125,9 +116,8 @@ export class Interaction {
     const plugins = () => [
       slashPlugin({ menu: this.menu, items: () => this.insertItems() }),
       findPlugin(),
-      learnPlugin(() => this.learning, this.options.learnMarks),
-      alertsPlugin(isLearning),
-      tablesPlugin(isLearning),
+      alertsPlugin(),
+      tablesPlugin(),
       ...(this.options.frontMatterForm === false
         ? []
         : [
@@ -138,7 +128,6 @@ export class Interaction {
                     editor: () => this.editor,
                     schema: () => this.frontMatterSchema(),
                     inputs: this.options.frontMatterInputs ?? [],
-                    isLearning: () => this.learning,
                     forms: this.forms,
                   }),
                 },
@@ -207,30 +196,12 @@ export class Interaction {
         menu: this.menu,
         insertItems: () => this.insertItems(),
         openFind: () => this.openFind(),
-        learn: (this.options.learnToggle ?? true) ? { isOn: () => this.learning, toggle: () => this.setLearnMode(!this.learning) } : undefined,
         editing: (this.options.readOnlyToggle ?? true) ? { isOn: () => editor.isEditable, toggle: editing.toggle, isShown: () => this.readOnlyShown } : undefined,
       });
       this.header.append(this.toolbar.dom);
     }
     this.header.append(this.findBar.dom);
     this.update(view);
-  }
-
-  /** isLearning is true while the mode to learn Markdown is on. */
-  get isLearning(): boolean {
-    return this.learning;
-  }
-
-  /**
-   * setLearnMode switches the mode to learn Markdown on or off (R-GEN-013).
-   * @param on - true to show the Markdown marks.
-   */
-  setLearnMode(on: boolean): void {
-    this.learning = on;
-    if (this.editor) {
-      setLearning(this.editor.view, on);
-    }
-    this.forms.forEach((form) => form.refresh());
   }
 
   /**

@@ -314,35 +314,9 @@ box of the text, and the parts that show over the text. The box leaves room at t
 }
 
 /*
-The mode to learn Markdown (R-GEN-013): the marks of the file beside the rendered text, muted, and in full color in the
-block of the cursor. A mark is an inline block, so that the underline or the strikethrough of its text does not cross
-it.
-*/
-.nsmd-editor .ProseMirror .nsmd-learn-mark {
-  display: inline-block;
-  color: var(--nsmd-muted);
-  opacity: 0.7;
-  font-family: var(--nsmd-code-font-family);
-  font-size: 0.85em;
-  font-weight: 400;
-  font-style: normal;
-  white-space: pre;
-  user-select: none;
-}
-
-.nsmd-editor .ProseMirror .nsmd-learn-mark-line {
-  display: block;
-}
-
-.nsmd-editor .ProseMirror .nsmd-learn-current .nsmd-learn-mark {
-  color: var(--nsmd-mark);
-  opacity: 1;
-}
-
-/*
 Tables (R-EDIT-008 to R-EDIT-010): the handles of the rows and the columns, the markers "+" on the borders, the line
 that shows where a dragged row or column goes, the colors of the cells, and the widths of the columns from the comment
-before the table, which hides itself outside the mode to learn Markdown.
+before the table, which hides itself.
 */
 .nsmd-editor .nsmd-table-grip,
 .nsmd-editor .nsmd-table-marker {
@@ -638,20 +612,9 @@ before the table, which hides itself outside the mode to learn Markdown.
   gap: 6px;
 }
 
-.nsmd-editor .nsmd-fm-source {
-  margin: 8px 0 0;
-  padding: 6px 8px;
-  border-top: 1px dashed var(--nsmd-border);
-  color: var(--nsmd-raw-foreground);
-  font-family: var(--nsmd-code-font-family);
-  font-size: 13px;
-  white-space: pre-wrap;
-}
-
 /*
 The blocks with a source (docs/plugins.md, R-GEN-012): a raw block shows its rendering or its text, and the user switches it
-to a field with its source in the same place; the two never show at the same time. The text of a rendered block shows below
-its rendering in the mode to learn Markdown.
+to a field with its source in the same place; the two never show at the same time.
 */
 
 .nsmd-editor .ProseMirror .nsmd-unit {
@@ -674,18 +637,6 @@ its rendering in the mode to learn Markdown.
   margin-bottom: 0;
 }
 
-.nsmd-editor .ProseMirror .nsmd-unit-source {
-  display: none;
-  margin: 6px 0 0;
-  padding: 6px 8px;
-  border-top: 1px dashed var(--nsmd-border);
-  border-radius: 0;
-}
-
-.nsmd-editor .ProseMirror.nsmd-learn .nsmd-unit-rendered:not(.nsmd-unit-editing) > .nsmd-unit-source {
-  display: block;
-}
-
 .nsmd-editor .ProseMirror .nsmd-unit-edit,
 .nsmd-editor .ProseMirror .nsmd-unit-done {
   position: absolute;
@@ -706,8 +657,7 @@ its rendering in the mode to learn Markdown.
 }
 
 .nsmd-editor .ProseMirror .nsmd-unit-editing > .nsmd-unit-edit,
-.nsmd-editor .ProseMirror .nsmd-unit-editing > .nsmd-unit-view,
-.nsmd-editor .ProseMirror .nsmd-unit-editing > .nsmd-unit-source {
+.nsmd-editor .ProseMirror .nsmd-unit-editing > .nsmd-unit-view {
   display: none;
 }
 

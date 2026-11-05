@@ -24,7 +24,7 @@ and the selections of every editor of the file. It must apply each change as
 a text patch with its origin: user, AI or other program. It must read and
 save the file through the platform adapter.
 
-*(proposal)* The source is the class `TextSource` of the package
+The source is the class `TextSource` of the package
 `@nimblescape/markdowntext`. A change is a list of patches: each patch
 replaces a range of the text before the change with a new text, and the
 positions count the UTF-16 code units of the text, as the strings of
@@ -48,13 +48,13 @@ formatter, an AI agent or another program, must reach every open editor as a
 change of the text. An editor must then replace only the parts whose text
 changed, and keep the cursor.
 
-*(proposal)* A program that gives only the new text, for example the watch
+A program that gives only the new text, for example the watch
 of the file, makes a change whose patches cover only the lines that differ,
 and inside them only the characters that differ; the line diff of the
 library `diff` finds them. A change of the file from outside has the origin
 `program` with the name `file`.
 
-*(proposal)* **Two changes at the same time.** When two sides change the
+**Two changes at the same time.** When two sides change the
 same text at the same time, for example the editor in a webview and the
 text editor of VS Code ([R-VSC-005](https://github.com/nimblescape/markdownnotes-vscode/blob/main/docs/requirements.md#r-vsc-005) of Markdown Notes), the function
 `mergeTexts` of `@nimblescape/markdowntext` merges the two changes: it keeps
@@ -73,7 +73,7 @@ file in YAML (between two lines `---`), in TOML (between two lines `+++`)
 and in JSON (an object at the start of the file). A plugin may add a further
 format.
 
-*(proposal)* The source must read the data of the front matter, change one
+The source must read the data of the front matter, change one
 value at a time so that the comments, the order and the quotes of the other
 keys stay ([R-FM-005](editor.md#r-fm-005)), and check the data against a
 JSON schema ([R-FM-004](editor.md#r-fm-004)), without a view. The form of

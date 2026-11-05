@@ -5,8 +5,7 @@
 // The GitHub alerts in the rendered text (docs/editor.md, R-EDIT-003): a block quote whose first paragraph starts with
 // `[!NOTE]`, `[!TIP]`, `[!IMPORTANT]`, `[!WARNING]` or `[!CAUTION]` shows as an alert of its kind, with the name of
 // the kind in place of the marker. The marker stays text of the document: when the cursor is in the first paragraph
-// of the alert, or in the mode to learn Markdown, the editor shows it as the file writes it, so that the user can
-// change it.
+// of the alert, the editor shows it as the file writes it, so that the user can change it.
 
 import type { Node } from '@tiptap/pm/model';
 import { Plugin, PluginKey, type EditorState } from '@tiptap/pm/state';
@@ -54,7 +53,7 @@ export function alertsOf(doc: Node): Alert[] {
 export const alertsKey = new PluginKey<Alert[]>('nsmdAlerts');
 
 /** decorationsOf returns the classes of the alerts, and the names of the kinds where the cursor is not at a marker. */
-function decorationsOf(state: EditorState, alerts: readonly Alert[], learn: boolean): DecorationSet {
+function decorationsOf(state: EditorState, alerts: readonly Alert[]): DecorationSet {
   const { $head } = state.selection;
   const decorations: Decoration[] = [];
   for (const alert of alerts) {
@@ -63,7 +62,7 @@ function decorationsOf(state: EditorState, alerts: readonly Alert[], learn: bool
     const atMarker = $head.parent.type.name === 'paragraph' && $head.start() === alert.from;
     decorations.push(
       Decoration.inline(alert.from, alert.to, {
-        class: atMarker || learn ? 'nsmd-alert-marker nsmd-alert-marker-raw' : 'nsmd-alert-marker',
+        class: atMarker ? 'nsmd-alert-marker nsmd-alert-marker-raw' : 'nsmd-alert-marker',
         'data-label': alertKinds[alert.kind],
       }),
     );
@@ -71,11 +70,8 @@ function decorationsOf(state: EditorState, alerts: readonly Alert[], learn: bool
   return DecorationSet.create(state.doc, decorations);
 }
 
-/**
- * alertsPlugin returns the plugin of the GitHub alerts.
- * @param isLearning - Returns true while the mode to learn Markdown is on, which shows the markers as text.
- */
-export function alertsPlugin(isLearning: (state: EditorState) => boolean): Plugin<Alert[]> {
+/** alertsPlugin returns the plugin of the GitHub alerts. */
+export function alertsPlugin(): Plugin<Alert[]> {
   return new Plugin<Alert[]>({
     key: alertsKey,
     state: {
@@ -85,7 +81,7 @@ export function alertsPlugin(isLearning: (state: EditorState) => boolean): Plugi
     props: {
       decorations(state) {
         const alerts = alertsKey.getState(state) ?? [];
-        return alerts.length > 0 ? decorationsOf(state, alerts, isLearning(state)) : undefined;
+        return alerts.length > 0 ? decorationsOf(state, alerts) : undefined;
       },
     },
   });

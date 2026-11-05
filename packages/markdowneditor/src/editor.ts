@@ -5,7 +5,7 @@
 // The editor of rendered Markdown (docs/specification.md, R-GEN-001; docs/editor.md, R-GEN-003, R-GEN-008): a Tiptap
 // editor with the extensions of the document, which reads and writes Markdown text with the codec of the editor, and
 // with the interaction of a document editor: the toolbar, the format bar, the insert menu, the slash commands, the
-// handles of the blocks, find and replace and the mode to learn Markdown. The text that the editor writes keeps each
+// handles of the blocks, and find and replace. The text that the editor writes keeps each
 // block that the user did not change as the file has it (R-EDIT-004). In read-only mode, the same editor is the view
 // of the text.
 //
@@ -92,10 +92,10 @@ export interface MarkdownEditorOptions extends InteractionOptions {
 
 /**
  * withPlugins returns the options of the interaction with the parts of the plugins: their items of the menus, their
- * buttons of the format bar, their marks of the mode to learn Markdown and their schema and inputs of the front matter.
+ * buttons of the format bar, and their schema and inputs of the front matter.
  * The options of the integrating code come first; the first schema wins.
  */
-function withPlugins(options: InteractionOptions, plugins: readonly MarkdownPlugin[], parts: PluginParts): InteractionOptions {
+function withPlugins(options: InteractionOptions, plugins: readonly MarkdownPlugin[]): InteractionOptions {
   if (plugins.length === 0) {
     return options;
   }
@@ -105,10 +105,6 @@ function withPlugins(options: InteractionOptions, plugins: readonly MarkdownPlug
     insertItems: (editor) => [...(options.insertItems?.(editor) ?? []), ...plugins.flatMap((plugin) => plugin.menus?.insert?.(editor) ?? [])],
     blockItems: (editor, block) => [...(options.blockItems?.(editor, block) ?? []), ...plugins.flatMap((plugin) => plugin.menus?.block?.(editor, block) ?? [])],
     tableItems: (editor, table) => [...(options.tableItems?.(editor, table) ?? []), ...plugins.flatMap((plugin) => plugin.menus?.table?.(editor, table) ?? [])],
-    learnMarks: {
-      marks: { ...parts.learnMarks.marks, ...options.learnMarks?.marks },
-      nodes: { ...parts.learnMarks.nodes, ...options.learnMarks?.nodes },
-    },
     frontMatterSchema: options.frontMatterSchema ?? plugins.find((plugin) => plugin.frontMatterSchema)?.frontMatterSchema,
     frontMatterInputs: [...(options.frontMatterInputs ?? []), ...plugins.flatMap((plugin) => plugin.frontMatterInputs ?? [])],
   };
@@ -173,7 +169,7 @@ export class MarkdownEditor implements PluginEditor {
     addStyles(plugins, element.ownerDocument, options.styleNonce);
     this.generated = new DocCache((doc) => validParts(doc, plugins.flatMap((plugin) => plugin.generated?.(doc) ?? [])));
     this.threads = new DocCache((doc) => threadEntries(plugins, doc));
-    this.interaction = new Interaction(element, withPlugins(options, plugins, this.parts));
+    this.interaction = new Interaction(element, withPlugins(options, plugins));
     this.tiptap = new Editor({
       element: this.interaction.box,
       extensions: [...(options.extensions ?? coreExtensions()), ...this.parts.extensions, this.pluginExtension(options), this.interaction.extension()],
@@ -667,19 +663,6 @@ export class MarkdownEditor implements PluginEditor {
    */
   setReadOnlyToggle(shown: boolean): void {
     this.interaction.setReadOnlyToggle(shown);
-  }
-
-  /** isLearning is true while the mode to learn Markdown is on (R-GEN-013). */
-  get isLearning(): boolean {
-    return this.interaction.isLearning;
-  }
-
-  /**
-   * setLearnMode switches the mode to learn Markdown on or off (R-GEN-013).
-   * @param on - true to show the Markdown marks beside the rendered text.
-   */
-  setLearnMode(on: boolean): void {
-    this.interaction.setLearnMode(on);
   }
 
   /**

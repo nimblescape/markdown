@@ -18,7 +18,10 @@ requirement marked *(proposal)* is not decided yet, and [section
 9](#9-open-questions) lists these open questions. Each requirement has an ID
 as its heading. The documentation [How the reflection tool
 works](reflection-guide.md) describes in detail how the reflection tool
-works ([R-REFL-020](#r-refl-020)).
+works ([R-REFL-020](#r-refl-020)). The
+[mockup](https://github.com/nimblescape/workreflection-vscode/tree/main/docs/mockup)
+in the repository of the reflection tool shows a design of its views with
+example data.
 
 ## 1. Scope
 
@@ -229,8 +232,9 @@ the output of automation and of AI without a check (Parasuraman & Manzey,
 origin of each episode ([R-HIST-001](history.md#r-hist-001)): for the user
 and for the AI, it gives the episodes, the time and the share of the final
 text of each class, for the whole document or set of files, and for each
-section or file. Changes with the origin "other program" or "probably AI"
-([R-VSC-004](history.md#r-vsc-004)) count apart until the user marks them.
+section or file. Changes with the origin "other program" count apart until
+the user marks them; changes with the mark "probably AI"
+([R-VSC-004](history.md#r-vsc-004)) count as changes of the AI.
 With the roles ([R-REFL-018](#r-refl-018)), it also gives the episodes that
 each party directed and judged. This shows which cognitive work the author
 moved to the AI, in the sense of cognitive offloading: an action that
@@ -274,7 +278,7 @@ and links to the documentation ([R-REFL-020](#r-refl-020)).
 The timeline follows the visualizations of the writing process in keystroke
 logging (Leijten & Van Waes, 2013), and the views as a whole follow the
 dashboards of learning analytics (Verbert et al., 2013). A click on a mark
-opens its episode in the history ([R-HIST-003](history.md#r-hist-003)). The
+opens its episode. The
 colors come from the theme ([R-THEME-001](platforms.md#r-theme-001)), and
 every view also tells the classes and the origins apart without color: about
 8% of men of European origin have a red-green color deficiency (Birch,
@@ -335,12 +339,12 @@ with its history: a written text, a paper of Paper, or a programming
 assignment. The plugin reads the history that the student submits with the
 assignment, applies the rules of the course, and gives the analysis, the
 views and the declaration of [R-REFL-009](#r-refl-009) for each assignment.
-The student sees the same analysis as the teacher. *(proposal)* A teacher
-evaluates all assignments of a course in one run, on the command line or on
-a server. The context of an assignment ([R-REFL-021](#r-refl-021)) may state
-the level of AI use that the assignment allows, after the AI Assessment
-Scale (Perkins et al., 2024), and the reflection tool shows the work beside
-this level. *(proposal)* The context of an assignment may name its learning
+The student sees the same analysis as the teacher. An assignment states no
+level of AI use that it allows, because no concrete level can say which use
+of AI is allowed and which is not. *(proposal)* A teacher evaluates all
+assignments of a course in one run, on the command line or on a server.
+*(proposal)* The context of an assignment ([R-REFL-021](#r-refl-021)) may
+name its learning
 objectives, each with the level that it aims at on the scale of the
 cognitive process ([R-REFL-003](#r-refl-003)), and the parts of the work
 that serve each objective, for example the requirements of its README. The
@@ -403,8 +407,8 @@ every platform:
   the tasks of a work, for example an assignment or a paper, each with the
   parts of the work that belong to it, for example files, sections or
   requirements; the learning objectives with the level that each aims at
-  ([R-REFL-003](#r-refl-003)) and the parts that serve each; the level of AI
-  use that a task allows and the goals ([R-REFL-014](#r-refl-014)); and
+  ([R-REFL-003](#r-refl-003)) and the parts that serve each; the goals
+  ([R-REFL-014](#r-refl-014)); and
   examples of the levels for the rules of the classifier
   ([R-REFL-004](#r-refl-004)). Each field may be missing. Without an
   adapter, the reflection tool works on the history alone.
@@ -412,7 +416,7 @@ every platform:
   and gives their context in this form. The adapter belongs to the product
   of that kind of work, and never to the history. For example, the course
   module reads the README files of a course and of its assignments
-  ([R-COURSE-011](course.md#r-course-011)), and Markdown Paper gives the
+  ([R-COURSE-011](https://github.com/nimblescape/course-vscode/blob/main/docs/requirements.md#r-course-011)), and Markdown Paper gives the
   chapters of a paper as its parts.
 - *Platforms:* in VS Code, an adapter is an extension that registers with
   the API of the reflection extension ([R-REFL-017](#r-refl-017)); on the
@@ -484,7 +488,7 @@ result; *new* combines established work in a new way and needs the check of
 | [R-REFL-011](#r-refl-011) Formative feedback | Hattie & Timperley (2007); Zimmerman (2002); Verbert et al. (2013); Matcha et al. (2020) | Established theories; the effect of the views is a hypothesis |
 | [R-REFL-012](#r-refl-012) Indicators | The column "Basis" of its table | Hypothesis |
 | [R-REFL-013](#r-refl-013) Limits of the indicators | Gašević et al. (2015) | Established position |
-| [R-REFL-014](#r-refl-014) Assignments | Perkins et al. (2024); Draxler et al. (2024); Krathwohl (2002) | Established framework and taxonomy, and a finding |
+| [R-REFL-014](#r-refl-014) Assignments | Draxler et al. (2024); Krathwohl (2002) | Established taxonomy and a finding |
 | [R-REFL-015](#r-refl-015) Data of the students | Slade & Prinsloo (2013); Drachsler & Greller (2016) | Established frameworks |
 | [R-REFL-016](#r-refl-016), [R-REFL-017](#r-refl-017) API and package | None: technical decisions | Not applicable |
 | [R-REFL-021](#r-refl-021) Adapters for the context | None: technical decisions | Not applicable |
@@ -576,11 +580,6 @@ result; *new* combines established work in a new way and needs the check of
   types and levels of human interaction with automation. *IEEE Transactions
   on Systems, Man, and Cybernetics – Part A: Systems and Humans, 30*(3),
   286–297. <https://doi.org/10.1109/3468.844354>
-- Perkins, M., Furze, L., Roe, J., & MacVaugh, J. (2024). The Artificial
-  Intelligence Assessment Scale (AIAS): A framework for ethical integration
-  of generative AI in educational assessment. *Journal of University
-  Teaching and Learning Practice, 21*(6).
-  <https://doi.org/10.53761/q3azde36>
 - Risko, E. F., & Gilbert, S. J. (2016). Cognitive offloading. *Trends in
   Cognitive Sciences, 20*(9), 676–688.
   <https://doi.org/10.1016/j.tics.2016.07.002>

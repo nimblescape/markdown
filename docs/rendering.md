@@ -26,7 +26,7 @@ content without edit functions: HTML, with a view for each kind of token. It
 must use markdown-it 14, the version of the Markdown preview of VS Code,
 with footnotes and task lists.
 
-*(proposal)* The renderer is the package `@nimblescape/markdownrender`. It
+The renderer is the package `@nimblescape/markdownrender`. It
 writes the HTML that GitHub writes where GitHub has one: a block quote whose
 first line is the marker of an alert, such as `> [!NOTE]`, becomes
 `<div class="markdown-alert markdown-alert-note">` with the title
@@ -41,24 +41,41 @@ cell and the widths of the columns. The styles of rendered content
 (`content.css`) are the same for a rendering and for the text of the editor
 ([R-GEN-010](specification.md#r-gen-010)).
 
-*(proposal)* **Raw HTML.** The renderer has no sanitizer. By default, raw
-HTML of the file shows safely: comments do not show; the elements of a fixed
+**Raw HTML.** The renderer has no sanitizer and no dependency for raw HTML.
+Raw HTML of the file shows safely: comments do not show; the elements of a fixed
 list without attributes (for example `ins`, `sub`, `sup`, `kbd`, `br`,
 `details` and `summary`), the anchors `<a id="…">` and `<a name="…">`, and
 the check boxes of task lists show as HTML; any other raw HTML shows as its
 text. An end tag shows as HTML only when it closes the last element that the
 raw HTML opened, and the rendering closes the elements that the raw HTML of
 a paragraph or of the whole text leaves open. No raw HTML of the file can
-run a script or load a resource. The integrating code may choose that raw
-HTML shows as its text, as in the editor, or as the file writes it, for a
-text that it trusts.
+run a script or load a resource. The list is fixed: a layout cannot add
+elements or attributes to it, because a layout can come from a third party.
+The integrating code may choose that raw HTML shows as its text, as in the
+editor.
+
+**Syntax colors.** The renderer gives code blocks the syntax colors of the
+editor ([R-EDIT-003](editor.md#r-edit-003)), with the same languages and the
+same variables `--nsmd-syntax-*`, so that the view "Pages" and the PDF show
+them. A layout that wants code without colors sets these variables to the
+color of the text.
+
+The languages are the common languages of highlight.js, in one
+list for the renderer and the editor; a code block without a language, or
+with another language, has no colors. Each line of the code ends the
+elements of its colors, so that the number of a line of a listing stands in
+no element of a color and a page breaks a code block between whole lines.
+The page of a layout has the rules of the colors, with the colors of the
+light theme of the editor as the defaults of the variables. The integrating
+code may switch the colors off (the option `syntaxColors: false`), and a
+plugin that sets the function `highlight` of markdown-it keeps its own.
 
 ### R-REN-003
 
 **The renderer without the editor.** The renderer must run without the
 editor, so that the command line needs no editor code.
 
-*(proposal)* `toHtml(text)` returns the HTML without a page, with the tokens
+`toHtml(text)` returns the HTML without a page, with the tokens
 that plugins show in a page; `render(text, element)` shows the rendering in
 an element of a page and runs the functions of the plugins. The package
 needs no code of the editor, of Tiptap or of ProseMirror.
@@ -75,7 +92,7 @@ markdown-it plugin, or a function `render(source, element)`. Examples:
 diagrams of PlantUML and Mermaid, math, GitHub alerts, syntax colors for
 source code, and the removal of the notes from the output.
 
-*(proposal)* A plugin of the renderer is the object `{ name, apiVersion: 1,
+A plugin of the renderer is the object `{ name, apiVersion: 1,
 extendMarkdownIt?, styles?, render? }`, the level "render" of the plugin
 object of the editor ([R-PLUGIN-001](plugins.md#r-plugin-001)), so that the
 same object works in the renderer and in the editor. `render` maps the type
@@ -95,18 +112,19 @@ tables, the generated lists (table of contents, lists of figures, tables and
 listings, the reference list), pages and PDF. Layouts are content, for
 example the layout `plain` and the layouts of PHT. Each layout has a JSON
 schema of the front matter of its documents
-([R-FM-004](editor.md#r-fm-004)).
+([R-FM-004](editor.md#r-fm-004)). A layout may hold this schema as a file:
+`layout.json` names it in the field `frontMatterSchema` (version 1.1.0 of
+the layout folder format), the layout gets its fields from the schema when
+`layout.json` gives none, and a layout without the file gets the schema of
+its fields.
 
-*(proposal)* The layout part is the package `@nimblescape/markdownlayout`. A
+The layout part is the package `@nimblescape/markdownlayout`. A
 layout is a folder with `layout.json` in the layout folder format
 `nimblescape-layout` of Markdown Paper, version 1.1.0: its style sheets, the
 templates of its fixed pages, its fields, its language and its rules for
-headings, contents, hyphens, listings and the name of the PDF. Version 1.1.0
-adds the field `frontMatterSchema`, the file of the JSON schema of the front
-matter in the layout folder; the layout gets its fields from the schema when
-`layout.json` gives none, and a layout without the file gets the schema of
-its fields. The package reads the layouts of the format 1.0.0 of Paper
-without a change. A document names its layout with the field `layout` of
+headings, contents, hyphens, listings and the name of the PDF, and the
+file of its schema. The package reads the layouts of the format 1.0.0 of
+Paper without a change. A document names its layout with the field `layout` of
 its front matter: the folder `layouts/<name>/` in the folder of the document
 or in a folder above it, up to the top folder of the search; a layout that
 the integrating code finds, for a name with `/`, for example a layout on
@@ -117,7 +135,13 @@ JSON fill the templates, and the field `lang` gives the layout its language.
 The page of a document is one HTML page with the style sheets of the layout,
 the fields as CSS variables and attributes, the filled templates, the text
 and the scripts; it lets only its own scripts run, and a template holds no
-script.
+script. Because a layout can come from a third party and its templates hold
+the fields of the front matter, the page loads nothing from the internet:
+its images, fonts and style sheets come only from the folders that the
+integrating code allows, such as the workspace, the layout and the
+extension, and no form of the page can send data. An image of a document
+from the internet does not show in the pages and in the PDF; the author
+saves it in the workspace.
 
 ### R-LAYOUT-004
 
@@ -125,7 +149,7 @@ script.
 Markdown Paper: Paper adds only its own parts to the layout, through its
 plugins ([R-PAPER-001](plugins.md#r-paper-001)).
 
-*(proposal)* The layout is a plugin of the renderer
+The layout is a plugin of the renderer
 ([R-REN-002](#r-ren-002)) whose rule works only in a rendering with a
 layout, so that the same renderer renders a text with and without a layout.
 In a rendering with a layout, each footnote goes to the foot of the page of
@@ -154,7 +178,7 @@ Paper, which writes the cite after the caption.
 view, so that the view and the PDF never differ
 ([R-GEN-010](specification.md#r-gen-010)).
 
-*(proposal)* **The PDF.** The entry point `@nimblescape/markdownlayout/pdf`
+**The PDF.** The entry point `@nimblescape/markdownlayout/pdf`
 makes the PDF in Node.js, for example on the command line and in the
 extension host of VS Code on the desktop. The page of the PDF is the page of
 the view of the pages, with the files of the disk: an installed browser
@@ -168,7 +192,7 @@ so that search and copy find whole words, and gets the title, the author,
 the subtitle as its subject and the language of the layout in its metadata.
 The code is the PDF code of nimblescape Markdown Paper.
 
-*(proposal)* **The functions of the plugins in the PDF.** In the page of the
+**The functions of the plugins in the PDF.** In the page of the
 PDF, no integrating code fills the placeholders of the plugins, as the view
 of the pages does. So the page holds the data of its placeholders as JSON,
 and a script of the page registers the functions of the plugins
@@ -180,12 +204,13 @@ token, with the methods `attrIndex` and `attrGet`.
 
 ### R-LAYOUT-003
 
-*(proposal)* **Pages.** The page engine is Paged.js. A button switches the
-editor between "Edit" and "Pages"; in "Pages", the highlights of the notes
-and "Add Note" work, and a double click on a page goes to that place in
-"Edit".
+**Pages.** A button must switch the editor between "Edit" and "Pages".
+"Pages" shows the pages of the layout; the text cannot be edited there, but
+the highlights of the notes and "Add Note" work, and a double click on a
+page goes to that place in "Edit". The page engine is
+Paged.js.
 
-*(proposal)* The view of the pages shows the page of the document in a
+The view of the pages shows the page of the document in a
 frame, so that the style sheets of the layout change only the frame. The
 page holds Paged.js until the functions of the plugins have shown their
 tokens in the frame; Paged.js then starts when the page has not changed for
@@ -195,7 +220,7 @@ waits for it. On a screen, the pages
 stand on a grey background with a gap between them; the PDF has no screen
 styles.
 
-*(proposal)* **The pages follow the text.** While "Pages" shows, the pages
+**The pages follow the text.** While "Pages" shows, the pages
 show again 600 ms after the last change of the text, at the same place of
 the frame; hidden pages make no new pages until they show again. A double
 click on a block of the pages switches to "Edit" and puts the cursor at the
@@ -209,24 +234,7 @@ folders of the extension ([R-VSC-007](https://github.com/nimblescape/markdownnot
 
 ## 5. Open questions
 
-1. Pages: the switch between "Edit" and "Pages"
-   ([R-LAYOUT-003](#r-layout-003), proposal)?
-2. Schema of a layout: the file of the schema in the layout folder, for
-   example `frontmatter.schema.json`, named in the field
-   `frontMatterSchema` of `layout.json`, gives the fields when `layout.json`
-   has none (format 1.1.0, [R-LAYOUT-001](#r-layout-001), proposal)?
-3. Raw HTML in a rendering: the safe way with a fixed list of elements by
-   default ([R-REN-001](#r-ren-001), proposal), or a sanitizer library, whose
-   license needs a decision ([R-GEN-011](specification.md#r-gen-011))?
-4. The functions of the plugins in the PDF: a script of the page that the
-   integrating code bundles with the same plugins as its renderer, whose
-   functions get a copy of the data of their tokens
-   ([R-LAYOUT-002](#r-layout-002), proposal)?
-5. Syntax colors: does the renderer also give the syntax colors of code
-   blocks of the editor ([R-EDIT-003](editor.md#r-edit-003)), so that the
-   view "Pages" and the PDF show them, and a layout that wants code without
-   colors sets the variables `--nsmd-syntax-*` to the color of the text
-   (proposal: yes)?
+No question is open.
 
 ---
 

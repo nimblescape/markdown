@@ -3,9 +3,9 @@
 // © 2026 Hannes Stauss (scalarion@nimblescape.com)
 // Licensed under the MIT License. See LICENSE in the repository root for details.
 
-// The tests of the interaction of the editor (docs/editor.md, R-GEN-003, R-EDIT-007, R-GEN-008, R-GEN-013): the slash
-// commands, find and replace, the moves of blocks, the insert items, the link, the GitHub alerts, read-only mode and
-// the mode to learn Markdown. Each test drives the editor through its commands and checks the Markdown that it writes.
+// The tests of the interaction of the editor (docs/editor.md, R-GEN-003, R-EDIT-007, R-GEN-008): the slash commands,
+// find and replace, the moves of blocks, the insert items, the link, the GitHub alerts and read-only mode. Each test
+// drives the editor through its commands and checks the Markdown that it writes.
 
 import { TextSelection } from '@tiptap/pm/state';
 import type { EditorView } from '@tiptap/pm/view';
@@ -203,10 +203,9 @@ describe('the toolbar and read-only mode', () => {
     open('Text\n', { toolbar: false });
     expect(element.querySelector('.nsmd-toolbar')).toBeNull();
     editor?.destroy();
-    open('Text\n', { readOnlyToggle: false, learnToggle: false });
+    open('Text\n', { readOnlyToggle: false });
     expect(element.querySelector('.nsmd-toolbar')).not.toBeNull();
     expect(element.querySelector('.nsmd-toolbar button[aria-label="Switch to read-only mode"]')).toBeNull();
-    expect(element.querySelector('.nsmd-toolbar button[aria-label="Show the Markdown marks"]')).toBeNull();
   });
 
   it('adds the buttons of extensions to the format bar', () => {
@@ -226,32 +225,5 @@ describe('the toolbar and read-only mode', () => {
     applies = true;
     select(opened, 1, 6);
     expect(button().hidden).toBe(false);
-  });
-});
-
-describe('the mode to learn Markdown', () => {
-  const text = '# Head\n\nSome __bold__, <ins>under</ins> and [a](https://x.y "t") `c`.\n\n- [ ] task\n\n> quote\n\n```js\nx\n```\n';
-  const marks = (): string[] => [...element.querySelectorAll('.nsmd-learn-mark')].map((mark) => mark.textContent ?? '');
-
-  it('shows the marks of the file beside the rendered text, without a change of the text', () => {
-    const opened = open(text, { learnMode: true });
-    expect(marks()).toEqual(['# ', '__', '__', '<ins>', '</ins>', '[', '](https://x.y "t")', '`', '`', '- [ ] ', '> ', '```js', '```']);
-    expect(opened.getMarkdown()).toBe(text);
-  });
-
-  it('switches on and off and stays on for a new text', () => {
-    const opened = open(text);
-    expect(marks()).toEqual([]);
-    opened.setLearnMode(true);
-    expect(opened.isLearning).toBe(true);
-    opened.setMarkdown('## Two\n');
-    expect(marks()).toEqual(['## ']);
-    opened.setLearnMode(false);
-    expect(marks()).toEqual([]);
-  });
-
-  it('shows the marker of a GitHub alert as text', () => {
-    open('> [!NOTE]\n> Text.\n', { learnMode: true });
-    expect(element.querySelector('.nsmd-alert-marker')?.classList.contains('nsmd-alert-marker-raw')).toBe(true);
   });
 });

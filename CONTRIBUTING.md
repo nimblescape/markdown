@@ -10,7 +10,7 @@ This guide explains the files, the development, the tests and the use of the
 npm packages of nimblescape Markdown before their release.
 [docs/specification.md](docs/specification.md) is the normative
 specification: what the libraries must, should and may do, each requirement
-with an ID, the open questions and the plan of the steps. It gives the scope
+with an ID, and the open questions. It gives the scope
 and the architecture, and its section "Documents" lists the documents of
 the parts, for example [docs/editor.md](docs/editor.md),
 [docs/history.md](docs/history.md) and, for the reflection tool, which
@@ -42,7 +42,8 @@ same pull request.
 | `packages/markdownrender/src/renderer.ts` | `MarkdownRenderer`: the text of a file as HTML without a page (`toHtml`), and in a page with the functions of the plugins (`render`, `fill`) ([R-REN-001](docs/rendering.md#r-ren-001), [R-REN-003](docs/rendering.md#r-ren-003)). |
 | `packages/markdownrender/src/markdownIt.ts` | The markdown-it of nimblescape Markdown, for the renderer and the editor: HTML, links in the text, footnotes and task lists, and the markdown-it plugins of the plugins. |
 | `packages/markdownrender/src/output.ts` | The output as GitHub writes it: GitHub alerts, the IDs of the headings, the comments of the tables and the lines of the blocks. |
-| `packages/markdownrender/src/rawHtml.ts` | The raw HTML of the file in the rendering: `safe`, `text` or `trusted`. |
+| `packages/markdownrender/src/syntax.ts` | The syntax colors of code blocks with highlight.js: the languages, which the editor gives to lowlight, and the colors of the code of a block, each line on its own ([R-REN-001](docs/rendering.md#r-ren-001)). |
+| `packages/markdownrender/src/rawHtml.ts` | The raw HTML of the file in the rendering: `safe` (the fixed list), `text`, or `trusted` only for the test against the CommonMark specification. |
 | `packages/markdownrender/src/plugins.ts` | The plugins of the renderer ([R-REN-002](docs/rendering.md#r-ren-002)), the level "render" of the plugins of the editor: their check, their parts and their styles. |
 | `packages/markdownrender/src/styles/content.css` | The styles of rendered content, for a rendering and for the text of the editor, with the tokens `--nsmd-*` of the theme ([R-GEN-010](docs/specification.md#r-gen-010), [R-THEME-001](docs/platforms.md#r-theme-001)). |
 | `packages/markdownrender/src/types/` | The types of the markdown-it plugins without types of their own. |
@@ -58,7 +59,7 @@ same pull request.
 | `packages/markdownlayout/src/pdf/` | The entry point `@nimblescape/markdownlayout/pdf` for Node.js: the search for an installed browser, the connection to it through the Chrome DevTools Protocol, the print of the page, the finish of the PDF with `pdf-lib`, and the host of the disk ([R-LAYOUT-002](docs/rendering.md#r-layout-002)). The code is the PDF code of Markdown Paper. |
 | `packages/markdownlayout/src/builtin.ts`, `packages/markdownlayout/layouts/plain/` | The built-in layout `plain`, whose files the package holds as texts. |
 | `packages/markdowneditor/src/index.ts` | The exports of `@nimblescape/markdowneditor`, the editor. |
-| `packages/markdowneditor/src/editor.ts` | `MarkdownEditor`: the editor on a DOM element, with its Markdown text in and out, the read-only mode ([R-GEN-008](docs/editor.md#r-gen-008)), the mode to learn Markdown ([R-GEN-013](docs/editor.md#r-gen-013)) and the event of a change. |
+| `packages/markdowneditor/src/editor.ts` | `MarkdownEditor`: the editor on a DOM element, with its Markdown text in and out, the read-only mode ([R-GEN-008](docs/editor.md#r-gen-008)) and the event of a change. |
 | `packages/markdowneditor/src/ui/proposals.ts` | The proposed changes as tracked changes: the proposals in the state of the editor, the removed text struck through, the new text and the buttons "Accept" and "Reject" ([R-AI-006](docs/ai.md#r-ai-006)). |
 | `packages/markdowneditor/src/extensions/core.ts` | The Tiptap extensions of the document: the nodes and marks of CommonMark and GFM, footnotes, the front matter, which stays the first block, and the raw nodes for HTML and for text that no block of Markdown holds. Attributes that record the form of the Markdown text, such as the bullet of a list, let a changed block keep its form. |
 | `packages/markdowneditor/src/markdown/parse.ts` | The Markdown text into the document of the editor, by the tokens of markdown-it and `prosemirror-markdown`. It keeps the text of each top-level block and the blank lines between the blocks. |
@@ -72,7 +73,6 @@ same pull request.
 | `packages/markdowneditor/src/ui/menu.ts`, `packages/markdowneditor/src/ui/items.ts`, `packages/markdowneditor/src/ui/slash.ts` | The menu of the editor, the items of the insert menu "+", of the slash commands and of the text styles, and the plugin of the slash commands. |
 | `packages/markdowneditor/src/ui/blockHandle.ts` | The "+" and the handle beside the block under the mouse: insert, drag and drop, move up and down, duplicate, delete. |
 | `packages/markdowneditor/src/ui/find.ts`, `packages/markdowneditor/src/ui/findBar.ts` | The plugin and the bar of find and replace. |
-| `packages/markdowneditor/src/ui/learnMode.ts` | The mode to learn Markdown: the marks of the file beside the rendered text, as widgets that are not text of the document. |
 | `packages/markdowneditor/src/ui/frontMatterForm.ts` | The form of the front matter ([R-FM-001](docs/editor.md#r-fm-001) to [R-FM-006](docs/editor.md#r-fm-006)): fixed keys and the edit of the keys, the problems of the schema, the inputs of plugins, and the text of a front matter that does not parse. |
 | `packages/markdowneditor/src/ui/alerts.ts` | The GitHub alerts, `> [!NOTE]`, with the name of their kind in place of the marker. |
 | `packages/markdowneditor/src/ui/table/grid.ts` | The commands of the tables ([R-EDIT-009](docs/editor.md#r-edit-009)): insert, move, delete, sort, align and color rows, columns and cells, and the widths of the columns. |

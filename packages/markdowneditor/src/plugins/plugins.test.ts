@@ -412,7 +412,6 @@ function mentions(): MarkdownPlugin {
     ],
     fromMarkdown: { mention: { node: 'mention', getAttrs: (token) => ({ name: (token.meta as { name: string }).name }) } },
     toMarkdown: { nodes: { mention: (state, node) => state.write(`@${node.attrs.name as string}`) } },
-    learnMarks: { nodes: { mention: () => '@' } },
     commands: {
       mention: (editor, name) => editor.tiptap.chain().insertContent({ type: 'mention', attrs: { name: String(name) } }).run(),
     },
