@@ -4,8 +4,8 @@
 
 // The form of the front matter (docs/editor.md, R-FM-001 to R-FM-006): the editor shows the front matter of a file as
 // a form, for YAML, TOML and JSON. In the mode with fixed keys (R-FM-002), the user changes only values, and only
-// where the schema allows it; in the mode to edit the keys (R-FM-003), the user also adds, renames and removes keys,
-// lists and groups. A button switches between the modes; a file with a schema opens with fixed keys, a file without a
+// where the schema allows it; in the mode to edit the keys (R-FM-003), the user also adds keys, lists and groups, and
+// renames and removes the keys that the schema does not name. A button switches between the modes; a file with a schema opens with fixed keys, a file without a
 // schema opens in the mode to edit the keys. Each change of a value is one step of undo and changes only the text of
 // that value (R-FM-005). A plugin may show the value of a key with an input of its own, which is read-only (R-FM-006).
 // A front matter that does not parse shows its text with the problem, and the user edits the text.
@@ -341,9 +341,10 @@ export class FrontMatterForm implements NodeView {
     }
     if (parsed && this.editable) {
       const edit = this.currentMode === 'edit';
+      const title = edit ? 'Fix the keys' : this.host.schema() === undefined ? 'Add, rename and remove keys' : 'Add keys, and rename and remove the keys that the schema does not name';
       const button = element(
         'button',
-        { type: 'button', class: 'nsmd-fm-mode', 'aria-pressed': String(edit), 'data-focus': 'mode', title: edit ? 'Fix the keys' : 'Add, rename and remove keys' },
+        { type: 'button', class: 'nsmd-fm-mode', 'aria-pressed': String(edit), 'data-focus': 'mode', title },
         icon('edit'),
         'Edit keys',
       );
@@ -407,11 +408,15 @@ export class FrontMatterForm implements NodeView {
     return box;
   }
 
-  /** fieldView returns the row of a key: its name, its input, its problems and, in the edit of the keys, its buttons. */
+  /**
+   * fieldView returns the row of a key: its name, its input, its problems and, in the edit of the keys, its buttons. A
+   * key that the schema names stays in both modes: the user renames and removes only the other keys (R-FM-003).
+   */
   private fieldView(field: Field, parent: JsonSchemaObject | undefined): HTMLElement {
     const name = String(field.path[field.path.length - 1]);
     const id = `nsmd-fm-${++this.ids}`;
-    const editKeys = this.editable && this.currentMode === 'edit' && field.present && field.schema?.readOnly !== true;
+    const ofSchema = parent?.properties !== undefined && Object.hasOwn(parent.properties, name);
+    const editKeys = this.editable && this.currentMode === 'edit' && field.present && !ofSchema && field.schema?.readOnly !== true;
     const required = parent?.required?.includes(name) ?? false;
     const row = element('div', { class: 'nsmd-fm-field', 'data-path': keyOf(field.path) });
     const label = editKeys

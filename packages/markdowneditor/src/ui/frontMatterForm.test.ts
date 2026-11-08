@@ -161,6 +161,30 @@ describe('the form of the front matter', () => {
     expect(opened.getMarkdown()).toBe('---\nb: 1\nlist:\n  - x\n---\n');
   });
 
+  it('keeps the keys of the schema in the mode to edit the keys: only the other keys get a new name or go', async () => {
+    const nested: JsonSchema = { ...schema, properties: { ...schema.properties, place: { type: 'object', properties: { city: { type: 'string' } } } } };
+    const opened = open("---\ntitle: 'Old'\nextra: x\nplace:\n  city: Wien\n  room: 3\n---\n", { frontMatterSchema: nested });
+    click('.nsmd-fm-mode');
+    for (const path of [['title'], ['place'], ['place', 'city']]) {
+      expect(form().querySelector(`[data-focus='key ${JSON.stringify(path)}']`)).toBeNull();
+      expect(form().querySelector(`[data-focus='remove ${JSON.stringify(path)}']`)).toBeNull();
+    }
+    expect(field(['title'])?.querySelector('.nsmd-fm-key')?.textContent).toBe('Title *');
+    // The value of a key of the schema still changes.
+    change(input(['title']), '');
+    await settle();
+    expect(opened.getMarkdown()).toBe("---\ntitle: ''\nextra: x\nplace:\n  city: Wien\n  room: 3\n---\n");
+    // The keys that the schema does not name get a new name and go, also in a map of the schema.
+    change(form().querySelector<HTMLInputElement>(`[data-focus='key ${JSON.stringify(['extra'])}']`) as HTMLInputElement, 'more');
+    await settle();
+    click(`[data-focus='remove ${JSON.stringify(['place', 'room'])}']`);
+    await settle();
+    expect(opened.getMarkdown()).toBe("---\ntitle: ''\nmore: x\nplace:\n  city: Wien\n---\n");
+    click(`[data-focus='remove ${JSON.stringify(['more'])}']`);
+    await settle();
+    expect(opened.getMarkdown()).toBe("---\ntitle: ''\nplace:\n  city: Wien\n---\n");
+  });
+
   it('switches between the modes with its button', async () => {
     open(text, { frontMatterSchema: schema });
     click('.nsmd-fm-mode');

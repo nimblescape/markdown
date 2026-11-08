@@ -271,10 +271,13 @@ marks `readOnly` stays read-only in both modes.
 
 ### R-FM-003
 
-**Edit mode of the form.** In the edit mode, the user also adds and removes
-keys and structured values, such as lists and maps, also nested. A button
+**Edit mode of the form.** In the edit mode, the user also adds keys and
+structured values, such as lists and maps, also nested, and renames and
+removes them. A key that the schema names stays in both modes: the user
+changes its value, but does not rename or remove it; only the other keys
+of the file, also in a map of the schema, get a new name or go. A button
 switches between the modes. A file without a schema opens in
-the edit mode. The user also renames keys. A new key gets one of the kinds
+the edit mode. A new key gets one of the kinds
 text, number, yes or no, list, or group of keys.
 
 ### R-FM-004
