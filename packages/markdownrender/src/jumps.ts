@@ -195,6 +195,106 @@ export function vscodeJumpKeysOf(rules: readonly VsCodeKeybinding[]): JumpKeys {
   return { back, forward };
 }
 
+/**
+ * withoutComments returns a text of JSON with comments (JSONC) without its comments and without the commas before a
+ * closing bracket, and keeps the strings as they are.
+ * @param text - The text.
+ */
+function withoutComments(text: string): string {
+  let plain = '';
+  for (let index = 0; index < text.length; index++) {
+    const character = text[index];
+    if (character === '"') {
+      let end = index + 1;
+      while (end < text.length && text[end] !== '"') {
+        end += text[end] === '\\' ? 2 : 1;
+      }
+      plain += text.slice(index, end + 1);
+      index = end;
+    } else if (character === '/' && text[index + 1] === '/') {
+      const end = text.indexOf('\n', index);
+      index = end < 0 ? text.length : end - 1;
+    } else if (character === '/' && text[index + 1] === '*') {
+      const end = text.indexOf('*/', index + 2);
+      index = end < 0 ? text.length : end + 1;
+    } else {
+      plain += character;
+    }
+  }
+  let result = '';
+  for (let index = 0; index < plain.length; index++) {
+    const character = plain[index];
+    if (character === '"') {
+      let end = index + 1;
+      while (end < plain.length && plain[end] !== '"') {
+        end += plain[end] === '\\' ? 2 : 1;
+      }
+      result += plain.slice(index, end + 1);
+      index = end;
+    } else if (character === ',') {
+      let next = index + 1;
+      while (next < plain.length && /\s/.test(plain[next])) {
+        next++;
+      }
+      if (plain[next] !== ']' && plain[next] !== '}') {
+        result += character;
+      }
+    } else {
+      result += character;
+    }
+  }
+  return result;
+}
+
+/**
+ * vscodeKeybindingRules returns the rules of a file of the keyboard shortcuts of VS Code, such as keybindings.json of
+ * the user or the default keyboard shortcuts, as JSON with comments; a text that is no list of rules gives no rules.
+ * @param text - The text of the file.
+ */
+export function vscodeKeybindingRules(text: string): VsCodeKeybinding[] {
+  try {
+    const value: unknown = JSON.parse(withoutComments(text.replace(/^\uFEFF/, '')));
+    return Array.isArray(value) ? value.filter((rule): rule is VsCodeKeybinding => typeof rule === 'object' && rule !== null) : [];
+  } catch {
+    return [];
+  }
+}
+
+/** jumpKeysAttribute is the attribute of the element of a rendered page that gives the keys of Go Back and Go Forward. */
+export const jumpKeysAttribute = 'data-nimblescape-jump-keys';
+
+/**
+ * jumpKeysHtml returns a hidden element of HTML with the keys of Go Back and Go Forward, which a renderer adds to a
+ * page, for example a plugin of markdown-it of the Markdown preview of VS Code, whose scripts get the keys only from
+ * the page; pageJumpKeys reads them.
+ * @param keys - The keys.
+ */
+export function jumpKeysHtml(keys: JumpKeys): string {
+  const value = JSON.stringify({ back: keys.back, forward: keys.forward }).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return `<div ${jumpKeysAttribute}="${value}" hidden></div>\n`;
+}
+
+/**
+ * pageJumpKeys returns the keys of Go Back and Go Forward of the first element of a page with them (jumpKeysHtml), or
+ * undefined without one.
+ * @param doc - The document of the page.
+ */
+export function pageJumpKeys(doc: Pick<Document, 'querySelector'>): JumpKeys | undefined {
+  const value = doc.querySelector(`[${jumpKeysAttribute}]`)?.getAttribute(jumpKeysAttribute);
+  if (!value) {
+    return undefined;
+  }
+  try {
+    const keys = JSON.parse(value) as { back?: unknown; forward?: unknown };
+    const strings = (list: unknown): string[] | undefined => (Array.isArray(list) && list.every((each) => typeof each === 'string') ? (list as string[]) : undefined);
+    const back = strings(keys.back);
+    const forward = strings(keys.forward);
+    return back && forward ? { back, forward } : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 /** KeyEvent is the part of a keyboard event that the keys compare. */
 export type KeyEvent = Pick<KeyboardEvent, 'key' | 'code' | 'ctrlKey' | 'altKey' | 'shiftKey' | 'metaKey'>;
 

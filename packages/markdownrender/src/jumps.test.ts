@@ -9,7 +9,20 @@
 // set of jumps for two scripts.
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { type JumpKeys, installPageJumps, keyLabel, matchesKey, type PageJumps, platformOf, vscodeJumpKeys, vscodeJumpKeysOf, vscodeKey } from './jumps';
+import {
+  installPageJumps,
+  type JumpKeys,
+  jumpKeysHtml,
+  keyLabel,
+  matchesKey,
+  type PageJumps,
+  pageJumpKeys,
+  platformOf,
+  vscodeJumpKeys,
+  vscodeJumpKeysOf,
+  vscodeKey,
+  vscodeKeybindingRules,
+} from './jumps';
 
 const key = (init: KeyboardEventInit) => new KeyboardEvent('keydown', { bubbles: true, cancelable: true, ...init });
 
@@ -87,6 +100,39 @@ describe('the keys', () => {
     expect(vscodeJumpKeysOf([...defaults, ...user])).toEqual<JumpKeys>({ back: ['BrowserBack', 'Alt-Meta-ArrowLeft'], forward: ['Alt-Meta-ArrowRight'] });
     expect(vscodeJumpKeysOf([...defaults, { command: '-workbench.action.navigateBack' }])).toEqual<JumpKeys>({ back: [], forward: ['Ctrl-Shift--'] });
     expect(vscodeJumpKeysOf([{ key: 3, command: 'workbench.action.navigateBack' }, { command: 4 }, {}])).toEqual<JumpKeys>({ back: [], forward: [] });
+  });
+
+  it('read the rules of a file of the keyboard shortcuts, as JSON with comments and commas at the end', () => {
+    const text = [
+      '\uFEFF// Place your key bindings in this file',
+      '[',
+      '  { "key": "cmd+alt+left", "command": "workbench.action.navigateBack" }, /* a comment */',
+      '  { "key": "ctrl+/", "command": "x", "when": "a // b, ]" },',
+      '  // { "key": "ctrl+alt+-", "command": "-workbench.action.navigateBack" },',
+      '  { "key": "ctrl+\\"", "command": "y", },',
+      ']',
+    ].join('\n');
+    expect(vscodeKeybindingRules(text)).toEqual([
+      { key: 'cmd+alt+left', command: 'workbench.action.navigateBack' },
+      { key: 'ctrl+/', command: 'x', when: 'a // b, ]' },
+      { key: 'ctrl+"', command: 'y' },
+    ]);
+    expect(vscodeKeybindingRules('')).toEqual([]);
+    expect(vscodeKeybindingRules('{ "key": "x" }')).toEqual([]);
+    expect(vscodeKeybindingRules('[1, null, { "key": "x" }]')).toEqual([{ key: 'x' }]);
+  });
+
+  it('go to the scripts of a page in a hidden element', () => {
+    const keys: JumpKeys = { back: ['Alt-Meta-ArrowLeft', 'Ctrl-"'], forward: ['Alt-Meta-ArrowRight'] };
+    document.body.innerHTML = `<p>Text</p>${jumpKeysHtml(keys)}`;
+    expect(document.querySelector('[data-nimblescape-jump-keys]')?.hasAttribute('hidden')).toBe(true);
+    expect(pageJumpKeys(document)).toEqual(keys);
+    document.body.innerHTML = '<div data-nimblescape-jump-keys="{&quot;back&quot;:3}"></div>';
+    expect(pageJumpKeys(document)).toBeUndefined();
+    document.body.innerHTML = '<div data-nimblescape-jump-keys="nothing"></div>';
+    expect(pageJumpKeys(document)).toBeUndefined();
+    document.body.innerHTML = '';
+    expect(pageJumpKeys(document)).toBeUndefined();
   });
 });
 

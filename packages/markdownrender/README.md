@@ -116,8 +116,12 @@ of the keyboard shortcuts of VS Code (the default rules first, then those of
 `keybindings.json`):
 
 ```ts
-import { installPageJumps, vscodeJumpKeysOf } from '@nimblescape/markdownrender/jumps';
+import { installPageJumps, vscodeJumpKeysOf, vscodeKeybindingRules } from '@nimblescape/markdownrender/jumps';
 
-let keys = vscodeJumpKeysOf([...defaultRules, ...userRules]);
+let keys = vscodeJumpKeysOf([...vscodeKeybindingRules(defaultsText), ...vscodeKeybindingRules(userText)]);
 installPageJumps(window, { keys: () => keys });
 ```
+
+The scripts of the Markdown preview of VS Code get the keys from the page:
+a plugin of markdown-it adds `jumpKeysHtml(keys)` to the rendered HTML, and
+the script reads them with `pageJumpKeys(document)`.
