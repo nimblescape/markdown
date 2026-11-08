@@ -13,7 +13,8 @@ does not change keeps its text byte for byte. The editor has a toolbar, a
 format bar over selected text, an insert menu and slash commands, handles of
 the blocks, find and replace, tables with handles and a table menu, a
 read-only mode, a mode that shows the Markdown marks beside the rendered
-text, a form of the front matter with a JSON schema, and the values of the
+text, a form of the front matter with a JSON schema, whose fields the arrow
+keys reach as lines ([R-FM-008](../../docs/editor.md#r-fm-008)), and the values of the
 front matter in the text, with hidden markers and read-only
 ([R-FM-007](../../docs/editor.md#r-fm-007)). The front matter code comes
 from [`@nimblescape/markdowntext`](../markdowntext). With the

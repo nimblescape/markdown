@@ -8,11 +8,13 @@
 // renames and removes the keys that the schema does not name. A button switches between the modes; a file with a schema opens with fixed keys, a file without a
 // schema opens in the mode to edit the keys. Each change of a value is one step of undo and changes only the text of
 // that value (R-FM-005). A plugin may show the value of a key with an input of its own, which is read-only (R-FM-006).
-// A front matter that does not parse shows its text with the problem, and the user edits the text.
+// A front matter that does not parse shows its text with the problem, and the user edits the text. The arrow keys move
+// the cursor between the fields of the form and into the text after the front matter (R-FM-008).
 
 import type { Editor } from '@tiptap/core';
 import { closeHistory } from '@tiptap/pm/history';
 import type { Node as PmNode } from '@tiptap/pm/model';
+import { Selection } from '@tiptap/pm/state';
 import type { EditorView, NodeView } from '@tiptap/pm/view';
 import {
   checkFrontMatter,
@@ -186,6 +188,35 @@ interface Field {
   present: boolean;
 }
 
+/** focusable selects the elements of the form that take the focus: inputs, buttons, and the elements of plugins. */
+const focusable = 'input, select, textarea, button, a[href], [tabindex]:not([tabindex="-1"])';
+
+/** controlsOf returns the elements of a box that take the focus, in their order, without the ones that are disabled. */
+const controlsOf = (box: HTMLElement): HTMLElement[] =>
+  [...box.querySelectorAll<HTMLElement>(focusable)].filter((item) => !(item as HTMLInputElement).disabled);
+
+/** isText returns true for an input that has a cursor in its text: a line of text or a text of lines. */
+const isText = (item: Element): item is HTMLInputElement | HTMLTextAreaElement =>
+  item instanceof HTMLTextAreaElement || (item instanceof HTMLInputElement && ['text', 'search', 'url', 'email', 'tel', 'password'].includes(item.type));
+
+/** lineStartOf returns the place where the line of a place of a text starts. */
+const lineStartOf = (value: string, at: number): number => (at === 0 ? 0 : value.lastIndexOf('\n', at - 1) + 1);
+
+/**
+ * leaves returns true when the arrow up or down leaves an element: always, except in a text of lines, which the cursor
+ * leaves only from its first line up and from its last line down.
+ */
+function leaves(item: HTMLElement, down: boolean): boolean {
+  if (!(item instanceof HTMLTextAreaElement)) {
+    return true;
+  }
+  const { selectionStart: start, selectionEnd: end, value } = item;
+  if (start !== end) {
+    return false;
+  }
+  return down ? !value.includes('\n', end) : lineStartOf(value, start) === 0;
+}
+
 /** Focus is the element that has the focus, which the form gives the focus again after it shows itself again. */
 interface Focus {
   id: string;
@@ -204,6 +235,11 @@ export class FrontMatterForm implements NodeView {
   private notices = new Map<string, string>();
   private pending = 0;
   private ids = 0;
+  /**
+   * moved is the element that the last arrow up or down went to, with the column that the cursor keeps while it goes
+   * on up or down, and the place where it put the cursor in a text.
+   */
+  private moved: { id: string; column: number; place: number | undefined } | undefined;
 
   /**
    * @param node - The node of the front matter.
@@ -220,6 +256,7 @@ export class FrontMatterForm implements NodeView {
     this.node = node;
     this.text = node.attrs.text as string;
     this.dom = element('div', { class: 'nsmd-fm', contenteditable: 'false', 'data-format': this.format });
+    this.dom.addEventListener('keydown', (event) => this.key(event));
     host.forms.add(this);
     this.render();
   }
@@ -282,6 +319,133 @@ export class FrontMatterForm implements NodeView {
   /** refresh shows the form again, for example after a switch between editing and reading. */
   refresh(): void {
     this.render();
+  }
+
+  /**
+   * focusLast gives the focus to the last line of the form, for the arrow up or left from the start of the text after
+   * the front matter (R-FM-008).
+   * @returns false when the form has no element that takes the focus, for example in the read-only mode.
+   */
+  focusLast(): boolean {
+    const lines = this.lines();
+    const last = lines[lines.length - 1];
+    if (!last) {
+      return false;
+    }
+    this.moved = undefined;
+    this.goTo(last[0], false);
+    return true;
+  }
+
+  /**
+   * key moves the cursor with the keys (R-FM-008): the arrow up and down go to the line before and after, in the same
+   * column, and from the last line into the text after the front matter; Tab on the last element goes there too.
+   */
+  private key(event: KeyboardEvent): void {
+    const target = event.target;
+    if (event.defaultPrevented || event.isComposing || event.altKey || event.ctrlKey || event.metaKey || !(target instanceof HTMLElement)) {
+      return;
+    }
+    if (event.key === 'Tab') {
+      const all = controlsOf(this.dom);
+      if (!event.shiftKey && all[all.length - 1] === target && this.toText()) {
+        event.preventDefault();
+      }
+      return;
+    }
+    if (event.shiftKey || (event.key !== 'ArrowUp' && event.key !== 'ArrowDown')) {
+      return;
+    }
+    const down = event.key === 'ArrowDown';
+    const lines = this.lines();
+    const at = lines.findIndex((line) => line.includes(target));
+    if (at < 0 || !leaves(target, down)) {
+      return;
+    }
+    const next = lines[at + (down ? 1 : -1)];
+    if (!next) {
+      if (down && this.toText()) {
+        event.preventDefault();
+      }
+      return;
+    }
+    event.preventDefault();
+    this.goTo(next[Math.min(lines[at].indexOf(target), next.length - 1)], down, this.columnOf(target));
+  }
+
+  /**
+   * lines returns the elements of the form that take the focus, by lines: the head, and each row of a key, of an item
+   * of a list and of a new key. The elements of a row after the rows inside it, for example the button that adds an
+   * item after the items, are a line of their own.
+   */
+  private lines(): HTMLElement[][] {
+    const lines: HTMLElement[][] = [];
+    let row: Element | null = null;
+    for (const item of controlsOf(this.dom)) {
+      const of = item.closest('.nsmd-fm-head, .nsmd-fm-item, .nsmd-fm-field, .nsmd-fm-add, .nsmd-fm-text-view');
+      if (lines.length === 0 || of !== row) {
+        lines.push([]);
+        row = of;
+      }
+      lines[lines.length - 1].push(item);
+    }
+    return lines;
+  }
+
+  /**
+   * columnOf returns the column of the cursor in an element: the column that it kept while it went up or down to the
+   * element, while it stays where it went to, else its place in its line, or undefined when the element has no text.
+   */
+  private columnOf(item: HTMLElement): number | undefined {
+    const moved = this.moved;
+    const text = isText(item);
+    if (moved && item.dataset.focus === moved.id && (moved.place === undefined || (text && item.selectionStart === moved.place && item.selectionEnd === moved.place))) {
+      return moved.column;
+    }
+    if (!text) {
+      return undefined;
+    }
+    const start = item.selectionStart ?? item.value.length;
+    return start - lineStartOf(item.value, start);
+  }
+
+  /**
+   * goTo gives the focus to an element of the form. In a text, the cursor goes to the column where it was in the line
+   * before, or to the end; in a text of lines, into its first line from above and into its last line from below.
+   */
+  private goTo(item: HTMLElement, down: boolean, column?: number): void {
+    item.focus();
+    const id = item.dataset.focus;
+    if (!isText(item)) {
+      this.moved = id === undefined || column === undefined ? undefined : { id, column, place: undefined };
+      return;
+    }
+    const { value } = item;
+    const lineStart = down ? 0 : lineStartOf(value, value.length);
+    const lineEnd = down && value.includes('\n') ? value.indexOf('\n') : value.length;
+    const place = column === undefined ? lineEnd : Math.min(lineStart + column, lineEnd);
+    item.setSelectionRange(place, place);
+    this.moved = id === undefined || column === undefined ? undefined : { id, column, place };
+  }
+
+  /**
+   * toText puts the cursor of the editor at the start of the text after the front matter (R-FM-008); the input that
+   * loses the focus writes its value first.
+   * @returns false when the document has no place for the cursor after the front matter.
+   */
+  private toText(): boolean {
+    const pos = this.getPos();
+    if (pos === undefined || !Selection.findFrom(this.view.state.doc.resolve(pos + this.node.nodeSize), 1)) {
+      return false;
+    }
+    this.moved = undefined;
+    this.view.focus();
+    const after = this.getPos();
+    const selection = after === undefined ? null : Selection.findFrom(this.view.state.doc.resolve(after + this.node.nodeSize), 1);
+    if (selection) {
+      this.view.dispatch(this.view.state.tr.setSelection(selection).scrollIntoView());
+    }
+    return true;
   }
 
   /** editable is true when the user can change the front matter. */

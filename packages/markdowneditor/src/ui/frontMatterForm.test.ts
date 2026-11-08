@@ -3,10 +3,12 @@
 // © 2026 Hannes Stauss (scalarion@nimblescape.com)
 // Licensed under the MIT License. See LICENSE in the repository root for details.
 
-// The tests of the form of the front matter (docs/editor.md, R-FM-001 to R-FM-006): the form in both modes, with and
-// without a schema, the problems of the schema, the inputs of plugins, read-only mode and undo. Each test changes the
-// inputs of the form as the user does and checks the Markdown that the editor writes.
+// The tests of the form of the front matter (docs/editor.md, R-FM-001 to R-FM-006, R-FM-008): the form in both modes,
+// with and without a schema, the problems of the schema, the inputs of plugins, read-only mode, undo, and the keys that
+// move the cursor between the fields and the text. Each test changes the inputs of the form as the user does and checks
+// the Markdown that the editor writes.
 
+import { TextSelection } from '@tiptap/pm/state';
 import { afterEach, describe, expect, it } from 'vitest';
 import { MarkdownEditor, type MarkdownEditorOptions } from '../editor';
 import type { JsonSchema } from '@nimblescape/markdowntext';
@@ -266,5 +268,140 @@ describe('the place of the front matter', () => {
     expect(opened.getMarkdown()).toBe('---\na: 1\n---\n\n# Head\n\nText\n');
     opened.setMarkdown('No front matter.\n');
     expect(opened.getMarkdown()).toBe('No front matter.\n');
+  });
+});
+
+/** press sends a key to an element as the user does, and returns true when the editor or the form took the key. */
+function press(target: HTMLElement, key: string, options: KeyboardEventInit = {}): boolean {
+  const event = new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true, ...options });
+  target.dispatchEvent(event);
+  return event.defaultPrevented;
+}
+
+/** active returns the element that has the focus. */
+const active = (): Element | null => document.activeElement;
+
+/** caret puts the cursor of a text input at a place. */
+function caret<T extends HTMLInputElement | HTMLTextAreaElement>(target: T, place: number): T {
+  target.focus();
+  target.setSelectionRange(place, place);
+  return target;
+}
+
+describe('the keys in the form of the front matter', () => {
+  const text = "---\ntitle: 'Old'\nauthors:\n- Ana\nlayout: pht\n---\n\n# Head\n\nText\n";
+  const addItem = (): HTMLElement => form().querySelector<HTMLElement>(`[data-focus='add-item ${JSON.stringify(['authors'])}']`) as HTMLElement;
+
+  it('moves with the arrow up and down from field to field, and from the last field into the text', () => {
+    const opened = open(text, { frontMatterSchema: schema });
+    const view = opened.tiptap.view;
+    const order = [input(['title']), input(['date']), input<HTMLSelectElement>(['kind']), input(['draft']), input(['pages']), input(['authors', 0]), addItem()];
+    order[0].focus();
+    for (const next of order.slice(1)) {
+      expect(press(active() as HTMLElement, 'ArrowDown')).toBe(true);
+      expect(active()).toBe(next);
+    }
+    for (const before of order.slice(0, -1).reverse()) {
+      expect(press(active() as HTMLElement, 'ArrowUp')).toBe(true);
+      expect(active()).toBe(before);
+    }
+    // Above the first field is the button of the mode; above it there is nothing.
+    expect(press(input(['title']), 'ArrowUp')).toBe(true);
+    expect(active()).toBe(form().querySelector('.nsmd-fm-mode'));
+    expect(press(active() as HTMLElement, 'ArrowUp')).toBe(false);
+    // The arrow down from the last line goes to the start of the text after the front matter.
+    addItem().focus();
+    expect(press(addItem(), 'ArrowDown')).toBe(true);
+    expect(active()).toBe(view.dom);
+    expect(view.state.selection.from).toBe((view.state.doc.firstChild?.nodeSize ?? 0) + 1);
+    // The keys with Shift, Ctrl or Alt stay with the input.
+    expect(press(input(['title']), 'ArrowDown', { shiftKey: true })).toBe(false);
+    expect(press(input(['title']), 'ArrowDown', { altKey: true })).toBe(false);
+  });
+
+  it('writes the value of a field that the cursor leaves with the arrow down', async () => {
+    const opened = open(text, { frontMatterSchema: schema });
+    const title = caret(input(['title']), 3);
+    title.value = 'New';
+    expect(press(title, 'ArrowDown')).toBe(true);
+    await settle();
+    expect(opened.getMarkdown()).toBe(text.replace("'Old'", "'New'"));
+    expect(active()).toBe(input(['date']));
+  });
+
+  it('keeps the column of the cursor while it moves up and down through the text inputs', () => {
+    open('---\na: abcdef\nb: xy\nc: ghijkl\n---\n\nText\n');
+    // In the mode to edit the keys, each line has the name, the value and the button that removes the key.
+    caret(input(['a']), 4);
+    expect(press(input(['a']), 'ArrowDown')).toBe(true);
+    expect(active()).toBe(input(['b']));
+    expect(input(['b']).selectionStart).toBe(2);
+    expect(press(input(['b']), 'ArrowDown')).toBe(true);
+    expect(active()).toBe(input(['c']));
+    expect(input(['c']).selectionStart).toBe(4);
+    // The name of a key goes to the name of the key below.
+    const key = (name: string): HTMLInputElement => form().querySelector<HTMLInputElement>(`[data-focus='key ${JSON.stringify([name])}']`) as HTMLInputElement;
+    caret(key('a'), 1);
+    expect(press(key('a'), 'ArrowDown')).toBe(true);
+    expect(active()).toBe(key('b'));
+    expect(key('b').selectionStart).toBe(1);
+  });
+
+  it('leaves a text of lines only from its first line up and from its last line down', () => {
+    open('---\na: x\nb: |-\n  one\n  two\nc: y\n---\n\nText\n');
+    const area = input<HTMLTextAreaElement>(['b']);
+    expect(area.value).toBe('one\ntwo');
+    caret(area, 1);
+    expect(press(area, 'ArrowDown')).toBe(false);
+    expect(press(area, 'ArrowUp')).toBe(true);
+    expect(active()).toBe(input(['a']));
+    caret(area, 5);
+    expect(press(area, 'ArrowUp')).toBe(false);
+    expect(press(area, 'ArrowDown')).toBe(true);
+    expect(active()).toBe(input(['c']));
+    // From below, the cursor goes into the last line of the text, in its column.
+    caret(input(['c']), 1);
+    expect(press(input(['c']), 'ArrowUp')).toBe(true);
+    expect(active()).toBe(area);
+    expect(area.selectionStart).toBe(5);
+  });
+
+  it('goes with Tab from the last field into the text, and with the arrow up or left from the start of the text into the last field', () => {
+    const opened = open(text, { frontMatterSchema: schema });
+    const view = opened.tiptap.view;
+    addItem().focus();
+    expect(press(addItem(), 'Tab')).toBe(true);
+    expect(active()).toBe(view.dom);
+    const start = (view.state.doc.firstChild?.nodeSize ?? 0) + 1;
+    expect(view.state.selection.from).toBe(start);
+    // Shift+Tab, and Tab on another field, stay with the browser.
+    expect(press(input(['title']), 'Tab')).toBe(false);
+    expect(press(input(['title']), 'Tab', { shiftKey: true })).toBe(false);
+    view.focus();
+    view.dispatch(view.state.tr.setSelection(TextSelection.create(view.state.doc, start)));
+    expect(press(view.dom, 'ArrowUp')).toBe(true);
+    expect(active()).toBe(addItem());
+    view.focus();
+    expect(press(view.dom, 'ArrowLeft')).toBe(true);
+    expect(active()).toBe(addItem());
+    // The arrow left from another place of the text, and the arrow up from a later block, stay in the text.
+    view.focus();
+    view.dispatch(view.state.tr.setSelection(TextSelection.create(view.state.doc, start + 2)));
+    expect(press(view.dom, 'ArrowLeft')).toBe(false);
+    expect(view.state.doc.child(2).textContent).toBe('Text');
+    view.dispatch(view.state.tr.setSelection(TextSelection.create(view.state.doc, view.state.doc.content.size - 2)));
+    expect(press(view.dom, 'ArrowUp')).toBe(false);
+  });
+
+  it('goes from the text into the form without a schema, and not into a form without inputs', () => {
+    const opened = open('---\na: 1\n---\n\nText\n');
+    opened.tiptap.view.focus();
+    expect(press(opened.tiptap.view.dom, 'ArrowUp')).toBe(true);
+    expect(active()).toBe(form().querySelector('.nsmd-fm-new-key'));
+    opened.destroy();
+    element.remove();
+    const reading = open('---\na: 1\n---\n\nText\n', { editable: false });
+    reading.tiptap.view.focus();
+    expect(press(reading.tiptap.view.dom, 'ArrowUp')).toBe(false);
   });
 });

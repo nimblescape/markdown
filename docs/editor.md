@@ -383,6 +383,34 @@ yes and no is its items, joined by commas, and the path of a key in a map
 in a list has the index of the item, for example `authors.0.name`. The
 source gives these values (`frontMatterValues`), also for formatters.
 
+### R-FM-008
+
+**Keys of the form.** The cursor moves through the form with the keys, as
+through the lines of a text:
+
+- The arrow down and the arrow up go to the next and to the previous line
+  of the form, in the same column: from a value to the value below it, from
+  the name of a key to the name below it. Each key, each item of a list and
+  the row of a new key is a line; the head of the form, with the button of
+  the mode, is the first line.
+- In a line of text, the cursor keeps its column while it goes up and down
+  through the lines. A text of several lines keeps the arrow keys inside
+  it, except up from its first line and down from its last line.
+- In an input of a choice, of a number or of a date, the arrow keys also go
+  to the next line: Space opens the list of a choice, and the user types a
+  number or a date.
+- The arrow down from the last line, and Tab from the last element of the
+  form, put the cursor at the start of the text after the front matter.
+  The arrow up from the first line of that text, and the arrow left from
+  its start, go to the last line of the form.
+- Tab and Shift+Tab go from element to element of the form. An arrow key
+  with Shift, Ctrl, Alt or Cmd stays with the input.
+- The input that the cursor leaves writes its value, as it does when it
+  loses the focus.
+
+In the clean editing view of Notes, the front matter is text, and the
+cursor moves through its lines and into the text after it as in any text.
+
 ## 8. Threads beside the text
 
 ### R-GEN-014

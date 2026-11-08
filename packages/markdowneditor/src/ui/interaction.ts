@@ -6,11 +6,12 @@
 // the bar of find and replace, the format bar, the menus and the handles of the blocks around the text, and gives the
 // editor the plugins and the keys of these parts as one Tiptap extension. The keys are those of R-EDIT-007, and also
 // Ctrl+F for find and replace and Alt+Up and Alt+Down to move the block of the cursor (Cmd in place of Ctrl on macOS).
-// The front matter shows as a form (R-FM-001), with the schema and the inputs of plugins that the options give.
+// The front matter shows as a form (R-FM-001), with the schema and the inputs of plugins that the options give; the
+// arrow up and left at the start of the text after the front matter go into the form (R-FM-008).
 
 import { type Editor, Extension } from '@tiptap/core';
 import type { Node as PmNode } from '@tiptap/pm/model';
-import { Plugin } from '@tiptap/pm/state';
+import { NodeSelection, Plugin, Selection } from '@tiptap/pm/state';
 import type { EditorView } from '@tiptap/pm/view';
 import { readFrontMatter, type FrontMatterFormat, type JsonSchema } from '@nimblescape/markdowntext';
 import { alertsPlugin } from './alerts';
@@ -137,7 +138,7 @@ export class Interaction {
       new Plugin({
         view: () => ({ update: (view) => this.update(view) }),
         props: {
-          handleKeyDown: (_view, event) => this.menuKey(event),
+          handleKeyDown: (view, event) => this.menuKey(event) || this.toFrontMatter(view, event),
           handleDOMEvents: {
             mousedown: (view) => {
               this.formatBar?.pointer(true, view);
@@ -338,6 +339,31 @@ export class Interaction {
     this.formatBar?.update(view);
     this.toolbar?.update();
     this.findBar?.update();
+  }
+
+  /**
+   * toFrontMatter gives the focus to the last line of the form of the front matter for the arrow up from the first line
+   * of the text after the front matter, and for the arrow left from its start (R-FM-008).
+   */
+  private toFrontMatter(view: EditorView, event: KeyboardEvent): boolean {
+    const up = event.key === 'ArrowUp';
+    if ((!up && event.key !== 'ArrowLeft') || event.shiftKey || event.altKey || event.ctrlKey || event.metaKey) {
+      return false;
+    }
+    const { doc, selection } = view.state;
+    const first = doc.firstChild;
+    const start = first?.type.name === 'frontMatter' ? Selection.findFrom(doc.resolve(first.nodeSize), 1) : null;
+    if (!start) {
+      return false;
+    }
+    const atStart =
+      start instanceof NodeSelection
+        ? selection.eq(start)
+        : up
+          ? selection.$head.start() === start.$head.start() && view.endOfTextblock('up')
+          : selection.empty && selection.head === start.head;
+    const form = atStart ? [...this.forms].find((each) => view.dom.contains(each.dom)) : undefined;
+    return form?.focusLast() ?? false;
   }
 
   /** menuKey gives the keys to an open menu that a button opened: the arrow keys, Enter and Escape. */
