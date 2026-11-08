@@ -14,13 +14,14 @@ The first version of the packages.
   in YAML, TOML or JSON.
 - `@nimblescape/markdownrender`: the renderer of Markdown with markdown-it,
   as GitHub shows it, with GitHub alerts, footnotes, task lists, the IDs of
-  the headings, raw HTML only from a fixed list of safe elements, and plugins
-  of the renderer.
+  the headings, raw HTML only from a fixed list of safe elements, plugins
+  of the renderer, and the way back after a jump in a rendered page.
 - `@nimblescape/markdowneditor`: the editor of rendered Markdown, for the web
   and for the webviews of VS Code. Each block that the user does not change
   keeps its text byte for byte. It has a toolbar, a format bar, an insert
   menu, slash commands, block handles, find and replace, tables, a read-only
-  mode, a form of the front matter, syntax colors of code blocks, threads
+  mode, a form of the front matter, syntax colors of code blocks, jumps to
+  places of the document with Go Back and Go Forward, threads
   beside the text, proposed changes as tracked changes, and version 1 of the
   plugin API.
 - `@nimblescape/markdownlayout`: layouts with the schema of their front

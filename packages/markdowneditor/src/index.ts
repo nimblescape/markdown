@@ -16,6 +16,7 @@ export type { Writers } from './markdown/serialize';
 export { MarkdownEditor, type AiContext, type MarkdownEditorOptions } from './editor';
 export type { SerializeOptions } from './markdown/serialize';
 export type { InteractionOptions } from './ui/interaction';
+export type { JumpsOptions } from './ui/jumps';
 export type { FormatButton } from './ui/formatBar';
 export type { ProposalResult, ProposedChange } from './ui/proposals';
 export { changeRows, EditorChanges, type ChangeLayout, type ChangePosition, type ChangeRow, type ChangeSide, type ChangesOptions } from './ui/changes';

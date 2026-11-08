@@ -29,6 +29,11 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./jumps": {
+      "nimblescape-source": "./src/jumps.ts",
+      "types": "./dist/jumps.d.ts",
+      "default": "./dist/jumps.js"
+    },
     "./content.css": {
       "nimblescape-source": "./src/styles/content.css",
       "default": "./dist/content.css"

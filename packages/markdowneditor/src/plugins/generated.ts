@@ -264,7 +264,11 @@ export function generatedPlugin(parts: DocCache<GeneratedPart[]>): Plugin {
           return false;
         }
         const part = parts.get(view.state.doc).find((each) => each.from <= pos && pos <= each.to && each.open);
-        part?.open?.();
+        if (part) {
+          // The cursor goes to the part first, as for a click on a link, so that a jump of the part starts there.
+          view.dispatch(view.state.tr.setSelection(TextSelection.near(view.state.doc.resolve(pos))).setMeta('pointer', true));
+          part.open?.();
+        }
         return part !== undefined;
       },
       handleDoubleClick: (view, pos) => {

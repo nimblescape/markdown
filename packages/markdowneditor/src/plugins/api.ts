@@ -60,7 +60,10 @@ export interface GeneratedPart {
   /** from and to are the positions of the part in the document. */
   readonly from: number;
   readonly to: number;
-  /** open goes to the target of the part, for example the entry of a reference, on Ctrl+click (Cmd+click on macOS). */
+  /**
+   * open goes to the target of the part, for example the entry of a reference, on Ctrl+click (Cmd+click on macOS). The
+   * cursor stands at the part then, so a jump with `jumpTo` of the editor starts there.
+   */
   readonly open?: () => void;
   /** edit opens the form of the data of the part, for example the page of a citation, on a double click. */
   readonly edit?: () => void;
@@ -125,6 +128,11 @@ export interface PluginEditor {
   textOffset(pos: number, side?: -1 | 1): number;
   /** runCommand runs a command of a plugin by its full name, `plugin.command`. */
   runCommand(name: string, ...args: unknown[]): boolean;
+  /**
+   * jumpTo goes to a position of the document, for example the target of a generated part, and keeps the place where
+   * the jump started, by default the selection, so that "Go Back" returns to it (R-EDIT-014).
+   */
+  jumpTo(pos: number, from?: number): void;
   /** openThread opens the panel of a thread beside the text, and closeThread closes it. */
   openThread(id: string): boolean;
   closeThread(): void;
