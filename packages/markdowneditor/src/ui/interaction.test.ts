@@ -239,9 +239,10 @@ describe('the insert items', () => {
     expect(opened.getMarkdown()).toBe('Text[^2][^1]\n\n[^1]: a\n\n[^2]: b\n');
   });
 
-  it('insert a GitHub alert', () => {
+  it('insert a GitHub alert that stays rendered, with the cursor in its text', () => {
     const opened = open('');
     expect(insertAlert(opened.tiptap, 'warning')).toBe(true);
+    expect(element.querySelector('blockquote.nsmd-alert-warning .nsmd-alert-marker')?.getAttribute('data-label')).toBe('Warning');
     type(opened, 'Careful.');
     expect(opened.getMarkdown()).toBe('> [!WARNING]\n> Careful.\n');
     expect(element.querySelector('blockquote.nsmd-alert-warning .nsmd-alert-marker')?.getAttribute('data-label')).toBe('Warning');
@@ -259,6 +260,122 @@ describe('the insert items', () => {
     }
     await Promise.resolve();
     expect(opened.getMarkdown()).toBe('Some [text](https://example.com).\n');
+  });
+});
+
+describe('the GitHub alerts', () => {
+  // 'Intro' is the paragraph at 0 to 7; the block quote starts at 7, its marker `[!NOTE] ` is 9 to 17, its text starts at 17.
+  const text = 'Intro\n\n> [!NOTE]\n> Some text.\n';
+
+  /** cursor returns the place of the cursor, or the anchor and the head of the selection. */
+  const cursor = (opened: MarkdownEditor): number | [number, number] => {
+    const { anchor, head } = viewOf(opened).state.selection;
+    return anchor === head ? head : [anchor, head];
+  };
+
+  /**
+   * dispatchSelection sets a selection as the keys or the mouse set it: after a key, as the browser moves the cursor
+   * for it, or after a click.
+   */
+  function dispatchSelection(opened: MarkdownEditor, anchor: number, head = anchor, by: string | 'pointer' = 'pointer'): void {
+    const view = viewOf(opened);
+    if (by !== 'pointer') {
+      key(opened, by);
+    }
+    const tr = view.state.tr.setSelection(TextSelection.create(view.state.doc, anchor, head));
+    view.dispatch(by === 'pointer' ? tr.setMeta('pointer', true) : tr);
+  }
+
+  it('keep the title of the kind while the cursor is in the first line of the alert', () => {
+    const opened = open(text);
+    select(opened, 20);
+    const marker = element.querySelector('blockquote.nsmd-alert-note .nsmd-alert-marker');
+    expect(marker?.getAttribute('data-label')).toBe('Note');
+    expect(marker?.className).toBe('nsmd-alert-marker');
+    expect(marker?.textContent).toBe('[!NOTE] ');
+  });
+
+  it('keep the cursor out of the marker: a click and Home go to the start of the text, the arrows left and up go to the text before', () => {
+    const opened = open(text);
+    dispatchSelection(opened, 12);
+    expect(cursor(opened)).toBe(17);
+    dispatchSelection(opened, 9);
+    expect(cursor(opened)).toBe(17);
+    dispatchSelection(opened, 9, 9, 'Home');
+    expect(cursor(opened)).toBe(17);
+    dispatchSelection(opened, 16, 16, 'ArrowLeft');
+    expect(cursor(opened)).toBe(6);
+    dispatchSelection(opened, 9, 9, 'ArrowDown');
+    expect(cursor(opened)).toBe(17);
+    select(opened, 22);
+    dispatchSelection(opened, 12, 12, 'ArrowUp');
+    expect(cursor(opened)).toBe(6);
+    // A selection that the user extends back into the marker holds the whole marker.
+    dispatchSelection(opened, 22, 13, 'ArrowUp');
+    expect(cursor(opened)).toEqual([22, 6]);
+    dispatchSelection(opened, 13, 22);
+    expect(cursor(opened)).toEqual([17, 22]);
+  });
+
+  it('stay at the start of the text of an alert at the start of the document', () => {
+    const opened = open('> [!TIP]\n> Text.\n');
+    dispatchSelection(opened, 9, 9, 'ArrowLeft');
+    expect(cursor(opened)).toBe(9);
+    dispatchSelection(opened, 5, 5, 'ArrowLeft');
+    expect(cursor(opened)).toBe(9);
+  });
+
+  it('drop an edit of the user that changes a piece of the marker, and leave the marker out of find and replace', () => {
+    const opened = open(text);
+    const view = viewOf(opened);
+    view.dispatch(view.state.tr.insertText('X', 12));
+    view.dispatch(view.state.tr.insertText('X', 9));
+    view.dispatch(view.state.tr.delete(14, 20));
+    view.dispatch(view.state.tr.setBlockType(9, 9, view.state.schema.nodes.heading, { level: 2 }));
+    expect(opened.getMarkdown()).toBe(text);
+    setFind(view, 'note', false);
+    expect(findKey.getState(view.state)?.matches).toHaveLength(0);
+    expect(replaceAll(view, 'x')).toBe(0);
+    expect(opened.getMarkdown()).toBe(text);
+  });
+
+  it('remove the whole marker with Backspace at the start of the text, so that the alert becomes a quote, in one step of Undo', () => {
+    const opened = open(text);
+    select(opened, 17);
+    expect(key(opened, 'Backspace')).toBe(true);
+    expect(opened.getMarkdown()).toBe('Intro\n\n> Some text.\n');
+    expect(element.querySelector('.nsmd-alert')).toBeNull();
+    opened.tiptap.commands.undo();
+    expect(opened.getMarkdown()).toBe(text);
+  });
+
+  it('separate the marker from text typed after a marker alone', () => {
+    const opened = open('> [!CAUTION]\n');
+    select(opened, 12);
+    type(opened, 'Hot');
+    expect(opened.getMarkdown()).toBe('> [!CAUTION]\n> Hot\n');
+    expect(element.querySelector('blockquote.nsmd-alert-caution')).not.toBeNull();
+  });
+
+  it('keep the marker without a format', () => {
+    const opened = open(text);
+    select(opened, 3, 22);
+    opened.tiptap.commands.toggleBold();
+    expect(opened.getMarkdown()).toBe('In**tro**\n\n> [!NOTE]\n> **Some** text.\n');
+    expect(element.querySelector('blockquote.nsmd-alert-note')).not.toBeNull();
+  });
+
+  it('remove the marker when the alert stops being a quote', () => {
+    const opened = open(text);
+    select(opened, 20);
+    opened.tiptap.commands.toggleBlockquote();
+    expect(opened.getMarkdown()).toBe('Intro\n\nSome text.\n');
+  });
+
+  it('take a change of the marker from outside', () => {
+    const opened = open(text);
+    opened.setMarkdown('Intro\n\n> [!WARNING]\n> Some text.\n');
+    expect(element.querySelector('blockquote.nsmd-alert-warning .nsmd-alert-marker')?.getAttribute('data-label')).toBe('Warning');
   });
 });
 

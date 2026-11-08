@@ -62,7 +62,8 @@ text has no exact place in the Markdown text in general.
 **Rendered Markdown.** The editor must show Markdown rendered, without
 Markdown marks, and the user must edit the rendered text. The editor must
 support CommonMark and GFM: headings, emphasis, strikethrough, links,
-autolinks, images, lists, task lists, quotes, GitHub alerts (`> [!NOTE]`),
+autolinks, images, lists, task lists, quotes, GitHub alerts (`> [!NOTE]`,
+[R-EDIT-013](#r-edit-013)),
 code blocks with syntax colors, tables and thematic breaks; standard
 footnotes; the front matter; HTML and comments as raw parts that keep their
 text. The syntax colors of code blocks come from highlight.js through
@@ -73,6 +74,27 @@ GitHub. The colors come from six variables `--nsmd-syntax-*` (keyword,
 string, constant, title, type, comment), which take the palette of seven
 colors of the theme ([R-THEME-001](platforms.md#r-theme-001)), so that they
 follow the light and the dark theme and the theme of VS Code.
+
+### R-EDIT-013
+
+**GitHub alerts stay rendered.** A GitHub alert, such as `> [!NOTE]`, must
+show as its box with the name of its kind as its title, for example
+"Note", also while the cursor is in the alert and the user edits its text.
+The title is fixed: the marker of the alert stays in the text of the file,
+the cursor never stands in it, and an edit of the user cannot change a
+piece of it. A click on the title puts the cursor at the start of the text
+of the alert; the arrow left at the start of the text and the arrow up in
+its first line go to the text before the alert. Backspace at the start of
+the text removes the whole marker in one step of undo, so that the alert
+becomes a quote; an edit that ends the quote, for example the text style
+"Text", removes the marker too. Text typed after a marker alone starts on
+the line after the marker, a format of the user leaves the marker out, and
+find and replace leave the marker out. The slash command `/alert` inserts
+an alert with the cursor in its text ([R-GEN-003](#r-gen-003)). A change
+from outside, for example in the text editor, may change the marker
+([R-SRC-002](source.md#r-src-002);
+[decision 83](https://github.com/nimblescape/markdownnotes-vscode/blob/main/docs/requirements.md#decisions)
+of Markdown Notes).
 
 ### R-GEN-009
 
