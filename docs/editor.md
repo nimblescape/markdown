@@ -234,7 +234,15 @@ example by the formatter, may change a generated part
 generated part, and the user deletes it only as a whole, in one step of
 undo. A plugin may give a form for the data of a generated part, for
 example the page of a citation. Ctrl+click (Cmd+click on macOS) on a
-reference goes to its target.
+reference goes to its target. A generated part has a gray background, the
+token `--nsmd-readonly`, so that the user sees that it is read-only; a part
+that holds whole blocks has it on the blocks, and a read-only value of the
+form of the front matter ([R-FM-003](#r-fm-003)) has it too. On a platform,
+the token comes from its theme; in VS Code it is the color of read-only
+parts of Markdown Notes, which its text editor that keeps the format of the
+file uses for the same parts
+([R-TEXT-009](https://github.com/nimblescape/markdownnotes-vscode/blob/main/docs/requirements.md#r-text-009)
+of Markdown Notes).
 
 A selection that touches a generated part holds the whole
 part. The user cannot change the format of a piece of a part. Backspace and

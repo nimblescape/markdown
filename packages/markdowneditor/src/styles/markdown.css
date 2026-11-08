@@ -561,7 +561,10 @@ before the table, which hides itself.
 
 .nsmd-editor .nsmd-fm-static {
   display: inline-block;
-  padding-top: 4px;
+  margin-top: 2px;
+  padding: 2px 4px;
+  border-radius: 3px;
+  background: var(--nsmd-readonly);
   overflow-wrap: anywhere;
   white-space: pre-wrap;
 }
@@ -689,11 +692,20 @@ to a field with its source in the same place; the two never show at the same tim
   outline-offset: 0;
 }
 
-/* The read-only generated parts (docs/editor.md, R-EDIT-011). */
+/*
+The read-only generated parts (docs/editor.md, R-EDIT-011) have the gray background of the token --nsmd-readonly, so
+that the user sees that they are read-only; a block that a part holds whole has it on the whole block.
+*/
 
-.nsmd-editor .ProseMirror .nsmd-generated {
+.nsmd-editor .ProseMirror .nsmd-generated,
+.nsmd-editor .ProseMirror .nsmd-generated-block {
   cursor: default;
   border-radius: 3px;
+  background: var(--nsmd-readonly);
+}
+
+.nsmd-editor .ProseMirror .nsmd-generated-block .nsmd-generated {
+  background: none;
 }
 
 .nsmd-editor .ProseMirror[contenteditable='true'] .nsmd-generated:hover {
