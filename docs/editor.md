@@ -237,7 +237,8 @@ example the page of a citation. Ctrl+click (Cmd+click on macOS) on a
 reference goes to its target. A generated part has a gray background, the
 token `--nsmd-readonly`, so that the user sees that it is read-only; a part
 that holds whole blocks has it on the blocks, and a read-only value of the
-form of the front matter ([R-FM-003](#r-fm-003)) has it too. On a platform,
+form of the front matter ([R-FM-003](#r-fm-003)) has it too, also one that
+the input of a plugin shows. On a platform,
 the token comes from its theme; in VS Code it is the color of read-only
 parts of Markdown Notes, which its text editor that keeps the format of the
 file uses for the same parts

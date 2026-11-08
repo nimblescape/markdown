@@ -471,6 +471,10 @@ export class FrontMatterForm implements NodeView {
     const box = element('div', { class: 'nsmd-fm-value' });
     const input = this.inputOf(field.path);
     if (input && field.present) {
+      // A read-only value that a plugin shows has the gray background of the read-only values too (R-EDIT-011).
+      if (!this.editable || field.schema?.readOnly === true) {
+        box.classList.add('nsmd-fm-readonly');
+      }
       box.append(input.render(field.value, { path: field.path, format: this.format, editor: this.host.editor() }));
       return box;
     }

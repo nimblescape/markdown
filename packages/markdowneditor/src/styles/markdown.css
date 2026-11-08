@@ -569,6 +569,16 @@ before the table, which hides itself.
   white-space: pre-wrap;
 }
 
+.nsmd-editor .nsmd-fm-field > .nsmd-fm-value.nsmd-fm-readonly {
+  justify-self: start;
+  max-width: 100%;
+  margin-top: 2px;
+  padding: 2px 4px;
+  border-radius: 3px;
+  background: var(--nsmd-readonly);
+  overflow-wrap: anywhere;
+}
+
 .nsmd-editor .nsmd-fm-empty {
   color: var(--nsmd-muted);
   font-style: italic;
