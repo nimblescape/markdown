@@ -154,6 +154,7 @@ export function jumpTo(view: EditorView, target: number, from?: number): void {
   const selection = selectionAt(state.doc, target, target);
   view.dispatch(state.tr.setSelection(selection).setMeta(jumpsKey, meta).setMeta('addToHistory', false).scrollIntoView());
   centerAt(view, selection.head);
+  view.focus();
 }
 
 /**
