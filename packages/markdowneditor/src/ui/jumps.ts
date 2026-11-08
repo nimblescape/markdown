@@ -13,7 +13,7 @@
 // without a place to go to goes on to the page, for example to Go Back of VS Code.
 
 import { slug } from '@nimblescape/markdownrender';
-import { type JumpKeys, matchesKey } from '@nimblescape/markdownrender/jumps';
+import { currentKeys, type JumpKeysOption, matchesKey } from '@nimblescape/markdownrender/jumps';
 import type { Node as PmNode } from '@tiptap/pm/model';
 import { type EditorState, Plugin, PluginKey, Selection, TextSelection, type Transaction } from '@tiptap/pm/state';
 import type { EditorView } from '@tiptap/pm/view';
@@ -301,8 +301,11 @@ function linkTarget(view: EditorView, pos: number, event: MouseEvent): number | 
 
 /** JumpsOptions configure the jumps of an editor. */
 export interface JumpsOptions {
-  /** keys are the keys of Go Back and Go Forward; without them, the mouse and the toolbar go back and forward. */
-  readonly keys?: JumpKeys;
+  /**
+   * keys are the keys of Go Back and Go Forward, or a function that returns the keys of now, for keys that the user can
+   * change while the editor shows; without them, the mouse and the toolbar go back and forward.
+   */
+  readonly keys?: JumpKeysOption;
   /** mouseButtons false leaves the back and forward buttons of the mouse to the platform; the default is true. */
   readonly mouseButtons?: boolean;
 }
@@ -346,7 +349,7 @@ export function jumpsPlugin(options: JumpsOptions = {}): Plugin<Jumps> {
         return true;
       },
       handleKeyDown: (view, event) => {
-        const keys = options.keys;
+        const keys = currentKeys(options.keys);
         if (keys?.back.some((key) => matchesKey(event, key))) {
           return goBack(view);
         }

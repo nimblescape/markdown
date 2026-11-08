@@ -50,6 +50,251 @@ export function vscodeJumpKeys(platform: Platform): JumpKeys {
   }
 }
 
+/**
+ * JumpKeysOption gives the keys of Go Back and Go Forward: the keys themselves, or a function that returns the keys of
+ * now, for keys that change while the page shows, for example after a change of the keyboard shortcuts of VS Code.
+ */
+export type JumpKeysOption = JumpKeys | (() => JumpKeys | undefined);
+
+/**
+ * currentKeys returns the keys of now of an option of the keys.
+ * @param option - The keys, or the function that returns them.
+ */
+export function currentKeys(option: JumpKeysOption | undefined): JumpKeys | undefined {
+  return typeof option === 'function' ? option() : option;
+}
+
+/** vscodeKeyNames are the names of keys of the keyboard shortcuts of VS Code with another name in ProseMirror. */
+const vscodeKeyNames: Readonly<Record<string, string>> = {
+  left: 'ArrowLeft',
+  right: 'ArrowRight',
+  up: 'ArrowUp',
+  down: 'ArrowDown',
+  pageup: 'PageUp',
+  pagedown: 'PageDown',
+  home: 'Home',
+  end: 'End',
+  insert: 'Insert',
+  delete: 'Delete',
+  backspace: 'Backspace',
+  tab: 'Tab',
+  enter: 'Enter',
+  escape: 'Escape',
+  space: 'Space',
+  browserback: 'BrowserBack',
+  browserforward: 'BrowserForward',
+  numpad_add: '+',
+  numpad_subtract: '-',
+  numpad_multiply: '*',
+  numpad_divide: '/',
+  numpad_decimal: '.',
+};
+
+/** keyCodes are the codes of the keys of the characters that a key of ProseMirror names, as KeyboardEvent.code. */
+const keyCodes: Readonly<Record<string, string>> = {
+  '-': 'Minus',
+  '=': 'Equal',
+  '[': 'BracketLeft',
+  ']': 'BracketRight',
+  '\\': 'Backslash',
+  ';': 'Semicolon',
+  "'": 'Quote',
+  ',': 'Comma',
+  '.': 'Period',
+  '/': 'Slash',
+  '`': 'Backquote',
+};
+
+/**
+ * vscodeKey returns a key of the keyboard shortcuts of VS Code, for example `cmd+alt+left` or `ctrl+-`, in the notation
+ * of ProseMirror, for example `Alt-Meta-ArrowLeft` or `Ctrl--`, or undefined for a chord of two keys or an unknown key.
+ * Cmd on macOS and Win and Super on the other platforms are Meta.
+ * @param binding - The key in the notation of VS Code.
+ */
+export function vscodeKey(binding: string): string | undefined {
+  const text = binding.trim().toLowerCase();
+  if (text === '' || /\s/.test(text)) {
+    return undefined;
+  }
+  const parts = text.split(/\+(?!$)/);
+  let name = parts.pop() ?? '';
+  const modifiers = new Set<string>();
+  for (const part of parts) {
+    const modifier = { ctrl: 'Ctrl', shift: 'Shift', alt: 'Alt', option: 'Alt', cmd: 'Meta', meta: 'Meta', win: 'Meta', super: 'Meta' }[part];
+    if (!modifier) {
+      return undefined;
+    }
+    modifiers.add(modifier);
+  }
+  // A scan code in brackets, for example [Minus] or [KeyA], names the key by its place.
+  const code = /^\[(\w+)\]$/.exec(binding.trim().split(/\+(?!$)/).pop() ?? '')?.[1];
+  if (code) {
+    const character = Object.entries(keyCodes).find(([, each]) => each === code)?.[0];
+    name = character ?? (/^Key[A-Z]$/.test(code) ? code.slice(3).toLowerCase() : /^Digit\d$/.test(code) ? code.slice(5) : (vscodeKeyNames[code.toLowerCase()] ?? code));
+  } else if (vscodeKeyNames[name]) {
+    name = vscodeKeyNames[name];
+  } else if (/^f\d{1,2}$/.test(name)) {
+    name = name.toUpperCase();
+  } else if (/^numpad\d$/.test(name)) {
+    name = `Numpad${name.slice(6)}`;
+  } else if ([...name].length !== 1) {
+    return undefined;
+  }
+  return [...['Ctrl', 'Alt', 'Shift', 'Meta'].filter((modifier) => modifiers.has(modifier)), name].join('-');
+}
+
+/** VsCodeKeybinding is a rule of the keyboard shortcuts of VS Code, as keybindings.json holds it. */
+export interface VsCodeKeybinding {
+  readonly key?: unknown;
+  readonly command?: unknown;
+  readonly when?: unknown;
+}
+
+/** vscodeBackCommands and vscodeForwardCommands are the commands of VS Code that go back and forward. */
+const vscodeBackCommands = new Set(['workbench.action.navigateBack', 'workbench.action.navigateBackInNavigationLocations']);
+const vscodeForwardCommands = new Set(['workbench.action.navigateForward', 'workbench.action.navigateForwardInNavigationLocations']);
+
+/**
+ * vscodeJumpKeysOf returns the keys of Go Back and Go Forward of VS Code from its rules of the keyboard shortcuts in
+ * their order, the default rules with those of the extensions first and the rules of the user after them, as VS Code
+ * applies them: a rule adds its key to its command, and a rule with a minus before the command removes its key from
+ * the command, or all keys of the command without a key. A later rule without a condition (`when`) that gives a key
+ * of Go Back or Go Forward to another command takes the key away from them, since VS Code then runs that command. A
+ * chord of two keys stays out, and so do the conditions of the rules of Go Back and Go Forward.
+ * @param rules - The rules.
+ */
+export function vscodeJumpKeysOf(rules: readonly VsCodeKeybinding[]): JumpKeys {
+  const back: string[] = [];
+  const forward: string[] = [];
+  for (const rule of rules) {
+    if (typeof rule.command !== 'string') {
+      continue;
+    }
+    const removes = rule.command.startsWith('-');
+    const command = removes ? rule.command.slice(1) : rule.command;
+    const keys = vscodeBackCommands.has(command) ? back : vscodeForwardCommands.has(command) ? forward : undefined;
+    const key = typeof rule.key === 'string' ? vscodeKey(rule.key) : undefined;
+    if (!keys) {
+      if (key && !removes && command !== '' && (rule.when === undefined || rule.when === null || rule.when === '')) {
+        for (const each of [back, forward]) {
+          const index = each.indexOf(key);
+          if (index >= 0) {
+            each.splice(index, 1);
+          }
+        }
+      }
+      continue;
+    }
+    if (removes) {
+      const kept = keys.filter((each) => typeof rule.key === 'string' && each !== key);
+      keys.splice(0, keys.length, ...kept);
+    } else if (key && !keys.includes(key)) {
+      keys.push(key);
+    }
+  }
+  return { back, forward };
+}
+
+/**
+ * withoutComments returns a text of JSON with comments (JSONC) without its comments and without the commas before a
+ * closing bracket, and keeps the strings as they are.
+ * @param text - The text.
+ */
+function withoutComments(text: string): string {
+  let plain = '';
+  for (let index = 0; index < text.length; index++) {
+    const character = text[index];
+    if (character === '"') {
+      let end = index + 1;
+      while (end < text.length && text[end] !== '"') {
+        end += text[end] === '\\' ? 2 : 1;
+      }
+      plain += text.slice(index, end + 1);
+      index = end;
+    } else if (character === '/' && text[index + 1] === '/') {
+      const end = text.indexOf('\n', index);
+      index = end < 0 ? text.length : end - 1;
+    } else if (character === '/' && text[index + 1] === '*') {
+      const end = text.indexOf('*/', index + 2);
+      index = end < 0 ? text.length : end + 1;
+    } else {
+      plain += character;
+    }
+  }
+  let result = '';
+  for (let index = 0; index < plain.length; index++) {
+    const character = plain[index];
+    if (character === '"') {
+      let end = index + 1;
+      while (end < plain.length && plain[end] !== '"') {
+        end += plain[end] === '\\' ? 2 : 1;
+      }
+      result += plain.slice(index, end + 1);
+      index = end;
+    } else if (character === ',') {
+      let next = index + 1;
+      while (next < plain.length && /\s/.test(plain[next])) {
+        next++;
+      }
+      if (plain[next] !== ']' && plain[next] !== '}') {
+        result += character;
+      }
+    } else {
+      result += character;
+    }
+  }
+  return result;
+}
+
+/**
+ * vscodeKeybindingRules returns the rules of a file of the keyboard shortcuts of VS Code, such as keybindings.json of
+ * the user or the default keyboard shortcuts, as JSON with comments; a text that is no list of rules gives no rules.
+ * @param text - The text of the file.
+ */
+export function vscodeKeybindingRules(text: string): VsCodeKeybinding[] {
+  try {
+    const value: unknown = JSON.parse(withoutComments(text.replace(/^\uFEFF/, '')));
+    return Array.isArray(value) ? value.filter((rule): rule is VsCodeKeybinding => typeof rule === 'object' && rule !== null) : [];
+  } catch {
+    return [];
+  }
+}
+
+/** jumpKeysAttribute is the attribute of the element of a rendered page that gives the keys of Go Back and Go Forward. */
+export const jumpKeysAttribute = 'data-nimblescape-jump-keys';
+
+/**
+ * jumpKeysHtml returns a hidden element of HTML with the keys of Go Back and Go Forward, which a renderer adds to a
+ * page, for example a plugin of markdown-it of the Markdown preview of VS Code, whose scripts get the keys only from
+ * the page; pageJumpKeys reads them.
+ * @param keys - The keys.
+ */
+export function jumpKeysHtml(keys: JumpKeys): string {
+  const value = JSON.stringify({ back: keys.back, forward: keys.forward }).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return `<div ${jumpKeysAttribute}="${value}" hidden></div>\n`;
+}
+
+/**
+ * pageJumpKeys returns the keys of Go Back and Go Forward of the first element of a page with them (jumpKeysHtml), or
+ * undefined without one.
+ * @param doc - The document of the page.
+ */
+export function pageJumpKeys(doc: Pick<Document, 'querySelector'>): JumpKeys | undefined {
+  const value = doc.querySelector(`[${jumpKeysAttribute}]`)?.getAttribute(jumpKeysAttribute);
+  if (!value) {
+    return undefined;
+  }
+  try {
+    const keys = JSON.parse(value) as { back?: unknown; forward?: unknown };
+    const strings = (list: unknown): string[] | undefined => (Array.isArray(list) && list.every((each) => typeof each === 'string') ? (list as string[]) : undefined);
+    const back = strings(keys.back);
+    const forward = strings(keys.forward);
+    return back && forward ? { back, forward } : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 /** KeyEvent is the part of a keyboard event that the keys compare. */
 export type KeyEvent = Pick<KeyboardEvent, 'key' | 'code' | 'ctrlKey' | 'altKey' | 'shiftKey' | 'metaKey'>;
 
@@ -82,7 +327,12 @@ export function matchesKey(event: KeyEvent, key: string): boolean {
   if (name === '-') {
     return event.key === '-' || event.key === '_' || event.code === 'Minus' || event.code === 'NumpadSubtract';
   }
-  return event.key.toLowerCase() === name.toLowerCase();
+  if (event.key.toLowerCase() === name.toLowerCase() || (name === 'Space' && event.key === ' ')) {
+    return true;
+  }
+  // Shift, and Option on macOS, change the character of a key, so a key of a character matches by its place too.
+  const code = keyCodes[name] ?? (/^[a-z]$/i.test(name) ? `Key${name.toUpperCase()}` : /^\d$/.test(name) ? `Digit${name}` : undefined);
+  return code !== undefined && event.code === code;
 }
 
 /**
@@ -93,7 +343,19 @@ export function matchesKey(event: KeyEvent, key: string): boolean {
 export function keyLabel(key: string, platform: Platform): string {
   const { modifiers, name } = partsOf(key);
   const names: Record<string, string> = { ctrl: 'Ctrl', alt: platform === 'mac' ? 'Option' : 'Alt', shift: 'Shift', meta: platform === 'mac' ? 'Cmd' : 'Meta', cmd: 'Cmd' };
-  return [...[...modifiers].map((modifier) => names[modifier] ?? modifier), name.replace(/^Arrow/, '')].join('+');
+  const order = ['ctrl', 'alt', 'shift', 'meta', 'cmd'];
+  const sorted = [...modifiers].sort((a, b) => order.indexOf(a) - order.indexOf(b));
+  return [...sorted.map((modifier) => names[modifier] ?? modifier), name.replace(/^Arrow/, '')].join('+');
+}
+
+/**
+ * shownKey returns the key that a tooltip names among the keys of a command: the last key of the keyboard, as VS Code
+ * names the key of its last rule, which is a rule of the user when there is one, else the first key, for example
+ * BrowserBack.
+ * @param keys - The keys of the command.
+ */
+export function shownKey(keys: readonly string[] | undefined): string | undefined {
+  return keys?.filter((key) => !/^Browser(Back|Forward)$/.test(key)).at(-1) ?? keys?.[0];
 }
 
 /**
@@ -109,8 +371,11 @@ export interface PagePlace {
 
 /** PageJumpsOptions configure the jumps of a page. */
 export interface PageJumpsOptions {
-  /** keys are the keys of Go Back and Go Forward; without them, only the mouse and the buttons go back and forward. */
-  readonly keys?: JumpKeys;
+  /**
+   * keys are the keys of Go Back and Go Forward, or a function that returns the keys of now; without them, only the
+   * mouse and the buttons go back and forward.
+   */
+  readonly keys?: JumpKeysOption;
   /**
    * mouseButtons false leaves the back and forward buttons of the mouse to the platform, for example to VS Code on
    * Windows, which gives them to its own commands Go Back and Go Forward also over a webview. The default is true.
@@ -261,11 +526,27 @@ export function installPageJumps(win: Window, options: PageJumpsOptions = {}): P
     });
     return element;
   };
-  const label = (keys: readonly string[] | undefined) => (keys?.[0] ? ` (${keyLabel(keys[0], platform)})` : '');
-  const backButton = button('Back', '←', `Go Back${label(options.keys?.back)}`, () => jumps.back());
-  const forwardButton = button('Forward', '→', `Go Forward${label(options.keys?.forward)}`, () => jumps.forward());
+  const label = (keys: readonly string[] | undefined) => {
+    const key = shownKey(keys);
+    return key ? ` (${keyLabel(key, platform)})` : '';
+  };
+  const backButton = button('Back', '←', 'Go Back', () => jumps.back());
+  const forwardButton = button('Forward', '→', 'Go Forward', () => jumps.forward());
   shadow.append(backButton, forwardButton);
+  // The titles name the keys of now, which change when the user binds other keys to Go Back and Go Forward.
+  const titles = () => {
+    const keys = currentKeys(options.keys);
+    for (const [element, title] of [
+      [backButton, `Go Back${label(keys?.back)}`],
+      [forwardButton, `Go Forward${label(keys?.forward)}`],
+    ] as const) {
+      element.title = title;
+      element.setAttribute('aria-label', title);
+    }
+  };
+  host.addEventListener('mouseenter', titles);
   const show = () => {
+    titles();
     const { back, forward } = stacks;
     host.style.display = back.length > 0 || forward.length > 0 ? 'flex' : 'none';
     backButton.style.display = back.length > 0 ? '' : 'none';
@@ -332,7 +613,7 @@ export function installPageJumps(win: Window, options: PageJumpsOptions = {}): P
   // A key that goes back or forward stays in the page, so that the platform does not go back too; without a place, the
   // key goes on to the platform, for example to Go Back of VS Code.
   const onKey = (event: KeyboardEvent) => {
-    const keys = options.keys;
+    const keys = currentKeys(options.keys);
     const run = keys?.back.some((key) => matchesKey(event, key)) ? jumps.back : keys?.forward.some((key) => matchesKey(event, key)) ? jumps.forward : undefined;
     if (run?.()) {
       event.preventDefault();

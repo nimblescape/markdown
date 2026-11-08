@@ -9,7 +9,7 @@
 // buttons "Go Back" and "Go Forward" show before the switch (R-EDIT-014); a button without a place is disabled.
 
 import type { Editor } from '@tiptap/core';
-import { type JumpKeys, keyLabel, platformOf } from '@nimblescape/markdownrender/jumps';
+import { currentKeys, type JumpKeysOption, keyLabel, platformOf, shownKey } from '@nimblescape/markdownrender/jumps';
 import { button, element, icon } from './dom';
 import { listItems, textStyleItems, textStyleName } from './items';
 import type { Menu, MenuItem } from './menu';
@@ -30,8 +30,8 @@ export interface JumpButtons {
   canGoForward: () => boolean;
   back: () => boolean;
   forward: () => boolean;
-  /** keys are the keys of Go Back and Go Forward, which the tooltips name. */
-  keys?: JumpKeys;
+  /** keys are the keys of Go Back and Go Forward, or a function that returns the keys of now, which the tooltips name. */
+  keys?: JumpKeysOption;
 }
 
 /** ToolbarHost is what the toolbar needs from the editor. */
@@ -76,10 +76,11 @@ export class Toolbar {
     this.editingOnly = [this.undo, this.redo, first, this.style, this.list, insert, second];
     if (host.jumps) {
       const jumps = host.jumps;
-      const platform = platformOf(navigator);
-      const label = (name: string, keys: readonly string[] | undefined) => (keys?.[0] ? `${name} (${keyLabel(keys[0], platform)})` : name);
-      this.back = button(label('Go Back', jumps.keys?.back), icon('back'), () => jumps.back());
-      this.forward = button(label('Go Forward', jumps.keys?.forward), icon('forward'), () => jumps.forward());
+      this.back = button('Go Back', icon('back'), () => jumps.back());
+      this.forward = button('Go Forward', icon('forward'), () => jumps.forward());
+      for (const each of [this.back, this.forward]) {
+        each.addEventListener('mouseenter', () => this.jumpTitles());
+      }
     }
     if (host.editing) {
       const editing = host.editing;
@@ -106,6 +107,26 @@ export class Toolbar {
     this.update();
   }
 
+  /** jumpTitles names the keys of now in the tooltips of Go Back and Go Forward, which change when the user binds other keys. */
+  private jumpTitles(): void {
+    if (!this.back || !this.forward || !this.host.jumps) {
+      return;
+    }
+    const keys = currentKeys(this.host.jumps.keys);
+    const platform = platformOf(navigator);
+    for (const [target, name, bound] of [
+      [this.back, 'Go Back', keys?.back],
+      [this.forward, 'Go Forward', keys?.forward],
+    ] as const) {
+      const key = shownKey(bound);
+      const title = key ? `${name} (${keyLabel(key, platform)})` : name;
+      if (target.title !== title) {
+        target.title = title;
+        target.setAttribute('aria-label', title);
+      }
+    }
+  }
+
   /** update shows the state of the editor in the buttons: undo, the text style, the switch. */
   update(): void {
     const { editor } = this.host;
@@ -123,6 +144,7 @@ export class Toolbar {
       this.forward.hidden = !shown;
       this.back.disabled = !jumps.canGoBack();
       this.forward.disabled = !jumps.canGoForward();
+      this.jumpTitles();
     }
     const inList = editor.isActive('bulletList') || editor.isActive('orderedList') || editor.isActive('taskList');
     this.list.classList.toggle('nsmd-button-active', inList);

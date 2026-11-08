@@ -213,16 +213,19 @@ last jump, at the same height in the view, and "Go Forward" goes to the
 place of the jump again; a new jump ends the way forward. The editor goes
 back and forward:
 
-- with the keys that the integrating code gives, for example the keys of
-  Go Back and Go Forward of VS Code: Ctrl+Alt+- and Ctrl+Shift+- on Linux,
-  Alt+Left and Alt+Right on Windows, Ctrl+- and Ctrl+Shift+- on macOS. A key
-  without a place to go to goes on to the page, so that the platform uses
-  it, for example Go Back of VS Code;
+- with the keys that the integrating code gives, for example the keys that
+  the user binds to Go Back and Go Forward of VS Code; by default these are
+  Ctrl+Alt+- and Ctrl+Shift+- on Linux, Alt+Left and Alt+Right on Windows,
+  Ctrl+- and Ctrl+Shift+- on macOS. The integrating code can give the keys
+  as a function that returns the keys of now, so that a change of the
+  keyboard shortcuts applies while the editor shows. A key without a place
+  to go to goes on to the page, so that the platform uses it, for example
+  Go Back of VS Code;
 - with the back and forward buttons of the mouse, unless the integrating
   code leaves them to the platform;
 - with the buttons "Go Back" and "Go Forward" of the toolbar, which show
   once the editor has a place; a button without a place in its direction is
-  disabled.
+  disabled, and the tooltips name the keys of now.
 
 A rendered page has the same way back ([R-REN-004](rendering.md#r-ren-004)).
 
