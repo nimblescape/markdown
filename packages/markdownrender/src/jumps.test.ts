@@ -4,12 +4,12 @@
 // Licensed under the MIT License. See LICENSE in the repository root for details.
 
 // The tests of the way back after a jump in a rendered page (docs/rendering.md, R-REN-004): the keys of Go Back and Go
-// Forward of VS Code, a click on a link to a place of the page that moves the page, Go Back and Go Forward with the
+// Forward of VS Code, also from its rules of the keyboard shortcuts, a click on a link to a place of the page that moves the page, Go Back and Go Forward with the
 // keys, the mouse buttons and the buttons of the page, the places of a content over a load of the page again, and one
 // set of jumps for two scripts.
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { installPageJumps, keyLabel, matchesKey, type PageJumps, platformOf, vscodeJumpKeys } from './jumps';
+import { type JumpKeys, installPageJumps, keyLabel, matchesKey, type PageJumps, platformOf, vscodeJumpKeys, vscodeJumpKeysOf, vscodeKey } from './jumps';
 
 const key = (init: KeyboardEventInit) => new KeyboardEvent('keydown', { bubbles: true, cancelable: true, ...init });
 
@@ -34,10 +34,59 @@ describe('the keys', () => {
     expect(matchesKey(key({ key: 'BrowserBack' }), 'BrowserBack')).toBe(true);
   });
 
+  it('match a key of a character by its place when Option or Shift changes the character, and the space key', () => {
+    expect(matchesKey(key({ key: '∂', code: 'KeyD', altKey: true, metaKey: true }), 'Alt-Meta-d')).toBe(true);
+    expect(matchesKey(key({ key: '¡', code: 'Digit1', altKey: true }), 'Alt-1')).toBe(true);
+    expect(matchesKey(key({ key: '“', code: 'BracketLeft', altKey: true }), 'Alt-[')).toBe(true);
+    expect(matchesKey(key({ key: ' ', code: 'Space', ctrlKey: true }), 'Ctrl-Space')).toBe(true);
+    expect(matchesKey(key({ key: 'ArrowLeft', code: 'ArrowLeft', altKey: true, metaKey: true }), 'Alt-Meta-ArrowLeft')).toBe(true);
+    expect(matchesKey(key({ key: 'ArrowLeft', code: 'ArrowLeft', metaKey: true }), 'Alt-Meta-ArrowLeft')).toBe(false);
+  });
+
   it('have names for the tooltips', () => {
     expect(keyLabel('Ctrl-Alt--', 'linux')).toBe('Ctrl+Alt+-');
     expect(keyLabel('Alt-ArrowLeft', 'windows')).toBe('Alt+Left');
     expect(keyLabel('Ctrl-Shift--', 'mac')).toBe('Ctrl+Shift+-');
+    expect(keyLabel('Alt-Meta-ArrowLeft', 'mac')).toBe('Option+Cmd+Left');
+  });
+
+  it('read a key in the notation of the keyboard shortcuts of VS Code', () => {
+    expect(vscodeKey('cmd+alt+left')).toBe('Alt-Meta-ArrowLeft');
+    expect(vscodeKey('alt+cmd+left')).toBe('Alt-Meta-ArrowLeft');
+    expect(vscodeKey('ctrl+alt+-')).toBe('Ctrl-Alt--');
+    expect(vscodeKey('ctrl+shift+-')).toBe('Ctrl-Shift--');
+    expect(vscodeKey('Shift+Alt+Right')).toBe('Alt-Shift-ArrowRight');
+    expect(vscodeKey('ctrl+[Minus]')).toBe('Ctrl--');
+    expect(vscodeKey('ctrl+[KeyB]')).toBe('Ctrl-b');
+    expect(vscodeKey('browserback')).toBe('BrowserBack');
+    expect(vscodeKey('f12')).toBe('F12');
+    expect(vscodeKey('ctrl++')).toBe('Ctrl-+');
+    expect(vscodeKey('meta+[')).toBe('Meta-[');
+    expect(vscodeKey('ctrl+k ctrl+left')).toBeUndefined();
+    expect(vscodeKey('ctrl+nothing')).toBeUndefined();
+    expect(vscodeKey('hyper+left')).toBeUndefined();
+    expect(vscodeKey('')).toBeUndefined();
+  });
+
+  it('come from the rules of the keyboard shortcuts of VS Code: the defaults, then the rules of the user', () => {
+    const defaults = [
+      { key: 'ctrl+alt+-', command: 'workbench.action.navigateBack' },
+      { key: 'ctrl+shift+-', command: 'workbench.action.navigateForward' },
+      { key: 'browserback', command: 'workbench.action.navigateBack' },
+      { key: 'ctrl+alt+-', command: 'editor.action.other', when: 'editorFocus' },
+      { key: 'ctrl+k ctrl+-', command: 'workbench.action.navigateBack' },
+      { key: 'ctrl+-', command: 'workbench.action.zoomOut' },
+    ];
+    expect(vscodeJumpKeysOf(defaults)).toEqual<JumpKeys>({ back: ['Ctrl-Alt--', 'BrowserBack'], forward: ['Ctrl-Shift--'] });
+    const user = [
+      { key: 'cmd+alt+left', command: 'workbench.action.navigateBack' },
+      { key: 'cmd+alt+right', command: 'workbench.action.navigateForwardInNavigationLocations' },
+      { key: 'ctrl+alt+-', command: '-workbench.action.navigateBack' },
+      { key: 'ctrl+shift+-', command: 'workbench.action.zoomIn' },
+    ];
+    expect(vscodeJumpKeysOf([...defaults, ...user])).toEqual<JumpKeys>({ back: ['BrowserBack', 'Alt-Meta-ArrowLeft'], forward: ['Alt-Meta-ArrowRight'] });
+    expect(vscodeJumpKeysOf([...defaults, { command: '-workbench.action.navigateBack' }])).toEqual<JumpKeys>({ back: [], forward: ['Ctrl-Shift--'] });
+    expect(vscodeJumpKeysOf([{ key: 3, command: 'workbench.action.navigateBack' }, { command: 4 }, {}])).toEqual<JumpKeys>({ back: [], forward: [] });
   });
 });
 
@@ -142,6 +191,22 @@ describe('the jumps of a page', () => {
     clickLink();
     document.body.dispatchEvent(new MouseEvent('mouseup', { button: 3, bubbles: true, cancelable: true }));
     expect(jumps.canGoBack).toBe(true);
+  });
+
+  it('takes the keys of now from a function, for keys that the user changes while the page shows', () => {
+    let keys: JumpKeys = vscodeJumpKeys('linux');
+    jumps = installPageJumps(window, { keys: () => keys, platform: 'mac' });
+    clickLink();
+    keys = { back: ['Alt-Meta-ArrowLeft'], forward: ['Alt-Meta-ArrowRight'] };
+    const old = key({ key: '-', code: 'Minus', ctrlKey: true, altKey: true });
+    document.body.dispatchEvent(old);
+    expect(old.defaultPrevented).toBe(false);
+    expect(window.scrollY).toBe(800);
+    const { host, back } = buttons();
+    host.dispatchEvent(new MouseEvent('mouseenter'));
+    expect(back.title).toBe('Go Back (Option+Cmd+Left)');
+    document.body.dispatchEvent(key({ key: 'ArrowLeft', code: 'ArrowLeft', altKey: true, metaKey: true }));
+    expect(window.scrollY).toBe(100);
   });
 
   it('shows the buttons Back and Forward only while there is a place in their direction', () => {

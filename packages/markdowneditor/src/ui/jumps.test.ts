@@ -9,7 +9,7 @@
 
 import type { EditorView } from '@tiptap/pm/view';
 import { pluginApiVersion } from '@nimblescape/markdownrender';
-import { vscodeJumpKeys } from '@nimblescape/markdownrender/jumps';
+import { type JumpKeys, vscodeJumpKeys } from '@nimblescape/markdownrender/jumps';
 import { afterEach, describe, expect, it } from 'vitest';
 import { MarkdownEditor, type MarkdownEditorOptions } from '../editor';
 import type { GeneratedPart, MarkdownPlugin, PluginEditor } from '../plugins/api';
@@ -159,6 +159,20 @@ describe('Go Back and Go Forward', () => {
     expect(blockAt(opened)).toContain('See');
     expect(key(opened, { key: '_', code: 'Minus', ctrlKey: true, shiftKey: true })).toBe(true);
     expect(blockAt(opened)).toBe('Again.');
+  });
+
+  it('take the keys of now from a function, also in the tooltips of the toolbar, for keys that the user changes', () => {
+    let keys: JumpKeys = vscodeJumpKeys('linux');
+    const opened = open(text, { jumps: { keys: () => keys } });
+    const back = element.querySelector<HTMLButtonElement>('button[title^="Go Back"]')!;
+    expect(back.title).toBe('Go Back (Ctrl+Alt+-)');
+    opened.jumpTo(posOf(opened, 'Again.'), posOf(opened, 'the methods'));
+    keys = { back: ['Alt-Meta-ArrowLeft'], forward: ['Alt-Meta-ArrowRight'] };
+    expect(key(opened, { key: '-', code: 'Minus', ctrlKey: true, altKey: true })).toBe(false);
+    back.dispatchEvent(new MouseEvent('mouseenter'));
+    expect(back.title).toBe('Go Back (Alt+Meta+Left)');
+    expect(key(opened, { key: 'ArrowLeft', code: 'ArrowLeft', altKey: true, metaKey: true })).toBe(true);
+    expect(blockAt(opened)).toContain('See');
   });
 
   it('use the back and forward buttons of the mouse, unless the integrating code leaves them to the platform', () => {

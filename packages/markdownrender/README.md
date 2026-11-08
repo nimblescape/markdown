@@ -109,3 +109,15 @@ import { installPageJumps, platformOf, vscodeJumpKeys } from '@nimblescape/markd
 
 installPageJumps(window, { keys: vscodeJumpKeys(platformOf(navigator)), key: () => location.pathname });
 ```
+
+The keys can also be a function that returns the keys of now. `vscodeJumpKeysOf`
+returns the keys that a user binds to Go Back and Go Forward from the rules
+of the keyboard shortcuts of VS Code (the default rules first, then those of
+`keybindings.json`):
+
+```ts
+import { installPageJumps, vscodeJumpKeysOf } from '@nimblescape/markdownrender/jumps';
+
+let keys = vscodeJumpKeysOf([...defaultRules, ...userRules]);
+installPageJumps(window, { keys: () => keys });
+```

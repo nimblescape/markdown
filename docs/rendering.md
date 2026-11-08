@@ -100,10 +100,17 @@ content starts without places.
 
 The entry point `@nimblescape/markdownrender/jumps` has no imports, so that
 a script of a page can bundle it: `installPageJumps` installs the jumps in
-a page, and `vscodeJumpKeys` gives the keys of Go Back and Go Forward of VS
-Code on each platform. Two scripts of one page that both install the jumps,
-for example the scripts of the Markdown preview of Markdown Notes and of
-Markdown Paper, share one set of places.
+a page, and `vscodeJumpKeys` gives the default keys of Go Back and Go Forward
+of VS Code on each platform. The keys that a user binds to Go Back and Go
+Forward in VS Code come from its rules of the keyboard shortcuts:
+`vscodeJumpKeysOf` reads them from the rules in the order in which VS Code
+applies them, and `vscodeKey` reads one key in the notation of VS Code, for
+example `cmd+alt+left`. The integrating code can give the keys as a function
+that returns the keys of now, so that a change of the keyboard shortcuts
+applies while the page shows; the tooltips of the buttons name the keys of
+now. Two scripts of one page that both install the jumps, for example the
+scripts of the Markdown preview of Markdown Notes and of Markdown Paper,
+share one set of places.
 
 ## 2. Plugins of the renderer
 
