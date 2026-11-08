@@ -163,7 +163,11 @@ The layout is a plugin of the renderer
 layout, so that the same renderer renders a text with and without a layout.
 In a rendering with a layout, each footnote goes to the foot of the page of
 its first reference, and a link to the outside with its own text gets its
-address in a footnote; the headings get numbers to the depth of the layout,
+address in a footnote; the text of a footnote comes from the method `render`
+of markdown-it itself, so that the elements that a plugin puts around the
+whole HTML of a rendering, for example "Markdown Preview Github Styling" in
+the Markdown preview of VS Code, are not in a footnote; the headings get
+numbers to the depth of the layout,
 except the special sections (table of contents, lists of figures, tables
 and listings, reference list, declaration, abstract, acknowledgements,
 foreword, appendix), which the words of the language or a marker such as
