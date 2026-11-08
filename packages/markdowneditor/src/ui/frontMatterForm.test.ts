@@ -205,6 +205,13 @@ describe('the form of the front matter', () => {
     });
     expect(field(['layout'])?.querySelector('.layout-link')?.textContent).toBe('Layout pht');
     expect(field(['layout'])?.querySelector('input.nsmd-fm-input')).toBeNull();
+    expect(field(['layout'])?.querySelector('.nsmd-fm-readonly')).toBeNull();
+  });
+
+  it('gives the value that the input of a plugin shows the gray background of the read-only values, when the schema marks it read-only (R-EDIT-011)', () => {
+    const render = (value: unknown) => Object.assign(document.createElement('a'), { className: 'layout-link', textContent: `Layout ${String(value)}` });
+    open(text, { frontMatterSchema: { type: 'object', properties: { layout: { type: 'string', readOnly: true } } }, frontMatterInputs: [{ key: 'layout', render }] });
+    expect(field(['layout'])?.querySelector('.nsmd-fm-value.nsmd-fm-readonly .layout-link')?.textContent).toBe('Layout pht');
   });
 
   it('shows the text of a front matter that does not parse, and the user edits the text', async () => {
