@@ -585,6 +585,16 @@ describe('the layout in a renderer with other plugins', () => {
     expect(body.html).toContain('<span class="heading-number">1</span> Einleitung');
   });
 
+  test('a footnote has no elements of a plugin that replaced the method render of the renderer of markdown-it to put them around the whole HTML, as in the Markdown preview of VS Code', () => {
+    const md = createLayoutRenderer().markdownIt;
+    // As "Markdown Preview Github Styling" does in the Markdown preview of VS Code.
+    const render = md.renderer.render.bind(md.renderer);
+    md.renderer.render = (tokens, options, env) => `<div class="github-markdown-body"><div class="github-markdown-content">${render(tokens, options, env)}</div></div>`;
+    const html = md.render('# Teil\n\nText.[^1]\n\n[^1]: Eine Fußnote.\n', { [layoutEnvKey]: { layout: layoutOf(), found: emptyFound() } });
+    expect(html.match(/github-markdown-body/g)).toHaveLength(1);
+    expect(html).toContain('Text.<span class="footnote"><span class="footnote-paragraph" id="paper-footnote-1">Eine Fußnote.</span></span>');
+  });
+
   test('without the layout in the environment, the same renderer renders the text without the layout: no numbers, footnotes at the end', () => {
     const renderer = createLayoutRenderer();
     const plain = renderer.toHtml('# Notizen\n\nText[^1]\n\n[^1]: Eine Fußnote.\n').html;

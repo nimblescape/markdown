@@ -591,7 +591,11 @@ function extendMarkdownIt(md: MarkdownIt): void {
   md.renderer.rules[layoutHtmlType] = (tokens, index) => tokens[index].content;
   md.renderer.rules[footnoteType] = (tokens, index, options, env, self) => {
     const meta = tokens[index].meta as FootnoteMeta;
-    return footnoteHtml(meta.number, self.render(meta.tokens, options, env), meta.link);
+    // The text of a footnote comes from the method render of markdown-it itself, not from the method of the renderer:
+    // a plugin can replace that method to put its elements around the whole HTML of a rendering, for example "Markdown
+    // Preview Github Styling" in the Markdown preview of VS Code, and these elements do not belong into a footnote.
+    const render = (Object.getPrototypeOf(self) as typeof self).render;
+    return footnoteHtml(meta.number, render.call(self, meta.tokens, options, env), meta.link);
   };
   md.renderer.rules[listType] = (tokens, index, _options, env) => {
     const layout = envOf(env);
