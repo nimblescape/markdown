@@ -233,10 +233,12 @@ export function installPageJumps(win: Window, options: PageJumpsOptions = {}): P
       'padding: 4px 10px',
       'margin-left: 4px',
       'border-radius: 4px',
-      'border: 1px solid var(--vscode-button-border, transparent)',
-      'color: var(--vscode-button-secondaryForeground, #fff)',
-      'background: var(--vscode-button-secondaryBackground, #5f6a79)',
-      'box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25)',
+      // The colors of the floating widgets of VS Code, such as the find widget: a solid background in each theme, also
+      // over the white pages of a paper.
+      'border: 1px solid var(--vscode-editorWidget-border, var(--vscode-widget-border, rgba(128, 128, 128, 0.5)))',
+      'color: var(--vscode-editorWidget-foreground, #333)',
+      'background: var(--vscode-editorWidget-background, #f3f3f3)',
+      'box-shadow: 0 1px 4px var(--vscode-widget-shadow, rgba(0, 0, 0, 0.25))',
       'cursor: pointer',
     ].join('; ');
     // The press keeps the selection and the focus of the page.
