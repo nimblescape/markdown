@@ -158,6 +158,13 @@ describe('the slash commands', () => {
     expect(labels()).not.toContain('Add a note');
   });
 
+  it('hide an item of the editor for a hidden item of a plugin with its id', () => {
+    const opened = open('\n', { insertItems: () => [{ id: 'footnote', label: 'Footnote', hidden: true, run: () => undefined }] });
+    select(opened, 1);
+    type(opened, '/foot');
+    expect(labels()).toEqual([]);
+  });
+
   it('start only at the start of a line or after a space, and close with Escape', () => {
     const opened = open('a\n');
     select(opened, 2);

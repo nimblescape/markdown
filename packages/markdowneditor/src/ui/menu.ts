@@ -32,6 +32,11 @@ export interface MenuItem {
    * only without selected text, and the other menus offer no command on selected text.
    */
   selection?: boolean;
+  /**
+   * hidden takes the item out of the menus: an item of a plugin with the id of an item of the editor and `hidden` hides
+   * that item, for example where the command of the plugin that takes its place does not apply.
+   */
+  hidden?: boolean;
   /** active marks the item that applies at the selection, for example the current text style. */
   active?: boolean;
   /** run does what the item does. */

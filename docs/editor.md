@@ -121,7 +121,7 @@ Alt+Down move the block of the cursor (Cmd in place of Ctrl on macOS).
 The slash commands have the same names and the same results as the slash
 commands of the text editor of the platform, for example of the clean
 editing view of Markdown Notes
-([decision 78](https://github.com/nimblescape/markdownnotes-vscode/blob/main/docs/requirements.md#decisions)).
+([decision 79](https://github.com/nimblescape/markdownnotes-vscode/blob/main/docs/requirements.md#decisions)).
 The list shows the name of each item at its right, and the typed name finds
 the item of that name first:
 
