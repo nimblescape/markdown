@@ -11,6 +11,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import spec from 'commonmark-spec';
 import type MarkdownIt from 'markdown-it';
+import footnote from 'markdown-it-footnote';
 import { describe, expect, it } from 'vitest';
 import { createMarkdownIt } from './markdownIt';
 import { addOutputRules, headingText, prepareOutput, slug } from './output';
@@ -276,6 +277,35 @@ describe('the plugins of the renderer', () => {
     expect(() => new MarkdownRenderer({ plugins: [plugin, { ...plugin }] })).toThrow(/renderer has two plugins with the name one/);
     expect(() => new MarkdownRenderer({ plugins: [{ name: 'two', apiVersion: 2 as 1 }] })).toThrow(/API version 2/);
     expect(() => new MarkdownRenderer({ plugins: [{ name: 'with space', apiVersion: 1 }] })).toThrow(/name/);
+  });
+
+  it('adds no syntax a second time: the footnotes stay once when a plugin adds markdown-it-footnote again, as the VS Code extension "Markdown Footnotes" does', () => {
+    const footnotes: RenderPlugin = { name: 'markdown-footnotes', apiVersion: 1, extendMarkdownIt: (md) => md.use(footnote) };
+    const text = 'Text.[^1] More^[inline].\n\n[^1]: The note.\n';
+    const shown = html(text, { plugins: [footnotes] });
+    expect(shown).toBe(html(text));
+    expect(shown.match(/<section class="footnotes">/g)).toHaveLength(1);
+    expect(shown).toContain('More^[inline].');
+    // The editor keeps each definition in its place.
+    const types = (md: MarkdownIt): string[] => md.parse(text, {}).map((token) => token.type);
+    expect(types(createMarkdownIt([(md) => md.use(footnote)], { footnotes: 'inPlace' }))).toEqual(types(createMarkdownIt([], { footnotes: 'inPlace' })));
+    const names = (md: MarkdownIt): string[] => (md.core.ruler as unknown as { __rules__: { name: string }[] }).__rules__.map((rule) => rule.name);
+    expect(names(createMarkdownIt([(md) => md.use(footnote)])).filter((name) => name === 'footnote_tail')).toHaveLength(1);
+  });
+
+  it('keeps a rule that a plugin changes in its place, and a rule of a plugin with a name of its own', () => {
+    const plugin = (md: MarkdownIt): MarkdownIt => {
+      md.inline.ruler.at('footnote_ref', () => false);
+      md.core.ruler.push('shout', (state) => {
+        for (const token of state.tokens) {
+          for (const child of token.children ?? []) {
+            child.content = child.content.toUpperCase();
+          }
+        }
+      });
+      return md;
+    };
+    expect(new MarkdownRenderer({ markdownIt: createMarkdownIt([plugin]), lines: false }).toHtml('Text.[^1]\n').html).toBe('<p>TEXT.[^1]</p>\n');
   });
 
   it('takes the markdown-it of the integrating code, for example the one of an editor', () => {

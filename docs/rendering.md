@@ -102,6 +102,15 @@ an empty element in its place; without a page, the token shows with the
 HTML of its rule of markdown-it. The page gets the styles of each plugin
 once.
 
+A plugin adds no syntax a second time: a rule that its `extendMarkdownIt`
+adds with the name of a rule that the markdown-it has already does not stay,
+so the rule of the renderer, or of a plugin before it, works alone. A rule
+that the plugin changes in its place, and a rule with a name of its own,
+stay. For example, the VS Code extension "Markdown Footnotes" adds
+markdown-it-footnote again: the footnotes still show once, at the end of the
+text or in their places in the editor, and the inline footnotes `^[text]`
+stay text.
+
 ## 3. Layouts
 
 ### R-LAYOUT-001
