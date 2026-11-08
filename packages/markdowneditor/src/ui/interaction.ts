@@ -14,7 +14,7 @@ import type { Node as PmNode } from '@tiptap/pm/model';
 import { NodeSelection, Plugin, Selection } from '@tiptap/pm/state';
 import type { EditorView } from '@tiptap/pm/view';
 import { readFrontMatter, type FrontMatterFormat, type JsonSchema } from '@nimblescape/markdowntext';
-import { alertsPlugin } from './alerts';
+import { alertTextStart, alertsPlugin } from './alerts';
 import { Asker } from './ask';
 import { BlockHandles, moveCurrentBlock } from './blockHandle';
 import { element } from './dom';
@@ -361,7 +361,7 @@ export class Interaction {
         ? selection.eq(start)
         : up
           ? selection.$head.start() === start.$head.start() && view.endOfTextblock('up')
-          : selection.empty && selection.head === start.head;
+          : selection.empty && (selection.head === start.head || selection.head === alertTextStart(view.state, start.head));
     const form = atStart ? [...this.forms].find((each) => view.dom.contains(each.dom)) : undefined;
     return form?.focusLast() ?? false;
   }
