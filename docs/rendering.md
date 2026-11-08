@@ -91,7 +91,9 @@ link again: with the keys that the integrating code gives, with the back
 and forward buttons of the mouse, unless the integrating code leaves them
 to the platform, and with the buttons "Back" and "Forward", which show at
 the bottom right of the page while there is a place in their direction. A
-key without a place to go to goes on to the platform. With a name of the
+key without a place to go to goes on to the platform. A place keeps the
+size of the page with it, so that it stays at its content when the page
+becomes higher or wider, for example by a zoom of its pages. With a name of the
 content, for example the URI of the file of a preview, the places stay in
 the storage of the session over a load of the page again, and another
 content starts without places.

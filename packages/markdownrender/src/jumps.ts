@@ -96,10 +96,15 @@ export function keyLabel(key: string, platform: Platform): string {
   return [...[...modifiers].map((modifier) => names[modifier] ?? modifier), name.replace(/^Arrow/, '')].join('+');
 }
 
-/** PagePlace is a place of a page: how far it was scrolled. */
+/**
+ * PagePlace is a place of a page: how far it was scrolled, and how wide and high the page was then, so that the place
+ * stays at its content when the page becomes larger or smaller, for example by a zoom of its pages.
+ */
 export interface PagePlace {
   readonly x: number;
   readonly y: number;
+  readonly width?: number;
+  readonly height?: number;
 }
 
 /** PageJumpsOptions configure the jumps of a page. */
@@ -213,8 +218,14 @@ export function installPageJumps(win: Window, options: PageJumpsOptions = {}): P
     }
     show();
   };
-  const here = (): PagePlace => ({ x: win.scrollX, y: win.scrollY });
-  const go = (place: PagePlace) => win.scrollTo({ left: place.x, top: place.y, behavior: 'instant' });
+  const size = () => ({ width: doc.documentElement.scrollWidth, height: doc.documentElement.scrollHeight });
+  const here = (): PagePlace => ({ x: win.scrollX, y: win.scrollY, ...size() });
+  /** scaled returns a coordinate of a place for the size of the page now, when both sizes are known. */
+  const scaled = (value: number, then: number | undefined, now: number) => (then && now && then !== now ? (value * now) / then : value);
+  const go = (place: PagePlace) => {
+    const now = size();
+    win.scrollTo({ left: scaled(place.x, place.width, now.width), top: scaled(place.y, place.height, now.height), behavior: 'instant' });
+  };
 
   // The buttons stand in their own shadow tree in the root element, outside the body, so that the styles of the page,
   // the scripts that change the body and the clicks on the content do not reach them, and their styles change nothing

@@ -91,6 +91,17 @@ describe('the jumps of a page', () => {
     expect(window.scrollY).toBe(800);
   });
 
+  it('goes back to the same content when the page became higher, for example by a zoom of its pages', () => {
+    let height = 2000;
+    Object.defineProperty(document.documentElement, 'scrollHeight', { configurable: true, get: () => height });
+    jumps = installPageJumps(window);
+    clickLink();
+    height = 4000;
+    expect(jumps.back()).toBe(true);
+    expect(window.scrollY).toBe(200);
+    delete (document.documentElement as { scrollHeight?: number }).scrollHeight;
+  });
+
   it('keeps no place for a link to another file or a click that does not move the page', () => {
     jumps = installPageJumps(window);
     clickLink('outside');
