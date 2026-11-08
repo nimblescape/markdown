@@ -38,6 +38,14 @@ describe('the schema of a front matter', () => {
     expect(checkFrontMatter({ title: 'A', date: '2026-11-02', authors: [{ name: 'Ana' }] }, schema)).toEqual([]);
   });
 
+  it('takes a key with an empty value as a key without a value: a required one is a problem, another one is none', () => {
+    expect(checkFrontMatter({ title: '', date: null, kind: '', pages: null, authors: [{ name: '' }] }, schema)).toEqual([
+      { path: ['title'], message: 'A value is required.' },
+      { path: ['date'], message: 'A value is required.' },
+      { path: ['authors', 0, 'name'], message: 'A value is required.' },
+    ]);
+  });
+
   it('checks the dates of TOML as their text', () => {
     const data = readFrontMatter('+++\ntitle = "A"\ndate = 2026-11-02\n+++', 'toml');
     expect(checkFrontMatter(data, schema)).toEqual([]);
