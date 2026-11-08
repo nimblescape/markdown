@@ -91,32 +91,35 @@ export type Ask = (label: string, value?: string) => Promise<string | undefined>
 export function insertItems(editor: Editor, ask: Ask): MenuItem[] {
   const chain = () => editor.chain().focus();
   const items: MenuItem[] = [
-    { id: 'paragraph', label: 'Text', keywords: ['paragraph', 'plain'], icon: 'paragraph', run: () => chain().setParagraph().run() },
+    { id: 'paragraph', label: 'Text', slash: 'text', keywords: ['paragraph', 'plain'], icon: 'paragraph', run: () => chain().setParagraph().run() },
     ...[1, 2, 3, 4, 5, 6].map((level) => ({
       id: `heading${level}`,
       label: `Heading ${level}`,
-      keywords: ['title', `h${level}`],
+      slash: `h${level}`,
+      keywords: ['title'],
       icon: 'heading' as const,
       hint: '#'.repeat(level),
       run: () => chain().setHeading({ level: level as 1 | 2 | 3 | 4 | 5 | 6 }).run(),
     })),
-    { id: 'bulletList', label: 'Bulleted list', keywords: ['unordered', 'ul'], icon: 'bulletList', hint: '-', run: () => chain().toggleBulletList().run() },
-    { id: 'orderedList', label: 'Numbered list', keywords: ['ordered', 'ol'], icon: 'orderedList', hint: '1.', run: () => chain().toggleOrderedList().run() },
-    { id: 'taskList', label: 'Task list', keywords: ['todo', 'checkbox', 'check'], icon: 'taskList', hint: '- [ ]', run: () => chain().toggleTaskList().run() },
-    { id: 'blockquote', label: 'Quote', keywords: ['blockquote'], icon: 'quote', hint: '>', run: () => chain().toggleBlockquote().run() },
-    { id: 'codeBlock', label: 'Code block', keywords: ['fence', 'pre'], icon: 'codeBlock', hint: '```', run: () => chain().setCodeBlock().run() },
+    { id: 'bulletList', label: 'Bulleted list', slash: 'bullets', keywords: ['unordered', 'ul'], icon: 'bulletList', hint: '-', run: () => chain().toggleBulletList().run() },
+    { id: 'orderedList', label: 'Numbered list', slash: 'numbers', keywords: ['ordered', 'ol'], icon: 'orderedList', hint: '1.', run: () => chain().toggleOrderedList().run() },
+    { id: 'taskList', label: 'Task list', slash: 'tasks', keywords: ['checkbox', 'check'], icon: 'taskList', hint: '- [ ]', run: () => chain().toggleTaskList().run() },
+    { id: 'blockquote', label: 'Quote', slash: 'quote', keywords: ['blockquote'], icon: 'quote', hint: '>', run: () => chain().toggleBlockquote().run() },
+    { id: 'codeBlock', label: 'Code block', slash: 'code', keywords: ['fence', 'pre'], icon: 'codeBlock', hint: '```', run: () => chain().setCodeBlock().run() },
     {
       id: 'table',
       label: 'Table',
+      slash: 'table',
       keywords: ['grid'],
       icon: 'table',
       hint: '| |',
       run: () => chain().insertTable({ rows: 3, cols: 2, withHeaderRow: true }).run(),
     },
-    { id: 'horizontalRule', label: 'Divider', keywords: ['rule', 'hr', 'line', 'separator'], icon: 'rule', hint: '---', run: () => chain().setHorizontalRule().run() },
+    { id: 'horizontalRule', label: 'Divider', slash: 'divider', keywords: ['rule', 'hr', 'line', 'separator'], icon: 'rule', hint: '---', run: () => chain().setHorizontalRule().run() },
     {
       id: 'image',
       label: 'Image',
+      slash: 'image',
       keywords: ['picture', 'img'],
       icon: 'image',
       hint: '![]()',
@@ -133,6 +136,7 @@ export function insertItems(editor: Editor, ask: Ask): MenuItem[] {
     ...(Object.entries(alertKinds) as [AlertKind, string][]).map(([kind, name]) => ({
       id: `alert-${kind}`,
       label: name,
+      slash: 'alert',
       keywords: ['alert', 'callout', 'admonition'],
       icon: 'alert' as const,
       hint: `[!${kind.toUpperCase()}]`,
@@ -140,7 +144,7 @@ export function insertItems(editor: Editor, ask: Ask): MenuItem[] {
     })),
   ];
   if (editor.schema.nodes.footnoteReference) {
-    items.push({ id: 'footnote', label: 'Footnote', keywords: ['note', 'reference'], icon: 'footnote', hint: '[^1]', run: () => insertFootnote(editor) });
+    items.push({ id: 'footnote', label: 'Footnote', slash: 'footnote', keywords: ['reference'], icon: 'footnote', hint: '[^1]', run: () => insertFootnote(editor) });
   }
   return items;
 }

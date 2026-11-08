@@ -313,6 +313,12 @@ box of the text, and the parts that show over the text. The box leaves room at t
   background: var(--nsmd-find-current);
 }
 
+/* The selected text of a slash typed on it stays marked while the list of the commands on selected text is open. */
+.nsmd-editor .nsmd-slash-selected {
+  background: var(--nsmd-selection);
+  color: var(--nsmd-selection-foreground, inherit);
+}
+
 /*
 Tables (R-EDIT-008 to R-EDIT-010): the handles of the rows and the columns, the markers "+" on the borders, the line
 that shows where a dragged row or column goes, the colors of the cells, and the widths of the columns from the comment

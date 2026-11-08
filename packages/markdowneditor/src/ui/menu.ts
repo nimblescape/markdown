@@ -20,6 +20,18 @@ export interface MenuItem {
   icon?: IconName;
   /** hint is a short text at the right of the item, for example the Markdown that it writes. */
   hint?: string;
+  /**
+   * slash is the name of the item as a slash command, small letters, for example `h1` for `/h1`: the same name as the
+   * command in the text editor of the platform (R-GEN-003). The slash commands show it at the right of the item, and the
+   * typed name finds the item first.
+   */
+  slash?: string;
+  /**
+   * selection marks a command on selected text, for example adding a note: the slash commands offer it only after a
+   * slash typed on selected text, and select the text again before it runs. The slash commands offer the other items
+   * only without selected text, and the other menus offer no command on selected text.
+   */
+  selection?: boolean;
   /** active marks the item that applies at the selection, for example the current text style. */
   active?: boolean;
   /** run does what the item does. */
@@ -27,7 +39,8 @@ export interface MenuItem {
 }
 
 /**
- * matches returns the items whose label, id or keywords start with each word of a query, in their order.
+ * matches returns the items whose label, id, name as a slash command or keywords start with each word of a query, in
+ * their order; the items whose name as a slash command is the query come first.
  * @param items - The items.
  * @param query - The typed words.
  */
@@ -36,10 +49,12 @@ export function matches(items: readonly MenuItem[], query: string): MenuItem[] {
   if (words.length === 0) {
     return [...items];
   }
-  return items.filter((item) => {
-    const terms = [item.label, item.id, ...(item.keywords ?? [])].join(' ').toLowerCase().split(/[\s-]+/);
+  const found = items.filter((item) => {
+    const terms = [item.label, item.id, item.slash ?? '', ...(item.keywords ?? [])].join(' ').toLowerCase().split(/[\s-]+/);
     return words.every((word) => terms.some((term) => term.startsWith(word)));
   });
+  const named = words.join(' ');
+  return [...found.filter((item) => item.slash === named), ...found.filter((item) => item.slash !== named)];
 }
 
 /** Menu is a list of items at a point of the box of the editor. */

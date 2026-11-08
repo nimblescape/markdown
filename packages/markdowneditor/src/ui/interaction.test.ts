@@ -74,6 +74,16 @@ describe('the menus', () => {
     expect(matches(items, 'ol').map((item) => item.id)).toEqual(['orderedList']);
     expect(matches(items, 'x')).toEqual([]);
   });
+
+  it('find an item by its name as a slash command, and put the item of that name first', () => {
+    const items = [
+      { id: 'alert-note', label: 'Note', slash: 'alert', run: () => undefined },
+      { id: 'note', label: 'Add a note', slash: 'note', run: () => undefined },
+      { id: 'heading1', label: 'Heading 1', slash: 'h1', run: () => undefined },
+    ];
+    expect(matches(items, 'h1').map((item) => item.id)).toEqual(['heading1']);
+    expect(matches(items, 'note').map((item) => item.id)).toEqual(['note', 'alert-note']);
+  });
 });
 
 describe('the slash commands', () => {
@@ -85,6 +95,67 @@ describe('the slash commands', () => {
     expect(key(opened, 'Enter')).toBe(true);
     expect(opened.getMarkdown()).toBe('## Title\n');
     expect(element.querySelector<HTMLElement>('.nsmd-menu')?.hidden).toBe(true);
+  });
+
+  it('show the name of each item as a slash command, the same name as in the text editor', () => {
+    const opened = open('Title\n');
+    select(opened, 1);
+    type(opened, '/h2');
+    expect(labels()).toEqual(['Heading 2']);
+    expect(element.querySelector('.nsmd-menu-item .nsmd-menu-hint')?.textContent).toBe('/h2');
+    expect(key(opened, 'Enter')).toBe(true);
+    expect(opened.getMarkdown()).toBe('## Title\n');
+    select(opened, opened.tiptap.state.doc.content.size - 1);
+    type(opened, ' /alert');
+    expect(labels()).toEqual(['Note', 'Tip', 'Important', 'Warning', 'Caution']);
+  });
+
+  it('keep selected text for the commands on selected text, and select it again before such a command runs', () => {
+    const ran: string[] = [];
+    const opened = open('Some text here.\n', {
+      insertItems: (tiptap) => [
+        { id: 'note', label: 'Add a note', slash: 'note', selection: true, run: () => ran.push(tiptap.state.doc.textBetween(tiptap.state.selection.from, tiptap.state.selection.to)) },
+        { id: 'date', label: 'Date', slash: 'date', run: () => ran.push('date') },
+      ],
+    });
+    select(opened, 6, 10);
+    type(opened, '/no');
+    expect(opened.getMarkdown()).toBe('Some text/no here.\n');
+    expect(labels()).toEqual(['Add a note']);
+    expect(element.querySelector('.nsmd-slash-selected')?.textContent).toBe('text');
+    expect(key(opened, 'Enter')).toBe(true);
+    expect(ran).toEqual(['text']);
+    expect(opened.getMarkdown()).toBe('Some text here.\n');
+    expect(element.querySelector('.nsmd-slash-selected')).toBeNull();
+    // Without selected text, the list has no commands on selected text.
+    select(opened, 16);
+    type(opened, ' /');
+    expect(labels()).toContain('Date');
+    expect(labels()).not.toContain('Add a note');
+  });
+
+  it('let a slash replace selected text when no command works on selected text', () => {
+    const opened = open('Some text here.\n');
+    select(opened, 6, 10);
+    type(opened, '/');
+    expect(opened.getMarkdown()).toBe('Some / here.\n');
+  });
+
+  it('take an item of a plugin in place of the item of the editor with the same id, and keep the commands on selected text out of the insert menu', () => {
+    const opened = open('\n', {
+      insertItems: () => [
+        { id: 'table', label: 'Table with caption', slash: 'table', run: () => undefined },
+        { id: 'note', label: 'Add a note', slash: 'note', selection: true, run: () => undefined },
+      ],
+    });
+    select(opened, 1);
+    type(opened, '/table');
+    expect(labels()).toEqual(['Table with caption']);
+    key(opened, 'Escape');
+    element.querySelector<HTMLElement>('.nsmd-toolbar button[aria-label="Insert"]')?.click();
+    expect(labels()).toContain('Table with caption');
+    expect(labels()).not.toContain('Table');
+    expect(labels()).not.toContain('Add a note');
   });
 
   it('start only at the start of a line or after a space, and close with Escape', () => {
@@ -181,6 +252,20 @@ describe('the insert items', () => {
     }
     await Promise.resolve();
     expect(opened.getMarkdown()).toBe('Some [text](https://example.com).\n');
+  });
+});
+
+describe('the changes of the text of plugins', () => {
+  it('change the text of the file as one step of Undo, and select a range of the text', () => {
+    const opened = open('First.\n\nSecond.\n');
+    expect(opened.changeText([{ from: 8, to: 8, insert: 'Table 1: Caption\n\n' }])).toBe(true);
+    expect(opened.getMarkdown()).toBe('First.\n\nTable 1: Caption\n\nSecond.\n');
+    expect(opened.selectText(17, 24)).toBe(true);
+    const { from, to } = opened.tiptap.state.selection;
+    expect(opened.tiptap.state.doc.textBetween(from, to)).toBe('Caption');
+    expect(opened.changeText([{ from: 50, to: 50, insert: 'x' }])).toBe(false);
+    opened.tiptap.commands.undo();
+    expect(opened.getMarkdown()).toBe('First.\n\nSecond.\n');
   });
 });
 
