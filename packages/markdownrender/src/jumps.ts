@@ -9,7 +9,7 @@
 // that the integrating code gives, for example those of Go Back and Go Forward of VS Code, with the back and forward
 // buttons of the mouse, and with the buttons "Back" and "Forward" that show at the bottom right while there is a place
 // to go to. The editor of nimblescape Markdown has its own places, which move with the changes of the text
-// (docs/editor.md, R-EDIT-013); it uses the keys and the names of the keys of this module.
+// (docs/editor.md, R-EDIT-014); it uses the keys and the names of the keys of this module.
 //
 // The module has no imports and changes nothing of the page outside its own element, so that a script of a page can
 // bundle it, for example the scripts of the Markdown preview of VS Code of Markdown Notes and Markdown Paper. The first

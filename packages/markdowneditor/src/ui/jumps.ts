@@ -2,7 +2,7 @@
 // © 2026 Hannes Stauss (scalarion@nimblescape.com)
 // Licensed under the MIT License. See LICENSE in the repository root for details.
 
-// The jumps in the document of the editor (docs/editor.md, R-EDIT-013). Ctrl+click (Cmd+click on macOS) on a link to a
+// The jumps in the document of the editor (docs/editor.md, R-EDIT-014). Ctrl+click (Cmd+click on macOS) on a link to a
 // place of the document goes to that place: a link `#id` to the heading with that GitHub ID, or to an element of HTML or
 // a node of a plugin with that ID or name; a footnote reference to its definition, and the label of a definition to its
 // first reference. A plugin jumps with `jumpTo`, for example to the target of a generated part (R-EDIT-011). The editor

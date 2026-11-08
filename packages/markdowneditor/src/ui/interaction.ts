@@ -14,7 +14,7 @@ import type { Node as PmNode } from '@tiptap/pm/model';
 import { NodeSelection, Plugin, Selection } from '@tiptap/pm/state';
 import type { EditorView } from '@tiptap/pm/view';
 import { readFrontMatter, type FrontMatterFormat, type JsonSchema } from '@nimblescape/markdowntext';
-import { alertsPlugin } from './alerts';
+import { alertTextStart, alertsPlugin } from './alerts';
 import { Asker } from './ask';
 import { BlockHandles, moveCurrentBlock } from './blockHandle';
 import { element } from './dom';
@@ -60,7 +60,7 @@ export interface InteractionOptions {
   frontMatterInputs?: FrontMatterInput[];
   /**
    * jumps gives the keys of Go Back and Go Forward after a jump to a place of the document, for example those of VS
-   * Code, and whether the editor takes the back and forward buttons of the mouse (R-EDIT-013).
+   * Code, and whether the editor takes the back and forward buttons of the mouse (R-EDIT-014).
    */
   jumps?: JumpsOptions;
 }
@@ -172,7 +172,7 @@ export class Interaction {
   }
 
   /**
-   * jumpsExtension returns the Tiptap extension of the jumps (R-EDIT-013). Its priority is the lowest, so that its
+   * jumpsExtension returns the Tiptap extension of the jumps (R-EDIT-014). Its priority is the lowest, so that its
    * Ctrl+click on a link comes after the plugins, for example after a generated part of a plugin with its own target.
    */
   jumpsExtension(): Extension {
@@ -383,7 +383,7 @@ export class Interaction {
         ? selection.eq(start)
         : up
           ? selection.$head.start() === start.$head.start() && view.endOfTextblock('up')
-          : selection.empty && selection.head === start.head;
+          : selection.empty && (selection.head === start.head || selection.head === alertTextStart(view.state, start.head));
     const form = atStart ? [...this.forms].find((each) => view.dom.contains(each.dom)) : undefined;
     return form?.focusLast() ?? false;
   }

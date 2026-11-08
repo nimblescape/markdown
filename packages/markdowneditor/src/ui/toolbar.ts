@@ -6,7 +6,7 @@
 // style and the list of the block of the cursor, the insert menu "+", find and replace, and the switch between editing
 // and reading. The code that integrates the editor decides whether the switch shows. In read-only mode, the toolbar
 // shows only the buttons that do not change the text. Once the editor has jumped to a place of the document, the
-// buttons "Go Back" and "Go Forward" show before the switch (R-EDIT-013); a button without a place is disabled.
+// buttons "Go Back" and "Go Forward" show before the switch (R-EDIT-014); a button without a place is disabled.
 
 import type { Editor } from '@tiptap/core';
 import { type JumpKeys, keyLabel, platformOf } from '@nimblescape/markdownrender/jumps';
@@ -22,7 +22,7 @@ export interface Switch {
   isShown?: () => boolean;
 }
 
-/** JumpButtons are the buttons "Go Back" and "Go Forward" of the jumps of the editor (R-EDIT-013). */
+/** JumpButtons are the buttons "Go Back" and "Go Forward" of the jumps of the editor (R-EDIT-014). */
 export interface JumpButtons {
   /** shown tells whether the editor has a place in one of the directions. */
   shown: () => boolean;

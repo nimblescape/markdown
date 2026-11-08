@@ -84,7 +84,7 @@ needs no code of the editor, of Tiptap or of ProseMirror.
 
 **The way back in a rendered page.** A page that shows rendered content,
 for example the Markdown preview of VS Code, must have the way back of the
-editor ([R-EDIT-013](editor.md#r-edit-013)). A click on a link to a place
+editor ([R-EDIT-014](editor.md#r-edit-014)). A click on a link to a place
 of the page itself that moves the page keeps the place where the page was.
 "Go Back" returns to that place and "Go Forward" goes to the place of the
 link again: with the keys that the integrating code gives, with the back

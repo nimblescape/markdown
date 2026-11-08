@@ -62,7 +62,8 @@ text has no exact place in the Markdown text in general.
 **Rendered Markdown.** The editor must show Markdown rendered, without
 Markdown marks, and the user must edit the rendered text. The editor must
 support CommonMark and GFM: headings, emphasis, strikethrough, links,
-autolinks, images, lists, task lists, quotes, GitHub alerts (`> [!NOTE]`),
+autolinks, images, lists, task lists, quotes, GitHub alerts (`> [!NOTE]`,
+[R-EDIT-013](#r-edit-013)),
 code blocks with syntax colors, tables and thematic breaks; standard
 footnotes; the front matter; HTML and comments as raw parts that keep their
 text. The syntax colors of code blocks come from highlight.js through
@@ -73,6 +74,27 @@ GitHub. The colors come from six variables `--nsmd-syntax-*` (keyword,
 string, constant, title, type, comment), which take the palette of seven
 colors of the theme ([R-THEME-001](platforms.md#r-theme-001)), so that they
 follow the light and the dark theme and the theme of VS Code.
+
+### R-EDIT-013
+
+**GitHub alerts stay rendered.** A GitHub alert, such as `> [!NOTE]`, must
+show as its box with the name of its kind as its title, for example
+"Note", also while the cursor is in the alert and the user edits its text.
+The title is fixed: the marker of the alert stays in the text of the file,
+the cursor never stands in it, and an edit of the user cannot change a
+piece of it. A click on the title puts the cursor at the start of the text
+of the alert; the arrow left at the start of the text and the arrow up in
+its first line go to the text before the alert. Backspace at the start of
+the text removes the whole marker in one step of undo, so that the alert
+becomes a quote; an edit that ends the quote, for example the text style
+"Text", removes the marker too. Text typed after a marker alone starts on
+the line after the marker, a format of the user leaves the marker out, and
+find and replace leave the marker out. The slash command `/alert` inserts
+an alert with the cursor in its text ([R-GEN-003](#r-gen-003)). A change
+from outside, for example in the text editor, may change the marker
+([R-SRC-002](source.md#r-src-002);
+[decision 83](https://github.com/nimblescape/markdownnotes-vscode/blob/main/docs/requirements.md#decisions)
+of Markdown Notes).
 
 ### R-GEN-009
 
@@ -116,7 +138,7 @@ blocks, and find and replace. Its code is original: no code and no design
 file of the Claude interface is copied. The toolbar holds undo
 and redo, the text style and the list of the block of the cursor, the
 insert menu, find and replace, after a jump in the document Go Back and Go
-Forward ([R-EDIT-013](#r-edit-013)), and the switch of read-only mode. Ctrl+F opens find and replace; Alt+Up and
+Forward ([R-EDIT-014](#r-edit-014)), and the switch of read-only mode. Ctrl+F opens find and replace; Alt+Up and
 Alt+Down move the block of the cursor (Cmd in place of Ctrl on macOS).
 
 The slash commands have the same names and the same results as the slash
@@ -173,7 +195,7 @@ as active when the whole selection has its format.
 Bold, italic, strikethrough, code and link must have the keys Ctrl+B,
 Ctrl+I, Ctrl+Shift+S, Ctrl+E and Ctrl+K (Cmd on macOS).
 
-### R-EDIT-013
+### R-EDIT-014
 
 **Jumps in the document and the way back.** Ctrl+click (Cmd+click on macOS)
 on a link to a place of the document must go to that place: a link `#id`

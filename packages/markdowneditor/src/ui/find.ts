@@ -5,13 +5,15 @@
 // Find and replace (docs/editor.md, R-GEN-003): the plugin finds a text in the rendered text of the document, marks
 // each match, and moves the selection to the current match; replace changes the current match or all matches, each as
 // one step of undo. A match never crosses a node that is not text, for example a footnote reference. Replace leaves a
-// match that holds a piece of a generated part (R-EDIT-011).
+// match that holds a piece of a generated part (R-EDIT-011), and the search leaves out the markers of the GitHub alerts,
+// which show as their titles (R-EDIT-013).
 
 import { closeHistory } from '@tiptap/pm/history';
 import type { Node } from '@tiptap/pm/model';
 import { Plugin, PluginKey, TextSelection, type EditorState, type Transaction } from '@tiptap/pm/state';
 import { Decoration, DecorationSet, type EditorView } from '@tiptap/pm/view';
 import { breaks, generatedPartsOf } from '../plugins/generated';
+import { alertsOf } from './alerts';
 
 /** Match is a range of the document that matches the searched text. */
 export interface Match {
@@ -85,7 +87,9 @@ function decorationsOf(doc: Node, matches: readonly Match[], current: number): D
 
 /** stateOf returns the state of find and replace for a text in a document, with the match nearest a position current. */
 function stateOf(doc: Node, query: string, caseSensitive: boolean, near: number): FindState {
-  const matches = findMatches(doc, query, caseSensitive);
+  // The marker of a GitHub alert shows as the title of the alert, so the search leaves it out (R-EDIT-013).
+  const markers = alertsOf(doc);
+  const matches = findMatches(doc, query, caseSensitive).filter((match) => !markers.some((alert) => match.from < alert.to && match.to > alert.from));
   let current = matches.findIndex((match) => match.from >= near);
   if (current < 0) {
     current = matches.length > 0 ? 0 : -1;

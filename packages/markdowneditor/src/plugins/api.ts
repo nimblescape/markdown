@@ -130,7 +130,7 @@ export interface PluginEditor {
   runCommand(name: string, ...args: unknown[]): boolean;
   /**
    * jumpTo goes to a position of the document, for example the target of a generated part, and keeps the place where
-   * the jump started, by default the selection, so that "Go Back" returns to it (R-EDIT-013).
+   * the jump started, by default the selection, so that "Go Back" returns to it (R-EDIT-014).
    */
   jumpTo(pos: number, from?: number): void;
   /** openThread opens the panel of a thread beside the text, and closeThread closes it. */

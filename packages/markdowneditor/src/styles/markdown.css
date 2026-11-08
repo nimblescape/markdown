@@ -34,26 +34,21 @@ are not editable.
   white-space: pre-wrap;
 }
 
-/* The marker of a GitHub alert shows the name of its kind, until the cursor is at the marker (R-EDIT-003). */
+/*
+The marker of a GitHub alert shows as the name of its kind, the title of the alert, also while the cursor is in the
+alert; the title is fixed (R-EDIT-003, R-EDIT-013).
+*/
 .nsmd-editor .ProseMirror .nsmd-alert-marker {
   color: var(--nsmd-alert-color);
-}
-
-.nsmd-editor .ProseMirror .nsmd-alert-marker:not(.nsmd-alert-marker-raw) {
   font-size: 0;
 }
 
 /* The name of the kind stands on a line of its own, as on GitHub. */
-.nsmd-editor .ProseMirror .nsmd-alert-marker:not(.nsmd-alert-marker-raw)::before {
+.nsmd-editor .ProseMirror .nsmd-alert-marker::before {
   content: attr(data-label);
   display: block;
   font-size: var(--nsmd-font-size);
   font-weight: 600;
-}
-
-.nsmd-editor .ProseMirror .nsmd-alert-marker-raw {
-  font-family: var(--nsmd-code-font-family);
-  font-size: 0.85em;
 }
 
 /*

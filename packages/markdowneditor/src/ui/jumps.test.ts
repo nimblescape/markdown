@@ -3,7 +3,7 @@
 // © 2026 Hannes Stauss (scalarion@nimblescape.com)
 // Licensed under the MIT License. See LICENSE in the repository root for details.
 
-// The tests of the jumps in the document of the editor (docs/editor.md, R-EDIT-013): Ctrl+click on a link to a place of
+// The tests of the jumps in the document of the editor (docs/editor.md, R-EDIT-014): Ctrl+click on a link to a place of
 // the document and on a footnote goes there, the editor keeps the place where the jump started, and Go Back and Go
 // Forward return through the places with the keys, the mouse buttons and the toolbar, also after changes of the text.
 

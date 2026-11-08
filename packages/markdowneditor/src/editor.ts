@@ -339,7 +339,7 @@ export class MarkdownEditor implements PluginEditor {
 
   /**
    * jumpTo goes to a position of the document, for example the target of a link, and keeps the place where the jump
-   * started, so that goBack returns to it (docs/editor.md, R-EDIT-013).
+   * started, so that goBack returns to it (docs/editor.md, R-EDIT-014).
    * @param pos - The position of the target.
    * @param from - The position where the jump started; the default is the selection.
    */
@@ -349,12 +349,12 @@ export class MarkdownEditor implements PluginEditor {
     }
   }
 
-  /** goBack returns to the place before the last jump, and returns whether there was one (R-EDIT-013). */
+  /** goBack returns to the place before the last jump, and returns whether there was one (R-EDIT-014). */
   goBack(): boolean {
     return !this.tiptap.isDestroyed && goBack(this.tiptap.view);
   }
 
-  /** goForward goes to the place of the jump that goBack left, and returns whether there was one (R-EDIT-013). */
+  /** goForward goes to the place of the jump that goBack left, and returns whether there was one (R-EDIT-014). */
   goForward(): boolean {
     return !this.tiptap.isDestroyed && goForward(this.tiptap.view);
   }
