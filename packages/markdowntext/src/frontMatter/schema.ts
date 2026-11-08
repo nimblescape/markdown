@@ -124,7 +124,13 @@ function forJson(value: unknown): unknown {
     return value.map(forJson);
   }
   if (value !== null && typeof value === 'object') {
-    return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, forJson(item)]));
+    // A key with an empty value has no value (R-FM-004): the check leaves it out, so that only a required key with an
+    // empty value is a problem, and an empty value of another key is none.
+    return Object.fromEntries(
+      Object.entries(value)
+        .filter(([, item]) => item !== null && item !== undefined && item !== '')
+        .map(([key, item]) => [key, forJson(item)]),
+    );
   }
   return value;
 }

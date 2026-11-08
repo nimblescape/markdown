@@ -25,9 +25,10 @@ general functions; a plugin adds only the functions of its extension.
 The libraries hold the standard footnotes and the values of the front
 matter in the text ([R-FM-007](editor.md#r-fm-007)). The captions with
 numbers, `/ref` and the listings stay in Notes in version 1
-([R-NOTES-001](#r-notes-001)). The form of the front matter of the editor
-([R-FM-001](editor.md#r-fm-001)) takes the place of the view "Front Matter"
-of Paper ([R-PAPER-001](#r-paper-001)).
+([R-NOTES-001](#r-notes-001)). The front matter is edited in the page:
+in the form of the front matter of the editor
+([R-FM-001](editor.md#r-fm-001)), and as text in the clean editing view of
+Notes; Paper has no view of its own for it ([R-PAPER-001](#r-paper-001)).
 
 ## 2. Levels of a plugin
 
@@ -176,9 +177,9 @@ the PDF through the layout ([R-LAYOUT-001](rendering.md#r-layout-001)), and
 the prompt protocol through the history
 ([R-HIST-005](history.md#r-hist-005)). It marks the parts that it generates
 as read-only ([R-EDIT-011](editor.md#r-edit-011)): the text of citations,
-the reference list and the generated lists. For a file in the editor, the
-form of the front matter of the editor ([R-FM-001](editor.md#r-fm-001))
-takes the place of the view "Front Matter" of Paper.
+the reference list and the generated lists. The form of the front matter
+of the editor ([R-FM-001](editor.md#r-fm-001)) shows the schema of the
+layout; Paper gives the clean editing view of Notes the same schema.
 
 ## 5. Open questions
 

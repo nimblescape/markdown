@@ -255,6 +255,12 @@ remove it; a new text, select all and undo may remove it. A front matter
 that does not parse shows its text with the problem, and the user edits the
 text. In the read-only mode of the editor ([R-GEN-008](#r-gen-008)), the
 form shows the values as text. The integrating code may show the text in place of the form.
+The clean editing view of Notes, a text editor, edits the front matter as
+text with the same rules: the keys of the schema and the read-only values
+stay, only the text after a key changes, and the problems of the schema
+show as warnings
+([R-TEXT-009](https://github.com/nimblescape/markdownnotes-vscode/blob/main/docs/requirements.md#r-text-009)
+of Notes).
 
 ### R-FM-002
 
@@ -275,8 +281,9 @@ marks `readOnly` stays read-only in both modes.
 structured values, such as lists and maps, also nested, and renames and
 removes them. A key that the schema names stays in both modes: the user
 changes its value, but does not rename or remove it; only the other keys
-of the file, also in a map of the schema, get a new name or go. A button
-switches between the modes. A file without a schema opens in
+of the file, also in a map of the schema, get a new name or go. An empty
+value keeps its key: a key goes only with the button that removes it. A
+button switches between the modes. A file without a schema opens in
 the edit mode. A new key gets one of the kinds
 text, number, yes or no, list, or group of keys.
 
@@ -289,7 +296,9 @@ is standard JSON Schema (draft 2020-12) without keywords of its own:
 `format`, `minimum`, `default`, and the order of `properties`. A validator
 without eval checks it, because the page policy of a webview of VS Code
 forbids eval. The validator is the library
-`@cfworker/json-schema`. Each problem shows at its value with a message in
+`@cfworker/json-schema`. A key with an empty value counts as a key without
+a value: a required key with an empty value is a problem, and an empty value
+of another key is none. Each problem shows at its value with a message in
 plain words, and the head of the form counts the problems. The integrating
 code gives the schema and can change it, for example after a change of the
 layout.
