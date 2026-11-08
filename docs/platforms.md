@@ -48,7 +48,13 @@ and the editor must also be able to edit a whole file in the editor area. A
 setting of the extension chooses which Markdown files open in the editor:
 `all`, `notesAndPapers` (files with the comment of the format of Notes or
 with a layout) or `none`. The default is `all`. "Reopen Editor
-With" of VS Code always offers the text editor.
+With" of VS Code always offers the text editor. A Markdown file has three
+views in the place of its editor: "Text Editor", "Markdown Preview" and
+"Markdown Editor", which is this editor, also for a paper document with the
+plugins of Paper. The list of the editors of VS Code shows only these three,
+and the title of each view has a button for each of the two other views
+([R-PREV-006](https://github.com/nimblescape/markdownnotes-vscode/blob/main/docs/requirements.md#r-prev-006)
+of Notes).
 
 The adapter of VS Code is a part of Markdown Notes, which registers the
 editor as a custom text editor of VS Code. Its requirements are in the
