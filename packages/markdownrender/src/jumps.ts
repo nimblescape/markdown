@@ -349,6 +349,16 @@ export function keyLabel(key: string, platform: Platform): string {
 }
 
 /**
+ * shownKey returns the key that a tooltip names among the keys of a command: the last key of the keyboard, as VS Code
+ * names the key of its last rule, which is a rule of the user when there is one, else the first key, for example
+ * BrowserBack.
+ * @param keys - The keys of the command.
+ */
+export function shownKey(keys: readonly string[] | undefined): string | undefined {
+  return keys?.filter((key) => !/^Browser(Back|Forward)$/.test(key)).at(-1) ?? keys?.[0];
+}
+
+/**
  * PagePlace is a place of a page: how far it was scrolled, and how wide and high the page was then, so that the place
  * stays at its content when the page becomes larger or smaller, for example by a zoom of its pages.
  */
@@ -516,7 +526,10 @@ export function installPageJumps(win: Window, options: PageJumpsOptions = {}): P
     });
     return element;
   };
-  const label = (keys: readonly string[] | undefined) => (keys?.[0] ? ` (${keyLabel(keys[0], platform)})` : '');
+  const label = (keys: readonly string[] | undefined) => {
+    const key = shownKey(keys);
+    return key ? ` (${keyLabel(key, platform)})` : '';
+  };
   const backButton = button('Back', '←', 'Go Back', () => jumps.back());
   const forwardButton = button('Forward', '→', 'Go Forward', () => jumps.forward());
   shadow.append(backButton, forwardButton);

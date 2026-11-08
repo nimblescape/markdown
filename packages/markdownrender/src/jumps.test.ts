@@ -18,6 +18,7 @@ import {
   type PageJumps,
   pageJumpKeys,
   platformOf,
+  shownKey,
   vscodeJumpKeys,
   vscodeJumpKeysOf,
   vscodeKey,
@@ -61,6 +62,14 @@ describe('the keys', () => {
     expect(keyLabel('Alt-ArrowLeft', 'windows')).toBe('Alt+Left');
     expect(keyLabel('Ctrl-Shift--', 'mac')).toBe('Ctrl+Shift+-');
     expect(keyLabel('Alt-Meta-ArrowLeft', 'mac')).toBe('Option+Cmd+Left');
+  });
+
+  it('name the last key of the keyboard in the tooltips, as VS Code names the key of the rule of the user', () => {
+    expect(shownKey(['BrowserBack', 'Ctrl-Alt--'])).toBe('Ctrl-Alt--');
+    expect(shownKey(['BrowserBack', 'Ctrl--', 'Alt-Meta-ArrowLeft'])).toBe('Alt-Meta-ArrowLeft');
+    expect(shownKey(['BrowserBack'])).toBe('BrowserBack');
+    expect(shownKey([])).toBeUndefined();
+    expect(shownKey(undefined)).toBeUndefined();
   });
 
   it('read a key in the notation of the keyboard shortcuts of VS Code', () => {

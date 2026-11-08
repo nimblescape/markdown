@@ -9,7 +9,7 @@
 // buttons "Go Back" and "Go Forward" show before the switch (R-EDIT-014); a button without a place is disabled.
 
 import type { Editor } from '@tiptap/core';
-import { currentKeys, type JumpKeysOption, keyLabel, platformOf } from '@nimblescape/markdownrender/jumps';
+import { currentKeys, type JumpKeysOption, keyLabel, platformOf, shownKey } from '@nimblescape/markdownrender/jumps';
 import { button, element, icon } from './dom';
 import { listItems, textStyleItems, textStyleName } from './items';
 import type { Menu, MenuItem } from './menu';
@@ -118,7 +118,8 @@ export class Toolbar {
       [this.back, 'Go Back', keys?.back],
       [this.forward, 'Go Forward', keys?.forward],
     ] as const) {
-      const title = bound?.[0] ? `${name} (${keyLabel(bound[0], platform)})` : name;
+      const key = shownKey(bound);
+      const title = key ? `${name} (${keyLabel(key, platform)})` : name;
       if (target.title !== title) {
         target.title = title;
         target.setAttribute('aria-label', title);
