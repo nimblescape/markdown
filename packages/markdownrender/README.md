@@ -93,3 +93,19 @@ installs it from GitHub.
 ## License
 
 [MIT](LICENSE) © 2026 Hannes Stauss (scalarion@nimblescape.com)
+
+## The way back after a jump
+
+A page that shows rendered content gets the way back of the editor with the
+entry point `@nimblescape/markdownrender/jumps`
+([R-REN-004](../../docs/rendering.md#r-ren-004)): after a click on a link to
+a place of the page, Go Back returns to the place where the page was, and Go
+Forward goes to the link again, with the keys that the page gives, the back
+and forward buttons of the mouse, and the buttons that show at the bottom
+right. The entry point has no imports, so a script of a page bundles it.
+
+```ts
+import { installPageJumps, platformOf, vscodeJumpKeys } from '@nimblescape/markdownrender/jumps';
+
+installPageJumps(window, { keys: vscodeJumpKeys(platformOf(navigator)), key: () => location.pathname });
+```

@@ -80,6 +80,29 @@ that plugins show in a page; `render(text, element)` shows the rendering in
 an element of a page and runs the functions of the plugins. The package
 needs no code of the editor, of Tiptap or of ProseMirror.
 
+### R-REN-004
+
+**The way back in a rendered page.** A page that shows rendered content,
+for example the Markdown preview of VS Code, must have the way back of the
+editor ([R-EDIT-013](editor.md#r-edit-013)). A click on a link to a place
+of the page itself that moves the page keeps the place where the page was.
+"Go Back" returns to that place and "Go Forward" goes to the place of the
+link again: with the keys that the integrating code gives, with the back
+and forward buttons of the mouse, unless the integrating code leaves them
+to the platform, and with the buttons "Back" and "Forward", which show at
+the bottom right of the page while there is a place in their direction. A
+key without a place to go to goes on to the platform. With a name of the
+content, for example the URI of the file of a preview, the places stay in
+the storage of the session over a load of the page again, and another
+content starts without places.
+
+The entry point `@nimblescape/markdownrender/jumps` has no imports, so that
+a script of a page can bundle it: `installPageJumps` installs the jumps in
+a page, and `vscodeJumpKeys` gives the keys of Go Back and Go Forward of VS
+Code on each platform. Two scripts of one page that both install the jumps,
+for example the scripts of the Markdown preview of Markdown Notes and of
+Markdown Paper, share one set of places.
+
 ## 2. Plugins of the renderer
 
 ### R-REN-002

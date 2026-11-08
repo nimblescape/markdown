@@ -50,6 +50,7 @@ import { generatedPlugin, generatedWrite, validParts } from './plugins/generated
 import { sourceViews } from './plugins/render';
 import { setOpenThread, threadEntries, threadsKey, threadsPlugin, type ThreadEntry } from './plugins/threads';
 import { Interaction, type InteractionOptions } from './ui/interaction';
+import { canGo, goBack, goForward, jumpTo } from './ui/jumps';
 import { type ProposalResult, type ProposedChange, proposalsKey, proposalsOf, proposalsPlugin, type Tracked } from './ui/proposals';
 import { type ChangesOptions, EditorChanges } from './ui/changes';
 
@@ -172,7 +173,7 @@ export class MarkdownEditor implements PluginEditor {
     this.interaction = new Interaction(element, withPlugins(options, plugins));
     this.tiptap = new Editor({
       element: this.interaction.box,
-      extensions: [...(options.extensions ?? coreExtensions()), ...this.parts.extensions, this.pluginExtension(options), this.interaction.extension()],
+      extensions: [...(options.extensions ?? coreExtensions()), ...this.parts.extensions, this.pluginExtension(options), this.interaction.extension(), this.interaction.jumpsExtension()],
       editable: options.editable ?? true,
       ...(options.styleNonce ? { injectNonce: options.styleNonce } : {}),
       // The text has the styles of rendered content of the renderer (content.css).
@@ -334,6 +335,37 @@ export class MarkdownEditor implements PluginEditor {
     const selection = Selection.near(state.doc.resolve(Math.min(range.start + 1, state.doc.content.size)));
     this.tiptap.view.dispatch(state.tr.setSelection(selection).scrollIntoView());
     this.tiptap.view.focus();
+  }
+
+  /**
+   * jumpTo goes to a position of the document, for example the target of a link, and keeps the place where the jump
+   * started, so that goBack returns to it (docs/editor.md, R-EDIT-013).
+   * @param pos - The position of the target.
+   * @param from - The position where the jump started; the default is the selection.
+   */
+  jumpTo(pos: number, from?: number): void {
+    if (!this.tiptap.isDestroyed) {
+      jumpTo(this.tiptap.view, pos, from);
+    }
+  }
+
+  /** goBack returns to the place before the last jump, and returns whether there was one (R-EDIT-013). */
+  goBack(): boolean {
+    return !this.tiptap.isDestroyed && goBack(this.tiptap.view);
+  }
+
+  /** goForward goes to the place of the jump that goBack left, and returns whether there was one (R-EDIT-013). */
+  goForward(): boolean {
+    return !this.tiptap.isDestroyed && goForward(this.tiptap.view);
+  }
+
+  /** canGoBack and canGoForward tell whether goBack and goForward have a place to go to. */
+  get canGoBack(): boolean {
+    return canGo(this.tiptap.state, 'back');
+  }
+
+  get canGoForward(): boolean {
+    return canGo(this.tiptap.state, 'forward');
   }
 
   /**

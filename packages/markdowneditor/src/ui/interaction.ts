@@ -23,6 +23,7 @@ import { FindBar } from './findBar';
 import { FormatBar, type FormatButton } from './formatBar';
 import { type FrontMatterForm, type FrontMatterInput, frontMatterView } from './frontMatterForm';
 import { insertItems } from './items';
+import { canGo, goBack, goForward, hasPlaces, jumpsPlugin, type JumpsOptions } from './jumps';
 import { Menu, type MenuItem } from './menu';
 import { slashPlugin } from './slash';
 import { TableHandles } from './table/tableHandles';
@@ -57,6 +58,11 @@ export interface InteractionOptions {
   frontMatterSchema?: JsonSchema | ((editor: Editor) => JsonSchema | undefined);
   /** frontMatterInputs are the inputs of plugins for the values of keys of the front matter (R-FM-006). */
   frontMatterInputs?: FrontMatterInput[];
+  /**
+   * jumps gives the keys of Go Back and Go Forward after a jump to a place of the document, for example those of VS
+   * Code, and whether the editor takes the back and forward buttons of the mouse (R-EDIT-013).
+   */
+  jumps?: JumpsOptions;
 }
 
 /** frontMatterLanguage returns the key `lang` or `language` of the front matter of a document. */
@@ -166,6 +172,14 @@ export class Interaction {
   }
 
   /**
+   * jumpsExtension returns the Tiptap extension of the jumps (R-EDIT-013). Its priority is the lowest, so that its
+   * Ctrl+click on a link comes after the plugins, for example after a generated part of a plugin with its own target.
+   */
+  jumpsExtension(): Extension {
+    return Extension.create({ name: 'nsmdJumps', priority: 1, addProseMirrorPlugins: () => [jumpsPlugin(this.options.jumps)] });
+  }
+
+  /**
    * attach creates the parts that need the editor, after the editor is created.
    * @param editor - The Tiptap editor.
    * @param editing - The switch between editing and reading of the editor.
@@ -197,6 +211,14 @@ export class Interaction {
         menu: this.menu,
         insertItems: () => this.insertItems(),
         openFind: () => this.openFind(),
+        jumps: {
+          shown: () => hasPlaces(editor.state),
+          canGoBack: () => canGo(editor.state, 'back'),
+          canGoForward: () => canGo(editor.state, 'forward'),
+          back: () => goBack(editor.view),
+          forward: () => goForward(editor.view),
+          keys: this.options.jumps?.keys,
+        },
         editing: (this.options.readOnlyToggle ?? true) ? { isOn: () => editor.isEditable, toggle: editing.toggle, isShown: () => this.readOnlyShown } : undefined,
       });
       this.header.append(this.toolbar.dom);

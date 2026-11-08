@@ -115,7 +115,8 @@ same list of items, and typed words filter it. It must have handles to move
 blocks, and find and replace. Its code is original: no code and no design
 file of the Claude interface is copied. The toolbar holds undo
 and redo, the text style and the list of the block of the cursor, the
-insert menu, find and replace, and the switch of read-only mode. Ctrl+F opens find and replace; Alt+Up and
+insert menu, find and replace, after a jump in the document Go Back and Go
+Forward ([R-EDIT-013](#r-edit-013)), and the switch of read-only mode. Ctrl+F opens find and replace; Alt+Up and
 Alt+Down move the block of the cursor (Cmd in place of Ctrl on macOS).
 
 The slash commands have the same names and the same results as the slash
@@ -171,6 +172,37 @@ applies, for example "Research" of Paper only in a paper. A button must show
 as active when the whole selection has its format.
 Bold, italic, strikethrough, code and link must have the keys Ctrl+B,
 Ctrl+I, Ctrl+Shift+S, Ctrl+E and Ctrl+K (Cmd on macOS).
+
+### R-EDIT-013
+
+**Jumps in the document and the way back.** Ctrl+click (Cmd+click on macOS)
+on a link to a place of the document must go to that place: a link `#id`
+goes to the element of HTML or the node of a plugin with that ID or name,
+else to the heading with that GitHub ID, as the renderer gives it
+([R-REN-001](rendering.md#r-ren-001)); a footnote reference goes to its
+definition, and the label of a definition goes to its first reference. A
+plugin goes to the target of a generated part in the same way, from the
+place of the part (`jumpTo`, [R-EDIT-011](#r-edit-011)). The cursor stands
+at the target, in the middle of the view.
+
+The editor keeps the place where each jump started, and the places move
+with the changes of the text. "Go Back" returns to the place before the
+last jump, at the same height in the view, and "Go Forward" goes to the
+place of the jump again; a new jump ends the way forward. The editor goes
+back and forward:
+
+- with the keys that the integrating code gives, for example the keys of
+  Go Back and Go Forward of VS Code: Ctrl+Alt+- and Ctrl+Shift+- on Linux,
+  Alt+Left and Alt+Right on Windows, Ctrl+- and Ctrl+Shift+- on macOS. A key
+  without a place to go to goes on to the page, so that the platform uses
+  it, for example Go Back of VS Code;
+- with the back and forward buttons of the mouse, unless the integrating
+  code leaves them to the platform;
+- with the buttons "Go Back" and "Go Forward" of the toolbar, which show
+  once the editor has a place; a button without a place in its direction is
+  disabled.
+
+A rendered page has the same way back ([R-REN-004](rendering.md#r-ren-004)).
 
 ## 5. Tables
 

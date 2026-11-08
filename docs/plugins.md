@@ -107,7 +107,9 @@ works in the renderer and in the editor.
 The API of the editor for the plugins gives the Tiptap editor, the text as
 Markdown, the place in the text of the file of a position of the document,
 exact inside a block (at the edge of a mark, outside the mark,
-or with the side 1 inside the marks of the text after the position), the commands by their full names, the panel of a thread, and a
+or with the side 1 inside the marks of the text after the position), the commands by their full names, the panel of a thread, a
+jump to a position of the document that keeps the place where it started
+for Go Back (`jumpTo`, [R-EDIT-013](editor.md#r-edit-013)), and a
 refresh of the generated parts and threads after a change of the data of a
 plugin. The refresh also asks the plugins again for the schema
 of the front matter, for example after the part of a plugin on the platform
