@@ -29,6 +29,7 @@ Code, vscode.css of @nimblescape/markdownvscode sets the tokens from the variabl
   --nsmd-raw-foreground: #59636e;
   --nsmd-surface: #ffffff;
   --nsmd-hover: rgba(129, 139, 152, 0.15);
+  --nsmd-readonly: rgba(0, 0, 0, 0.1);
   --nsmd-active: rgba(9, 105, 218, 0.12);
   --nsmd-shadow: 0 4px 16px rgba(31, 35, 40, 0.15);
   --nsmd-mark: #953800;
@@ -72,6 +73,7 @@ Code, vscode.css of @nimblescape/markdownvscode sets the tokens from the variabl
     --nsmd-raw-foreground: #9198a1;
     --nsmd-surface: #151b23;
     --nsmd-hover: rgba(101, 108, 118, 0.2);
+    --nsmd-readonly: rgba(255, 255, 255, 0.1);
     --nsmd-active: rgba(68, 147, 248, 0.15);
     --nsmd-shadow: 0 4px 16px rgba(1, 4, 9, 0.6);
     --nsmd-mark: #ffa657;
