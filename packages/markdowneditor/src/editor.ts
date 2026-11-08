@@ -26,9 +26,9 @@
 import { type AnyExtension, Editor, Extension } from '@tiptap/core';
 import type { Node } from '@tiptap/pm/model';
 import { closeHistory } from '@tiptap/pm/history';
-import { EditorState, Plugin, Selection, type Transaction } from '@tiptap/pm/state';
+import { EditorState, Plugin, Selection, TextSelection as PmTextSelection, type Transaction } from '@tiptap/pm/state';
 import { ReplaceStep, Transform } from '@tiptap/pm/transform';
-import type { JsonSchema, Origin, TextChange, TextSelection, TextSource } from '@nimblescape/markdowntext';
+import { applyPatches, type JsonSchema, type Origin, type TextChange, type TextPatch, type TextSelection, type TextSource } from '@nimblescape/markdowntext';
 import { coreExtensions } from './extensions/core';
 import { MarkdownCodec } from './markdown/codec';
 import type { MarkdownSource } from './markdown/parse';
@@ -745,6 +745,65 @@ export class MarkdownEditor implements PluginEditor {
       this.source = before;
       return false;
     }
+    return true;
+  }
+
+  /**
+   * changeText changes the text of the file as a change of the user, as one step of Undo, for example for a slash command
+   * of a plugin whose platform finds the new text (docs/plugins.md, R-PLUGIN-001). The patches have the places of the
+   * current text of the file, in their order, and do not overlap.
+   * @param patches - The patches.
+   * @returns Whether the text changed.
+   */
+  changeText(patches: readonly TextPatch[]): boolean {
+    if (!this.isEditable || !this.source || this.tiptap.isDestroyed || patches.length === 0) {
+      return false;
+    }
+    const { state } = this.tiptap;
+    const { text, source } = this.codec.rebased(state.doc, this.source);
+    let file: string;
+    try {
+      file = applyPatches(text, patches);
+    } catch {
+      return false;
+    }
+    const { tr, source: next } = updated(state, source, this.codec.parse(file));
+    if (!tr) {
+      return false;
+    }
+    // The change may write markup of the plugins and generated parts, as a change from outside does.
+    closeHistory(tr).setMeta('addToHistory', true).setMeta(outsideChange, false).setMeta(generatedWrite, true);
+    const before = this.source;
+    this.source = next;
+    this.tiptap.view.dispatch(tr.scrollIntoView());
+    if (this.tiptap.state.doc === state.doc) {
+      this.source = before;
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * selectText selects a range of the text of the file inside the text of one paragraph or heading, or puts the cursor
+   * at a place there, focuses the editor and shows the selection, for example the caption that a slash command inserted.
+   * @param from - The start of the range in the text of the file.
+   * @param to - The end of the range; the default is the start.
+   * @returns Whether the editor found the range.
+   */
+  selectText(from: number, to = from): boolean {
+    if (!this.source || this.tiptap.isDestroyed) {
+      return false;
+    }
+    const { text } = this.codec.rebased(this.tiptap.state.doc, this.source);
+    const ranges = this.blockRanges();
+    const index = ranges.findIndex((range) => range.from <= from && to <= range.to);
+    const found = index < 0 ? undefined : this.lineRange(text, { ...ranges[index], index }, { id: '', from, to, text: '' });
+    if (!found) {
+      return false;
+    }
+    const { state } = this.tiptap;
+    this.tiptap.view.dispatch(state.tr.setSelection(PmTextSelection.create(state.doc, found.from, found.to)).scrollIntoView());
+    this.tiptap.view.focus();
     return true;
   }
 

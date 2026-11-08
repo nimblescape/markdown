@@ -97,7 +97,7 @@ works in the renderer and in the editor.
 | `toMarkdown` | How a changed node or mark is written |
 | `commands` | Commands by name; the full name of a command is `plugin.command` |
 | `keys` | A key for a command of the plugin, for example `Mod-Alt-m` |
-| `menus` | The items of the insert menu and of the slash commands, the buttons of the format bar, the items of the block menu and of the table menu |
+| `menus` | The items of the insert menu and of the slash commands, the buttons of the format bar, the items of the block menu and of the table menu. An item names its slash command (`slash`), and marks a command on selected text (`selection`), which only the slash commands offer, after a slash typed on selected text ([R-GEN-003](editor.md#r-gen-003)); `slashSelection` gives a plugin that text while the list is open. An item of the insert menu with the id of an item of the editor takes its place, or hides it (`hidden`) |
 | `frontMatterSchema`, `frontMatterInputs` | The schema of the front matter and the inputs of keys ([R-FM-004](editor.md#r-fm-004), [R-FM-006](editor.md#r-fm-006)); the schema of the integrating code comes first |
 | `generated` | The generated parts of a document, which are read-only ([R-EDIT-011](editor.md#r-edit-011)) |
 | `threads` | The threads of a document and the function that fills the panel of a thread ([R-GEN-014](editor.md#r-gen-014)) |
@@ -113,7 +113,11 @@ plugin. The refresh also asks the plugins again for the schema
 of the front matter, for example after the part of a plugin on the platform
 sent the schema of the layout of a paper. The API of the editor
 also takes proposed changes of the text, which the editor shows as tracked
-changes ([R-AI-006](ai.md#r-ai-006)). A transaction that takes a change of the text from outside has the
+changes ([R-AI-006](ai.md#r-ai-006)). It changes the text of the file as a change of the user, in
+one step of Undo, by patches with places of the text of the file
+(`changeText`), and selects a range of the text of a paragraph or a heading
+(`selectText`), for example for a slash command whose part on the platform
+finds the new text, as `/figure` of Notes. A transaction that takes a change of the text from outside has the
 meta `outsideChange`, so that a plugin that guards its parts against the
 edits of the user, for example the notes of Notes, lets such a change pass.
 A plugin whose syntax changes, for example after new data from its part on
@@ -157,7 +161,10 @@ of answers beside a block, "Add Note", and the buttons Comment and Reaction
 and the removal of the notes from the output to the renderer. It marks the
 parts that it generates as read-only ([R-EDIT-011](editor.md#r-edit-011)):
 the numbers in captions, the text of references (`/ref`), and the code and
-the cite of listings. It hides the anchors of the captions and the headings
+the cite of listings. It adds the slash commands of its text editor, with the
+same names and results: `/note`, `/todo`, `/footnote`, `/figure`, `/table`,
+`/listing`, `/ref`, `/date`, `/time` and `/user`
+([R-EDIT-008](https://github.com/nimblescape/markdownnotes-vscode/blob/main/docs/requirements.md#r-edit-008) of Markdown Notes). It hides the anchors of the captions and the headings
 and the comments of the listings. The libraries show the values of the
 front matter in the text ([R-FM-007](editor.md#r-fm-007)); Notes inserts
 them with `/ref`, and its formatter writes their current values. Notes integrates the AI chat as notes
@@ -171,7 +178,7 @@ them with `/ref`, and its formatter writes their current values. Notes integrate
 layout, and `layout` and `repos` read-only with Ctrl+click (Cmd+click on
 macOS) to the clone
 ([R-FM-006](editor.md#r-fm-006)). It adds citations: `/cite` with Zotero,
-`/research`, the hidden comment of the sources, and the hidden codes of the
+`/research` on selected text, as in the text editor, the hidden comment of the sources, and the hidden codes of the
 special sections. It adds the generated lists, the layouts, the pages and
 the PDF through the layout ([R-LAYOUT-001](rendering.md#r-layout-001)), and
 the prompt protocol through the history

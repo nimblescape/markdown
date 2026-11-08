@@ -118,6 +118,33 @@ and redo, the text style and the list of the block of the cursor, the
 insert menu, find and replace, and the switch of read-only mode. Ctrl+F opens find and replace; Alt+Up and
 Alt+Down move the block of the cursor (Cmd in place of Ctrl on macOS).
 
+The slash commands have the same names and the same results as the slash
+commands of the text editor of the platform, for example of the clean
+editing view of Markdown Notes
+([decision 79](https://github.com/nimblescape/markdownnotes-vscode/blob/main/docs/requirements.md#decisions)).
+The list shows the name of each item at its right, and the typed name finds
+the item of that name first:
+
+| Name | Item |
+| --- | --- |
+| `/text` | Text (paragraph) |
+| `/h1` to `/h6` | Heading 1 to 6 |
+| `/bullets`, `/numbers`, `/tasks` | Bulleted list, numbered list, task list |
+| `/quote`, `/code` | Quote, code block |
+| `/table`, `/divider`, `/image` | Table, divider, image |
+| `/alert` | The GitHub alerts Note, Tip, Important, Warning and Caution |
+| `/footnote` | Footnote |
+
+A plugin adds its own slash commands, and an item of a plugin with the id
+of an item of the editor takes its place, for example a table with its
+caption ([R-PLUGIN-001](plugins.md#r-plugin-001)). A command on selected
+text, for example adding a note, shows only after a slash typed on selected
+text: the slash goes after the text, which stays and stays marked while the
+list is open, and the command gets the text selected again. The other items
+show only without selected text, and the other menus have no commands on
+selected text. Without commands on selected text, a slash replaces selected
+text as any typed character does.
+
 ### R-EDIT-007
 
 **The format bar.** A format bar must show over selected text, with these

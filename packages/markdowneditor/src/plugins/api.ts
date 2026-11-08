@@ -16,7 +16,7 @@ import type { AnyExtension, Editor } from '@tiptap/core';
 import type { Node } from '@tiptap/pm/model';
 import type { ParseSpec } from 'prosemirror-markdown';
 import { renderParts, type MarkdownItExtension, type RenderFunction, type RenderPlugin } from '@nimblescape/markdownrender';
-import type { JsonSchema } from '@nimblescape/markdowntext';
+import type { JsonSchema, TextPatch } from '@nimblescape/markdowntext';
 import type { Writers } from '../markdown/serialize';
 import type { FormatButton } from '../ui/formatBar';
 import type { FrontMatterInput } from '../ui/frontMatterForm';
@@ -135,6 +135,17 @@ export interface PluginEditor {
    * of the level "render" knows; only the top-level blocks whose node changes change, and the text stays the same.
    */
   reparse(): void;
+  /**
+   * changeText changes the text of the file as a change of the user, as one step of Undo, for example for a slash
+   * command whose platform finds the new text. The patches have the places of the current text of the file, in their
+   * order, and do not overlap. It returns whether the text changed.
+   */
+  changeText(patches: readonly TextPatch[]): boolean;
+  /**
+   * selectText selects a range of the text of the file inside the text of one paragraph or heading, or puts the cursor
+   * at a place there, and focuses the editor. It returns whether the editor found the range.
+   */
+  selectText(from: number, to?: number): boolean;
   /**
    * proposeChange shows a change of the text of the file as a tracked change with "Accept" and "Reject" (R-AI-006), for
    * example a change of the AI; the result says how the proposal ended.

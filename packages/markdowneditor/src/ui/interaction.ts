@@ -114,7 +114,7 @@ export class Interaction {
   extension(): Extension {
     // The functions are arrow functions, so that `this` is the interaction and not the context of Tiptap.
     const plugins = () => [
-      slashPlugin({ menu: this.menu, items: () => this.insertItems() }),
+      slashPlugin({ menu: this.menu, items: () => this.insertItems(true) }),
       findPlugin(),
       alertsPlugin(),
       tablesPlugin(),
@@ -315,12 +315,23 @@ export class Interaction {
     return true;
   }
 
-  private insertItems(): MenuItem[] {
+  /**
+   * insertItems returns the items of the insert menu and of the plugins. An item of a plugin with the id of an item of
+   * the editor takes its place, for example a table with its caption, or hides it; the other items of the plugins
+   * follow. Only the slash commands get the commands on selected text.
+   * @param slash - true for the slash commands.
+   */
+  private insertItems(slash = false): MenuItem[] {
     const editor = this.editor;
     if (!editor) {
       return [];
     }
-    return [...insertItems(editor, (label, value) => this.ask(label, value)), ...(this.options.insertItems?.(editor) ?? [])];
+    const added = this.options.insertItems?.(editor) ?? [];
+    const byId = new Map(added.map((item) => [item.id, item]));
+    const own = insertItems(editor, (label, value) => this.ask(label, value));
+    const replaced = new Set(own.filter((item) => byId.has(item.id)).map((item) => item.id));
+    const items = [...own.map((item) => byId.get(item.id) ?? item), ...added.filter((item) => !replaced.has(item.id))].filter((item) => item.hidden !== true);
+    return slash ? items : items.filter((item) => item.selection !== true);
   }
 
   private update(view: EditorView): void {
