@@ -31,7 +31,10 @@
 //   measured, and the browser moved this line and, for the widows of the paragraph, the line before it into the next
 //   column. The handler breaks such a word at its soft hyphen. After Paged.js has made a page, the handler measures the
 //   page again, as Paged.js does; while text still lies outside the page, it breaks the page before that text, at the
-//   last place where a line can break, and the next page starts there. Then the last lines get their spaces.
+//   last place where a line can break, and the next page starts there. Then the last lines get their spaces. The
+//   next page starts at the place of the break in the text of the content that the text on the page copies: Paged.js
+//   searched that text by its characters, and in an element with a repeated text, such as "). " after each citation,
+//   it found an earlier one, so that the next page showed a part of the page before once more.
 //
 // - The functions of the plugins in the page (src/pageRenders.ts). A page without `hold` fills each placeholder of the
 //   text whose kind has a function of `addRender` after the page has loaded, with the data of its slot from the element
@@ -129,12 +132,90 @@
   }
 
   /**
+   * The break token of an overflow that starts in a text of a page, with the text of the content that this text copies,
+   * or undefined when the token of Paged.js is right or the text is not known. Paged.js finds that text of the content
+   * as the first text of the element whose characters hold the characters of the text on the page, and the place in it
+   * as the first place of these characters. Texts that repeat in an element, such as "). " after each citation, then
+   * gave the place of an earlier text, and the next page showed a part of the page before once more.
+   * @param texts - The texts of the content of the texts of the pages, with the place where each starts in it.
+   * @param token - The break token of Paged.js.
+   * @param overflow - The range of the overflow, from its start to the end of the page.
+   */
+  function sourceToken(texts, token, overflow) {
+    if (!token || !overflow) {
+      return undefined;
+    }
+    let text = overflow.startContainer;
+    let offset = overflow.startOffset;
+    // A text that lies outside the page as a whole is the child of the element where the overflow starts.
+    if (text.nodeType !== Node.TEXT_NODE) {
+      text = text.childNodes[offset];
+      offset = 0;
+    }
+    const place = text && text.nodeType === Node.TEXT_NODE ? texts.get(text) : undefined;
+    if (!place) {
+      return undefined;
+    }
+    const start = place.start + offset;
+    // Paged.js lets the next page start at the element of a text that is the first child of the element.
+    const parent = place.node.parentNode;
+    if (start === 0 && parent && parent.firstChild === place.node && token.node === parent && !token.offset) {
+      return undefined;
+    }
+    return token.node === place.node && token.offset === start ? undefined : new token.constructor(place.node, start);
+  }
+
+  /** The reference of Paged.js of the element of a text, which the copy of the element on a page has as well. */
+  function refOf(text) {
+    return text.parentElement ? text.parentElement.getAttribute('data-ref') : null;
+  }
+
+  /**
+   * Notes for each text of a part of a page the text of the content that it copies, for sourceToken. Paged.js copies a
+   * paragraph with all its texts, and the first text on a page alone, which can be the end of a text of the content.
+   * @param texts - The texts of the content of the texts of the pages, with the place where each starts in it.
+   * @param clone - The element or the text on the page.
+   * @param node - The element or the text of the content.
+   */
+  function noteTexts(texts, clone, node) {
+    if (!clone || !node) {
+      return;
+    }
+    if (clone.nodeType === Node.TEXT_NODE && node.nodeType === Node.TEXT_NODE) {
+      texts.set(clone, { node, start: Math.max(0, node.data.length - clone.data.length) });
+      return;
+    }
+    if (clone.nodeType !== Node.ELEMENT_NODE || node.nodeType !== Node.ELEMENT_NODE) {
+      return;
+    }
+    const originals = [];
+    const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
+    for (let original = walker.nextNode(); original; original = walker.nextNode()) {
+      originals.push(original);
+    }
+    const copies = document.createTreeWalker(clone, NodeFilter.SHOW_TEXT);
+    let next = 0;
+    for (let copy = copies.nextNode(); copy && next < originals.length; copy = copies.nextNode()) {
+      // Other handlers can change the copy, such as the one of the notes at the foot of the page.
+      let index = next;
+      while (index < originals.length && !(originals[index].data === copy.data && refOf(originals[index]) === refOf(copy))) {
+        index++;
+      }
+      if (index < originals.length) {
+        texts.set(copy, { node: originals[index], start: 0 });
+        next = index + 1;
+      }
+    }
+  }
+
+  /**
    * Breaks a page before the text that lies outside it, as Paged.js breaks a page, and lets the next page start there.
    * The text outside the page is in the next column of the text, which does not show.
    * @param page - The page of Paged.js.
    * @param source - The content of Paged.js, from which it makes the pages.
+   * @param texts - The texts of the content of the texts of the pages (sourceToken).
    */
-  function fitPage(page, source) {
+  function fitPage(page, source, texts) {
     const layout = page && page.layoutMethod;
     const rendered = page && page.wrapper;
     const token = page && page.endToken;
@@ -150,7 +231,8 @@
       }
       removeHyphen(rendered, hyphen);
       const overflow = atLineBreak(found);
-      const next = layout.createBreakToken(overflow, rendered, source);
+      const made = layout.createBreakToken(overflow, rendered, source);
+      const next = sourceToken(texts, made, overflow) || made;
       // A page breaks after some text, else the next page would start where this one does.
       if (!next || !next.node || (page.startToken && next.equals(page.startToken))) {
         return;
@@ -373,12 +455,26 @@
         }
       }
       class PageEnds extends window.Paged.Handler {
+        constructor(chunker, polisher, caller) {
+          super(chunker, polisher, caller);
+          /** The text of the content of each text on the pages, with the place where the text starts in it. */
+          this.texts = new WeakMap();
+        }
+
+        renderNode(clone, node) {
+          noteTexts(this.texts, clone, node);
+        }
+
         onOverflow(overflow) {
           return afterSoftHyphen(overflow);
         }
 
+        onBreakToken(token, overflow) {
+          return sourceToken(this.texts, token, overflow);
+        }
+
         finalizePage(pageElement, page) {
-          fitPage(page, this.chunker && this.chunker.source);
+          fitPage(page, this.chunker && this.chunker.source, this.texts);
           naturalLastLines(pageElement, splitRefs(page));
         }
       }

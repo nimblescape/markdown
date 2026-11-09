@@ -253,8 +253,10 @@ the page at one of its soft hyphens, with a hyphen, and the next page starts
 with the rest of the word. After Paged.js has made a page, the script of the
 layout measures the page again: text that still lies outside the page goes
 to the next page, from the last place before it where a line can break. The
-last line on a page of a paragraph that goes on on the next page stays
-justified.
+next page starts at exactly this place of the text, also in a paragraph with
+a text that repeats, such as "). " after each citation, so no text shows
+twice. The last line on a page of a paragraph that goes on on the next page
+stays justified.
 
 **The functions of the plugins in the PDF.** In the page of the
 PDF, no integrating code fills the placeholders of the plugins, as the view
