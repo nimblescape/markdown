@@ -54,12 +54,18 @@ export interface PluginMenus {
 /**
  * GeneratedPart is a part of the document that a plugin generates, for example the text of a citation (R-EDIT-011).
  * The user cannot type in it, delete a piece of it or paste into it; the cursor jumps over it, and the user deletes it
- * only as a whole, in one step of Undo.
+ * only as a whole, in one step of Undo. A locked part the user cannot delete at all.
  */
 export interface GeneratedPart {
   /** from and to are the positions of the part in the document. */
   readonly from: number;
   readonly to: number;
+  /**
+   * locked keeps the part also from a deletion as a whole, for example an entry of the reference list or a generated
+   * list, which the plugin writes from other places of the document: an edit of the user that holds the part, also
+   * with text around it, changes nothing.
+   */
+  readonly locked?: boolean;
   /**
    * open goes to the target of the part, for example the entry of a reference, on Ctrl+click (Cmd+click on macOS). The
    * cursor stands at the part then, so a jump with `jumpTo` of the editor starts there.

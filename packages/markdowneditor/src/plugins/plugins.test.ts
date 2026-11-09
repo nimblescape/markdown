@@ -614,6 +614,56 @@ describe('the generated parts', () => {
     expect(editor.getMarkdown()).toBe('Before\n\nxAfter\n');
   });
 
+  it('keep a locked part also from a deletion as a whole, with Backspace and Delete, and with Replace', () => {
+    // Each paragraph that starts with "Entry" is a locked part, as an entry of the reference list.
+    const entries: MarkdownPlugin = {
+      name: 'entries',
+      apiVersion: 1,
+      generated: (doc) => {
+        const parts: GeneratedPart[] = [];
+        doc.forEach((node, offset) => {
+          if (node.textContent.startsWith('Entry')) {
+            parts.push({ from: offset, to: offset + node.nodeSize, locked: true });
+          }
+        });
+        return parts;
+      },
+    };
+    const list = 'Before\n\nEntry one.\n\nEntry two.\n\nEntry three.\n\nAfter\n';
+    const editor = open(list, [entries]);
+    const view = viewOf(editor);
+    const doc = view.state.doc;
+    const start = doc.child(0).nodeSize;
+    const end = doc.content.size - doc.child(4).nodeSize;
+    // A selection over the empty lines between the entries, the whole entries, and the text around them.
+    view.dispatch(view.state.tr.delete(start, end));
+    view.dispatch(view.state.tr.delete(start + 3, end - 3));
+    view.dispatch(view.state.tr.delete(2, end + 2));
+    view.dispatch(view.state.tr.delete(0, view.state.doc.content.size));
+    view.dispatch(view.state.tr.insertText('x', 2, end + 2));
+    expect(editor.getMarkdown()).toBe(list);
+    // Backspace at the start of the text after an entry and Delete at the end of the text before it change nothing.
+    select(editor, end + 1);
+    expect(key(editor, 'Backspace')).toBe(true);
+    select(editor, start - 1);
+    expect(key(editor, 'Delete')).toBe(true);
+    expect(editor.getMarkdown()).toBe(list);
+    // An empty paragraph after an entry goes with Backspace, and the entry stays.
+    select(editor, end + 1);
+    view.dispatch(view.state.tr.split(end + 1));
+    expect(view.state.doc.childCount).toBe(6);
+    select(editor, end + 1);
+    expect(key(editor, 'Backspace')).toBe(true);
+    expect(editor.getMarkdown()).toBe(list);
+    // Replace leaves a match in an entry.
+    setFind(view, 'Entry', false);
+    expect(replaceAll(view, 'Item')).toBe(0);
+    expect(editor.getMarkdown()).toBe(list);
+    // A change from outside and a write of the plugin may change it.
+    view.dispatch(view.state.tr.delete(start, end).setMeta(generatedWrite, true));
+    expect(editor.getMarkdown()).toBe('Before\n\nAfter\n');
+  });
+
   it('come again after refreshPlugins, when the data of the plugin changed', () => {
     let active = false;
     const plugin: MarkdownPlugin = { name: 'switch', apiVersion: 1, generated: (doc) => (active ? [{ from: 1, to: doc.child(0).nodeSize - 1 }] : []) };

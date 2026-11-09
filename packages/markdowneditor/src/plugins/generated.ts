@@ -7,9 +7,11 @@
 // format a piece of it: the editor drops such a change. The cursor jumps over a part, a selection that touches a part
 // holds the whole part, and Backspace and Delete next to a part delete the whole part in one step of Undo. Text typed at
 // the edge of a part does not take the marks of the part. A part can hold whole blocks, for example the code block of a
-// listing: the cursor then stays in the text before or after it. Ctrl+click (Cmd+click on macOS) on a part goes to its
-// target, and a double click opens its form, when the plugin gives them. Changes from outside, Undo and Redo, and the
-// writes of the plugins, with the meta `generatedWrite`, may change a part.
+// listing: the cursor then stays in the text before or after it. A locked part, for example an entry of the reference
+// list, the user cannot delete at all: the editor drops every change of the user that holds it, also with text around
+// it, and Backspace and Delete next to it delete only an empty textblock at the cursor. Ctrl+click (Cmd+click on macOS)
+// on a part goes to its target, and a double click opens its form, when the plugin gives them. Changes from outside,
+// Undo and Redo, and the writes of the plugins, with the meta `generatedWrite`, may change a part.
 
 import { isHistoryTransaction } from '@tiptap/pm/history';
 import type { Node } from '@tiptap/pm/model';
@@ -47,15 +49,20 @@ interface Range {
   readonly to: number;
 }
 
+/** PartRange is the range of a generated part, and whether the part is locked. */
+interface PartRange extends Range {
+  readonly locked?: boolean;
+}
+
 /**
  * breaks returns true when a change of a range touches a part without the whole part: an insert inside the part, or a
- * replacement that holds a piece of the part.
+ * replacement that holds a piece of the part. A change that holds a locked part, also the whole part, breaks it.
  */
-export function breaks(change: Range, part: Range): boolean {
+export function breaks(change: Range, part: PartRange): boolean {
   if (change.from === change.to) {
     return part.from < change.from && change.from < part.to;
   }
-  return change.from < part.to && change.to > part.from && !(change.from <= part.from && change.to >= part.to);
+  return change.from < part.to && change.to > part.from && (part.locked === true || !(change.from <= part.from && change.to >= part.to));
 }
 
 /** changesOf returns the ranges of a step in the document before the step. */
@@ -72,8 +79,8 @@ function changesOf(step: unknown, map: StepMap): Range[] {
 }
 
 /** mapParts returns the parts after a change, without the parts that the change removed. */
-function mapParts(parts: readonly Range[], mapping: Mapping | StepMap): Range[] {
-  return parts.map((part) => ({ from: mapping.map(part.from, 1), to: mapping.map(part.to, -1) })).filter((part) => part.from < part.to);
+function mapParts(parts: readonly PartRange[], mapping: Mapping | StepMap): PartRange[] {
+  return parts.map((part) => ({ from: mapping.map(part.from, 1), to: mapping.map(part.to, -1), locked: part.locked })).filter((part) => part.from < part.to);
 }
 
 /**
@@ -81,11 +88,11 @@ function mapParts(parts: readonly Range[], mapping: Mapping | StepMap): Range[] 
  * @param tr - The transaction.
  * @param parts - The parts of the document before the transaction.
  */
-export function keepsParts(tr: Transaction, parts: readonly Range[]): boolean {
+export function keepsParts(tr: Transaction, parts: readonly PartRange[]): boolean {
   if (!tr.docChanged || parts.length === 0 || tr.getMeta(outsideChange) || tr.getMeta(generatedWrite) || isHistoryTransaction(tr)) {
     return true;
   }
-  let current: Range[] = [...parts];
+  let current: PartRange[] = [...parts];
   for (const [index, step] of tr.steps.entries()) {
     const map = tr.mapping.maps[index];
     if (changesOf(step, map).some((change) => current.some((part) => breaks(change, part)))) {
@@ -161,8 +168,8 @@ function outsideParts(state: EditorState, before: number, parts: readonly Genera
 /**
  * deleteNext deletes the whole part next to the cursor, for Backspace before the cursor and for Delete after it. A part
  * that holds whole blocks is next to the cursor at the start of the textblock after it and at the end of the textblock
- * before it.
- * @returns true when it deleted a part.
+ * before it. Next to a locked part, the key deletes only the textblock of the cursor when it is empty, and else nothing.
+ * @returns true when it used the key.
  */
 function deleteNext(view: EditorView, parts: readonly GeneratedPart[], backward: boolean): boolean {
   const { selection } = view.state;
@@ -175,6 +182,14 @@ function deleteNext(view: EditorView, parts: readonly GeneratedPart[], backward:
   const part = parts.find((each) => (backward ? each.to === head || each.to === block : each.from === head || each.from === block));
   if (!part) {
     return false;
+  }
+  if (part.locked) {
+    if (atEdge && $head.parent.content.size === 0 && $head.node(-1).childCount > 1) {
+      const tr = view.state.tr.delete($head.before(), $head.after());
+      const near = Selection.findFrom(tr.doc.resolve(Math.min($head.before(), tr.doc.content.size)), backward ? 1 : -1, true) ?? Selection.near(tr.doc.resolve(Math.min($head.before(), tr.doc.content.size)));
+      view.dispatch(tr.setSelection(near).scrollIntoView());
+    }
+    return true;
   }
   view.dispatch(view.state.tr.delete(part.from, part.to).scrollIntoView());
   return true;
