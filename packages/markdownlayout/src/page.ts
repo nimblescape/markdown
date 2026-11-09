@@ -370,8 +370,8 @@ export function compose(loaded: LoadedLayout, values: Readonly<Record<string, st
 /** baseCss is the style sheet of the layout part before the style sheets of the layout: only the rules without which a
  * part of the layout does not work in Paged.js. A footnote goes to the foot of its page with its number in the text,
  * the generated lists show the page of each entry, the number of a line of a listing shows, and the comments of the
- * tables of the editor show (docs/editor.md, R-EDIT-010). A link has the color of the text without a mark, and a long
- * address breaks at the end of a line. The code blocks have the syntax colors of the editor (docs/rendering.md,
+ * tables of the editor show (docs/editor.md, R-EDIT-010). A link has the color of the text without a mark, a long
+ * address breaks at the end of a line, and a reference to a place in a source stays on one line. The code blocks have the syntax colors of the editor (docs/rendering.md,
  * R-REN-001), with the colors of its light theme as the defaults of the variables --nsmd-syntax-*. A layout changes the
  * look of each of them with its own rules, and decides whether a template is a page of its own. */
 export const baseCss = `.footnote {
@@ -383,6 +383,10 @@ a {
 }
 .link-address {
   overflow-wrap: anywhere;
+}
+/* A reference to a place in a source, such as "S. 18 – 19", and a range of numbers stay on one line (keepReferences). */
+.nsmd-nowrap {
+  white-space: nowrap;
 }
 /* Paged.js sets the number of a footnote in the text with font-variant-position, which most fonts do not have. */
 [data-footnote-call]::after {

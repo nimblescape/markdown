@@ -26,7 +26,9 @@ The first version of the packages.
   plugin API.
 - `@nimblescape/markdownlayout`: layouts with the schema of their front
   matter, the pages of a document with Paged.js, and the PDF in Node.js; the
-  page runs only its own scripts and loads nothing from the internet.
+  page runs only its own scripts and loads nothing from the internet. No text
+  is lost or shows twice at a page break, and a reference to a place in a
+  source, such as "S. 18 – 19", stays on one line.
 - `@nimblescape/markdownai`: the provider API of an AI, the context of the
   document, the tool of the proposed changes and the loop of a chat, without
   a provider of its own.
