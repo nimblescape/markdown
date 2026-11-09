@@ -312,6 +312,18 @@ cursor then stays in the text before or after it, and Backspace at the start
 of the text after it and Delete at the end of the text before it delete the
 whole part.
 
+A plugin may mark a generated part as locked, for example an entry of the
+reference list or a generated list, which it writes from other places of
+the document. The user cannot delete a locked part at all, also not as a
+whole: the editor drops each change of the user that holds a piece of it or
+the whole part, also with text around it, for example a selection over
+several entries and the empty lines between them. Backspace and Delete next
+to a locked part delete only an empty textblock at the cursor. The text
+editor of Markdown Notes that keeps the format of the file keeps the same
+parts locked
+([R-TEXT-009](https://github.com/nimblescape/markdownnotes-vscode/blob/main/docs/requirements.md#r-text-009)
+of Markdown Notes).
+
 ### R-EDIT-012
 
 **Rendered changes.** The editor must show the changes of its text against
