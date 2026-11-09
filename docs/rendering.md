@@ -212,7 +212,12 @@ the captions of figures, tables and listings keep the numbers of the file
 and get the next number otherwise, with the letter of the appendix in the
 appendix part; the special section of a list shows the list; a link whose
 text is a word and a number gets the label of its target; and the text gets
-soft hyphens by the language of the layout. The headings keep the IDs that
+soft hyphens by the language of the layout. A reference to a place in a
+source, such as "S. 18 – 19", "Kap. 2" or "§ 8", and a range of numbers
+with a dash, such as "2015 – 2023", stay on one line: the browser would
+break a line after "S." when an ordinary space follows it, and after the
+dash of a range also between no-break spaces. Their text stays the same for
+search and copy in the PDF. The headings keep the IDs that
 GitHub gives them. The classes, the IDs and the event `paper-rendered` are
 those of the layout folder format of Paper, so that the layouts of Paper
 work without a change. The removal of the notes is a plugin of Markdown
@@ -240,6 +245,16 @@ part downloads no browser. The PDF then loses the marks of the soft hyphens,
 so that search and copy find whole words, and gets the title, the author,
 the subtitle as its subject and the language of the layout in its metadata.
 The code is the PDF code of nimblescape Markdown Paper.
+
+**No text lost at a page break.** Every line of the text shows on a
+page, in the PDF and in the view of the pages. Paged.js breaks a page before
+the first glyph that does not fit on it. A word in which a page breaks ends
+the page at one of its soft hyphens, with a hyphen, and the next page starts
+with the rest of the word. After Paged.js has made a page, the script of the
+layout measures the page again: text that still lies outside the page goes
+to the next page, from the last place before it where a line can break. The
+last line on a page of a paragraph that goes on on the next page stays
+justified.
 
 **The functions of the plugins in the PDF.** In the page of the
 PDF, no integrating code fills the placeholders of the plugins, as the view

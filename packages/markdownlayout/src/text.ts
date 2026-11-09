@@ -45,6 +45,7 @@ import { footnoteHtml, placeFootnotes, type FootnoteMeta } from './footnotes';
 import { type Layout, type Problem, type SectionCode, sectionCodes, type Terms } from './format';
 import { hyphenateHtml } from './hyphenate';
 import { type Entry, type GeneratedList, generatedLists, listHtml } from './lists';
+import { keepReferences } from './nowrap';
 import { escapeHtml } from './template';
 import { decodedTarget, footnoteType, internalLinks, layoutHtml, layoutHtmlType, listType, plainText, trailingAnchor, withoutTrailingSpace, type InternalLink } from './tokens';
 
@@ -633,7 +634,8 @@ export interface LayoutText extends TextFound {
 }
 
 /**
- * renderText returns the HTML of the text of a document in its layout, with soft hyphens when the layout asks for them.
+ * renderText returns the HTML of the text of a document in its layout, with soft hyphens when the layout asks for them,
+ * and with each reference to a place in a source and each range of numbers on one line (keepReferences).
  * @param renderer - The renderer, from createLayoutRenderer.
  * @param text - The text of the file; the renderer leaves its front matter out.
  * @param layout - The layout of the document.
@@ -643,5 +645,6 @@ export interface LayoutText extends TextFound {
 export function renderText(renderer: MarkdownRenderer, text: string, layout: Layout, hyphenate?: (text: string) => string, env: Readonly<Record<string, unknown>> = {}): LayoutText {
   const found = emptyFound();
   const rendering = renderer.toHtml(text, { ...env, [layoutEnvKey]: { layout, found } satisfies LayoutEnv });
-  return { ...found, html: hyphenate ? hyphenateHtml(rendering.html, hyphenate) : rendering.html, slots: rendering.slots };
+  const html = keepReferences(rendering.html);
+  return { ...found, html: hyphenate ? hyphenateHtml(html, hyphenate) : html, slots: rendering.slots };
 }

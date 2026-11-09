@@ -21,7 +21,17 @@
 //   narrow spaces and then widens the spaces of each full line to the width of the text. The last line of a paragraph
 //   is not justified, so it would keep the narrow spaces, which Word does not do. After Paged.js has made a page, the
 //   handler gives the last line of each such paragraph that ends on the page its natural spaces again, or narrows them
-//   only as far as the line needs to fit, and leaves the paragraph as it was when the change would add a line.
+//   only as far as the line needs to fit, and leaves the paragraph as it was when the change would add a line. The
+//   paragraph in which the page breaks does not end on the page: its last line on the page stays justified.
+// - No text is lost at a page break. Paged.js lays the text out in a column as high as the page and breaks the page
+//   before the first glyph that the browser puts into the next column; a column beside the page does not show. The
+//   browser gives the first glyph after a line break at a soft hyphen the rectangle of the line before, so Paged.js
+//   took that glyph for the last one on the page and broke the word one glyph after the soft hyphen, with its own
+//   hyphen after that glyph: "Fließb-" for "Fließ-band". The page then needed one more line than Paged.js had
+//   measured, and the browser moved this line and, for the widows of the paragraph, the line before it into the next
+//   column. The handler breaks such a word at its soft hyphen. After Paged.js has made a page, the handler measures the
+//   page again, as Paged.js does; while text still lies outside the page, it breaks the page before that text, at the
+//   last place where a line can break, and the next page starts there. Then the last lines get their spaces.
 //
 // - The functions of the plugins in the page (src/pageRenders.ts). A page without `hold` fills each placeholder of the
 //   text whose kind has a function of `addRender` after the page has loaded, with the data of its slot from the element
@@ -39,12 +49,136 @@
     return walker.nextNode();
   }
 
-  /** Gives the last lines of the justified paragraphs with shrinking spaces of a page their natural spaces. */
-  function naturalLastLines(page) {
+  /** A character that shows no glyph and where a line can break: white space or a soft hyphen. */
+  const noGlyph = /[\s\u00ad]/;
+
+  /**
+   * The references (`data-ref`) of the elements that the break at the end of a page splits: the parents of the place of
+   * the break in the content of Paged.js. Paged.js marks the part of such an element on the page with `data-split-to`
+   * only when it makes the next page.
+   * @param page - The page of Paged.js.
+   */
+  function splitRefs(page) {
+    const refs = new Set();
+    const token = page && page.endToken;
+    for (let element = token && token.node ? token.node.parentElement : null; element; element = element.parentElement) {
+      if (element.dataset && element.dataset.ref) {
+        refs.add(element.dataset.ref);
+      }
+    }
+    return refs;
+  }
+
+  /**
+   * The overflow of a page that starts after the soft hyphen where the browser breaks the line, or undefined when the
+   * overflow does not start one glyph after a soft hyphen. The browser gives the first glyph after a line break at a
+   * soft hyphen the rectangle of the line before, so Paged.js takes that glyph for the last one that fits.
+   * @param overflow - The range of the overflow that Paged.js found, from its start to the end of the page.
+   */
+  function afterSoftHyphen(overflow) {
+    if (!overflow) {
+      return undefined;
+    }
+    const node = overflow.startContainer;
+    const offset = overflow.startOffset;
+    if (node.nodeType !== Node.TEXT_NODE || offset < 2 || node.data[offset - 2] !== '\u00ad' || noGlyph.test(node.data[offset - 1])) {
+      return undefined;
+    }
+    const moved = overflow.cloneRange();
+    moved.setStart(node, offset - 1);
+    return moved;
+  }
+
+  /**
+   * The overflow of a page that starts at the last place before its start where a line can break, when it starts inside
+   * a word: after the white space or the soft hyphen before the word in the same text node. Else the overflow itself.
+   * @param overflow - The range of the overflow, from its start to the end of the page.
+   */
+  function atLineBreak(overflow) {
+    const node = overflow.startContainer;
+    const offset = overflow.startOffset;
+    // The end of a text node is inside a word when only the hyphen of Paged.js after it lay outside the page.
+    if (node.nodeType !== Node.TEXT_NODE || offset === 0 || noGlyph.test(node.data[offset - 1]) || (offset < node.data.length && noGlyph.test(node.data[offset]))) {
+      return overflow;
+    }
+    let start = offset - 1;
+    while (start > 0 && !noGlyph.test(node.data[start - 1])) {
+      start--;
+    }
+    if (start === 0) {
+      return overflow;
+    }
+    const moved = overflow.cloneRange();
+    moved.setStart(node, start);
+    return moved;
+  }
+
+  /**
+   * Takes the hyphen away that Paged.js added after the last text of a page, where it broke a word, so that the text of
+   * the page is again a part of the text of the content.
+   * @param rendered - The element of the text of the page.
+   * @param hyphen - The hyphen of Paged.js.
+   */
+  function removeHyphen(rendered, hyphen) {
+    const walker = document.createTreeWalker(rendered, NodeFilter.SHOW_TEXT);
+    const last = walker.lastChild();
+    if (last && last.parentElement && last.parentElement.classList.contains('pagedjs_hyphen') && last.data.endsWith(hyphen)) {
+      last.data = last.data.slice(0, last.data.length - hyphen.length);
+      last.parentElement.classList.remove('pagedjs_hyphen');
+    }
+  }
+
+  /**
+   * Breaks a page before the text that lies outside it, as Paged.js breaks a page, and lets the next page start there.
+   * The text outside the page is in the next column of the text, which does not show.
+   * @param page - The page of Paged.js.
+   * @param source - The content of Paged.js, from which it makes the pages.
+   */
+  function fitPage(page, source) {
+    const layout = page && page.layoutMethod;
+    const rendered = page && page.wrapper;
+    const token = page && page.endToken;
+    if (!layout || !rendered || !source || !token || !token.node) {
+      return;
+    }
+    const hyphen = (layout.settings && layout.settings.hyphenGlyph) || '\u2011';
+    // Each round breaks the page at least one line earlier; a page with this many rounds has a problem of its own.
+    for (let round = 0; round < 20; round++) {
+      const found = layout.findOverflow(rendered, layout.bounds);
+      if (!found) {
+        return;
+      }
+      removeHyphen(rendered, hyphen);
+      const overflow = atLineBreak(found);
+      const next = layout.createBreakToken(overflow, rendered, source);
+      // A page breaks after some text, else the next page would start where this one does.
+      if (!next || !next.node || (page.startToken && next.equals(page.startToken))) {
+        return;
+      }
+      const letter = next.offset && next.node.textContent ? next.node.textContent.charAt(next.offset) : undefined;
+      const removed = layout.removeOverflow(overflow, letter);
+      // The other handlers, such as the one of the footnotes, learn which text left the page.
+      layout.hooks.afterOverflowRemoved.trigger(removed, rendered, layout);
+      token.node = next.node;
+      token.offset = next.offset;
+    }
+  }
+
+  /** The place and the height of each box of an element, which changes when the element gets or loses a line. */
+  function shapeOf(element) {
+    return Array.from(element.getClientRects(), (rect) => `${Math.round(rect.left * 2)},${Math.round(rect.top * 2)},${Math.round(rect.height * 2)}`).join(' ');
+  }
+
+  /**
+   * Gives the last lines of the justified paragraphs with shrinking spaces of a page their natural spaces.
+   * @param page - The element of the page.
+   * @param split - The references of the elements that the break at the end of the page splits (splitRefs).
+   */
+  function naturalLastLines(page, split = new Set()) {
     for (const block of page.querySelectorAll('p, li, dd, dt, td, th')) {
       const style = getComputedStyle(block);
       const shrink = parseFloat(style.wordSpacing);
-      if (!(shrink < 0) || style.textAlign !== 'justify' || style.textAlignLast === 'justify' || block.hasAttribute('data-split-to')) {
+      if (!(shrink < 0) || style.textAlign !== 'justify' || style.textAlignLast === 'justify' || block.hasAttribute('data-split-to') || split.has(block.dataset.ref)) {
         continue;
       }
       if (block.querySelector('p, div, ul, ol, table, blockquote, figure, pre')) {
@@ -102,6 +236,9 @@
       }
       // The page can be scaled: the rectangles are on the screen, the word spacing is in CSS pixels.
       const box = block.getBoundingClientRect();
+      // A box for each column of the paragraph: a line that the change adds can go into the next column of the page,
+      // where the height of all boxes together can stay the same.
+      const shape = shapeOf(block);
       const scale = block.offsetWidth > 0 ? box.width / block.offsetWidth : 1;
       const right = box.right - (parseFloat(style.paddingRight) + parseFloat(style.borderRightWidth)) * scale;
       const room = (right - last.right) / scale;
@@ -116,7 +253,7 @@
         span.appendChild(text);
         spans.push(span);
       }
-      if (Math.abs(block.getBoundingClientRect().height - box.height) > 0.5) {
+      if (shapeOf(block) !== shape) {
         for (const span of spans) {
           span.replaceWith(span.firstChild);
         }
@@ -235,12 +372,17 @@
           pageElement.style.counterSet = `page ${this.number}`;
         }
       }
-      class LastLines extends window.Paged.Handler {
-        finalizePage(page) {
-          naturalLastLines(page);
+      class PageEnds extends window.Paged.Handler {
+        onOverflow(overflow) {
+          return afterSoftHyphen(overflow);
+        }
+
+        finalizePage(pageElement, page) {
+          fitPage(page, this.chunker && this.chunker.source);
+          naturalLastLines(pageElement, splitRefs(page));
         }
       }
-      window.Paged.registerHandlers(PageNumbers, LastLines);
+      window.Paged.registerHandlers(PageNumbers, PageEnds);
     },
     /** before is the function `before` of the configuration of Paged.js: it waits until the content is complete. */
     before() {

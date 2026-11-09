@@ -35,6 +35,7 @@ export {
 export { fieldValues, type FieldValues } from './frontMatter';
 export { hyphenateHtml, hyphenatorOf, softHyphen } from './hyphenate';
 export { generatedLists, inContents, listHtml, type Entry, type GeneratedList } from './lists';
+export { keepReferences, nowrapClass } from './nowrap';
 export {
   baseCss,
   compose,
