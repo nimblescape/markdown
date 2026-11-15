@@ -72,7 +72,7 @@
     "lowlight": "^3.3.0",
     "markdown-it": "^14.3.3",
     "prosemirror-markdown": "^1.13.9",
-    "string-width": "^8.3.0"
+    "string-width": "^9.0.0"
   },
   "engines": {
     "node": ">=22"
